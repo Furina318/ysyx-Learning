@@ -13,7 +13,7 @@ all:
 sim: $(BUILD_DIR)/$(TOP_MODULE)
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
 	@echo "Write this Makefile by your self."
-	./$(BUILD_DIR)/$(EXE_NAME)
+	./$(BUILD_DIR)/$(TOP_MODULE)
 $(BUILD_DIR)/$(TOP_MODULE): $(VERILOG_SOURCES) $(CPP_SOURCES) | $(BUILD_DIR)
 	$(VERILATOR) --cc --exe --build -Wall --trace \
 		--Mdir $(BUILD_DIR) $(CPP_SOURCES) $(VERILOG_SOURCES)	
