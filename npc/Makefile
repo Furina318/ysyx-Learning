@@ -17,4 +17,10 @@ sim: $(BUILD_DIR)/$(TOP_MODULE)
 $(BUILD_DIR)/$(TOP_MODULE): $(VERILOG_SOURCES) $(CPP_SOURCES) | $(BUILD_DIR)
 	$(VERILATOR) --cc --exe --build -Wall --trace \
 		--Mdir $(BUILD_DIR) $(CPP_SOURCES) $(VERILOG_SOURCES)	
+$(BUILD_DIR):
+	mkdir -p $@
+clean:
+	rm -rf $(BUILD_DIR) $(VCD_FILE)
+.PHONY: all sim clean
+
 include ../Makefile
