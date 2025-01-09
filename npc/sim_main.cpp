@@ -16,7 +16,7 @@ int main(int argc,char** argv)
 	contextp->traceEverOn(true);//开启跟踪功能
 	top->trace(tfp,0);
 	tfp->open("wave.vcd");//设定输出文件为'wave.vcd'
-	while(!contextp->gotFinish())//使用Ctrl+C结束，或者使用contextp->time()<100来仿真一百个周期
+	while(contextp->time()<80)//使用Ctrl+C结束，contextp->time()<100/!contextp->gotFinish()
 	{
 		int a=rand() & 1;
 		int b=rand() &1;
