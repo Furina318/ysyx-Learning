@@ -13,10 +13,10 @@ int main(int argc,char** argv)
 	Vdouble_sw* top=new Vdouble_sw{contextp};
 
 	VerilatedVcdC* tfp=new VerilatedVcdC;//init VCD*
-	contextp->traceEverOn(true);// trace function begin
+	contextp->traceEverOn(true);//开启跟踪功能
 	top->trace(tfp,0);
-	tfp->open("wave.vcd");//set output file'wave.vcd'
-	while(!contextp->gotFinish())
+	tfp->open("wave.vcd");//设定输出文件为'wave.vcd'
+	while(!contextp->gotFinish())//使用Ctrl+C结束，或者使用contextp->time()<100来仿真一百个周期
 	{
 		int a=rand() & 1;
 		int b=rand() &1;
@@ -26,7 +26,7 @@ int main(int argc,char** argv)
 		printf("a = %d,b = %d,f = %d\n",a,b,top->f);
 		
 		tfp->dump(contextp->time());//dump wave
-		contextp->timeInc(1);//push simulation time
+		contextp->timeInc(1);//推进仿真时间
 		assert(top->f == (a^b));
 	}
 	delete top;
