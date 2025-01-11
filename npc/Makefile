@@ -1,6 +1,6 @@
-TOP_NAME=light
+TOP_NAME=mux241
 VERILATOR=verilator
-NXDC_FILE=constr/light.nxdc
+NXDC_FILE=constr/mux241.nxdc
 INC_PATH ?= 
 VERILATOR_CFLAGS += -MMD --build -cc \
 				-O3 --x-assign fast --x-initial fast --noassert
