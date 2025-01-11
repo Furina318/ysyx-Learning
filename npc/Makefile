@@ -1,7 +1,9 @@
-TOP_NAME=mux241
+TOP_NAME=light
 VERILATOR=verilator
-NXDC_FILE=constr/mux241.nxdc
+NXDC_FILE=constr/light.nxdc
 INC_PATH ?= 
+#CSRCS= $(abspath ./csrc/light_main.cpp)
+
 VERILATOR_CFLAGS += -MMD --build -cc \
 				-O3 --x-assign fast --x-initial fast --noassert
 
@@ -10,10 +12,8 @@ OBJ_DIR=$(BUILD_DIR)/obj_dir
 BIN=$(BUILD_DIR)/$(TOP_NAME)
 
 default:$(BIN)
-$(BUILD_DIR) $(OBJ_DIR):
-	@mkdir -p $@
-
-SRC_AUTO_BIND=$(abspath $(BUILD_DIR)/auto_bind.cpp)
+$(shell mkdir -p $(BUILD_DIR))
+SRC_AUTO_BIND = $(abspath $(BUILD_DIR)/auto_bind.cpp)
 $(SRC_AUTO_BIND):$(NXDC_FILE)
 	python3 $(NVBOARD_HOME)/scripts/auto_pin_bind.py $^ $@
 
