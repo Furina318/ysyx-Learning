@@ -1,6 +1,6 @@
-TOP_NAME=double_sw
+TOP_NAME=light
 VERILATOR=verilator
-NXDC_FILE=constr/double_sw.nxdc
+NXDC_FILE=constr/light.nxdc
 INC_PATH ?= 
 VERILATOR_CFLAGS += -MMD --build -cc \
 				-O3 --x-assign fast --x-initial fast --noassert
