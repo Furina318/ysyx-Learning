@@ -16,7 +16,7 @@ always @(posedge clk or posedge rst or posedge stop) begin
         if(stop) begin
             q[7:0]<=q[7:0];
         end
-        if(count==0) begin
+        if(count==0 && !stop) begin
             q[6:0]<=q[7:1];
             q[7]<=q[4]^q[3]^q[2]^q[0];
         end
