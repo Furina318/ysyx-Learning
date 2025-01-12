@@ -1,6 +1,6 @@
-TOP_NAME=priority83
+TOP_NAME=alu4
 VERILATOR=verilator
-NXDC_FILE=constr/priority83.nxdc
+NXDC_FILE=constr/alu4.nxdc
 INC_PATH ?= 
 #CSRCS= $(abspath ./csrc/light_main.cpp)
 
