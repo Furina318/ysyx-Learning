@@ -2,8 +2,8 @@ module lfsr_num(
     input clk,
     input rst,
     input stop,
-    output reg [6:0] num0,
-    output reg [6:0] num1
+    output reg [7:0] num0,
+    output reg [7:0] num1
 );
 reg [7:0] q;
 always @(posedge clk or posedge rst or posedge stop) begin
