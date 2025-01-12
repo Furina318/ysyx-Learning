@@ -1,3 +1,4 @@
+//生成更加复杂的伪随机数
 module lfsr_num(
     input clk,
     input rst,
@@ -5,11 +6,14 @@ module lfsr_num(
     output reg [7:0] num0,
     output reg [7:0] num1
 );
+reg [7:0] q1;
+reg [7:0] q2;
 reg [7:0] q;
 reg [31:0] count;
 always @(posedge clk or posedge rst or posedge stop) begin
     if(rst) begin
-        q[7:0]<=8'b00000001;
+        q1[7:0]<=8'b00000001;
+        q2[7:0]<=8'b00000010;
         count<=0;
     end
     else begin
@@ -17,8 +21,12 @@ always @(posedge clk or posedge rst or posedge stop) begin
             q[7:0]<=q[7:0];
         end
         if(count==0 && !stop) begin
-            q[6:0]<=q[7:1];
-            q[7]<=q[4]^q[3]^q[2]^q[0];
+            q1[6:0]<=q1[7:1];
+            q1[7]<=q1[4]^q1[3]^q1[2]^q1[0];
+            q2[6:0]<=q2[7:1];
+            q2[7]<=q2[6]^q2[5]^q2[4];
+
+            q<=q1+q2;
         end
         count<=(count>=5000000 ? 32'b0 : count+1);
     end
