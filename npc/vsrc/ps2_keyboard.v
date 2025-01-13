@@ -18,7 +18,7 @@ module ps2_keyboard(
 
     reg [7:0] rom [255:0];
     initial begin
-      rom[18]=65;//a
+      rom[28]=65;//a
       rom[50]=66;//b
       rom[33]=67;//c
       rom[35]=68;//d
