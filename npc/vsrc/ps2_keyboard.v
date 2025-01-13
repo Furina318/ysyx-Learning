@@ -105,11 +105,8 @@ module ps2_keyboard(
                             bin_in5<=press_count[7:4];
                         end
                         else begin
+                            off<=1;
                             check<=0;
-                            seg0=8'b11111111;
-                            seg1=8'b11111111;
-                            seg2=8'b11111111;
-                            seg3=8'b11111111;
                         end
                     end
                 end
