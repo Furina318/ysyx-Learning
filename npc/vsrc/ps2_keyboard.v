@@ -68,8 +68,9 @@ module ps2_keyboard(
     wire sampling = ps2_clk_sync[2] & ~ps2_clk_sync[1];
 
     always @(posedge clk) begin
-        if (rst == 0) begin // reset
+        if (rst == 1) begin // reset
             count <= 0;
+            press_count<=0;
             bin_in0<=4'b0000;
             bin_in1<=4'b0000;
             bin_in2<=4'b0000;
@@ -84,11 +85,10 @@ module ps2_keyboard(
                     (ps2_data)       &&                     // stop bit
                     (^buffer[9:1])) begin                   // odd  parity
                     $display("receive %x", buffer[8:1]);
-                    //get_ascii={1'b0,rom[buffer[8:1]]};
                     get_ascii=rom[buffer[8:1]];
 
                     if(buffer[8:1]==8'hF0) begin
-                      press_count=press_count+1;
+                      press_count<=press_count+1;
                       bin_in0<=4'b0000;
                       bin_in1<=4'b0000;
                       bin_in2<=4'b0000;
