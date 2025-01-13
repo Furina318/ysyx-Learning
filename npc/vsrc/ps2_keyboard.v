@@ -16,7 +16,7 @@ module ps2_keyboard(
     reg [2:0] ps2_clk_sync;
     reg [7:0] press_count;
 
-    reg [7:0] rom [0:255];
+    reg [7:0] rom [255:0];
     initial begin
       rom[18]=65;//a
       rom[50]=66;//b
@@ -70,12 +70,12 @@ module ps2_keyboard(
     always @(posedge clk) begin
         if (rst == 0) begin // reset
             count <= 0;
-            bin_in0<=0;
-            bin_in1<=0;
-            bin_in2<=0;
-            bin_in3<=0;
-            bin_in4<=0;
-            bin_in5<=0;
+            bin_in0<=4'b0000;
+            bin_in1<=4'b0000;
+            bin_in2<=4'b0000;
+            bin_in3<=4'b0000;
+            bin_in4<=4'b0000;
+            bin_in5<=4'b0000;
         end
         else begin
             if (sampling) begin
@@ -89,10 +89,10 @@ module ps2_keyboard(
 
                     if(buffer[8:1]==8'hF0) begin
                       press_count=press_count+1;
-                      bin_in0<=0;
-                      bin_in1<=0;
-                      bin_in2<=0;
-                      bin_in3<=0;
+                      bin_in0<=4'b0000;
+                      bin_in1<=4'b0000;
+                      bin_in2<=4'b0000;
+                      bin_in3<=4'b0000;
                     end
                     else begin
                       bin_in0<=buffer[4:1];
