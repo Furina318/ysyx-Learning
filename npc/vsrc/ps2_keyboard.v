@@ -106,6 +106,10 @@ module ps2_keyboard(
                         end
                         else begin
                             check<=0;
+                            seg0=8'b11111111;
+                            seg1=8'b11111111;
+                            seg2=8'b11111111;
+                            seg3=8'b11111111;
                         end
                     end
                 end
