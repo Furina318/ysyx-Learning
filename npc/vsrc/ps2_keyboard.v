@@ -86,6 +86,7 @@ module ps2_keyboard(
                     (^buffer[9:1])) begin                   // odd  parity
                     $display("receive %x", buffer[8:1]);
                     get_ascii=rom[buffer[8:1]];
+                    $display("ascii: %x",get_ascii);
 
                     if(buffer[8:1]==8'hF0) begin
                         check<=1;
