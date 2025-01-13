@@ -71,12 +71,12 @@ module ps2_keyboard(
         if (rst == 1) begin // reset
             count <= 0;
             press_count<=0;
-            bin_in0<=4'b0000;
-            bin_in1<=4'b0000;
-            bin_in2<=4'b0000;
-            bin_in3<=4'b0000;
-            bin_in4<=4'b0000;
-            bin_in5<=4'b0000;
+            seg0=8'b11111111;
+            seg1=8'b11111111;
+            seg2=8'b11111111;
+            seg3=8'b11111111;
+            seg4=8'b11111111;
+            seg5=8'b11111111;
         end
         else begin
             if (sampling) begin
@@ -89,10 +89,10 @@ module ps2_keyboard(
 
                     if(buffer[8:1]==8'hF0) begin
                       press_count<=press_count+1;
-                      bin_in0<=4'b0000;
-                      bin_in1<=4'b0000;
-                      bin_in2<=4'b0000;
-                      bin_in3<=4'b0000;
+                      seg0=8'b11111111;
+                      seg1=8'b11111111;
+                      seg2=8'b11111111;
+                      seg3=8'b11111111;
                     end
                     else begin
                       bin_in0<=buffer[4:1];
