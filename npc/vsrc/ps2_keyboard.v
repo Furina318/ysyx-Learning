@@ -59,7 +59,7 @@ module ps2_keyboard(
 
     reg [3:0] bin_in0,bin_in1,bin_in2,bin_in3,bin_in4,bin_in5;
     reg [7:0] get_ascii;
-
+    reg check;
 
     always @(posedge clk) begin
         ps2_clk_sync <=  {ps2_clk_sync[1:0],ps2_clk};
@@ -71,12 +71,12 @@ module ps2_keyboard(
         if (rst == 1) begin // reset
             count <= 0;
             press_count<=0;
-            seg0=8'b11111111;
-            seg1=8'b11111111;
-            seg2=8'b11111111;
-            seg3=8'b11111111;
-            seg4=8'b11111111;
-            seg5=8'b11111111;
+            bin_in0<=4'b0000;
+            bin_in1<=4'b0000;
+            bin_in2<=4'b0000;
+            bin_in3<=4'b0000;
+            bin_in4<=4'b0000;
+            bin_in5<=4'b0000;
         end
         else begin
             if (sampling) begin
@@ -88,19 +88,25 @@ module ps2_keyboard(
                     get_ascii=rom[buffer[8:1]];
 
                     if(buffer[8:1]==8'hF0) begin
-                      press_count<=press_count+1;
-                      seg0=8'b11111111;
-                      seg1=8'b11111111;
-                      seg2=8'b11111111;
-                      seg3=8'b11111111;
+                        check<=1;
+                        press_count<=press_count+1;
+                        bin_in0<=4'b0000;
+                        bin_in1<=4'b0000;
+                        bin_in2<=4'b0000;
+                        bin_in3<=4'b0000;
                     end
                     else begin
-                      bin_in0<=buffer[4:1];
-                      bin_in1<=buffer[8:5];
-                      bin_in2<=get_ascii[3:0];
-                      bin_in3<=get_ascii[7:4];
-                      bin_in4<=press_count[3:0];
-                      bin_in5<=press_count[7:4];
+                        if(check==0) begin
+                            bin_in0<=buffer[4:1];
+                            bin_in1<=buffer[8:5];
+                            bin_in2<=get_ascii[3:0];
+                            bin_in3<=get_ascii[7:4];
+                            bin_in4<=press_count[3:0];
+                            bin_in5<=press_count[7:4];
+                        end
+                        else begin
+                            check<=0;
+                        end
                     end
                 end
                 count <= 0;                                 // for next
