@@ -20,6 +20,7 @@ module seg16(
             4'b1101:seg_out=8'b10000101;
             4'b1110:seg_out=8'b01100001;
             4'b1111:seg_out=8'b01110001;
+            default:seg_out=8'b11111111;
         endcase
     end
 endmodule
