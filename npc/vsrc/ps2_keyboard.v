@@ -60,6 +60,7 @@ module ps2_keyboard(
     reg [3:0] bin_in0,bin_in1,bin_in2,bin_in3,bin_in4,bin_in5;
     reg [7:0] get_ascii;
     reg check;
+    reg off;
 
     always @(posedge clk) begin
         ps2_clk_sync <=  {ps2_clk_sync[1:0],ps2_clk};
@@ -71,10 +72,7 @@ module ps2_keyboard(
         if (rst == 1) begin // reset
             count <= 0;
             press_count<=0;
-            bin_in0<=4'b0000;
-            bin_in1<=4'b0000;
-            bin_in2<=4'b0000;
-            bin_in3<=4'b0000;
+            off<=1;
             bin_in4<=4'b0000;
             bin_in5<=4'b0000;
         end
@@ -86,10 +84,11 @@ module ps2_keyboard(
                     (^buffer[9:1])) begin                   // odd  parity
                     $display("receive %x", buffer[8:1]);
                     get_ascii=rom[buffer[8:1]];
-                    $display("ascii: %x",get_ascii);
+                    off<=0;
 
                     if(buffer[8:1]==8'hF0) begin
                         check<=1;
+                        off<=1;
                         press_count<=press_count+1;
                         bin_in0<=4'b0000;
                         bin_in1<=4'b0000;
@@ -123,10 +122,11 @@ module ps2_keyboard(
         end
     end
     
-    seg16 show0(.bin_in(bin_in0),.seg_out(seg0));
-    seg16 show1(.bin_in(bin_in1),.seg_out(seg1));
-    seg16 show2(.bin_in(bin_in2),.seg_out(seg2));
-    seg16 show3(.bin_in(bin_in3),.seg_out(seg3));
+    
+    ps2_seg show0(.bin_in(bin_in0),.check(off),.seg_out(seg0));
+    ps2_seg show1(.bin_in(bin_in1),.check(off),.seg_out(seg1));
+    ps2_seg show2(.bin_in(bin_in2),.check(off),.seg_out(seg2));
+    ps2_seg show3(.bin_in(bin_in3),.check(off),.seg_out(seg3));
     seg16 show4(.bin_in(bin_in4),.seg_out(seg4));
     seg16 show5(.bin_in(bin_in5),.seg_out(seg5));
 
