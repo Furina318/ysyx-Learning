@@ -1,197 +1,140 @@
-module ps2_kbd(
-    input clk,
-    input rst,
-    input ps2_clk,
-    input ps2_data,
-    output [7:0] data,
-    output reg ready,
-    output reg overflow
-);
-
-reg [9:0] buffer;                 //ps2_data bits
-reg [7:0] fifo[7:0];              //FIFO数据缓存队列，二维数组fifo[7][7]
-reg [2:0] w_ptr,r_ptr;            //fifo队列中的读写指针
-reg [3:0] count;
-reg [2:0] ps2_clk_sync;           //检测ps2_clk的电平变化
-
-always @(posedge clk) begin
-    ps2_clk_sync<={ps2_clk_sync[1:0],ps2_clk};//随着仿真时间更新检测记录
-end
-wire sampling=ps2_clk_sync[2] & ~ps2_clk_sync[1];//检测到上升沿
-
-always @(posedge clk) begin
-    if(rst) begin
-        count<=0;w_ptr<=0;r_ptr<=0;overflow<=0;ready<=0;//复位
-    end
-    else begin
-        if(ready) begin                         //检测到fifo准备，便启动读出
-            r_ptr<=r_ptr+3'b1;              //读出指针递增
-            if(w_ptr==(r_ptr+3'b1)) begin   //若读取指针与写入指针重合，即fifo为空，则取消fifo读取准备状态
-                ready<=1'b0;
-            end
-        end
-        if(sampling) begin
-            if(count==4'd10) begin                                  //读入buffer数组完成后
-                if((buffer[0]==0)&&(ps2_data)&&(^buffer[9:1])) begin//检测到数据头完整（数据准入），有数据传入
-                    fifo[w_ptr]<=buffer[8:1];                       //数据写入二维数组fifo中
-                    w_ptr<=w_ptr+3'b1;                              //写入指针递增
-                    ready<=1'b1;                                    //fifo准备
-                    overflow<=overflow|(r_ptr==(w_ptr+3'b1));
-                end
-                count<=0;
-            end
-            else begin
-                buffer[count]<=ps2_data;                  //一位一位地读入buffer
-                count<=count+4'b1;
-            end
-        end
-    end
-end
-assign data=fifo[r_ptr];
-endmodule
-
-module seven_segment_display_controller (
-    input clk,
-    input rst,
-    input [7:0] keycode,
-    input key_released,
-    output reg [6:0] seg_low,
-    output reg [6:0] seg_mid,
-    output reg [6:0] seg_high
-);
-
-reg [7:0] ascii_rom [0:255];                       //建立一个ROM将键码映射为ASCII码
-integer i;
-
-initial begin
-    for (i = 0; i < 256; i = i + 1) begin          // ROM初始化
-        ascii_rom[i] = 8'hFF;                      // 如果没有输入则7段数码管初始化熄灭
-    end
-    ascii_rom[39] = 8'h3F; // '1'
-    ascii_rom[55] = 8'h06; // '2'
-    ascii_rom[54] = 8'h5B; // '3'
-    ascii_rom[53] = 8'h4F; // '4'
-    ascii_rom[38] = 8'h66; // '5'
-    ascii_rom[51] = 8'h6D; // '6'
-    ascii_rom[37] = 8'h7D; // '7'
-    ascii_rom[36] = 8'h07; // '8'
-    ascii_rom[35] = 8'h7F; // '9'
-    ascii_rom[28] = 8'h6F; // '0'
-    ascii_rom[4] = 8'h77;  // 'A'
-    ascii_rom[5] = 8'h7C;  // 'B'
-    ascii_rom[12] = 8'h39; // 'C'
-    ascii_rom[29] = 8'h5E; // 'D'
-    ascii_rom[42] = 8'h79; // 'E'
-    ascii_rom[43] = 8'h71; // 'F'
-end
-
-reg [7:0] current_ascii;
-reg [7:0] prev_keycode;
-reg [6:0] press_count;
-
-always @(posedge clk) begin
-    if (rst) begin                    //复位，6个七段数码管熄灭
-        seg_low <= 7'b1111111;
-        seg_mid <= 7'b1111111;
-        seg_high <= 7'b1111111;
-        current_ascii <= 8'hFF;
-        prev_keycode <= 8'h00;
-        press_count <= 7'b0000000;
-    end else begin
-        if (keycode != prev_keycode && keycode != 8'hFF) begin   //当键盘信号刷新（keycode\prev_code）
-            current_ascii <= ascii_rom[keycode];                 //从ROM读取对应的ASCII值
-            prev_keycode <= keycode;
-            press_count <= press_count + 1;                      //记录按键次数
-        end else if (key_released) begin                         //松开则七段数码管复位
-            seg_low <= 7'b1111111;
-            seg_mid <= 7'b1111111;
-        end
-
-        case (current_ascii)
-            8'h3F: seg_mid <= 7'b0000110; // '1'
-            8'h06: seg_mid <= 7'b1011011; // '2'
-            8'h5B: seg_mid <= 7'b1001111; // '3'
-            8'h4F: seg_mid <= 7'b1100110; // '4'
-            8'h66: seg_mid <= 7'b1101101; // '5'
-            8'h6D: seg_mid <= 7'b1111101; // '6'
-            8'h7D: seg_mid <= 7'b0000111; // '7'
-            8'h07: seg_mid <= 7'b1111111; // '8'
-            8'h7F: seg_mid <= 7'b1111011; // '9'
-            8'h6F: seg_mid <= 7'b1110111; // '0'
-            8'h77: seg_mid <= 7'b1111001; // 'A'
-            8'h7C: seg_mid <= 7'b0111101; // 'B'
-            8'h39: seg_mid <= 7'b1001110; // 'C'
-            8'h5E: seg_mid <= 7'b0111100; // 'D'
-            8'h79: seg_mid <= 7'b1011001; // 'E'
-            8'h71: seg_mid <= 7'b1011111; // 'F'
-            default: seg_mid <= 7'b1111111;
-        endcase
-
-        case (keycode)
-            39: seg_low <= 7'b0000110; // '1'
-            55: seg_low <= 7'b1011011; // '2'
-            54: seg_low <= 7'b1001111; // '3'
-            53: seg_low <= 7'b1100110; // '4'
-            38: seg_low <= 7'b1101101; // '5'
-            51: seg_low <= 7'b1111101; // '6'
-            37: seg_low <= 7'b0000111; // '7'
-            36: seg_low <= 7'b1111111; // '8'
-            35: seg_low <= 7'b1110111; // '9'
-            28: seg_low <= 7'b1110110; // '0'
-            default: seg_low <= 7'b1111111;
-        endcase
-
-        seg_high <=~(press_count[6:0]); 
-    end
-end
-
-endmodule
-
 module ps2_keyboard(
     input clk,
     input rst,
     input ps2_clk,
     input ps2_data,
-    output reg [6:0] seg_low,
-    output reg [6:0] seg_mid,
-    output reg [6:0] seg_high
+    output reg [6:0] seg0,   // 最低位七段数码管显示
+    output reg [6:0] seg1,   // 次低位七段数码管显示
+    output reg [6:0] seg2,   // 最中间位七段数码管显示
+    output reg [6:0] seg3,   // 次中间位七段数码管显示
+    output reg [6:0] seg4,   // 次高位七段数码管显示
+    output reg [6:0] seg5    // 最高位七段数码管显示
 );
 
-reg [7:0] keycode;
-reg ready;
-reg overflow;
-reg key_released;
+reg [9:0] buffer;                 // PS2_data bits
+reg [6:0] keycode;
+reg [6:0] ascii_code;
+reg key_pressed;
+reg [7:0] press_count;
 
-ps2_kbd ps2_kb (
-    .clk(clk),
-    .rst(rst),
-    .ps2_clk(ps2_clk),
-    .ps2_data(ps2_data),
-    .data(keycode),
-    .ready(ready),
-    .overflow(overflow)
-);
+// ROM for ASCII conversion
+reg [6:0] rom [0:127];
 
-seven_segment_display_controller ssd_ctrl (
-    .clk(clk),
-    .rst(rst),
-    .keycode(keycode),
-    .key_released(key_released),
-    .seg_low(seg_low),
-    .seg_mid(seg_mid),
-    .seg_high(seg_high)
-);
+initial begin
+    rom[4] = 7'd65;  // 'A'
+    rom[5] = 7'd66;  // 'B'
+    rom[6] = 7'd67;  // 'C'
+    rom[7] = 7'd68;  // 'D'
+    rom[8] = 7'd69;  // 'E'
+    rom[9] = 7'd70;  // 'F'
+    rom[10] = 7'd71;  // 'G'
+    rom[11] = 7'd72;  // 'H'
+    rom[12] = 7'd73;  // 'I'
+    rom[13] = 7'd74;  // 'J'
+    rom[14] = 7'd75;  // 'K'
+    rom[15] = 7'd76;  // 'L'
+    rom[16] = 7'd77;  // 'M'
+    rom[17] = 7'd78;  // 'N'
+    rom[18] = 7'd79;  // 'O'
+    rom[19] = 7'd80;  // 'P'
+    rom[20] = 7'd81;  // 'Q'
+    rom[21] = 7'd82;  // 'R'
+    rom[22] = 7'd83;  // 'S'
+    rom[23] = 7'd84;  // 'T'
+    rom[24] = 7'd85;  // 'U'
+    rom[25] = 7'd86;  // 'V'
+    rom[26] = 7'd87;  // 'W'
+    rom[27] = 7'd88;  // 'X'
+    rom[28] = 7'd89;  // 'Y'
+    rom[29] = 7'd90;  // 'Z'
+    rom[30] = 7'd49;  // '1'
+    rom[31] = 7'd50;  // '2'
+    rom[32] = 7'd51;  // '3'
+    rom[33] = 7'd52;  // '4'
+    rom[34] = 7'd53;  // '5'
+    rom[35] = 7'd54;  // '6'
+    rom[36] = 7'd55;  // '7'
+    rom[37] = 7'd56;  // '8'
+    rom[38] = 7'd57;  // '9'
+    rom[39] = 7'd48;  // '0'
+end
+
+reg [2:0] ps2_clk_sync;           // 检测ps2_clk的电平变化
+
+always @(posedge clk) begin
+    ps2_clk_sync <= {ps2_clk_sync[1:0], ps2_clk}; // 更新检测记录
+end
+
+wire sampling = ps2_clk_sync[2] & ~ps2_clk_sync[1]; // 检测到上升沿
 
 always @(posedge clk) begin
     if (rst) begin
-        key_released <= 1'b0;
+        keycode <= 7'b1111111;
+        ascii_code <= 7'b1111111;
+        key_pressed <= 0;
+        press_count <= 0;
+        seg0 <= 7'b1111111; // 熄灭
+        seg1 <= 7'b1111111; // 熄灭
+        seg2 <= 7'b1111111; // 熄灭
+        seg3 <= 7'b1111111; // 熄灭
+        seg4 <= 7'b1111111; // 熄灭
+        seg5 <= 7'b1111111; // 熄灭
     end else begin
-        if (ready) begin
-            key_released <= 1'b0;
-        end else begin
-            key_released <= 1'b1;
+        if (sampling) begin
+            if (buffer[0] == 0 && buffer[9] == 1 && (^buffer[8:1])) begin // 数据头完整（数据准入），有数据传入
+                keycode <= buffer[8:2]; // 存储按键码
+                if (!key_pressed) begin
+                    key_pressed <= 1;
+                    press_count <= press_count + 8'd1;
+                end
+            end
+        end
+
+        // 处理按键释放
+        if (~ps2_data && key_pressed) begin
+            key_pressed <= 0;
+            seg0 <= 7'b1111111; // 熄灭
+            seg1 <= 7'b1111111; // 熄灭
+        end
+
+        // 显示按键码和ASCII码
+        if (keycode != 7'b1111111) begin
+            ascii_code <= rom[keycode];
+            seg0 <= segment_codes[keycode[3:0]]; // 最低位显示按键码低四位
+            seg1 <= segment_codes[{1'b0, keycode[6:4]}]; // 次低位显示按键码高三位
+            seg2 <= segment_codes[ascii_code[3:0]]; // 最中间位显示ASCII码低四位
+            seg3 <= segment_codes[{1'b0, ascii_code[6:4]}]; // 次中间位显示ASCII码高三位
+            seg4 <= segment_codes[(press_count > 9 ? press_count / 10 : 0)]; // 次高位显示按键次数十位
+            seg5 <= segment_codes[press_count % 10]; // 最高位显示按键次数个位
+        end
+        else begin
+            seg0 <= 7'b1111111; // 熄灭
+            seg1 <= 7'b1111111; // 熄灭
+            seg2 <= 7'b1111111; // 熄灭
+            seg3 <= 7'b1111111; // 熄灭
+            seg4 <= 7'b1111111; // 熄灭
+            seg5 <= 7'b1111111; // 熄灭
         end
     end
 end
 
+// 七段数码管编码
+reg [6:0] segment_codes [0:15];
+
+initial begin
+    segment_codes[0] = 7'b1000000; // 0
+    segment_codes[1] = 7'b1111001; // 1
+    segment_codes[2] = 7'b0100100; // 2
+    segment_codes[3] = 7'b0110000; // 3
+    segment_codes[4] = 7'b0011001; // 4
+    segment_codes[5] = 7'b0010010; // 5
+    segment_codes[6] = 7'b0000010; // 6
+    segment_codes[7] = 7'b1111000; // 7
+    segment_codes[8] = 7'b0000000; // 8
+    segment_codes[9] = 7'b0010000; // 9
+    segment_codes[10] = 7'b1111111; // OFF
+end
 endmodule
+
+
+
