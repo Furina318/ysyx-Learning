@@ -8,9 +8,7 @@ module ps2_keyboard(
     output reg [7:0] seg2,   // 最中间位七段数码管显示
     output reg [7:0] seg3,   // 次中间位七段数码管显示
     output reg [7:0] seg4,   // 次高位七段数码管显示
-    output reg [7:0] seg5,    // 最高位七段数码管显示
-    output reg shift_led,    // Shift LED indicator
-    output reg ctrl_led
+    output reg [7:0] seg5    // 最高位七段数码管显示
 );
 
     reg [9:0] buffer;                                       // ps2_data bits
@@ -70,71 +68,53 @@ module ps2_keyboard(
 
     wire sampling = ps2_clk_sync[2] & ~ps2_clk_sync[1];
 
-    reg shift_pressed;
-    reg ctrl_pressed;
-
-    // ... (保持ps2_clk_sync和sampling定义不变)
-
     always @(posedge clk) begin
-        if (rst) begin
-            // Reset signals
+        if (rst == 1) begin // reset
             count <= 0;
-            buffer <= 0;
-            press_count <= 0;
-            check <= 0;
-            off <= 1;
-            shift_pressed <= 0;
-            ctrl_pressed <= 0;
-            shift_led <= 0;
-            ctrl_led <= 0;
-        end else if (sampling && !off) begin
-            if (count < 10) begin
-                // Collecting PS/2 data bits
-                buffer[count] <= ps2_data;
-                count <= count + 1;
-            end else if (count == 10) begin
-                // Validate and process the received byte
-                if ((buffer[0] == 0) && // Start bit
-                    (buffer[9] == 1) && // Stop bit
-                    (^buffer[8:1]) == 1) begin // Odd parity
+            press_count<=0;
+            off<=1;
+            bin_in4<=4'b0000;
+            bin_in5<=4'b0000;
+        end
+        else begin
+            if (sampling) begin
+              if (count == 4'd10) begin
+                if ((buffer[0] == 0) &&                     // start bit
+                    (ps2_data)       &&                     // stop bit
+                    (^buffer[9:1])) begin                   // odd  parity
                     $display("receive %x", buffer[8:1]);
+                    get_ascii=rom[buffer[8:1]];
+                    off<=0;
 
-                    // Check for make/break code
-                    case(buffer[8:1])
-                        8'hF0: check <= 1; // Break code prefix
-                        8'h12: shift_pressed <= ~check; // Left Shift
-                        8'h59: shift_pressed <= ~check; // Right Shift
-                        8'h14: ctrl_pressed <= ~check;  // Left Ctrl
-                        8'hE0: ctrl_pressed <= ~check; // Right Ctrl
-
-                        default: if (!check) begin
-                            // Process make code for non-modifier keys
-                            get_ascii = rom[buffer[8:1]];
-                            if (shift_pressed) begin
-                                // Apply shift modifier to ASCII conversion if needed
-                                // For example, converting lowercase to uppercase
-                                if (get_ascii >= 65 && get_ascii <= 90) begin // A-Z
-                                    get_ascii = get_ascii - 32; // Convert to uppercase
-                                end
-                            end
-                            press_count <= press_count + 1;
-
-                            // Prepare binary inputs for segment displays
-                            bin_in0 <= get_ascii[3:0];
-                            bin_in1 <= get_ascii[7:4];
-                            bin_in2 <= press_count[3:0];
-                            bin_in3 <= press_count[7:4];
+                    if(buffer[8:1]==8'hF0) begin
+                        check<=1;
+                        off<=1;
+                        press_count<=(press_count<8'b11111111)?press_count+1:0;
+                        bin_in0<=4'b0000;
+                        bin_in1<=4'b0000;
+                        bin_in2<=4'b0000;
+                        bin_in3<=4'b0000;
+                    end
+                    else begin
+                        if(check==0) begin
+                            bin_in0<=buffer[4:1];
+                            bin_in1<=buffer[8:5];
+                            bin_in2<=get_ascii[3:0];
+                            bin_in3<=get_ascii[7:4];
+                            bin_in4<=press_count[3:0];
+                            bin_in5<=press_count[7:4];
                         end
-                    endcase
-                    // Update LED indicators based on modifier key states
-                    shift_led <= shift_pressed;
-                    ctrl_led <= ctrl_pressed;
+                        else begin
+                            off<=1;
+                            check<=0;
+                        end
+                    end
                 end
-                // Reset for next byte
-                count <= 0;
-                buffer <= 0;
-                off <= 1;
-                check <= 0;
+                count <= 0;                                 // for next
+              end else begin
+                buffer[count] <= ps2_data;  // store ps2_data
+                count <= count + 3'b1;
+              end
             end
         end
     end
