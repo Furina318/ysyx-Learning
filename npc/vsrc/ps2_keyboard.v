@@ -89,7 +89,7 @@ module ps2_keyboard(
                     if(buffer[8:1]==8'hF0) begin
                         check<=1;
                         off<=1;
-                        press_count<=press_count+1;
+                        press_count<=(press_count<8'b11111111)?press_count+1:0;
                         bin_in0<=4'b0000;
                         bin_in1<=4'b0000;
                         bin_in2<=4'b0000;
