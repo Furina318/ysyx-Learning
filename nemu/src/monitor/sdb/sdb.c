@@ -100,9 +100,9 @@ static int cmd_x(char *args){//扫描内存，且EXPR简化使用十六进制
     return -1;
   }
   for(int i=0;i<len;i++){
-    printf("%x : %08x\n",addr,paddr_read(addr,4));
+    printf("addr%x : %08x\n",addr,paddr_read(addr,4));
+    addr+=4;
   }
-  addr+=4;
   return 0;
 }
 
