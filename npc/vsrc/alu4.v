@@ -38,7 +38,7 @@ end
 
 assign zero=~(|result);
 assign overflow=(sel[2] && (add_result[3] != b[3])) || (!sel[2] && (sub_result[3] != b[3]));
-assign cout=(sel[2]&&add_result[3])||(!sel[2]&&sub_result[3]);
+assign cout=(sel[2]&&add_result[3])||(!sel[2]&&sub_result[3]);//{cout,result}=A+B,cout=(A+B-result)>>4
 
 seg16 alu4_seg(
     .bin_in(result),
