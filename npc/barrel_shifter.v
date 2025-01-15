@@ -6,7 +6,7 @@ module barrel_shifter(
     output reg [7:0] dout
 );
 alwasys @(*) begin
-    dout = din; 
+    dout = din; // Default assignment: no shift (output equals input) 
 
     case (L_R)           
         1'b1: begin       
