@@ -92,15 +92,15 @@ static int cmd_x(char *args){//扫描内存，且EXPR简化使用十六进制
   arg = strtok(NULL, " ");// 解析第一个参数为整数N
   if (arg == NULL || sscanf(arg, "%d", &len) != 1 || len <= 0) {
     printf("Error: Invalid number of words to display.\n");
-    return -1;
+    return 0;
   }
   arg = strtok(NULL, " ");// 解析第二个参数为十六进制地址EXPR
   if (arg == NULL || sscanf(arg, "%x", &addr) != 1) {
     printf("Error: Invalid address format. Please provide a hexadecimal address.\n");
-    return -1;
+    return 0;
   }
   for(int i=0;i<len;i++){
-    printf("addr%x : %08x\n",addr,paddr_read(addr,4));
+    printf("addr->%x : %08x\n",addr,paddr_read(addr,4));
     addr+=4;
   }
   return 0;
