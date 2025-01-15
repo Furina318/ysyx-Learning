@@ -118,9 +118,9 @@ static struct {
   { "q", "Exit NEMU", cmd_q },
 
   /* TODO: Add more commands */
-  { "si N", "Let the program excute N instuctions and then suspend the excution(while the N is not given,the default value is 1)", cmd_si},
-  { "info r/w", "Print register status with\"r\",or print the monitor status with \"w\" ",cmd_info},
-  { "x N EXPR", "I don't konw how to explain the function",cmd_x},
+  { "si", "Let the program excute N instuctions and then suspend the excution(while the N is not given,the default value is 1)", cmd_si},
+  { "info", "Print register status with\"r\",or print the monitor status with \"w\" ",cmd_info},
+  { "x", "I don't konw how to explain the function",cmd_x},
 };
 
 #define NR_CMD ARRLEN(cmd_table)
