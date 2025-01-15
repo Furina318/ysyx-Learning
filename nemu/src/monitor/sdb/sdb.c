@@ -18,6 +18,7 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #include "sdb.h"
+#include <memory/paddr.h>
 
 static int is_batch_mode = false;
 
@@ -43,7 +44,7 @@ static char* rl_gets() {
 }
 
 static int cmd_c(char *args) {
-  cpu_exec(-1);
+  cpu_exec(-1);//将-1作为无符号的参数传入cpu_exec函数中，使得程序执行指令数量很大很大，程序几乎无法停止
   return 0;
 }
 
@@ -51,6 +52,58 @@ static int cmd_c(char *args) {
 static int cmd_q(char *args) {
   nemu_state.state=NEMU_QUIT;//直接改变good的值，防止其直接退出时good！=0（/src/utils/state.c）导致return出现异常
   return -1;
+}
+
+static int cmd_si(char *args){//自己编写的si命令，让程序单步执行N条指令后暂停执行,当N没有给出时, 缺省为1
+  int N = 1; // 默认为1
+  if (args != NULL && args[0] != '\0') { // 检查是否有提供参数
+    N = atoi(args);
+    if (N <= 0) { // 如果N不是一个正整数，则设置为默认值1
+      printf("Invalid argument, using default value of 1.\n");
+      N = 1;
+    }
+  }
+  cpu_exec(N); // 执行N条指令
+  printf("Executed %d instruction(s).\n", N);
+  return 0;
+}
+
+static int cmd_info(char *args){
+  char *arg;
+  if(args!=NULL && args[0]!='\0'){
+    arg=strtok(args," ");
+    if(arg==NULL){
+      printf("No argument provided. Please specify 'r' or 'w'.\n");
+    }
+    if(strcmp(arg,"r")==0){
+      isa_reg_display();//打印寄存器，文件在isa/risv32/reg.c中
+    }else if(strcmp(arg,"w")==0){
+      //打印监视点信息
+    }else printf("Invalid operation,please specify 'r' or 'w'.\n");
+  }else printf("No argument provided. Please specify 'r' or 'w'.\n");
+  return 0;
+}
+
+static int cmd_x(char *args){//扫描内存，且EXPR简化使用十六进制
+  int len;
+  paddr_t addr;
+  char *arg;
+  
+  arg = strtok(NULL, " ");// 解析第一个参数为整数N
+  if (arg == NULL || sscanf(arg, "%d", &len) != 1 || len <= 0) {
+    printf("Error: Invalid number of words to display.\n");
+    return -1;
+  }
+  arg = strtok(NULL, " ");// 解析第二个参数为十六进制地址EXPR
+  if (arg == NULL || sscanf(arg, "%x", &addr) != 1) {
+    printf("Error: Invalid address format. Please provide a hexadecimal address.\n");
+    return -1;
+  }
+  for(int i=0;i<len;i++){
+    printf("%x : %08x\n",addr,paddr_read(addr,4));
+  }
+  addr+=4;
+  return 0;
 }
 
 static int cmd_help(char *args);
@@ -65,7 +118,9 @@ static struct {
   { "q", "Exit NEMU", cmd_q },
 
   /* TODO: Add more commands */
-
+  { "si N", "Let the program excute N instuctions and then suspend the excution(while the N is not given,the default value is 1)", cmd_si},
+  { "info r/w", "Print register status with\"r\",or print the monitor status with \"w\" ",cmd_info},
+  { "x N EXPR", "I don't konw how to explain the function",cmd_x},
 };
 
 #define NR_CMD ARRLEN(cmd_table)
