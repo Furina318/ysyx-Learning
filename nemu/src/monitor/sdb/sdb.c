@@ -84,19 +84,24 @@ static int cmd_info(char *args){
   return 0;
 }
 
-static int cmd_x(char *args){//扫描内存，且EXPR简化使用十六进制
+static int cmd_x(char *args){//扫描内存
   int len;
   paddr_t addr;
   char *arg;
   
   arg = strtok(NULL, " ");// 解析第一个参数为整数N
   if (arg == NULL || sscanf(arg, "%d", &len) != 1 || len <= 0) {
-    printf("Error: Invalid number of words to display.\n");
+    printf("Invalid number of words to display\n");
     return 0;
   }
-  arg = strtok(NULL, " ");// 解析第二个参数为十六进制地址EXPR
-  if (arg == NULL || sscanf(arg, "%x", &addr) != 1) {
-    printf("Error: Invalid address format. Please provide a hexadecimal address.\n");
+  arg = strtok(NULL, " ");// 解析第二个参数EXPR,调用expr函数计算表达式得到内存地址
+  if(arg==NULL){
+    printf("Missing address expression\n");
+    return 0;
+  }
+  addr=(paddr_t)expr(arg);
+  if(addr==-1){
+    printf("Invalid address expression,please provide a valid expression\n");
     return 0;
   }
   for(int i=0;i<len;i++){

@@ -22,7 +22,7 @@
 
 enum {
   TK_NOTYPE = 256, TK_EQ,
-
+  TK_NUM,TK_NEQ,
   /* TODO: Add more token types */
 
 };
@@ -36,6 +36,14 @@ static struct rule {
    * Pay attention to the precedence level of different rules.
    */
 
+  {"\\(", '('},         // left parenthesis
+  {"\\)",')'},         // right parenthesis
+  {"\\*", '*'},         // multiplication
+  {"/", '/'},           // division
+  {"-", '-'},           // minus
+  {"[0-9]+", TK_NUM},   // integer number
+  {"!=",TK_NEQ},        //not equal
+
   {" +", TK_NOTYPE},    // spaces
   {"\\+", '+'},         // plus
   {"==", TK_EQ},        // equal
@@ -48,6 +56,11 @@ static regex_t re[NR_REGEX] = {};
 /* Rules are used for many times.
  * Therefore we compile them only once before any usage.
  */
+
+//性能优化:编译后的正则表达式可以在后续的匹配操作中更快地工作。如果每次使用时都重新解析正则表达式的字符串形式，将会浪费大量的时间和资源。通过提前编译，可以显著提高效率，尤其是在多次重复使用同一个正则表达式的情况下。
+//错误检测:在初始化阶段，即调用regcomp时，任何语法错误都会被捕获并报告。这有助于开发者在程序运行之前发现和修复问题，而不是等到实际匹配时才遇到异常。
+//内存管理:编译后的正则表达式会被存储在一个结构体中（如regex_t），这使得我们可以更好地管理和释放与之相关的资源。当不再需要某个正则表达式时，可以通过regfree函数释放其占用的内存。
+//准备就绪的状态:一旦正则表达式被成功编译，它就处于一种“准备就绪”的状态，可以直接用于文本匹配，而不需要额外的处理步骤。
 void init_regex() {
   int i;
   char error_msg[128];
@@ -95,6 +108,20 @@ static bool make_token(char *e) {
          */
 
         switch (rules[i].token_type) {
+          case TK_NUM:
+          case '+':
+          case '-':
+          case '*':
+          case '/':
+          case '(':
+          case ')':
+          case TK_NEQ:
+          case TK_EQ:
+            strncpy(tokens[nr_token].str,substr_start,substr_len);
+            tokens[nr_token].str[substr_len]='\0';
+            tokens[nr_token].type=rules[i].token_type;
+            nr_token++;
+            break;
           default: TODO();
         }
 
@@ -111,15 +138,93 @@ static bool make_token(char *e) {
   return true;
 }
 
-
-word_t expr(char *e, bool *success) {
-  if (!make_token(e)) {
-    *success = false;
-    return 0;
+static bool check_parentheses(int p,int q){
+  int cnt=0;
+  if(tokens[p].type!='(' || tokens[q].type!=')') return false;
+  for(int i=p;i<=q;i++){
+    if(tokens[i].type=='(') cnt++;
+    if(tokens[i].type==')') cnt--;
+    if(cnt==0&&i<q) return false;
   }
+  if(cnt!=0) return false;
+  else return true;
+}
 
+static int oprator_level(int op_type){
+  switch(op_type){
+    case '+': return 2;
+    case '-': return 2;
+    case '*': return 1;
+    case '/': return 1;
+    default:  
+      printf("Undefine oprator\n");
+      assert(0);
+  }
+}
+
+static int find_main_operator(int p,int q){
+  int high_operator_level=-1;
+  int main_operator=-1;
+  for(int i=p;i<=q;i++){
+    if(tokens[i].type=='('){//这一步跳过所有括号内的内容，因为括号内的运算级更高
+      while(i<=q && tokens[i].type!=')') ++i;
+      if(i<=q && tokens[i].type==')') continue;
+      else{
+        printf("Invalid operator!");
+        return -1;
+      }
+    }
+    if(tokens[i].type!=TK_NUM && tokens[i].type!=TK_NOTYPE && tokens[i].type!=TK_EQ && tokens[i].type!=TK_NEQ){//排除非运算符
+      if(high_operator_level<oprator_level(i)){
+        high_operator_level=oprator_level(i);
+        main_operator=i;
+      }
+    }
+  }
+  return main_operator;
+}
+
+word_t eval(int p,int q){
+  int op;
+  if(p>q){
+    return 0;
+  }else if(p==q){
+    if(tokens[p].type!=TK_NUM){
+      return 0;
+    }
+    return atoi(tokens[p].str);
+  }else if(check_parentheses(p,q)==true){//查找两端的括号并丢弃
+    return eval(p+1,q-1);
+  }else{
+    op=find_main_operator(p,q);
+    if(op==-1 || op<p || op>q){
+      return 0;
+    }
+    word_t val1=eval(p,op-1);
+    word_t val2=eval(op+1,q);
+    switch(tokens[op].type){
+      case '+':return val1+val2;
+      case '-':return val1-val2;
+      case '*':return val1*val2;
+      case '/':
+        if(val2==0){
+          printf("The denominator can't be zero!\n");
+          return 0;
+        }
+        return val1/val2;
+      default:
+        return 0;
+    }
+  }
+}
+
+word_t expr(char *e) {//分治递归算法
+  if (!make_token(e)) {
+    return -1;
+  }
   /* TODO: Insert codes to evaluate the expression. */
+  word_t result=eval(0,nr_token-1);
   TODO();
 
-  return 0;
+  return result;
 }
