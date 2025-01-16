@@ -224,7 +224,7 @@ word_t expr(char *e) {//分治递归算法
   }
   /* TODO: Insert codes to evaluate the expression. */
   word_t result=eval(0,nr_token-1);
-  TODO();
+  //TODO();
 
   return result;
 }
