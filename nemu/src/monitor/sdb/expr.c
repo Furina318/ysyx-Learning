@@ -151,7 +151,7 @@ static bool check_parentheses(int p,int q){
 }
 
 static int oprator_level(int op_type){
-  switch(op_type){
+  switch(tokens[op_type].type){
     case '+': return 2;
     case '-': return 2;
     case '*': return 1;
