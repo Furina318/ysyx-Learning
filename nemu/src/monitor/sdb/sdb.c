@@ -115,6 +115,20 @@ static int cmd_x(char *args){//扫描内存
   return 0;
 }
 
+static int cmd_p(char *args){
+  char *arg;
+  int result;
+  arg=strtok(NULL," ");
+  result=expr(arg);
+  if(result==-1){
+    printf("Invalid expression\n");
+    return 0;
+  }else{
+    printf("%s result is:%u\n",arg,result);
+  }
+  return 0;
+}
+
 static int cmd_help(char *args);
 
 static struct {
@@ -130,6 +144,7 @@ static struct {
   { "si", "Let the program excute N instuctions and then suspend the excution(while the N is not given,the default value is 1)", cmd_si},
   { "info", "Print register status with\"r\",or print the monitor status with \"w\" ",cmd_info},
   { "x", "I don't konw how to explain the function",cmd_x},
+  { "p", "Find the value of the expression 'EXPR' and add one to the result",cmd_p},
 };
 
 #define NR_CMD ARRLEN(cmd_table)
