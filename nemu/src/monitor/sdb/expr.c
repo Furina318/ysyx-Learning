@@ -190,7 +190,7 @@ word_t eval(int p,int q){
     return 0;
   }else if(p==q){
     if(tokens[p].type!=TK_NUM){
-      return 0;
+      return -1;
     }
     return atoi(tokens[p].str);
   }else if(check_parentheses(p,q)==true){//查找两端的括号并丢弃
@@ -198,7 +198,7 @@ word_t eval(int p,int q){
   }else{
     op=find_main_operator(p,q);
     if(op==-1 || op<p || op>q){
-      return 0;
+      return -1;
     }
     word_t val1=eval(p,op-1);
     word_t val2=eval(op+1,q);
