@@ -99,8 +99,10 @@ static int cmd_x(char *args){//扫描内存
     printf("Missing address expression\n");
     return 0;
   }
-  if(sscanf(arg,"%x",&addr)!=1){
-    addr=(paddr_t)expr(arg);
+  if(arg[0]=='0' && (arg[1]=='x' || arg[1]=='X')){
+    sscanf(arg,"%x",&addr);
+  }else{
+  addr=(paddr_t)expr(arg);
     if(addr==-1){
       printf("Invalid address expression,please provide a valid expression\n");
       return 0;
