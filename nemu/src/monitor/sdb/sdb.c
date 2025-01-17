@@ -131,15 +131,15 @@ static int cmd_x(char *args){//扫描内存
 static int cmd_p(char *args) {
   if (args == NULL || strlen(args) == 0) {
     printf("No expression provided\n");
-    return -1;
+    return 0;
   }
 
-  word_t result = expr(args);
+  int result = expr(args);
   
   // Check for various error conditions.
   if (result == -1) {
     printf("Invalid expression\n");
-    return -1;
+    return 0;
   }
   // 正常输出结果
   printf("%s = %u\n", args, result);
