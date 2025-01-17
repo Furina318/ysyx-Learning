@@ -162,33 +162,37 @@ static int oprator_level(int op_type){
   }
 }
 
-static int find_main_operator(int p,int q){
-  int high_operator_level=-1;
-  int main_operator=-1;
-  int cnt,j;
-  for(int i=p;i<=q;i++){
-    if(tokens[i].type=='('){//这一步跳过所有括号内的内容，因为括号内的运算级更高
-      //while(i<=q && tokens[i].type!=')') ++i;
-      cnt=1;
-      for(j=i+1;j<=q;j++){
-        if(cnt==0) break;
-        else if(tokens[j].type=='(') cnt++;
-        else if(tokens[j].type==')') cnt--;
-      }
-      i=j;
-      if(i<=q && tokens[i].type==')') continue;
-      else{
-        printf("Invalid operator!");
-        return -1;
-      }
+static int find_main_operator(int p, int q) {
+  int high_operator_level = -1;
+  int main_operator = -1;
+  int cnt = 0;
+
+  for (int i = p; i <= q; ++i) {
+    if (tokens[i].type == '(') {
+      cnt++;
+    } else if (tokens[i].type == ')') {
+      cnt--;
+    } else if (cnt == 0 && tokens[i].type != TK_NUM && tokens[i].type != TK_NOTYPE) {
+      int current_level = oprator_level(tokens[i].type);
+      if (current_level < high_operator_level) continue;
+
+      // If the current level is higher or it's the first operator found,
+      // set it as the main operator.
+      high_operator_level = current_level;
+      main_operator = i;
     }
-    if(tokens[i].type!=TK_NUM && tokens[i].type!=TK_NOTYPE && tokens[i].type!=TK_EQ && tokens[i].type!=TK_NEQ){//排除非运算符
-      if(high_operator_level<oprator_level(i)){
-        high_operator_level=oprator_level(i);
-        main_operator=i;
-      }
+
+    if (cnt < 0) { // Unmatched right parenthesis
+      printf("Unmatched right parenthesis at position %d\n", i);
+      return -1;
     }
   }
+
+  if (cnt > 0) { // Unmatched left parenthesis
+    printf("Unmatched left parenthesis\n");
+    return -1;
+  }
+
   return main_operator;
 }
 
