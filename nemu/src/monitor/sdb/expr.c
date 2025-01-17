@@ -172,8 +172,8 @@ static int find_main_operator(int p,int q){
       cnt=1;
       for(j=i+1;j<=q;j++){
         if(cnt==0) break;
-        else if(tokens[i].type=='(') cnt++;
-        else if(tokens[i].type==')') cnt--;
+        else if(tokens[j].type=='(') cnt++;
+        else if(tokens[j].type==')') cnt--;
       }
       i=j;
       if(i<=q && tokens[i].type==')') continue;
