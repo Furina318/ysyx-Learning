@@ -180,7 +180,7 @@ static int find_main_operator(int p,int q){
     }
     if (cnt>0) continue;
     if(tokens[i].type!=TK_NUM && tokens[i].type!=TK_NOTYPE && tokens[i].type!=TK_EQ && tokens[i].type!=TK_NEQ){//排除非运算符
-      if(high_operator_level<operator_level(i)){
+      if(high_operator_level<=operator_level(i)){
         high_operator_level=operator_level(i);
         main_operator=i;
       }
