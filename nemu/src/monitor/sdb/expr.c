@@ -165,9 +165,17 @@ static int oprator_level(int op_type){
 static int find_main_operator(int p,int q){
   int high_operator_level=-1;
   int main_operator=-1;
+  int cnt,j;
   for(int i=p;i<=q;i++){
     if(tokens[i].type=='('){//这一步跳过所有括号内的内容，因为括号内的运算级更高
-      while(i<=q && tokens[i].type!=')') ++i;
+      //while(i<=q && tokens[i].type!=')') ++i;
+      cnt=1;
+      for(j=i+1;j<=q;j++){
+        if(cnt==0) break;
+        else if(tokens[i].type=='(') cnt++;
+        else if(tokens[i].type==')') cnt--;
+      }
+      i=j;
       if(i<=q && tokens[i].type==')') continue;
       else{
         printf("Invalid operator!");
