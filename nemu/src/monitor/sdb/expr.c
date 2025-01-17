@@ -181,7 +181,7 @@ static int find_main_operator(int p,int q){
       if(high_operator_level<operator_level(i)){
         high_operator_level=operator_level(i);
         main_operator=i;
-    }
+      }
     }
   }
   return main_operator;
