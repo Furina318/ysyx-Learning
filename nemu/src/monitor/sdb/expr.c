@@ -150,7 +150,7 @@ static bool check_parentheses(int p,int q){
   else return true;
 }
 
-static int oprator_level(int op_type){
+static int operator_level(int op_type){
   switch(tokens[op_type].type){
     case '+': return 2;
     case '-': return 2;
@@ -165,24 +165,22 @@ static int oprator_level(int op_type){
 static int find_main_operator(int p,int q){
   int high_operator_level=-1;
   int main_operator=-1;
+  int cnt=0;
   for(int i=p;i<=q;i++){
-    if(tokens[i].type=='('){//这一步跳过所有括号内的内容，因为括号内的运算级更高
-      //while(i<=q && tokens[i].type!=')') ++i;
-      int cnt=1;
-      while(i<=q && tokens[i].type!=')' && cnt!=0){
-        ++i;
-        if(tokens[i].type=='(') cnt++;
-        if(tokens[i].type==')') cnt--;
-      }
-      if(i<=q && tokens[i].type==')') continue;
-      else{
-        printf("Invalid operator!");
+    if (tokens[i].type == '(') {
+      cnt++;
+    } else if (tokens[i].type == ')') {
+      cnt--;
+      if (cnt < 0) { // Unmatched right parenthesis
+        printf("Unmatched right parenthesis at position %d\n", i);
         return -1;
       }
     }
+    // Skip all tokens inside parentheses.
+    if (cnt > 0) continue;
     if(tokens[i].type!=TK_NUM && tokens[i].type!=TK_NOTYPE && tokens[i].type!=TK_EQ && tokens[i].type!=TK_NEQ){//排除非运算符
-      if(high_operator_level<=oprator_level(i)){
-        high_operator_level=oprator_level(i);
+      if(high_operator_level<operator_level(i)){
+        high_operator_level=operator_level(i);
         main_operator=i;
     }
     }
