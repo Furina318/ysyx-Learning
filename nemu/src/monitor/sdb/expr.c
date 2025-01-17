@@ -146,7 +146,7 @@ static bool check_parentheses(int p,int q){
     if(tokens[i].type==')') cnt--;
     if(cnt==0&&i<q) return false;
   }
-  if(cnt<0) return false;
+  if(cnt!=0) return false;
   else return true;
 }
 
