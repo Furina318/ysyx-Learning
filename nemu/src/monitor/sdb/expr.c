@@ -172,12 +172,13 @@ static int find_main_operator(int p,int q){
       cnt++;
     } else if (tokens[i].type == ')') {
       cnt--;
+      if(cnt==0) continue;
       if (cnt < 0) {
         printf("Unmatched right parenthesis at position %d\n", i);
         return -1;
       }
     }
-    if (cnt>0 || cnt==0) continue;
+    if (cnt>0) continue;
     if(tokens[i].type!=TK_NUM && tokens[i].type!=TK_NOTYPE && tokens[i].type!=TK_EQ && tokens[i].type!=TK_NEQ){//排除非运算符
       if(high_operator_level<operator_level(i)){
         high_operator_level=operator_level(i);
