@@ -158,7 +158,8 @@ static int operator_level(int op_type){
     case '/': return 1;
     default:  
       printf("Undefine oprator\n");
-      assert(0);
+      // assert(0);
+      return -1;
   }
 }
 
@@ -176,7 +177,7 @@ static int find_main_operator(int p,int q){
         return -1;
       }
     }
-    if (cnt > 0) continue;
+    if (cnt>0 || cnt==0) continue;
     if(tokens[i].type!=TK_NUM && tokens[i].type!=TK_NOTYPE && tokens[i].type!=TK_EQ && tokens[i].type!=TK_NEQ){//排除非运算符
       if(high_operator_level<operator_level(i)){
         high_operator_level=operator_level(i);
