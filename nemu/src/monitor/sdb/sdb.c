@@ -115,20 +115,37 @@ static int cmd_x(char *args){//扫描内存
   return 0;
 }
 
-static int cmd_p(char *args){
-  char *arg;
-  int result;
-  arg=strtok(NULL," ");
-  result=expr(arg);
-  if(result==-1){
-    printf("Invalid expression\n");
-    return 0;
-  }else{
-    printf("%s = %u\n",arg,result);//调试成功后不要忘记result还要加一
+// static int cmd_p(char *args){
+//   char *arg;
+//   int result;
+//   arg=strtok(NULL," ");
+//   result=expr(arg);
+//   if(result==-1){
+//     printf("Invalid expression\n");
+//     return 0;
+//   }else{
+//     printf("%s = %u\n",arg,result);//调试成功后不要忘记result还要加一
+//   }
+//   return 0;
+// }
+static int cmd_p(char *args) {
+  if (args == NULL || strlen(args) == 0) {
+    printf("No expression provided\n");
+    return -1;
   }
+
+  word_t result = expr(args);
+  
+  // Check for various error conditions.
+  if (result == -1) {
+    printf("Invalid expression\n");
+    return -1;
+  }
+  // 正常输出结果
+  printf("%s = %u\n", args, result);
+
   return 0;
 }
-
 static int cmd_help(char *args);
 
 static struct {

@@ -122,7 +122,7 @@ static bool make_token(char *e) {
             tokens[nr_token].type=rules[i].token_type;
             nr_token++;
             break;
-          default: TODO();
+          default: continue;//TODO();
         }
 
         break;
