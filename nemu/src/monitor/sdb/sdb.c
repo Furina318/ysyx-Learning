@@ -124,7 +124,7 @@ static int cmd_p(char *args){
     printf("Invalid expression\n");
     return 0;
   }else{
-    printf("%s+1 = %u\n",arg,result+1);//调试成功后不要忘记result还要加一
+    printf("%s = %u\n",arg,result);//调试成功后不要忘记result还要加一
   }
   return 0;
 }
