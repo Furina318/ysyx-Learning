@@ -118,7 +118,8 @@ static int cmd_x(char *args){//扫描内存
 static int cmd_p(char *args){
   char *arg;
   int result;
-  arg=strtok(NULL," ");
+  // arg=strtok(NULL," ");
+  arg=args;
   result=expr(arg);
   if(result==-1){
     printf("Invalid expression\n");
