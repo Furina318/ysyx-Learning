@@ -124,7 +124,7 @@ static int cmd_p(char *args){
     printf("Invalid expression\n");
     return 0;
   }else{
-    printf("%s result is:%u\n",arg,result);
+    printf("%s result is:%u\n",arg,result);//调试成功后不要忘记result还要加一
   }
   return 0;
 }
