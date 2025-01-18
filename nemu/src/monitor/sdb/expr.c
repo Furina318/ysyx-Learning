@@ -183,8 +183,7 @@ static bool make_token(char *e) {
             break;
           case TK_$:
             int name_num = 0;
-            char reg_name[5]; // 假设 REG_NAME_MAX_LEN 是定义好的最大寄存器名长度
-            // position--; // 跳过 '$' 符号并开始读取寄存器名,因为之前已经增加了 substr_len（即 1），所以需要先回退一个位置
+            char reg_name[5]; 
             while (isalnum(e[position])||e[position]=='$') { // 继续读取直到遇到非字母数字
               if (name_num<4) {
                 reg_name[name_num++] = e[position++];
