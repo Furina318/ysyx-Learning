@@ -142,7 +142,7 @@ static int cmd_p(char *args) {
     return 0;
   }
   // 正常输出结果
-  printf("%s = %u\n", args, result);
+  printf("%s+1 = %u\n", args, result+1);
 
   return 0;
 }
