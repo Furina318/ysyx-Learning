@@ -47,7 +47,6 @@ static struct rule {
 
   {" +", TK_NOTYPE},    // spaces
   {"\\+", '+'},         // plus
-  {"\\+", TK_TUN},      //反转后的+
   {"==", TK_EQ},        // equal
 };
 
@@ -133,7 +132,7 @@ static bool make_token(char *e) {
               }
               strncpy(tokens[nr_token].str, substr_start, substr_len); // 保存一个减号作为标记
               tokens[nr_token].str[substr_len] = '\0';
-              tokens[nr_token].type = neg_count % 2 ? TK_NEG : TK_TUN; // 奇数个减号变为负，偶数个变为正
+              tokens[nr_token].type = neg_count % 2 ? TK_NEG : '+'; // 奇数个减号变为负，偶数个变为正
               nr_token++;
             } else { // 否则当作二元减号处理
               strncpy(tokens[nr_token].str, substr_start, substr_len);
@@ -228,7 +227,7 @@ word_t eval(int p,int q){
     if(op==-1 || op<p || op>q){
       return -1;
     }
-    if(tokens[op].type==TK_NEG || tokens[op].type==TK_TUN){
+    if(tokens[op].type==TK_NEG || tokens[op].type=='+'){
       val2=eval(op+1,q);
       if(tokens[op].type==TK_NEG) return -val2;
       else return val2;
