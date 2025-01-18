@@ -22,7 +22,7 @@
 
 enum {
   TK_NOTYPE = 256, TK_EQ,
-  TK_NUM,TK_NEQ,TK_NEG,TK_TUN,TK_PO,
+  TK_NUM,TK_NEQ,TK_NEG,TK_PO,
   /* TODO: Add more token types */
 
 };
@@ -133,6 +133,10 @@ static bool make_token(char *e) {
               strncpy(tokens[nr_token].str, substr_start, substr_len); // 保存一个减号作为标记
               tokens[nr_token].str[substr_len] = '\0';
               tokens[nr_token].type = neg_count % 2 ? TK_NEG : '+'; // 奇数个减号变为负，偶数个变为正
+              nr_token--;
+              if (neg_count > 1) {
+                position -= (neg_count - 1);
+              }
               nr_token++;
             } else { // 否则当作二元减号处理
               strncpy(tokens[nr_token].str, substr_start, substr_len);
@@ -174,7 +178,6 @@ static int operator_level(int op_type){
     case '+': return 2;
     case '-': return 2;
     case TK_NEG: return 2;
-    case TK_TUN: return 2;
     case '*': return 1;
     case '/': return 1;
     default:  
