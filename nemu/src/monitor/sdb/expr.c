@@ -19,7 +19,6 @@
  * Type 'man regex' for more information about POSIX regex functions.
  */
 #include <regex.h>
-
 enum {
   TK_NOTYPE = 256, TK_EQ,
   TK_NUM,TK_NEQ,TK_NEG,TK_PO,
@@ -84,6 +83,10 @@ typedef struct token {
 static Token tokens[32] __attribute__((used)) = {};
 static int nr_token __attribute__((used))  = 0;
 
+int min(int a,int b){
+  return (a<b)?a:b;
+}
+
 static bool make_token(char *e) {
   int position = 0;
   int i;
@@ -130,8 +133,8 @@ static bool make_token(char *e) {
                 neg_count++;
                 position++;
               }
-              strncpy(tokens[nr_token].str, substr_start, substr_len); // 保存一个减号作为标记
-              tokens[nr_token].str[substr_len] = '\0';
+              strncpy(tokens[nr_token].str, "-", min(1,substr_len)); // 保存一个减号作为标记
+              tokens[nr_token].str[min(1,substr_len)] = '\0';
               tokens[nr_token].type = neg_count % 2 ? TK_NEG : '+'; // 奇数个减号变为负，偶数个变为正
               nr_token--;
               if (neg_count > 1) {
