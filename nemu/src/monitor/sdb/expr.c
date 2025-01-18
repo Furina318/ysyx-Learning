@@ -93,19 +93,17 @@ static int hex_char_to_decimal(char c) {
   if (c >= '0' && c <= '9') return c - '0';
   if (c >= 'A' && c <= 'F') return c - 'A' + 10;
   if (c >= 'a' && c <= 'f') return c - 'a' + 10;
-  // 如果不是有效的十六进制字符，则返回-1表示错误
   return -1;
 }
 
-// 十六进制转十进制函数
-static long hex_to_decimal(const char *hex_string) {
+static long hex_to_decimal(const char *hex_string) {// 十六进制转十进制函数
   long decimal_value = 0;
   int i, len = 0;
 
-  // 跳过可选的前缀 "0x" 或 "$"
-  if (hex_string[0] == '0' && hex_string[1] == 'x') {
-    hex_string += 2;
-  }
+  // // 跳过可选的前缀 "0x" 或 "$"
+  // if (hex_string[0] == '0' && hex_string[1] == 'x') {
+  //   hex_string += 2;
+  // }
 
   // 计算字符串长度
   for (len = 0; hex_string[len]; ++len);
@@ -115,7 +113,7 @@ static long hex_to_decimal(const char *hex_string) {
     int value = hex_char_to_decimal(tolower(hex_string[i]));
     if (value == -1) {
       fprintf(stderr, "Invalid hex digit '%c'\n", hex_string[i]);
-      return -1; // 返回错误代码
+      return -1; 
     }
     decimal_value = decimal_value * 16 + value;
   }
@@ -183,9 +181,6 @@ static bool make_token(char *e) {
               nr_token++;
               // 更新position以跳过整个十六进制数
               position += strlen(hex_start) - substr_len + 2; // 包括0x的长度
-            } else {
-              printf("Hexadecimal conversion failed.\n");
-              return false;
             }
             break;
           case TK_$:
