@@ -21,7 +21,7 @@
 #include <regex.h>
 enum {
   TK_NOTYPE = 256, TK_EQ,
-  TK_NUM,TK_NEQ,TK_NEG,TK_PO,
+  TK_NUM,TK_NEQ,TK_NEG,TK_PO,TK_ADD,TK_0x,TK_$,
   /* TODO: Add more token types */
 
 };
@@ -38,11 +38,15 @@ static struct rule {
   {"\\(", '('},         // 左括号
   {"\\)",')'},          // 右括号
   {"\\*", '*'},         // 乘法
+  {"\\*", TK_PO},       //指针解引用
   {"/", '/'},           // 除法
   {"-", '-'},           // 减法
   {"-", TK_NEG},        //负号，处理多元减号
   {"[0-9]+", TK_NUM},   // 数字
   {"!=",TK_NEQ},        //不等号
+  {"&&",TK_ADD},
+  {"0x",TK_0x},
+  {"$",TK_$},
 
   {" +", TK_NOTYPE},    // spaces
   {"\\+", '+'},         // plus
@@ -136,10 +140,6 @@ static bool make_token(char *e) {
               strncpy(tokens[nr_token].str, "-", min(1,substr_len)); // 保存一个减号作为标记
               tokens[nr_token].str[min(1,substr_len)] = '\0';
               tokens[nr_token].type = neg_count % 2 ? TK_NEG : '+'; // 奇数个减号变为负，偶数个变为正
-              nr_token--;
-              if (neg_count > 1) {
-                position -= (neg_count - 1);
-              }
               nr_token++;
             } else { // 否则当作二元减号处理
               strncpy(tokens[nr_token].str, substr_start, substr_len);
