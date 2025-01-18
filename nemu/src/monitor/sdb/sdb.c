@@ -134,7 +134,7 @@ static int cmd_p(char *args) {
     return 0;
   }
 
-  int result = expr(args);
+  uint32_t result = expr(args);
   
   // Check for various error conditions.
   if (result == -1) {
