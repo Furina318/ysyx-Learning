@@ -118,6 +118,7 @@ static bool make_token(char *e) {
         switch (rules[i].token_type) {
           case TK_NUM:
           case '+':
+          case '-':
           case '*':
           case '/':
           case '(':
@@ -128,34 +129,6 @@ static bool make_token(char *e) {
             tokens[nr_token].str[substr_len]='\0';
             tokens[nr_token].type=rules[i].token_type;
             nr_token++;
-            break;
-          case '-':
-            if (nr_token == 0 || 
-                tokens[nr_token - 1].type == TK_NUM || 
-                 tokens[nr_token - 1].type == ')') {
-              // 处理一元负号
-              int neg_count = 1;
-              while (position < strlen(e) && (e[position] == '-'||e[position]==' ')) {
-                if(e[position]=='-') neg_count++;
-                position++;
-              }
-              if (neg_count % 2 == 1) {
-                tokens[nr_token].type = TK_NEG;
-                tokens[nr_token].str[0] = '-'; 
-                tokens[nr_token].str[1] = '\0';
-              } else {
-                tokens[nr_token].type = '+';
-                tokens[nr_token].str[0] = '+'; 
-                tokens[nr_token].str[1] = '\0'; 
-              }
-              nr_token++;
-            } else {
-              // 处理二元减号
-              tokens[nr_token].str[0] = '-'; 
-              tokens[nr_token].str[1] = '\0'; 
-              tokens[nr_token].type = '-';
-              nr_token++;
-            }
             break;
           default: break;//TODO();
         }
@@ -189,7 +162,6 @@ static int operator_level(int op_type){
   switch(tokens[op_type].type){
     case '+': return 2;
     case '-': return 2;
-    case TK_NEG: return 2;
     case '*': return 1;
     case '/': return 1;
     default:  
@@ -227,7 +199,6 @@ static int find_main_operator(int p,int q){
 
 word_t eval(int p,int q){
   int op;
-  word_t val1,val2;
   if(p>q){
     return 0;
   }else if(p==q){
@@ -242,13 +213,8 @@ word_t eval(int p,int q){
     if(op==-1 || op<p || op>q){
       return -1;
     }
-    if(tokens[op].type==TK_NEG || tokens[op].type=='+'){
-      val2=eval(op+1,q);
-      if(tokens[op].type==TK_NEG) return -val2;
-      else return val2;
-    }else{
-      val1=eval(p,op-1);
-      val2=eval(op+1,q);
+    word_t val1=eval(p,op-1);
+    word_t val2=eval(op+1,q);
       switch(tokens[op].type){
         case '+':return val1+val2;
         case '-':return val1-val2;
@@ -261,7 +227,6 @@ word_t eval(int p,int q){
           return val1/val2;
         default:
           return 0;
-      }
     }
   }
 }
