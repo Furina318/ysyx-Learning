@@ -131,8 +131,8 @@ static bool make_token(char *e) {
             break;
           case '-':
             if (nr_token == 0 || 
-                (tokens[nr_token - 1].type != TK_NUM && 
-                 tokens[nr_token - 1].type != ')')) {
+                tokens[nr_token - 1].type == TK_NUM || 
+                 tokens[nr_token - 1].type == ')') {
               // 处理一元负号
               int neg_count = 1;
               while (position < strlen(e) && e[position] == '-') {
@@ -141,18 +141,18 @@ static bool make_token(char *e) {
               }
               if (neg_count % 2 == 1) {
                 tokens[nr_token].type = TK_NEG;
-                tokens[nr_token].str[0] = '-'; // 直接赋值
-                tokens[nr_token].str[1] = '\0'; // 手动添加终止符
+                tokens[nr_token].str[0] = '-'; 
+                tokens[nr_token].str[1] = '\0';
               } else {
                 tokens[nr_token].type = '+';
-                tokens[nr_token].str[0] = '+'; // 直接赋值
-                tokens[nr_token].str[1] = '\0'; // 手动添加终止符
+                tokens[nr_token].str[0] = '+'; 
+                tokens[nr_token].str[1] = '\0'; 
               }
               nr_token++;
             } else {
               // 处理二元减号
-              tokens[nr_token].str[0] = '-'; // 直接赋值
-              tokens[nr_token].str[1] = '\0'; // 手动添加终止符
+              tokens[nr_token].str[0] = '-'; 
+              tokens[nr_token].str[1] = '\0'; 
               tokens[nr_token].type = '-';
               nr_token++;
             }
