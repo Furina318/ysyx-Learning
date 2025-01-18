@@ -135,8 +135,8 @@ static bool make_token(char *e) {
                  tokens[nr_token - 1].type == ')') {
               // 处理一元负号
               int neg_count = 1;
-              while (position < strlen(e) && e[position] == '-') {
-                neg_count++;
+              while (position < strlen(e) && (e[position] == '-'||e[position]==' ')) {
+                if(e[position]=='-') neg_count++;
                 position++;
               }
               if (neg_count % 2 == 1) {
