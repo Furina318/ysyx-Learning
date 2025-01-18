@@ -87,9 +87,7 @@ typedef struct token {
 static Token tokens[32] __attribute__((used)) = {};
 static int nr_token __attribute__((used))  = 0;
 
-int min(int a,int b){
-  return (a<b)?a:b;
-}
+
 
 static bool make_token(char *e) {
   int position = 0;
@@ -203,7 +201,7 @@ static int find_main_operator(int p,int q){
       }
     }
     if (cnt>0) continue;
-    if(tokens[i].type!=TK_NUM && tokens[i].type!=TK_NOTYPE && tokens[i].type!=TK_EQ && tokens[i].type!=TK_NEQ){//排除非运算符
+    if(tokens[i].type!=TK_NUM && tokens[i].type!=TK_NOTYPE){//排除非运算符
       if(high_operator_level<=operator_level(i)){
         high_operator_level=operator_level(i);
         main_operator=i;
