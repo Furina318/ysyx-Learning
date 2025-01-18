@@ -199,7 +199,7 @@ static bool make_token(char *e) {
             long reg_val = isa_reg_str2val(reg_name);
             printf("%ld\n",reg_val);
             if (reg_val < 0) {
-              printf("未知寄存器名: %s\n", reg_name);
+              printf("Unknow reg name: %s\n", reg_name);
               return false;
             }
             // 将寄存器值转换为十进制字符串并存储到 tokens 中
