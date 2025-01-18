@@ -128,19 +128,19 @@ static bool make_token(char *e) {
             tokens[nr_token].type=rules[i].token_type;
             nr_token++;
             break;
-          case '-':
-          case TK_NEG:
-            if (nr_token == 0 || tokens[nr_token - 1].type == '(' || 
-              tokens[nr_token - 1].type == '+' || tokens[nr_token - 1].type == '-' ||
-              tokens[nr_token - 1].type == '*' || tokens[nr_token - 1].type == '/') {
-                tokens[nr_token].type = TK_NEG; // 标记
-                nr_token++;
-                break;
-              }else{
-              tokens[nr_token].type='-';
-              nr_token++;
-              break;
+          case '-': // 处理一元和二元减法
+            if (nr_token == 0 || tokens[nr_token - 1].type == '(' ||
+                tokens[nr_token - 1].type == '+' || tokens[nr_token - 1].type == '-' ||
+                tokens[nr_token - 1].type == '*' || tokens[nr_token - 1].type == '/' ||
+                tokens[nr_token - 1].type == TK_NEG) { // 新增条件：前面也是负号
+              tokens[nr_token].type = TK_NEG; // 标记为一元运算符
+            } else {
+              tokens[nr_token].type = '-'; // 标记为二元运算符
             }
+            strncpy(tokens[nr_token].str, substr_start, substr_len);
+            tokens[nr_token].str[substr_len] = '\0';
+            nr_token++;
+            break;
           default: break;//TODO();
         }
 
@@ -227,12 +227,10 @@ word_t eval(int p,int q){
     }
     if (tokens[op].type == TK_NEG) {
       int neg_count = 0;
-      while (op <= q && tokens[op].type == TK_NEG) {
-        neg_count++;
-        op++;
-      }
-      word_t val = eval(op, q); // 注意这里不再是 op+1
-      return (neg_count % 2 == 0) ? val : -val;
+      // 计算连续的一元减号数量
+      for (int j = op; j <= q && tokens[j].type == TK_NEG; j++, neg_count++);
+      word_t val = eval(op + neg_count, q); // 跳过所有的一元减号
+      return (neg_count % 2 == 0) ? val : -val; // 根据奇偶性决定最终是加还是减
     }
     word_t val1=eval(p,op-1);
     word_t val2=eval(op+1,q);
