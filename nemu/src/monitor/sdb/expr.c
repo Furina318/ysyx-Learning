@@ -19,6 +19,8 @@
  * Type 'man regex' for more information about POSIX regex functions.
  */
 #include <regex.h>
+#include<ctype.h>
+#include<isa.h>
 enum {
   TK_NOTYPE = 256, TK_EQ,
   TK_NUM,TK_NEQ,TK_NEG,TK_PO,TK_AND,TK_0x,TK_$,
@@ -45,8 +47,8 @@ static struct rule {
   {"[0-9]+", TK_NUM},   // 数字
   {"!=",TK_NEQ},        //不等号
   {"&&",TK_AND},
-  {"0x",TK_0x},
-  {"$",TK_$},
+  {"0x[0-9a-fA-F]+",TK_0x},
+  {"$[a-f0-9]+",TK_$},
 
   {" +", TK_NOTYPE},    // spaces
   {"\\+", '+'},         // plus
@@ -87,7 +89,39 @@ typedef struct token {
 static Token tokens[32] __attribute__((used)) = {};
 static int nr_token __attribute__((used))  = 0;
 
+static int hex_char_to_decimal(char c) {
+  if (c >= '0' && c <= '9') return c - '0';
+  if (c >= 'A' && c <= 'F') return c - 'A' + 10;
+  if (c >= 'a' && c <= 'f') return c - 'a' + 10;
+  // 如果不是有效的十六进制字符，则返回-1表示错误
+  return -1;
+}
 
+// 十六进制转十进制函数
+static long hex_to_decimal(const char *hex_string) {
+  long decimal_value = 0;
+  int i, len = 0;
+
+  // 跳过可选的前缀 "0x" 或 "$"
+  if (hex_string[0] == '0' && hex_string[1] == 'x') {
+    hex_string += 2;
+  }
+
+  // 计算字符串长度
+  for (len = 0; hex_string[len]; ++len);
+
+  // 从左到右处理每个字符
+  for (i = 0; i < len; ++i) {
+    int value = hex_char_to_decimal(tolower(hex_string[i]));
+    if (value == -1) {
+      fprintf(stderr, "Invalid hex digit '%c'\n", hex_string[i]);
+      return -1; // 返回错误代码
+    }
+    decimal_value = decimal_value * 16 + value;
+  }
+
+  return decimal_value;
+}
 
 static bool make_token(char *e) {
   int position = 0;
@@ -139,6 +173,22 @@ static bool make_token(char *e) {
             strncpy(tokens[nr_token].str, substr_start, substr_len);
             tokens[nr_token].str[substr_len] = '\0';
             nr_token++;
+            break;
+          case TK_0x:
+            const char *hex_start = substr_start + 2; // 跳过0x
+            long decimal_val = hex_to_decimal(hex_start);
+            if (decimal_val >= 0) {
+              snprintf(tokens[nr_token].str, sizeof(tokens[nr_token].str), "%ld", decimal_val);
+              tokens[nr_token].type = TK_NUM;
+              nr_token++;
+              // 更新position以跳过整个十六进制数
+              position += strlen(hex_start) - substr_len + 2; // 包括0x的长度
+            } else {
+              printf("Hexadecimal conversion failed.\n");
+              return false;
+            }
+            break;
+          case TK_$:
             break;
           default: break;//TODO();
         }
@@ -245,9 +295,9 @@ word_t eval(int p,int q){
             return 0;
           }
           return val1/val2;
-        case TK_NEG:return val1!=val2?1:0;
-        case TK_EQ:return val1==val2?1:0;
-        case TK_AND:return val1&&val2?1:0;
+        case TK_NEG:return val1 != val2?1:0;
+        case TK_EQ:return val1 == val2?1:0;
+        case TK_AND:return val1 && val2?1:0;
         default:return 0;
     }
   }
