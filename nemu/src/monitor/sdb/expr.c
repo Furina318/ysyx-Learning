@@ -42,6 +42,7 @@ static struct rule {
   {"/", '/'},           // 除法
   {"-", '-'},           // 减法
   {"-", TK_NEG},        //负号，处理多元减号
+  {"--",TK_NEG},
   {"[0-9]+", TK_NUM},   // 数字
   {"!=",TK_NEQ},        //不等号
   {"&&",TK_ADD},
@@ -114,7 +115,14 @@ static bool make_token(char *e) {
          * to record the token in the array `tokens'. For certain types
          * of tokens, some extra actions should be performed.
          */
-
+        int token_type = rules[i].token_type;// 判断负号
+        if (token_type == '-' || token_type == TK_NEG) {
+          if (nr_token == 0 || tokens[nr_token - 1].type == '(' || 
+              tokens[nr_token - 1].type == '+' || tokens[nr_token - 1].type == '-' ||
+              tokens[nr_token - 1].type == '*' || tokens[nr_token - 1].type == '/') {
+            token_type = TK_NEG; // 标记为负号
+          }
+        }
         switch (rules[i].token_type) {
           case TK_NUM:
           case '+':
@@ -125,6 +133,7 @@ static bool make_token(char *e) {
           case ')':
           case TK_NEQ:
           case TK_EQ:
+          case TK_NEG:
             strncpy(tokens[nr_token].str,substr_start,substr_len);
             tokens[nr_token].str[substr_len]='\0';
             tokens[nr_token].type=rules[i].token_type;
@@ -162,6 +171,7 @@ static int operator_level(int op_type){
   switch(tokens[op_type].type){
     case '+': return 2;
     case '-': return 2;
+    case TK_NEG: return 2;
     case '*': return 1;
     case '/': return 1;
     default:  
@@ -212,6 +222,15 @@ word_t eval(int p,int q){
     op=find_main_operator(p,q);
     if(op==-1 || op<p || op>q){
       return -1;
+    }
+    if(tokens[op].type==TK_NEG){
+      int neg_count = 0;
+        while (op <= q && tokens[op].type == TK_NEG) {
+          neg_count++;
+          op++;
+        }
+        word_t val = eval(op+1, q);
+        return (neg_count % 2 == 0) ? val : -val;
     }
     word_t val1=eval(p,op-1);
     word_t val2=eval(op+1,q);
