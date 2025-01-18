@@ -48,7 +48,7 @@ static struct rule {
   {"[0-9]+", TK_NUM},   // 数字
   {"!=",TK_NEQ},        //不等号
   {"&&",TK_AND},
-  {"//$",TK_$},
+  {"\\$",TK_$},
 
   {" +", TK_NOTYPE},    // spaces
   {"\\+", '+'},         // plus
