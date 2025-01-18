@@ -21,7 +21,7 @@
 #include <regex.h>
 enum {
   TK_NOTYPE = 256, TK_EQ,
-  TK_NUM,TK_NEQ,TK_NEG,TK_PO,TK_ADD,TK_0x,TK_$,
+  TK_NUM,TK_NEQ,TK_NEG,TK_PO,TK_AND,TK_0x,TK_$,
   /* TODO: Add more token types */
 
 };
@@ -44,7 +44,7 @@ static struct rule {
   {"-", TK_NEG},        //负号，处理多元减号
   {"[0-9]+", TK_NUM},   // 数字
   {"!=",TK_NEQ},        //不等号
-  {"&&",TK_ADD},
+  {"&&",TK_AND},
   {"0x",TK_0x},
   {"$",TK_$},
 
@@ -123,6 +123,7 @@ static bool make_token(char *e) {
           case ')':
           case TK_NEQ:
           case TK_EQ:
+          case TK_AND:
             strncpy(tokens[nr_token].str,substr_start,substr_len);
             tokens[nr_token].str[substr_len]='\0';
             tokens[nr_token].type=rules[i].token_type;
@@ -171,11 +172,14 @@ static bool check_parentheses(int p,int q){
 
 static int operator_level(int op_type){
   switch(tokens[op_type].type){
-    case '+': return 2;
-    case '-': return 2;
-    case TK_NEG: return 32;
-    case '*': return 1;
-    case '/': return 1;
+    case TK_NEG: return 5;
+    case '+': return 4;
+    case '-': return 4;
+    case '*': return 3;
+    case '/': return 3;
+    case TK_EQ:return 2;
+    case TK_NEQ:return 2;
+    case TK_AND:return 1;
     default:  
       printf("Undefine oprator\n");
       // assert(0);
@@ -243,8 +247,10 @@ word_t eval(int p,int q){
             return 0;
           }
           return val1/val2;
-        default:
-          return 0;
+        case TK_NEG:return (val1 != val2)?1:0;
+        case TK_EQ:return (val1 == val2)?1:0;
+        case TK_AND:return (val1 && val2)?1:0;
+        default:return 0;
     }
   }
 }
