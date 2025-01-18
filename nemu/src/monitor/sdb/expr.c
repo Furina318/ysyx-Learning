@@ -114,32 +114,33 @@ static bool make_token(char *e) {
          * to record the token in the array `tokens'. For certain types
          * of tokens, some extra actions should be performed.
          */
-        int token_type = rules[i].token_type;// 判断负号
-        if (token_type == '-' || token_type == TK_NEG) {
-          if (nr_token == 0 || tokens[nr_token - 1].type == '(' || 
-              tokens[nr_token - 1].type == '+' || tokens[nr_token - 1].type == '-' ||
-              tokens[nr_token - 1].type == '*' || tokens[nr_token - 1].type == '/') {
-            rules[i].token_type = TK_NEG; // 标记
-          }else{
-            rules[i].token_type='-';
-          }
-        }
         switch (rules[i].token_type) {
           case TK_NUM:
           case '+':
-          case '-':
           case '*':
           case '/':
           case '(':
           case ')':
           case TK_NEQ:
           case TK_EQ:
-          case TK_NEG:
             strncpy(tokens[nr_token].str,substr_start,substr_len);
             tokens[nr_token].str[substr_len]='\0';
             tokens[nr_token].type=rules[i].token_type;
             nr_token++;
             break;
+          case '-':
+          case TK_NEG:
+            if (nr_token == 0 || tokens[nr_token - 1].type == '(' || 
+              tokens[nr_token - 1].type == '+' || tokens[nr_token - 1].type == '-' ||
+              tokens[nr_token - 1].type == '*' || tokens[nr_token - 1].type == '/') {
+                tokens[nr_token].type = TK_NEG; // 标记
+                nr_token++;
+                break;
+              }else{
+              tokens[nr_token].type='-';
+              nr_token++;
+              break;
+            }
           default: break;//TODO();
         }
 
