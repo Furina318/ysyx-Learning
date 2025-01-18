@@ -42,7 +42,6 @@ static struct rule {
   {"/", '/'},           // 除法
   {"-", '-'},           // 减法
   {"-", TK_NEG},        //负号，处理多元减号
-  {"--",TK_NEG},
   {"[0-9]+", TK_NUM},   // 数字
   {"!=",TK_NEQ},        //不等号
   {"&&",TK_ADD},
@@ -120,7 +119,9 @@ static bool make_token(char *e) {
           if (nr_token == 0 || tokens[nr_token - 1].type == '(' || 
               tokens[nr_token - 1].type == '+' || tokens[nr_token - 1].type == '-' ||
               tokens[nr_token - 1].type == '*' || tokens[nr_token - 1].type == '/') {
-            token_type = TK_NEG; // 标记为负号
+            rules[i].token_type = TK_NEG; // 标记
+          }else{
+            rules[i].token_type='-';
           }
         }
         switch (rules[i].token_type) {
@@ -171,7 +172,7 @@ static int operator_level(int op_type){
   switch(tokens[op_type].type){
     case '+': return 2;
     case '-': return 2;
-    case TK_NEG: return 2;
+    case TK_NEG: return 32;
     case '*': return 1;
     case '/': return 1;
     default:  
@@ -223,14 +224,14 @@ word_t eval(int p,int q){
     if(op==-1 || op<p || op>q){
       return -1;
     }
-    if(tokens[op].type==TK_NEG){
+    if (tokens[op].type == TK_NEG) {
       int neg_count = 0;
-        while (op <= q && tokens[op].type == TK_NEG) {
-          neg_count++;
-          op++;
-        }
-        word_t val = eval(op+1, q);
-        return (neg_count % 2 == 0) ? val : -val;
+      while (op <= q && tokens[op].type == TK_NEG) {
+        neg_count++;
+        op++;
+      }
+      word_t val = eval(op, q); // 注意这里不再是 op+1
+      return (neg_count % 2 == 0) ? val : -val;
     }
     word_t val1=eval(p,op-1);
     word_t val2=eval(op+1,q);
