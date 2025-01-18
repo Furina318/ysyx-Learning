@@ -48,7 +48,7 @@ static struct rule {
   {"[0-9]+", TK_NUM},   // 数字
   {"!=",TK_NEQ},        //不等号
   {"&&",TK_AND},
-  {"$[a-f0-9]+",TK_$},
+  {"//$",TK_$},
 
   {" +", TK_NOTYPE},    // spaces
   {"\\+", '+'},         // plus
@@ -173,15 +173,38 @@ static bool make_token(char *e) {
             nr_token++;
             break;
           case TK_0x:
-            const char *hex_start = substr_start + 2;
-            long decimal_val = strtol(hex_start, NULL, 16); // 使用标准库函数strtol进行转换
-            if (decimal_val >= 0) {
+            const char *hex_start=substr_start+2;
+            long decimal_val=strtol(hex_start, NULL, 16); //strtol用于将字符串转换为长整型数,灵活的转进制能力。转换基数为0时候则根据前缀
+            if (decimal_val>=0) {
               snprintf(tokens[nr_token].str, sizeof(tokens[nr_token].str), "%ld", decimal_val);
-              tokens[nr_token].type = TK_NUM;
+              tokens[nr_token].type=TK_NUM;
               nr_token++;
             }
             break;
           case TK_$:
+            int name_num = 0;
+            char reg_name[5]; // 假设 REG_NAME_MAX_LEN 是定义好的最大寄存器名长度
+            position--; // 跳过 '$' 符号并开始读取寄存器名,因为之前已经增加了 substr_len（即 1），所以需要先回退一个位置
+            while (isalnum(e[position])||e[position]=='$') { // 继续读取直到遇到非字母数字
+              if (name_num<4) {
+                reg_name[name_num++] = e[position++];
+              } else {
+                printf("寄存器名称过长\n");
+                return false;
+              }
+              if(e[position]=='\0') break;
+            }
+            reg_name[name_num] = '\0';
+            long reg_val = isa_reg_str2val(reg_name);
+            if (reg_val < 0) {
+              printf("未知寄存器名: %s\n", reg_name);
+              return false;
+            }
+            // 将寄存器值转换为十进制字符串并存储到 tokens 中
+            snprintf(tokens[nr_token].str, sizeof(tokens[nr_token].str), "%ld", reg_val);
+            tokens[nr_token].type = TK_NUM;
+            nr_token++;
+
             break;
           default: break;//TODO();
         }
