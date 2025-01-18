@@ -22,7 +22,7 @@
 
 enum {
   TK_NOTYPE = 256, TK_EQ,
-  TK_NUM,TK_NEQ,
+  TK_NUM,TK_NEQ,TK_NEG,TK_TUN
   /* TODO: Add more token types */
 
 };
@@ -36,16 +36,18 @@ static struct rule {
    * Pay attention to the precedence level of different rules.
    */
 
-  {"\\(", '('},         // left parenthesis
-  {"\\)",')'},         // right parenthesis
-  {"\\*", '*'},         // multiplication
-  {"/", '/'},           // division
-  {"-", '-'},           // minus
-  {"[0-9]+", TK_NUM},   // integer number
-  {"!=",TK_NEQ},        //not equal
+  {"\\(", '('},         // 左括号
+  {"\\)",')'},          // 右括号
+  {"\\*", '*'},         // 乘法
+  {"/", '/'},           // 除法
+  {"-", '-'},           // 减法
+  {"-", TK_NEG},        //负号，处理多元减号
+  {"[0-9]+", TK_NUM},   // 数字
+  {"!=",TK_NEQ},        //不等号
 
   {" +", TK_NOTYPE},    // spaces
   {"\\+", '+'},         // plus
+  {"\\+", TK_TUN},      //反转后的+
   {"==", TK_EQ},        // equal
 };
 
@@ -110,7 +112,6 @@ static bool make_token(char *e) {
         switch (rules[i].token_type) {
           case TK_NUM:
           case '+':
-          case '-':
           case '*':
           case '/':
           case '(':
@@ -121,6 +122,25 @@ static bool make_token(char *e) {
             tokens[nr_token].str[substr_len]='\0';
             tokens[nr_token].type=rules[i].token_type;
             nr_token++;
+            break;
+          case '-':
+            if (nr_token == 0 || tokens[nr_token-1].type!=')') {
+              // 如果是连续的一元减号，合并为一个标记，并根据数量决定符号
+              int neg_count = 1;
+              while (position < strlen(e) && e[position] == '-') {
+                neg_count++;
+                position++;
+              }
+              strncpy(tokens[nr_token].str, substr_start, substr_len); // 保存一个减号作为标记
+              tokens[nr_token].str[substr_len] = '\0';
+              tokens[nr_token].type = neg_count % 2 ? TK_NEG : TK_TUN; // 奇数个减号变为负，偶数个变为正
+              nr_token++;
+            } else { // 否则当作二元减号处理
+              strncpy(tokens[nr_token].str, substr_start, substr_len);
+              tokens[nr_token].str[substr_len] = '\0';
+              tokens[nr_token].type = '-';
+              nr_token++;
+            }
             break;
           default: break;//TODO();
         }
@@ -191,6 +211,7 @@ static int find_main_operator(int p,int q){
 
 word_t eval(int p,int q){
   int op;
+  word_t val1,val2;
   if(p>q){
     return 0;
   }else if(p==q){
@@ -205,20 +226,26 @@ word_t eval(int p,int q){
     if(op==-1 || op<p || op>q){
       return -1;
     }
-    word_t val1=eval(p,op-1);
-    word_t val2=eval(op+1,q);
-    switch(tokens[op].type){
-      case '+':return val1+val2;
-      case '-':return val1-val2;
-      case '*':return val1*val2;
-      case '/':
-        if(val2==0){
-          printf("The denominator can't be zero!\n");
+    if(tokens[op].type==TK_NEG || tokens[op].type==TK_TUN){
+      val2=eval(op+1,q);
+      if(tokens[op].type==TK_NEG) return -val2;
+      else return val2;
+    }else{
+      val1=eval(p,op-1);
+      val2=eval(op+1,q);
+      switch(tokens[op].type){
+        case '+':return val1+val2;
+        case '-':return val1-val2;
+        case '*':return val1*val2;
+        case '/':
+          if(val2==0){
+            printf("The denominator can't be zero!\n");
+            return 0;
+          }
+          return val1/val2;
+        default:
           return 0;
-        }
-        return val1/val2;
-      default:
-        return 0;
+      }
     }
   }
 }
