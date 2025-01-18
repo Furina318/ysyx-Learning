@@ -22,7 +22,7 @@
 
 enum {
   TK_NOTYPE = 256, TK_EQ,
-  TK_NUM,TK_NEQ,TK_NEG,TK_TUN
+  TK_NUM,TK_NEQ,TK_NEG,TK_TUN,TK_PO,
   /* TODO: Add more token types */
 
 };
@@ -174,6 +174,8 @@ static int operator_level(int op_type){
   switch(tokens[op_type].type){
     case '+': return 2;
     case '-': return 2;
+    case TK_NEG: return 2;
+    case TK_TUN: return 2;
     case '*': return 1;
     case '/': return 1;
     default:  
