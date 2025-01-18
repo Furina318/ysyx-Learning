@@ -130,20 +130,29 @@ static bool make_token(char *e) {
             nr_token++;
             break;
           case '-':
-            if (nr_token == 0 || tokens[nr_token-1].type!=')') {
-              // 如果是连续的一元减号，合并为一个标记，并根据数量决定符号
+            if (nr_token == 0 || 
+                (tokens[nr_token - 1].type != TK_NUM && 
+                 tokens[nr_token - 1].type != ')')) {
+              // 处理一元负号
               int neg_count = 1;
               while (position < strlen(e) && e[position] == '-') {
                 neg_count++;
                 position++;
               }
-              strncpy(tokens[nr_token].str, "-", min(1,substr_len)); // 保存一个减号作为标记
-              tokens[nr_token].str[min(1,substr_len)] = '\0';
-              tokens[nr_token].type = neg_count % 2 ? TK_NEG : '+'; // 奇数个减号变为负，偶数个变为正
+              if (neg_count % 2 == 1) {
+                tokens[nr_token].type = TK_NEG;
+                tokens[nr_token].str[0] = '-'; // 直接赋值
+                tokens[nr_token].str[1] = '\0'; // 手动添加终止符
+              } else {
+                tokens[nr_token].type = '+';
+                tokens[nr_token].str[0] = '+'; // 直接赋值
+                tokens[nr_token].str[1] = '\0'; // 手动添加终止符
+              }
               nr_token++;
-            } else { // 否则当作二元减号处理
-              strncpy(tokens[nr_token].str, substr_start, substr_len);
-              tokens[nr_token].str[substr_len] = '\0';
+            } else {
+              // 处理二元减号
+              tokens[nr_token].str[0] = '-'; // 直接赋值
+              tokens[nr_token].str[1] = '\0'; // 手动添加终止符
               tokens[nr_token].type = '-';
               nr_token++;
             }
