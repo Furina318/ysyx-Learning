@@ -21,6 +21,7 @@
 #include <regex.h>
 #include<ctype.h>
 #include<isa.h>
+#include<memory/paddr.h>
 enum {
   TK_NOTYPE = 256, TK_EQ,
   TK_NUM,TK_NEQ,TK_NEG,TK_PO,TK_AND,TK_0x,TK_$,
@@ -147,7 +148,6 @@ static bool make_token(char *e) {
         switch (rules[i].token_type) {
           case TK_NUM:
           case '+':
-          case '*':
           case '/':
           case '(':
           case ')':
@@ -172,6 +172,19 @@ static bool make_token(char *e) {
             tokens[nr_token].str[substr_len] = '\0';
             nr_token++;
             break;
+          case '*':
+            if (nr_token == 0 || tokens[nr_token - 1].type == '(' ||
+                tokens[nr_token - 1].type == '+' || tokens[nr_token - 1].type == '-' ||
+                tokens[nr_token - 1].type == '*' || tokens[nr_token - 1].type == '/' ||
+                tokens[nr_token - 1].type == TK_PO) { 
+              tokens[nr_token].type = TK_PO; 
+            } else {
+              tokens[nr_token].type = '*'; 
+            }
+            strncpy(tokens[nr_token].str, substr_start, substr_len);
+            tokens[nr_token].str[substr_len] = '\0';
+            nr_token++;
+            break;
           case TK_0x:
             const char *hex_start=substr_start+2;
             long decimal_val=strtol(hex_start, NULL, 16); //strtol用于将字符串转换为长整型数,灵活的转进制能力。转换基数为0时候则根据前缀
@@ -188,7 +201,7 @@ static bool make_token(char *e) {
               if (name_num<4) {
                 reg_name[name_num++] = e[position++];
               } else {
-                printf("寄存器名称过长\n");
+                printf("Reg name too long\n");
                 return false;
               }
               if(e[position]=='\0') break;
@@ -198,12 +211,10 @@ static bool make_token(char *e) {
             if (reg_val < 0) {
               printf("Unknow reg name: %s\n", reg_name);
               return false;
-            }
-            // 将寄存器值转换为十进制字符串并存储到 tokens 中
+            }// 将寄存器值转换为十进制字符串并存储到 tokens 中
             snprintf(tokens[nr_token].str, sizeof(tokens[nr_token].str), "%ld", reg_val);
             tokens[nr_token].type = TK_NUM;
             nr_token++;
-
             break;
           default: break;//TODO();
         }
@@ -297,6 +308,16 @@ word_t eval(int p,int q){
       for (int j = op; j <= q && tokens[j].type == TK_NEG; j++, neg_count++);
       word_t val = eval(op + neg_count, q); // 跳过所有的一元减号
       return (neg_count % 2 == 0) ? val : -val; // 根据奇偶性决定最终是加还是减
+    }
+    if (tokens[op].type == TK_PO) {// 解指针操作，假设后面跟着的是一个有效的内存地址
+      if (op + 1 <= q && tokens[op + 1].type == TK_NUM) {
+        word_t addr = atoi(tokens[op + 1].str); // 将字符串转换为整数作为地址
+        word_t val = paddr_read(addr, sizeof(word_t)); // 读取地址处的值
+        return val;
+      } else {
+        printf("Invalid dereference operation\n");
+        return -1;
+      }
     }
     word_t val1=eval(p,op-1);
     word_t val2=eval(op+1,q);
