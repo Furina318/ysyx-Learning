@@ -19,12 +19,14 @@
 #include <readline/history.h>
 #include "sdb.h"
 #include <memory/paddr.h>
+#include <common.h>
+#include "watchpoint.h"
 
 static int is_batch_mode = false;
 
 void init_regex();
 void init_wp_pool();
-
+WP *new_wp();
 /* We use the `readline' library to provide more flexibility to read from stdin. */
 static char* rl_gets() {
   static char *line_read = NULL;
@@ -78,7 +80,17 @@ static int cmd_info(char *args){
     if(strcmp(arg,"r")==0){
       isa_reg_display();//打印寄存器，文件在isa/risv32/reg.c中
     }else if(strcmp(arg,"w")==0){
-      //打印监视点信息
+      WP *wp=get_wp_head();
+      if(wp == NULL){
+        printf("No watchpoints set.\n");
+        return 0;
+      }
+      printf("Current watchpoints:\n");
+      while (wp != NULL) {// 打印监视点信息
+        printf("Watchpoint NO:%-2d: Expression '%s' Last Value: 0x%x\n",
+          wp->NO, wp->expr ? wp->expr : "N/A", wp->old_val);
+        wp=wp->next;
+      }
     }else printf("Invalid operation,please specify 'r' or 'w'.\n");
   }else printf("No argument provided. Please specify 'r' or 'w'.\n");
   return 0;
@@ -116,18 +128,47 @@ static int cmd_x(char *args){//扫描内存
 }
 
 static int cmd_w(char *args){
-
+  if(args==NULL || strlen(args)==0){
+    printf("No expression provided\n");
+    return 0;
+  }
+  char *EXPR=args;
+  WP *wp = new_wp();
+  if (wp == NULL) return 0;
+  strcpy(wp->expr,EXPR);
+  // if (wp->expr == NULL) {
+  //   free_wp(wp);
+  //   return 0;
+  // }
+  wp->old_val=expr(EXPR); 
+  return 0;
 }
-static int cmd_d(char *args){
 
+static int cmd_d(char *args){
+  if (args==NULL || strlen(args)==0) {
+    printf("Invalid index. Please enter a valid number.\n");
+    return 0;
+  }
+  int no=atoi(strtok(NULL," "));
+  WP *wp=get_wp_head();
+  while(wp!=NULL){
+    if (wp->NO==no) {
+      free_wp(wp);
+      printf("Watchpoint %d deleted.\n", no);
+      return 0;
+    }
+    wp=wp->next;
+  }
+  printf("Watchpoint with index %d not found.\n", no);
+  return 0;
 }
 static int cmd_p(char *args) {
-  if (args == NULL || strlen(args) == 0) {
+  if(args == NULL || strlen(args) == 0){
     printf("No expression provided\n");
     return 0;
   }
 
-  uint32_t result = expr(args);
+  word_t result = expr(args);
   
   // Check for various error conditions.
   if (result == -1) {
@@ -153,9 +194,9 @@ static struct {
   /* TODO: Add more commands */
   { "si", "Let the program excute N instuctions and then suspend the excution(while the N is not given,the default value is 1)", cmd_si},
   { "info", "Print register status with\"r\",or print the monitor status with \"w\" ",cmd_info},
-  { "x", "I don't konw how to explain the function",cmd_x},
-  { "p", "Find the value of the expression 'EXPR' and add one to the result",cmd_p},
-  { "w", "Set watchpoint on EXPR,the programme will stop when it change",cmd_w},
+  { "x", "Scan N pieces of memory base on 'EXPR' ",cmd_x},
+  { "p", "Find the value of the expression 'EXPR' ",cmd_p},
+  { "w", "Set watchpoint on 'EXPR',the programme will stop when it change",cmd_w},
   { "d", "Delete a watchpoint NO.n you set",cmd_d},
 };
 

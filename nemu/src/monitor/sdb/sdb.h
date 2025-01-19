@@ -19,5 +19,6 @@
 #include <common.h>
 
 word_t expr(char *e);
+void sdb_mainloop();
 
 #endif
