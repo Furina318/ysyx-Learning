@@ -134,6 +134,7 @@ static int cmd_w(char *args){
   }
   char *EXPR=args;
   WP *wp = new_wp();
+  if (wp == NULL) return 0;
   strcpy(wp->expr,EXPR);
   wp->old_val=expr(EXPR); 
   return 0;
