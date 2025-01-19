@@ -160,10 +160,10 @@ static bool make_token(char *e) {
             nr_token++;
             break;
           case '-': // 处理一元和多元减法
-            if (nr_token == 0 || tokens[nr_token - 1].type == '(' ||
-                tokens[nr_token - 1].type == '+' || tokens[nr_token - 1].type == '-' ||
-                tokens[nr_token - 1].type == '*' || tokens[nr_token - 1].type == '/' ||
-                tokens[nr_token - 1].type == TK_NEG) { 
+            if (nr_token == 0 || tokens[nr_token-1].type == '(' ||
+                tokens[nr_token-1].type == '+' || tokens[nr_token-1].type == '-' ||
+                tokens[nr_token-1].type == '*' || tokens[nr_token-1].type == '/' ||
+                tokens[nr_token-1].type == TK_NEG) { 
               tokens[nr_token].type = TK_NEG; 
             } else {
               tokens[nr_token].type = '-'; 
@@ -174,9 +174,9 @@ static bool make_token(char *e) {
             break;
           case '*':
             if (nr_token == 0 || tokens[nr_token - 1].type == '(' ||
-                tokens[nr_token - 1].type == '+' || tokens[nr_token - 1].type == '-' ||
-                tokens[nr_token - 1].type == '*' || tokens[nr_token - 1].type == '/' ||
-                tokens[nr_token - 1].type == TK_PO) { 
+                tokens[nr_token-1].type == '+' || tokens[nr_token-1].type == '-' ||
+                tokens[nr_token-1].type == '*' || tokens[nr_token-1].type == '/' ||
+                tokens[nr_token-1].type == TK_PO) { 
               tokens[nr_token].type = TK_PO; 
             } else {
               tokens[nr_token].type = '*'; 
