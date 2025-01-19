@@ -134,9 +134,11 @@ static int cmd_w(char *args){
   }
   char *EXPR=args;
   WP *wp = new_wp();
-  if (wp == NULL) return 0;
+  if(wp == NULL) return 0;
   strcpy(wp->expr,EXPR);
+  printf("in\n");
   wp->old_val=expr(EXPR); 
+  printf("GET\n");
   return 0;
 }
 
@@ -148,7 +150,7 @@ static int cmd_d(char *args){
   int no=atoi(strtok(NULL," "));
   WP *wp=get_wp_head();
   while(wp!=NULL){
-    if (wp->NO==no) {
+    if(wp->NO==no){
       free_wp(wp);
       printf("Watchpoint %d deleted.\n", no);
       return 0;
@@ -163,17 +165,12 @@ static int cmd_p(char *args) {
     printf("No expression provided\n");
     return 0;
   }
-
-  word_t result = expr(args);
-  
-  // Check for various error conditions.
+  word_t result =expr(args);
   if (result == -1) {
     printf("Invalid expression\n");
     return 0;
   }
-  // 正常输出结果
   printf("%s = %u\n", args, result);
-
   return 0;
 }
 static int cmd_help(char *args);
