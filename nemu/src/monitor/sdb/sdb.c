@@ -80,12 +80,16 @@ static int cmd_info(char *args){
     if(strcmp(arg,"r")==0){
       isa_reg_display();//打印寄存器，文件在isa/risv32/reg.c中
     }else if(strcmp(arg,"w")==0){
+      char *wp_state="turn off";
+#ifdef CONFIG_WATCHPOINTS
+      *wp_state="working";
+#endif
       WP *wp=get_wp_head();
       if(wp == NULL){
         printf("No watchpoints set.\n");
         return 0;
       }
-      printf("Current watchpoints:\n");
+      printf("Current watchpoints state: %s\n",wp_state);
       while (wp != NULL) {// 打印监视点信息
         printf("Watchpoint NO:%-2d: Expression '%s' Last Value: 0x%08x\n",
           wp->NO, wp->expr ? wp->expr : "N/A", wp->old_val);
@@ -151,7 +155,7 @@ static int cmd_d(char *args){
   while(wp!=NULL){
     if(wp->NO==no){
       free_wp(wp);
-      printf("Watchpoint %d deleted.\n", no);
+      printf("Watchpoint NO.%d deleted.\n", no);
       return 0;
     }
     wp=wp->next;
