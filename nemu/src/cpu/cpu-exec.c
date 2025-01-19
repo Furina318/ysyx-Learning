@@ -40,17 +40,19 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
 #endif
   if (g_print_step) { IFDEF(CONFIG_ITRACE, puts(_this->logbuf)); }
   IFDEF(CONFIG_DIFFTEST, difftest_step(_this->pc, dnpc));
-  WP *wp=get_wp_head();
-  while(wp!=NULL){
-    word_t val=expr(wp->expr);
-    if(val!=wp->old_val){
-      printf("Watchpoint NO.%d: Expression '%s' changed from 0x%08x to 0x%08x.\n", wp->NO, wp->expr, wp->old_val, val);
-      nemu_state.state=NEMU_STOP;
-      //sdb_mainloop();
-      break;
+    if(CONFIG_WATCHPOINTS){
+    WP *wp=get_wp_head();
+    while(wp!=NULL){
+      word_t val=expr(wp->expr);
+      if(val!=wp->old_val){
+        printf("Watchpoint NO.%d: Expression '%s' changed from 0x%08x to 0x%08x.\n", wp->NO, wp->expr, wp->old_val, val);
+        nemu_state.state=NEMU_STOP;
+        //sdb_mainloop();
+        break;
+      }
+      wp->old_val=val;
+      wp=wp->next;
     }
-    wp->old_val=val;
-    wp=wp->next;
   }
 }
 
