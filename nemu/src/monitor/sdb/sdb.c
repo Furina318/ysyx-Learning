@@ -134,12 +134,9 @@ static int cmd_w(char *args){
   }
   char *EXPR=args;
   WP *wp = new_wp();
+  printf("get\n");
   if (wp == NULL) return 0;
   strcpy(wp->expr,EXPR);
-  // if (wp->expr == NULL) {
-  //   free_wp(wp);
-  //   return 0;
-  // }
   wp->old_val=expr(EXPR); 
   return 0;
 }
