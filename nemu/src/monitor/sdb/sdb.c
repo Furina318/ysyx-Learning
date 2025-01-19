@@ -87,7 +87,7 @@ static int cmd_info(char *args){
       }
       printf("Current watchpoints:\n");
       while (wp != NULL) {// 打印监视点信息
-        printf("Watchpoint NO:%-2d: Expression '%s' Last Value: 0x%8x\n",
+        printf("Watchpoint NO:%-2d: Expression '%s' Last Value: 0x%08x\n",
           wp->NO, wp->expr ? wp->expr : "N/A", wp->old_val);
         wp=wp->next;
       }
