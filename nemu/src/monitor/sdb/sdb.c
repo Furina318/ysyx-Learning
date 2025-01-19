@@ -115,19 +115,12 @@ static int cmd_x(char *args){//扫描内存
   return 0;
 }
 
-// static int cmd_p(char *args){
-//   char *arg;
-//   int result;
-//   arg=strtok(NULL," ");
-//   result=expr(arg);
-//   if(result==-1){
-//     printf("Invalid expression\n");
-//     return 0;
-//   }else{
-//     printf("%s = %u\n",arg,result);//调试成功后不要忘记result还要加一
-//   }
-//   return 0;
-// }
+static int cmd_w(char *args){
+
+}
+static int cmd_d(char *args){
+
+}
 static int cmd_p(char *args) {
   if (args == NULL || strlen(args) == 0) {
     printf("No expression provided\n");
@@ -162,6 +155,8 @@ static struct {
   { "info", "Print register status with\"r\",or print the monitor status with \"w\" ",cmd_info},
   { "x", "I don't konw how to explain the function",cmd_x},
   { "p", "Find the value of the expression 'EXPR' and add one to the result",cmd_p},
+  { "w", "Set watchpoint on EXPR,the programme will stop when it change",cmd_w},
+  { "d", "Delete a watchpoint NO.n you set",cmd_d},
 };
 
 #define NR_CMD ARRLEN(cmd_table)
