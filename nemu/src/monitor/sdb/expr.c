@@ -247,6 +247,7 @@ static bool check_parentheses(int p,int q){
 static int operator_level(int op_type){
   switch(tokens[op_type].type){
     case TK_NEG: return 5;
+    case TK_PO: return 5;
     case '+': return 4;
     case '-': return 4;
     case '*': return 3;
