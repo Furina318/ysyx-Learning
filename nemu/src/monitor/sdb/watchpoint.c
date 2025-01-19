@@ -49,9 +49,9 @@ WP *get_wp_head(){
 
 void update_all_watchpoint_NOs(){
   WP *wp=head;
-  int no=0;
+  int n0=0;
   while(wp!=NULL){
-    wp->NO=no++;
+    wp->NO=n0++;
     wp=wp->next;
   }
 }
