@@ -129,7 +129,7 @@ menu "Testing and Debugging"
 config WATCHPOINTS
   bool "Open watchpoints"
   default y
-  
+
 config TRACE
   bool "Enable tracer"
   default y
