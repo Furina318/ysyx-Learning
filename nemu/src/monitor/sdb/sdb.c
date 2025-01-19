@@ -136,7 +136,7 @@ static int cmd_w(char *args){
   WP *wp = new_wp();
   if(wp == NULL) return 0;
   printf("ready\n");
-  strcpy(wp->expr,EXPR);
+  wp->expr = strdup(EXPR);
   printf("in\n");
   wp->old_val=expr(EXPR); 
   printf("GET\n");
