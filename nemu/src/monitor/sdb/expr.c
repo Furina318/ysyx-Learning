@@ -175,8 +175,7 @@ static bool make_token(char *e) {
           case '*':
             if (nr_token == 0 || tokens[nr_token - 1].type == '(' ||
                 tokens[nr_token-1].type == '+' || tokens[nr_token-1].type == '-' ||
-                tokens[nr_token-1].type == '*' || tokens[nr_token-1].type == '/' ||
-                tokens[nr_token-1].type == TK_PO) { 
+                tokens[nr_token-1].type == '*' || tokens[nr_token-1].type == '/') { 
               tokens[nr_token].type = TK_PO; 
             } else {
               tokens[nr_token].type = '*'; 
@@ -247,7 +246,7 @@ static bool check_parentheses(int p,int q){
 static int operator_level(int op_type){
   switch(tokens[op_type].type){
     case TK_NEG: return 5;
-    case TK_PO: return 5;
+    // case TK_PO: return 5;
     case '+': return 4;
     case '-': return 4;
     case '*': return 3;
@@ -305,16 +304,22 @@ word_t eval(int p,int q){
       return -1;
     }
     if (tokens[op].type == TK_NEG) {
-      int neg_count = 0;// 计算连续的一元减号数量
-      for (int j = op; j <= q && tokens[j].type == TK_NEG; j++, neg_count++);
-      word_t val = eval(op + neg_count, q); // 跳过所有的一元减号
-      return (neg_count % 2 == 0) ? val : -val; // 根据奇偶性决定最终是加还是减
+      int neg_count = 0;//计算连续的一元减号数量
+      for (int j=op;j<=q && tokens[j].type == TK_NEG;j++,neg_count++);
+      word_t val=eval(op+neg_count,q); //跳过所有的一元减号
+      return (neg_count%2 == 0) ? val : -val; //根据奇偶性决定最终是加还是减
     }
-    if (tokens[op].type == TK_PO) {// 解指针操作，假设后面跟着的是一个有效的内存地址
-      if (op + 1 <= q && tokens[op + 1].type == TK_NUM) {
-        word_t addr = atoi(tokens[op + 1].str); // 将字符串转换为整数作为地址
-        word_t val = paddr_read(addr, sizeof(word_t)); // 读取地址处的值
-        return val;
+    if (tokens[op].type == TK_PO) {//解指针操作，假设后面跟着的是一个有效的内存地址
+      if (op+1<=q && (tokens[op+1].type==TK_NUM || tokens[op+1].type=='(')) {
+        if(tokens[op+1].type==TK_NUM){
+          word_t addr=atoi(tokens[op+1].str); //将字符串转换为整数作为地址
+          word_t val=paddr_read(addr,sizeof(word_t)); //取地址处的值
+          return val;
+        }else if(tokens[op+1].type=='('){
+          word_t addr0=eval(op+1,q);
+          word_t val0=paddr_read(addr0,sizeof(word_t));
+          return val0;
+        }
       } else {
         printf("Invalid dereference operation\n");
         return -1;
