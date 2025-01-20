@@ -8,7 +8,9 @@ module ps2_keyboard(
     output reg [7:0] seg2,   // 最中间位七段数码管显示
     output reg [7:0] seg3,   // 次中间位七段数码管显示
     output reg [7:0] seg4,   // 次高位七段数码管显示
-    output reg [7:0] seg5    // 最高位七段数码管显示
+    output reg [7:0] seg5,    // 最高位七段数码管显示
+    output reg [7:0] seg6,
+    output reg [7:0] seg7
 );
 
     reg [9:0] buffer;                                       // ps2_data bits
@@ -61,6 +63,8 @@ module ps2_keyboard(
     reg [7:0] get_ascii;
     reg check;
     reg off;
+    wire kill;//用来关闭最高两位的灯
+    assign kill=1;
 
     always @(posedge clk) begin
         ps2_clk_sync <=  {ps2_clk_sync[1:0],ps2_clk};
@@ -126,5 +130,7 @@ module ps2_keyboard(
     ps2_seg show3(.bin_in(bin_in3),.check(off),.seg_out(seg3));
     seg16 show4(.bin_in(bin_in4),.seg_out(seg4));
     seg16 show5(.bin_in(bin_in5),.seg_out(seg5));
+    ps2_seg show6(.bin_in(4'b0000),.check(kill),.seg_out(seg6));
+    ps2_seg show7(.bin_in(4'b0000),.check(kill),.seg_out(seg7));
 
 endmodule
