@@ -111,10 +111,12 @@ module ps2_keyboard(
                         else begin
                             off<=1;
                             check<=0;
+                            bin_in4<=press_count[3:0];
+                            bin_in5<=press_count[7:4];
                         end
                     end
                 end
-                count <= 0;                                 // for next
+                count <= 0;                              
               end else begin
                 buffer[count] <= ps2_data;  // store ps2_data
                 count <= count + 3'b1;
