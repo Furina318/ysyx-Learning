@@ -325,7 +325,7 @@ word_t eval(int p,int q){
       switch(tokens[op].type){
         case '+':
           word_t out1=val1+val2;
-          if(out1>UINT32_MAX || out1<0){
+          if(out1>=UINT32_MAX || out1<0){
             goto kill;
           }
           return out1;
