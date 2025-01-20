@@ -323,21 +323,43 @@ word_t eval(int p,int q){
     word_t val1=eval(p,op-1);
     word_t val2=eval(op+1,q);
       switch(tokens[op].type){
-        case '+':return val1+val2;
-        case '-':return val1-val2;
-        case '*':return val1*val2;
+        case '+':
+          word_t out1=val1+val2;
+          if(out1>UINT32_MAX || out1<0){
+            goto kill;
+          }
+          return out1;
+        case '-':
+          word_t out2=val1-val2;
+          if(out2>UINT32_MAX || out2<0){
+            goto kill;
+          }
+          return out2;
+        case '*':
+          word_t out3=val1*val2;
+          if(out3>UINT32_MAX || out3<0){
+            goto kill;
+          }
+          return out3;
         case '/':
           if(val2==0){
             printf("The denominator can't be zero!\n");
             return 0;
           }
-          return val1/val2;
+          word_t out4=val1*val2;
+          if(out4>UINT32_MAX || out4<0){
+            goto kill;
+          }
+          return out4;
         case TK_NEQ:return val1 != val2?1:0;
         case TK_EQ:return val1 == val2?1:0;
         case TK_AND:return val1 && val2?1:0;
         default:return 0;
     }
   }
+  kill:
+    printf("Over uint32_t\n");
+    return -1;
 }
 
 word_t expr(char *e) {//分治递归算法
@@ -346,7 +368,7 @@ word_t expr(char *e) {//分治递归算法
   }
   /* TODO: Insert codes to evaluate the expression. */
   word_t result=eval(0,nr_token-1);
+  
   //TODO();
-
   return result;
 }
