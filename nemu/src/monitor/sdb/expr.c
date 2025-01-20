@@ -358,8 +358,7 @@ word_t eval(int p,int q){
     }
   }
   kill:
-    printf("Over uint32_t\n");
-    return -1;
+    return -2;
 }
 
 word_t expr(char *e) {//分治递归算法

@@ -173,8 +173,11 @@ static int cmd_p(char *args) {
     return 0;
   }
   word_t result =expr(args);
-  if (result == -1) {
+  if(result == -1){
     printf("Invalid expression\n");
+    return 0;
+  }else if(result==-2){
+    printf("Over uint32_t\n");
     return 0;
   }
   printf("%s = %u\n", args, result);
