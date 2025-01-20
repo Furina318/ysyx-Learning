@@ -82,7 +82,7 @@ static int cmd_info(char *args){
     }else if(strcmp(arg,"w")==0){
       char *wp_state="turn off";
 #ifdef CONFIG_WATCHPOINTS
-      *wp_state="working";
+      wp_state="working";
 #endif
       WP *wp=get_wp_head();
       if(wp == NULL){
