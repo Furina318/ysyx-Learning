@@ -140,6 +140,10 @@ static int cmd_w(char *args){
   WP *wp = new_wp();
   if(wp == NULL) return 0;
   wp->expr = strdup(EXPR);
+  if(expr(EXPR)==-1){
+    free_wp(wp);
+    return 0;
+  }
   wp->old_val=expr(EXPR); 
   // printf("GET\n");
   return 0;
