@@ -325,7 +325,7 @@ word_t eval(int p,int q){
       switch(tokens[op].type){
         case '+':
           word_t out1=val1+val2;
-          if(out1>=UINT32_MAX || out1<0){
+          if(out1>UINT32_MAX || out1<0){
             goto kill;
           }
           return out1;
@@ -346,7 +346,7 @@ word_t eval(int p,int q){
             printf("The denominator can't be zero!\n");
             return 0;
           }
-          word_t out4=val1*val2;
+          word_t out4=val1/val2;
           if(out4>UINT32_MAX || out4<0){
             goto kill;
           }
