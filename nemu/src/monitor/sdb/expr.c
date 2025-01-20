@@ -324,11 +324,11 @@ word_t eval(int p,int q){
     word_t val2=eval(op+1,q);
       switch(tokens[op].type){
         case '+':
-          word_t out1=val1+val2;
+          long long out1=val1+val2;
           if(out1>UINT32_MAX || out1<0){
             goto kill;
           }
-          return out1;
+          return (word_t)out1;
         case '-':
           word_t out2=val1-val2;
           if(out2>UINT32_MAX || out2<0){
