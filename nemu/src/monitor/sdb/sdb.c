@@ -245,7 +245,7 @@ void sdb_mainloop() {
     /* treat the remaining string as the arguments,
      * which may need further parsing
      */
-    char *args = cmd + strlen(cmd) + 1;
+    char *args = cmd + strlen(cmd) + 1;//cmd+strlen(cmd)指向命令的结尾，而cmd+strlen(cmd)+1指向命令后的第一个参数
     if (args >= str_end) {
       args = NULL;
     }
