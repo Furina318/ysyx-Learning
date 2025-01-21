@@ -21,6 +21,7 @@
 #include <memory/paddr.h>
 #include <common.h>
 #include "watchpoint.h"
+#include <utils.h>
 
 static int is_batch_mode = false;
 
@@ -89,7 +90,7 @@ static int cmd_info(char *args){
         printf("No watchpoints set.\n");
         return 0;
       }
-      printf("Current watchpoints state: %s\n",wp_state);
+      Log("Current watchpoints state: %s\n",wp_state);
       while (wp != NULL) {// 打印监视点信息
         printf("Watchpoint NO:%-2d: Expression '%s' Last Value: 0x%08x\n",
           wp->NO, wp->expr ? wp->expr : "N/A", wp->old_val);
