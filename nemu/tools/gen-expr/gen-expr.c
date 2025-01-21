@@ -19,9 +19,10 @@
 #include <time.h>
 #include <assert.h>
 #include <string.h>
-#include "/home/furina/ysyx-workbench/nemu/include/generated/autoconf.h"
-#include "/home/furina/ysyx-workbench/nemu/include/common.h"
-#include "/home/furina/ysyx-workbench/nemu/src/monitor/sdb/sdb.h"
+// #include "/home/furina/ysyx-workbench/nemu/include/generated/autoconf.h"
+// #include <common.h>
+// #include "/home/furina/ysyx-workbench/nemu/src/monitor/sdb/sdb.h"
+#include <sdb.h>
 
 // this should be enough
 static char buf[65536] = {};
