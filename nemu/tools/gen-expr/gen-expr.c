@@ -22,7 +22,7 @@
 // #include "/home/furina/ysyx-workbench/nemu/include/generated/autoconf.h"
 // #include <common.h>
 // #include "/home/furina/ysyx-workbench/nemu/src/monitor/sdb/sdb.h"
-#include <sdb.h>
+// #include <sdb.h>
 
 // this should be enough
 static char buf[65536] = {};
@@ -35,7 +35,7 @@ static char *code_format =
 "  return 0; "
 "}";
 
-#define MAX_DEPTH 20 // 定义最大递归深度以防止无限递归,防止溢出
+#define MAX_DEPTH 10 // 定义最大递归深度以防止无限递归,防止溢出
 
 static void gen(char const *c){
   strncat(buf,c,1);
@@ -132,7 +132,7 @@ int main(int argc, char *argv[]) {
     uint32_t result;
     ret = fscanf(fp, "%u", &result);
     pclose(fp);
-    printf("my_expr:%u\n",expr(buf));
+    // printf("my_expr:%u\n",expr(buf));
     printf("%u %s\n", result, buf);
   }
   return 0;
