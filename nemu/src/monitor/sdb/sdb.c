@@ -193,20 +193,11 @@ static int cmd_test(){
     assert(file!=NULL);
     while (fgets(line, sizeof(line), file)) {// 逐行读取文件
         line[strcspn(line, "\n")] = '\0';// 去掉行末的换行符
-        char *first_param = strtok(line, " ");
-        // if (first_param == NULL) {
-        //     fprintf(stderr, "错误：行格式不正确\n");
-        //     continue;
-        // }
-        char *expression = strtok(NULL, "");// 提取第二个参数（表达式）
-        // if (expression == NULL) {
-        //     fprintf(stderr, "错误：行格式不正确\n");
-        //     continue;
-        // }
+        char *ans = strtok(line, " ");
+        char *expression = strtok(NULL, "");
         word_t result = expr(expression);
-
         // 输出第一个参数和 expr 的结果
-        printf("correct ans:%s   my_expr:%u\n", first_param, result);
+        printf("%s  correct ans:%s   my_expr:%u\n",expression,ans,result);
     }
     fclose(file);
     return 0;
