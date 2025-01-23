@@ -117,11 +117,15 @@ int main(int argc, char *argv[]) {
     gen_rand_expr(0);
 
     sprintf(code_buf, code_format, buf);
-
     FILE *fp = fopen("/tmp/.code.c", "w");
     assert(fp != NULL);
     fputs(code_buf, fp);
     fclose(fp);
+
+    // fp=fopen("/home/furina/ysyx-workbench/nemu/expr-test","w");
+    // assert(fp!=NULL);
+    // fputs(buf,fp);
+    // fclose(fp);
 
     int ret = system("gcc /tmp/.code.c -o /tmp/.expr");
     if (ret != 0) continue;

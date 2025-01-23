@@ -184,6 +184,34 @@ static int cmd_p(char *args) {
   printf("%s = %u\n", args, result);
   return 0;
 }
+
+static int cmd_test(){
+  FILE *file;
+    char line[256];
+    char *filename = "/home/furina/ysyx-workbench/nemu/tools/gen-expr/build/input";  // 替换为你的文件名
+    file = fopen(filename, "r");
+    assert(file!=NULL);
+    while (fgets(line, sizeof(line), file)) {// 逐行读取文件
+        line[strcspn(line, "\n")] = '\0';// 去掉行末的换行符
+        char *first_param = strtok(line, " ");
+        // if (first_param == NULL) {
+        //     fprintf(stderr, "错误：行格式不正确\n");
+        //     continue;
+        // }
+        char *expression = strtok(NULL, "");// 提取第二个参数（表达式）
+        // if (expression == NULL) {
+        //     fprintf(stderr, "错误：行格式不正确\n");
+        //     continue;
+        // }
+        word_t result = expr(expression);
+
+        // 输出第一个参数和 expr 的结果
+        printf("correct ans:%s   my_expr:%u\n", first_param, result);
+    }
+    fclose(file);
+    return 0;
+}
+
 static int cmd_help(char *args);
 
 static struct {
@@ -202,6 +230,7 @@ static struct {
   { "p", "Find the value of the expression 'EXPR' ",cmd_p},
   { "w", "Set watchpoint on 'EXPR',the programme will stop when it change",cmd_w},
   { "d", "Delete a watchpoint NO.n you set",cmd_d},
+  { "test", "Open randon-expressions file to check expr() whether current",cmd_test},
 };
 
 #define NR_CMD ARRLEN(cmd_table)
