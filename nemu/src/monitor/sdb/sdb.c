@@ -197,7 +197,7 @@ static int cmd_test(){
         char *expression = strtok(NULL, "");
         word_t result = expr(expression);
         // 输出第一个参数和 expr 的结果
-        printf("%s  correct ans:%s   my_expr:%u\n",expression,ans,result);
+        printf("%s\ncorrect ans:%s   my_expr:%u\n\n",expression,ans,result);
     }
     fclose(file);
     return 0;
@@ -221,7 +221,7 @@ static struct {
   { "p", "Find the value of the expression 'EXPR' ",cmd_p},
   { "w", "Set watchpoint on 'EXPR',the programme will stop when it change",cmd_w},
   { "d", "Delete a watchpoint NO.n you set",cmd_d},
-  { "test", "Open randon-expressions file to check expr() whether current",cmd_test},
+  { "test", "Open randon-expressions file to check expr() whether correct",cmd_test},
 };
 
 #define NR_CMD ARRLEN(cmd_table)
