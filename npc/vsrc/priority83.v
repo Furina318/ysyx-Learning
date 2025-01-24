@@ -1,7 +1,7 @@
 module priority83(
     input [7:0] sw,
     output reg [2:0] y,
-    output reg [6:0] out_seg
+    output reg [7:0] out_seg
 );
     always @(*) begin
         casez(sw)

@@ -1,6 +1,6 @@
-TOP_NAME=lfsr_num
+TOP_NAME=priority83
 VERILATOR=verilator
-NXDC_FILE=constr/lfsr_num.nxdc
+NXDC_FILE=constr/priority83.nxdc
 INC_PATH ?= 
 #CSRCS= $(abspath ./csrc/light_main.cpp)
 

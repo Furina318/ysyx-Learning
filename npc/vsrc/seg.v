@@ -1,6 +1,6 @@
 module seg(
     input [2:0] bin_in,
-    output reg [6:0] seg_out
+    output reg [7:0] seg_out
 );
     always @(*) begin
         case(bin_in)
