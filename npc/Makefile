@@ -1,6 +1,6 @@
-TOP_NAME=alu4
+TOP_NAME=lfsr_num
 VERILATOR=verilator
-NXDC_FILE=constr/alu4.nxdc
+NXDC_FILE=constr/lfsr_num.nxdc
 INC_PATH ?= 
 #CSRCS= $(abspath ./csrc/light_main.cpp)
 
