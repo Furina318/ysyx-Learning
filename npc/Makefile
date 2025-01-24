@@ -1,6 +1,6 @@
-TOP_NAME=priority83
+TOP_NAME=ps2_keyboard
 VERILATOR=verilator
-NXDC_FILE=constr/priority83.nxdc
+NXDC_FILE=constr/ps2_keyboard.nxdc
 INC_PATH ?= 
 #CSRCS= $(abspath ./csrc/light_main.cpp)
 
