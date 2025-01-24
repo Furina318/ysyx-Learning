@@ -91,22 +91,22 @@ static Token tokens[1000] __attribute__((used)) = {};//tokens原来长度是32�
 static int nr_token __attribute__((used))  = 0;
 
 // static int hex_char_to_decimal(char c) {
-//   if (c >= '0' && c <= '9') return c - '0';
-//   if (c >= 'A' && c <= 'F') return c - 'A' + 10;
-//   if (c >= 'a' && c <= 'f') return c - 'a' + 10;
+//   if(c>='0' && c<='9') return c-'0';
+//   if(c>='A' && c<='F') return c-'A'+10;
+//   if(c>='a' && c<='f') return c-'a'+10;
 //   return -1;
 // }
 // static long hex_to_decimal(const char *hex_string) {// 十六进制转十进制函数
 //   long decimal_value = 0;
 //   int i,len=0;
 //   // // 跳过可选的前缀 "0x"
-//   // if (hex_string[0] == '0' && hex_string[1] == 'x') {
+//   // if(hex_string[0] == '0' && hex_string[1] == 'x'){
 //   //   hex_string += 2;
 //   // }
 //   // 计算字符串长度
-//   for (len=0;hex_string[len];++len);
+//   for(len=0;hex_string[len];++len);
 //   // 从左到右处理每个字符
-//   for (i=;i<len;++i) {
+//   for(i=;i<len;++i) {
 //     int value=hex_char_to_decimal(tolower(hex_string[i]));
 //     if (value==-1) {
 //       fprintf(stderr,"Invalid hex digit '%c'\n", hex_string[i]);
@@ -158,6 +158,7 @@ static bool make_token(char *e) {
             if (nr_token == 0 || tokens[nr_token-1].type == '(' ||
                 tokens[nr_token-1].type == '+' || tokens[nr_token-1].type == '-' ||
                 tokens[nr_token-1].type == '*' || tokens[nr_token-1].type == '/' ||
+                tokens[nr_token-1].type == TK_AND || tokens[nr_token-1].type == TK_EQ || tokens[nr_token-1].type ==TK_NEQ ||
                 tokens[nr_token-1].type == TK_NEG) { 
               tokens[nr_token].type = TK_NEG; 
             } else {
@@ -170,6 +171,7 @@ static bool make_token(char *e) {
           case '*':
             if (nr_token == 0 || tokens[nr_token - 1].type == '(' ||
                 tokens[nr_token-1].type == '+' || tokens[nr_token-1].type == '-' ||
+                tokens[nr_token-1].type == TK_AND || tokens[nr_token-1].type == TK_EQ || tokens[nr_token-1].type ==TK_NEQ ||
                 tokens[nr_token-1].type == '*' || tokens[nr_token-1].type == '/') { 
               tokens[nr_token].type = TK_PO; 
             } else {
