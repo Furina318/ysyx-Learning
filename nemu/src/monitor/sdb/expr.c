@@ -99,7 +99,7 @@ static int nr_token __attribute__((used))  = 0;
 // static long hex_to_decimal(const char *hex_string) {// 十六进制转十进制函数
 //   long decimal_value = 0;
 //   int i,len=0;
-//   // // 跳过可选的前缀 "0x" 或 "$"
+//   // // 跳过可选的前缀 "0x"
 //   // if (hex_string[0] == '0' && hex_string[1] == 'x') {
 //   //   hex_string += 2;
 //   // }
