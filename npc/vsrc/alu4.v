@@ -6,7 +6,7 @@ module alu4(
     output reg zero,
     output reg overflow,
     output reg cout,
-    output reg [6:0] seg7
+    output reg [7:0] seg7
 );
 wire [3:0] add_result;
 wire [3:0] sub_result;

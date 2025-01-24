@@ -1,6 +1,6 @@
-TOP_NAME=ps2_keyboard
+TOP_NAME=alu4
 VERILATOR=verilator
-NXDC_FILE=constr/ps2_keyboard.nxdc
+NXDC_FILE=constr/alu4.nxdc
 INC_PATH ?= 
 #CSRCS= $(abspath ./csrc/light_main.cpp)
 
