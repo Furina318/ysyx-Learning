@@ -224,7 +224,7 @@ static struct {
   { "p", "Find the value of the expression 'EXPR' ",cmd_p},
   { "w", "Set watchpoint on 'EXPR',the programme will stop when it change",cmd_w},
   { "d", "Delete a watchpoint NO.n you set",cmd_d},
-  { "test", "Open randon-expressions file to check expr() whether correct",cmd_test},
+  { "test", "Open random-expressions-file to check expr() whether correct",cmd_test},
 };
 
 #define NR_CMD ARRLEN(cmd_table)
