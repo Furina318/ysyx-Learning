@@ -96,27 +96,6 @@ static int nr_token __attribute__((used))  = 0;
 //   if(c>='a' && c<='f') return c-'a'+10;
 //   return -1;
 // }
-// static long hex_to_decimal(const char *hex_string) {// 十六进制转十进制函数
-//   long decimal_value = 0;
-//   int i,len=0;
-//   // // 跳过可选的前缀 "0x"
-//   // if(hex_string[0] == '0' && hex_string[1] == 'x'){
-//   //   hex_string += 2;
-//   // }
-//   // 计算字符串长度
-//   for(len=0;hex_string[len];++len);
-//   // 从左到右处理每个字符
-//   for(i=;i<len;++i) {
-//     int value=hex_char_to_decimal(tolower(hex_string[i]));
-//     if (value==-1) {
-//       fprintf(stderr,"Invalid hex digit '%c'\n", hex_string[i]);
-//       return -1; 
-//     }
-//     decimal_value=decimal_value * 16 + value;
-//   }
-//   return decimal_value;
-// }
-
 static bool make_token(char *e) {
   int position = 0;
   int i;
@@ -318,7 +297,7 @@ word_t eval(int p,int q){
           return val0;
         }
       } else {
-        printf("Invalid dereference operation\n");
+        printf("Invalid operation\n");
         return -1;
       }
     }
