@@ -23,7 +23,7 @@
 #include "watchpoint.h"
 #include <utils.h>
 
-static int is_batch_mode = false;
+static int is_batch_mode = true;
 
 void init_regex();
 void init_wp_pool();
@@ -258,6 +258,7 @@ void sdb_set_batch_mode() {
 
 void sdb_mainloop() {
   if (is_batch_mode) {
+    //批处理模式is_batch_mode
     cmd_c(NULL);
     return;
   }
