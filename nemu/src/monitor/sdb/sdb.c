@@ -23,7 +23,7 @@
 #include "watchpoint.h"
 #include <utils.h>
 
-static int is_batch_mode = true;
+static int is_batch_mode = true;//批处理模式（省略c的键入）
 
 void init_regex();
 void init_wp_pool();
