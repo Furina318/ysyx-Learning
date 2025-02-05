@@ -6,45 +6,102 @@
 
 size_t strlen(const char *s) {
   if(s==NULL) return 0;
-  unsigned long n=0;
+  size_t n=0;
   while(s[n]!='\0') ++n;
   return n;
 }
 
 char *strcpy(char *dst, const char *src) {
-  panic("Not implemented");
+  if(dst==NULL || src==NULL) return dst;
+  char *aim_dst=dst;//dst指针会在复制过程中移动，所以需要保存其起始地址以便返回
+  while((*dst++ = *src++)!='\0');
+  return aim_dst;
 }
 
 char *strncpy(char *dst, const char *src, size_t n) {
-  panic("Not implemented");
+  if(n==0 || dst==NULL || src==NULL) return dst;
+  size_t i;
+  for(i=0;i<n && src[i]!='\0';i++) dst[i]=src[i];
+  for(;i<n;i++) dst[i]='\0';//空字符填充剩余内容
+  return dst;
 }
 
 char *strcat(char *dst, const char *src) {
-  panic("Not implemented");
+  if(dst==NULL || src==NULL) return dst;
+  char *ptr=dst;
+  while(*ptr++!='\0');
+  while((*ptr++ = *src++)!='\0');
+  return dst;
+  
 }
 
 int strcmp(const char *s1, const char *s2) {
-  panic("Not implemented");
+  if(s1==NULL || s2==NULL) return 0;
+  while(*s1 && *s2 && *s1==*s2){
+    s1++;
+    s2++;
+  }
+  if(*s1>*s2) return 1;
+  else if(*s1<*s2) return -1;
+  else return 0;
 }
 
 int strncmp(const char *s1, const char *s2, size_t n) {
-  panic("Not implemented");
+  if(s1==NULL || s2==NULL) return 0;
+  while(n--){
+    if(*s1>*s2) return 1;
+    if(*s1<*s2) return -1;
+    s1++;
+    s2++;
+  }
+  return 0;
 }
 
 void *memset(void *s, int c, size_t n) {
-  panic("Not implemented");
+  if(s==NULL) return NULL;
+  char *ptr=(char *)s;
+  while(n--) *ptr++=c;
+  return s;
 }
 
 void *memmove(void *dst, const void *src, size_t n) {
-  panic("Not implemented");
+  if (dst == NULL || src == NULL) return dst;
+  char *d=(char *)dst;
+  const char *s=(const char *)src;
+  if (d < s) {
+    // 如果目标地址在源地址之前，正向复制
+    while (n--) {
+      *d++ = *s++;
+    }
+  } else {
+    // 如果目标地址在源地址之后，反向复制
+    d += n;
+    s += n;
+    while (n--) {
+      *--d = *--s;
+    }
+  }
+
+  return dst; // 返回目标地址
 }
 
 void *memcpy(void *out, const void *in, size_t n) {
-  panic("Not implemented");
+  char *dst=(char *)out;
+  const char *src=(const char *)in;
+  while(n--) *dst++ = *src++;
+  return out; 
 }
 
 int memcmp(const void *s1, const void *s2, size_t n) {
-  panic("Not implemented");
+  char *str1=(char *)s1;
+  const char *str2=(const char *)s2;
+  while(n--){
+    if(*str1>*str2) return 1;
+    if(*str1<*str2) return -1;
+    str1++;
+    str2++;
+  }
+  return 0;
 }
 
 #endif
