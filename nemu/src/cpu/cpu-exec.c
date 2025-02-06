@@ -55,7 +55,9 @@ void iringbuf_push(vaddr_t pc,uint32_t inst,char *logbuf){
   iringbuf.entries[iringbuf.w_ptr].inst=inst;
   strncpy(iringbuf.entries[iringbuf.w_ptr].logbuf,logbuf,sizeof(iringbuf.entries[iringbuf.w_ptr].logbuf)-1);
   iringbuf.entries[iringbuf.w_ptr].logbuf[sizeof(iringbuf.entries[iringbuf.w_ptr].logbuf)-1]='\0';
-  iringbuf.w_ptr=(iringbuf.w_ptr+1)%IRINGBUF_SIZE;
+  iringbuf.w_ptr=(iringbuf.w_ptr+1)%IRINGBUF_SIZE;//更新写指针
+  if(iringbuf.full) iringbuf.r_ptr=(iringbuf.r_ptr+1)%IRINGBUF_SIZE;//如果满，则更新读指针
+  iringbuf.full=(iringbuf.r_ptr==iringbuf.w_ptr);
 }
 
 void iringbuf_dummy(vaddr_t error_pc){
@@ -135,6 +137,8 @@ static void exec_once(Decode *s, vaddr_t pc) {
   void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte);
   disassemble(p, s->logbuf + sizeof(s->logbuf) - p,
       MUXDEF(CONFIG_ISA_x86, s->snpc, s->pc), (uint8_t *)&s->isa.inst, ilen);
+
+  iringbuf_push(s->pc,s->isa.inst,s->logbuf);
 #endif
 }
 
@@ -147,7 +151,7 @@ static void execute(uint64_t n) {
     if (nemu_state.state != NEMU_RUNNING) break;
     IFDEF(CONFIG_DEVICE, device_update());
   }
-  if(nemu_state.state==NEMU_ABORT){
+  if(nemu_state.state==NEMU_ABORT){//程序出错时
     vaddr_t error_pc=cpu.pc;
     iringbuf_dummy(error_pc);
   }
@@ -174,7 +178,7 @@ void cpu_exec(uint64_t n) {
     case NEMU_END: case NEMU_ABORT: case NEMU_QUIT:
       printf("Program execution has ended. To restart the program, exit NEMU and run again.\n");
       return;
-    default: nemu_state.state = NEMU_RUNNING;
+    default: nemu_state.state = NEMU_RUNNING;iringbuf_init();
   }
 
   uint64_t timer_start = get_time();
