@@ -63,7 +63,7 @@ void iringbuf_push(vaddr_t pc,uint32_t inst,char *logbuf){
 void iringbuf_dummy(vaddr_t error_pc){
   printf("Recent inst\n");
   int count=iringbuf.full ? IRINGBUF_SIZE : iringbuf.w_ptr;
-  for(int i=0;i<count;i++){
+  for(int i=1;i<=count;i++){
     int index=(iringbuf.r_ptr+i)%IRINGBUF_SIZE;
     if(iringbuf.entries[index].pc==error_pc) printf(" --> ");
     else printf("     ");
