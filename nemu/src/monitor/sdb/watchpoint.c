@@ -61,7 +61,7 @@ WP *new_wp(){
   if(free_==NULL){
     printf("No more free watchpoints available\n");
     //assert(0);
-    return 0;
+    return NULL;
   }else{
     wp=free_;
     free_=free_->next;
@@ -70,7 +70,7 @@ WP *new_wp(){
     }
     wp->next=head;
     wp->prev=NULL; //新加入的监视点没有前驱(链表过程看笔记)
-    if (head){
+    if(head){
       head->prev=wp; //更新原来头部的 prev 指针
     }
     head=wp;

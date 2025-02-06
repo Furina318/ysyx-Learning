@@ -26,6 +26,54 @@
  * You can modify this value as you want.
  */
 #define MAX_INST_TO_PRINT 10
+#define IRINGBUF_SIZE 16
+
+typedef struct {
+  vaddr_t pc;                      //指令pc
+  uint32_t inst;                   //指令编码
+  char logbuf[128];                //反汇编
+}instInfo;
+
+typedef struct{
+  instInfo entries[IRINGBUF_SIZE]; //环形缓冲区
+  int w_ptr;                       //写指针
+  int r_ptr;                       //读指针
+  bool full;                       //溢出检测
+}Iringbuf;
+
+static Iringbuf iringbuf;
+
+void iringbuf_init(){
+  iringbuf.w_ptr=0;
+  iringbuf.r_ptr=0;
+  iringbuf.full=false;
+  memset(iringbuf.entries,' ',sizeof(iringbuf.entries));
+}
+
+void iringbuf_push(vaddr_t pc,uint32_t inst,char *logbuf){
+  iringbuf.entries[iringbuf.w_ptr].pc=pc;
+  iringbuf.entries[iringbuf.w_ptr].inst=inst;
+  strncpy(iringbuf.entries[iringbuf.w_ptr].logbuf,logbuf,sizeof(iringbuf.entries[iringbuf.w_ptr].logbuf)-1);
+  iringbuf.entries[iringbuf.w_ptr].logbuf[sizeof(iringbuf.entries[iringbuf.w_ptr].logbuf)-1]='\0';
+  iringbuf.w_ptr=(iringbuf.w_ptr+1)%IRINGBUF_SIZE;
+}
+
+void iringbuf_dummy(vaddr_t error_pc){
+  printf("Recent inst");
+  int count=iringbuf.full ? IRINGBUF_SIZE : iringbuf.w_ptr;
+  for(int i=0;i<count;i++){
+    int index=(iringbuf.r_ptr+i)%IRINGBUF_SIZE;
+    if(iringbuf.entries[index].pc==error_pc) printf(" --> ");
+    else printf("     ");
+    printf("0x%08x: %-20s %02x %02x %02x %02x\n",
+              iringbuf.entries[index].pc,
+              iringbuf.entries[index].logbuf,
+              (iringbuf.entries[index].inst >> 24) & 0xff,
+              (iringbuf.entries[index].inst >> 16) & 0xff,
+              (iringbuf.entries[index].inst >> 8) & 0xff,
+              iringbuf.entries[index].inst & 0xff);
+  }
+}
 
 CPU_state cpu = {};
 uint64_t g_nr_guest_inst = 0;
@@ -98,6 +146,10 @@ static void execute(uint64_t n) {
     trace_and_difftest(&s, cpu.pc);
     if (nemu_state.state != NEMU_RUNNING) break;
     IFDEF(CONFIG_DEVICE, device_update());
+  }
+  if(nemu_state.state==NEMU_ABORT){
+    vaddr_t error_pc=cpu.pc;
+    iringbuf_dummy(error_pc);
   }
 }
 
