@@ -151,7 +151,7 @@ static void execute(uint64_t n) {
     if (nemu_state.state != NEMU_RUNNING) break;
     IFDEF(CONFIG_DEVICE, device_update());
   }
-  if(nemu_state.state==NEMU_ABORT){//程序出错时
+  if(nemu_state.state==NEMU_END){//程序出错时
     vaddr_t error_pc=cpu.pc;
     iringbuf_dummy(error_pc);
   }
