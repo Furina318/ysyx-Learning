@@ -67,7 +67,7 @@ void iringbuf_dummy(vaddr_t error_pc){
     int index=(iringbuf.r_ptr+i)%IRINGBUF_SIZE;
     if(iringbuf.entries[index].pc==error_pc) printf(" --> ");
     else printf("     ");
-    printf("%-20s %-2x %02x %02x %02x\n",
+    printf("%-25s %02x %02x %02x %02x\n",
               // iringbuf.entries[index].pc,
               iringbuf.entries[index].logbuf,
               (iringbuf.entries[index].inst >> 24) & 0xff,
