@@ -210,10 +210,10 @@ static int cmd_mtrace(char *args){
 #ifdef CONFIG_MEMORY_TRACE
   typedef uint32_t paddr_t;
   char *arg1,*arg2,*arg3,*arg4;
-  if(args==NULL || strlen(args)<4){
-    printf("No info provide\n");
-    return 0;
-  }
+  // if(args==NULL || strlen(args)<4){
+  //   printf("No info provide\n");
+  //   return 0;
+  // }
   // if (arg1 == NULL || arg2 == NULL || arg3 == NULL || arg4 == NULL) {
   //   printf("Invalid arguments\n");
   //   return 0;
