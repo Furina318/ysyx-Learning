@@ -222,9 +222,9 @@ static int cmd_mtrace(char *args){
   arg2=strtok(NULL," ");
   arg3=strtok(NULL," ");
   arg4=strtok(NULL," ");
-  paddr_t start_addr=(arg1 != NULL) ? strtoul(arg1, NULL, 16) : 0x80000000;
-  paddr_t end_addr=(arg2 != NULL) ? strtoul(arg2, NULL, 16) : 0x8FFFFFFF;
-  bool filter_en=atoi(arg3);
+  paddr_t start_addr=(arg1!=NULL) ? strtoul(arg1, NULL, 16) : 0x80000000;
+  paddr_t end_addr=(arg2!=NULL) ? strtoul(arg2, NULL, 16) : 0x8FFFFFFF;
+  bool filter_en=(arg3!=NULL) ? atoi(arg3) : false;
   uint32_t filter_data=(arg4!=NULL) ? strtoul(arg4,NULL,16) : 0xFFFFFFFF;
   mtrace_filter_output(start_addr,end_addr,filter_en,filter_data);
   return 0;
