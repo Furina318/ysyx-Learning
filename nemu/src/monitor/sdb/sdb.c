@@ -207,6 +207,7 @@ static int cmd_test(){
 }
 
 static int cmd_mtrace(char *args){
+#ifdef CONFIG_MEMORY_TRACE
   typedef uint32_t paddr_t;
   char *arg1,*arg2,*arg3,*arg4;
   if(args==NULL || strlen(args)<4){
@@ -225,8 +226,10 @@ static int cmd_mtrace(char *args){
   paddr_t end_addr=(arg2 != NULL) ? strtoul(arg2, NULL, 16) : 0x8FFFFFFF;
   bool filter_en=atoi(arg3);
   uint32_t filter_data=(arg4!=NULL) ? strtoul(arg4,NULL,16) : 0xFFFFFFFF;
-
   mtrace_filter_output(start_addr,end_addr,filter_en,filter_data);
+  return 0;
+#endif
+  printf("memory trace not open\n");
   return 0;
 }
 
