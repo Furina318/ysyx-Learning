@@ -17,6 +17,7 @@
 #include <cpu/decode.h>
 #include <cpu/difftest.h>
 #include <locale.h>
+#include <memory/paddr.h>
 #include "/home/furina/ysyx-workbench/nemu/src/monitor/sdb/watchpoint.h"
 #include "/home/furina/ysyx-workbench/nemu/src/monitor/sdb/sdb.h"
 
@@ -67,7 +68,7 @@ void iringbuf_dummy(vaddr_t error_pc){
     int index=(iringbuf.r_ptr+i)%IRINGBUF_SIZE;
     if(iringbuf.entries[index].pc==error_pc) printf(" --> ");
     else printf("     ");
-    printf("%-25s %02x %02x %02x %02x\n",
+    printf("%-20s %02x %02x %02x %02x\n",
               // iringbuf.entries[index].pc,
               iringbuf.entries[index].logbuf,
               (iringbuf.entries[index].inst >> 24) & 0xff,
@@ -144,6 +145,7 @@ static void exec_once(Decode *s, vaddr_t pc) {
 
 static void execute(uint64_t n) {
   Decode s;
+  IFDEF(CONFIG_MEMORY_TRACE,init_mtrace());
   for (;n > 0; n --) {
     exec_once(&s, cpu.pc);
     g_nr_guest_inst ++;
@@ -151,7 +153,10 @@ static void execute(uint64_t n) {
     if (nemu_state.state != NEMU_RUNNING) break;
     IFDEF(CONFIG_DEVICE, device_update());
   }
-  if(nemu_state.state==NEMU_END){//程序出错时
+  if(nemu_state.state==NEMU_END || nemu_state.state==NEMU_ABORT){
+    IFDEF(CONFIG_MEMORY_TRACE,close_mtrace());
+  }
+  if(nemu_state.state==NEMU_ABORT){//程序出错时
     vaddr_t error_pc=cpu.pc;
     iringbuf_dummy(error_pc);
   }
