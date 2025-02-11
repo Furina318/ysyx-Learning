@@ -280,7 +280,7 @@ static int cmd_help(char *args) {
   return 0;
 }
 
-void sdb_set_batch_mode() {
+void sdb_set_batch_mode() {//设置批处理模式
   is_batch_mode = true;
 }
 
@@ -314,7 +314,7 @@ void sdb_mainloop() {
     int i;
     for (i = 0; i < NR_CMD; i ++) {
       if (strcmp(cmd, cmd_table[i].name) == 0) {
-        if (cmd_table[i].handler(args) < 0) { return; }
+        if (cmd_table[i].handler(args) < 0) { return; }//cmd_q不修改前直接返回-1会在这里引发报错
         break;
       }
     }

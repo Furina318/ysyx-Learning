@@ -28,6 +28,7 @@
  */
 #define MAX_INST_TO_PRINT 10
 #define IRINGBUF_SIZE 16
+#define MAX_FTRACE_SIZE 64
 
 typedef struct {
   vaddr_t pc;                      //指令pc
@@ -43,6 +44,14 @@ typedef struct{
 }Iringbuf;
 
 static Iringbuf iringbuf;
+
+// typedef struct{
+//   vaddr_t pc;                      //函数调用地址
+//   char *name;                      //函数名
+// }ftrace_info;
+
+// static ftrace_info ftrace[MAX_FTRACE_SIZE];
+// static int ftrace_size=0;//当前调用栈深度
 
 void iringbuf_init(){
   iringbuf.w_ptr=0;
@@ -77,6 +86,15 @@ void iringbuf_dummy(vaddr_t error_pc){
               iringbuf.entries[index].inst & 0xff);
   }
 }
+
+// const char *get_func_name(vaddr_t addr) {
+//   for (int i = 0; i < func_count; i++) {
+//       if (func_table[i].addr == addr) {
+//           return func_table[i].name;
+//       }
+//   }
+//   return "unknown"; // 未知函数
+// }
 
 CPU_state cpu = {};
 uint64_t g_nr_guest_inst = 0;
