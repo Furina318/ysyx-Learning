@@ -116,12 +116,12 @@ void ftrace_log_ret(vaddr_t pc, const char *name){
     printf("Call stack underflow!\n");
     return;
   }
-  // 出栈
-  ftrace_size--;
   // 输出返回信息
   for(int i=0;i<ftrace_size;i++){
     printf("  "); // 缩进
   }
+  // 出栈
+  ftrace_size--;
   printf("ret  [%s]\n", name);
 }
 
