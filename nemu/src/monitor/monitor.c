@@ -80,74 +80,70 @@ typedef struct {
   char name[64];  // 函数名
 } func_symbol_t;
 
-static func_symbol_t func_table[1024]; // 符号表
-static int func_count = 0;             // 符号数量
+func_symbol_t func_table[1024]; // 符号表
+int func_count = 0;             // 符号数量
 
 void load_func_table(const char *elf_file) {
-  FILE *fp = fopen(elf_file, "rb");
+  FILE *fp = fopen(elf_file, "rb");//二进制模式打开
   if (fp==NULL) {
     printf("Failed to open ELF file: %s\n", elf_file);
     return;
   }
-
-  //读取 ELF Header
-  uint8_t header[64];
-  int check0=fread(header, 1, 64, fp);
+  uint8_t header[64];//读取文件头ELF Header
+  int check0=fread(header, 1, 64, fp);//读取前64个字节
   assert(check0==64);
   //检查 ELF 文件魔数
-  if (header[0] != 0x7F || header[1] != 'E' || header[2] != 'L' || header[3] != 'F') {
+  if(header[0] != 0x7F || header[1] != 'E' || header[2] != 'L' || header[3] != 'F'){//ELF 文件的前 4 字节必须是 0x7F ELF否则不是有效的ELF文件
     printf("Invalid ELF file: %s\n", elf_file);
     fclose(fp);
     return;
   }
-
   // 解析 ELF Header
   uint32_t shoff = *(uint32_t *)(header + 32); // Section Header 表偏移
   uint16_t shnum = *(uint16_t *)(header + 48); // Section Header 数量
   // uint16_t shstrndx = *(uint16_t *)(header + 50); // 节区名称字符串表索引
-
-  // 读取 Section Header 表
-  fseek(fp, shoff, SEEK_SET);
+  
+  fseek(fp, shoff, SEEK_SET);// 读取 Section Header 表
   uint8_t *shdrs = malloc(shnum * 40); // 每个 Section Header 大小为 40 字节
   int check1=fread(shdrs, 40, shnum, fp);
   assert(check1==shnum);
 
   // 找到符号表和字符串表
-  uint32_t symtab_offset = 0, symtab_size = 0;
-  uint32_t strtab_offset = 0, strtab_size = 0;
+  uint32_t symtab_offset = 0, symtab_size = 0;//定义变量存储符号表的偏移量和大小
+  uint32_t strtab_offset = 0, strtab_size = 0;//定义变量存储字符串表的偏移量和大小
 
-  for (int i = 0; i < shnum; i++) {
-    uint8_t *shdr = shdrs + i * 40;
-    uint32_t sh_type = *(uint32_t *)(shdr + 4);
+  for (int i = 0; i < shnum; i++) {//遍历 Section Header 表
+    uint8_t *shdr = shdrs + i * 40;//获取当前 Section Header 的指针
+    uint32_t sh_type = *(uint32_t *)(shdr + 4);//获取当前 Section Header 的类型
 
-    if (sh_type == 2) { // SHT_SYMTAB
+    if(sh_type == SHT_SYMTAB){ // SHT_SYMTAB
       symtab_offset = *(uint32_t *)(shdr + 16);
       symtab_size = *(uint32_t *)(shdr + 20);
-    } else if (sh_type == 3) { // SHT_STRTAB
+    }else if(sh_type == SHT_STRTAB){ // SHT_STRTAB
       strtab_offset = *(uint32_t *)(shdr + 16);
       strtab_size = *(uint32_t *)(shdr + 20);
     }
   }
 
   // 读取符号表
-  fseek(fp, symtab_offset, SEEK_SET);
+  fseek(fp, symtab_offset, SEEK_SET);//将文件指针移动到符号表的位置
   int8_t *symtab = malloc(symtab_size);
   int check2=fread(symtab, 1, symtab_size, fp);
   assert(check2==symtab_size);
 
   // 读取字符串表
-  fseek(fp, strtab_offset, SEEK_SET);
+  fseek(fp, strtab_offset, SEEK_SET);//将文件指针移动到字符串表的位置
   uint8_t *strtab = malloc(strtab_size);
   int check3=fread(strtab, 1, strtab_size, fp);
   assert(check3==strtab_size);
   // 解析符号表
   int num_symbols = symtab_size / 16; // 每个符号表项大小为 16 字节
-  for (int i = 0; i < num_symbols; i++) {
+  for (int i = 0; i < num_symbols; i++) {//遍历符号表
     uint8_t *symtab=malloc(symtab_size);
-    uint8_t *sym = symtab + i * 16;
+    uint8_t *sym = symtab + i * 16;//获取当前符号表项的指针
     uint32_t st_name = *(uint32_t *)sym;
     uint32_t st_value = *(uint32_t *)(sym + 4);
-    uint8_t st_info = *(uint8_t *)(sym + 12);
+    uint8_t st_info = *(uint8_t *)(sym + 12);//读取符号的类型和绑定信息
 
     if (ELF32_ST_TYPE(st_info) == STT_FUNC) { // 只记录函数符号
       func_table[func_count].addr = st_value;

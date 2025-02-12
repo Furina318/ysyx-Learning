@@ -18,6 +18,7 @@
 #include <cpu/difftest.h>
 #include <locale.h>
 #include <memory/paddr.h>
+#include <common.h>
 #include "/home/furina/ysyx-workbench/nemu/src/monitor/sdb/watchpoint.h"
 #include "/home/furina/ysyx-workbench/nemu/src/monitor/sdb/sdb.h"
 
@@ -79,53 +80,59 @@ void iringbuf_dummy(vaddr_t error_pc){
   }
 }
 
+typedef struct {
+  uint32_t addr;  // 函数地址
+  char name[64];  // 函数名
+} func_symbol_t;
+extern int func_count;
+extern func_symbol_t func_table[];
 
-// typedef struct{
-//   vaddr_t pc;                      //函数调用地址
-//   char *name;                      //函数名
-// }ftrace_info;
+typedef struct{
+  vaddr_t pc;                      //函数调用地址
+  char *name;                      //函数名
+}ftrace_info;
 
-// static ftrace_info ftrace[MAX_FTRACE_SIZE];
-// static int ftrace_size=0;//当前调用栈深度
+static ftrace_info ftrace[MAX_FTRACE_SIZE];
+static int ftrace_size=0;//当前调用栈深度
 
-// void ftrace_log_call(vaddr_t pc, vaddr_t target, const char *name) {
-//   if (call_stack_depth >= MAX_CALL_STACK_DEPTH) {
-//       printf("Call stack overflow!\n");
-//       return;
-//   }
-//   // 输出调用信息
-//   for (int i = 0; i < call_stack_depth; i++) {
-//       printf("  "); // 缩进
-//   }
-//   printf("call [%s@0x%08x]\n", name, pc);
-//   // 压栈
-//   call_stack[call_stack_depth].pc = pc;
-//   call_stack[call_stack_depth].name = name;
-//   call_stack_depth++;
-// }
+void ftrace_log_call(vaddr_t pc,char *name) {
+  if(ftrace_size>=MAX_FTRACE_SIZE){
+    printf("Call stack overflow!\n");
+    return;
+  }
+  // 输出调用信息
+  for(int i=0;i<ftrace_size;i++){
+    printf("  "); // 缩进
+  }
+  printf("call [%s@0x%08x]\n",name,pc);
+  // 压栈
+  ftrace[ftrace_size].pc = pc;
+  ftrace[ftrace_size].name = name;
+  ftrace_size++;
+}
 
-// void ftrace_log_ret(vaddr_t pc, const char *name) {
-//   if (call_stack_depth <= 0) {
-//       printf("Call stack underflow!\n");
-//       return;
-//   }
-//   // 出栈
-//   call_stack_depth--;
-//   // 输出返回信息
-//   for (int i = 0; i < call_stack_depth; i++) {
-//       printf("  "); // 缩进
-//   }
-//   printf("ret  [%s]\n", name);
-// }
+void ftrace_log_ret(vaddr_t pc, const char *name){
+  if(ftrace_size<=0){
+    printf("Call stack underflow!\n");
+    return;
+  }
+  // 出栈
+  ftrace_size--;
+  // 输出返回信息
+  for(int i=0;i<ftrace_size;i++){
+    printf("  "); // 缩进
+  }
+  printf("ret  [%s]\n", name);
+}
 
-// const char *get_func_name(vaddr_t addr) {
-//   for (int i = 0; i < func_count; i++) {
-//       if (func_table[i].addr == addr) {
-//           return func_table[i].name;
-//       }
-//   }
-//   return "unknown"; // 未知函数
-// }
+char *get_func_name(vaddr_t addr){
+  for(int i=0;i<func_count;i++){
+    if(func_table[i].addr == addr){
+      return func_table[i].name;
+    }
+  }
+  return "unknown"; // 未知函数
+}
 
 CPU_state cpu = {};
 uint64_t g_nr_guest_inst = 0;
@@ -163,14 +170,15 @@ static void exec_once(Decode *s, vaddr_t pc) {
   s->pc = pc;
   s->snpc = pc;
   isa_exec_once(s);
-  // if (s->isa.inst == JAL || s->isa.inst == JALR) {
-  //   const char *name = get_func_name(s->dnpc); // 根据地址获取函数名
-  //   if (s->isa.inst == JAL) {
-  //       ftrace_log_call(pc, s->dnpc, name); // 函数调用
-  //   } else if (s->isa.inst == JALR && s->dnpc == cpu.gpr[1]) { // ra 寄存器
-  //       ftrace_log_ret(pc, name); // 函数返回
-  //   }
-  // }
+  uint32_t opcode = s->isa.inst & 0x7f; // 提取指令的操作码
+  if(opcode == 0x6f || opcode == 0x67){ // JAL 或 JALR 指令
+    char *name = get_func_name(s->dnpc); // 根据地址获取函数名
+    if(opcode == 0x6f){ // JAL 指令
+      ftrace_log_call(pc,name); // 函数调用
+    } else if(opcode == 0x67 && s->dnpc == cpu.gpr[1]) { // JALR 指令且目标地址为 ra 寄存器
+      ftrace_log_ret(pc,name); // 函数返回
+    }
+  }
   cpu.pc = s->dnpc;
 #ifdef CONFIG_ITRACE
   char *p = s->logbuf;
