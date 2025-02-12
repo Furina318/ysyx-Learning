@@ -15,6 +15,11 @@
 
 #include <isa.h>
 #include <memory/paddr.h>
+#include <elf.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 
 void init_rand();
 void init_log(const char *log_file);
@@ -69,6 +74,97 @@ static long load_img() {
   return size;
 }
 
+//太TM难了，这个elf解析没一个是自己写的
+typedef struct {
+  uint32_t addr;  // 函数地址
+  char name[64];  // 函数名
+} func_symbol_t;
+
+static func_symbol_t func_table[1024]; // 符号表
+static int func_count = 0;             // 符号数量
+
+void load_func_table(const char *elf_file) {
+  FILE *fp = fopen(elf_file, "rb");
+  if (fp==NULL) {
+    printf("Failed to open ELF file: %s\n", elf_file);
+    return;
+  }
+
+  //读取 ELF Header
+  uint8_t header[64];
+  int check0=fread(header, 1, 64, fp);
+  assert(check0==64);
+  //检查 ELF 文件魔数
+  if (header[0] != 0x7F || header[1] != 'E' || header[2] != 'L' || header[3] != 'F') {
+    printf("Invalid ELF file: %s\n", elf_file);
+    fclose(fp);
+    return;
+  }
+
+  // 解析 ELF Header
+  uint32_t shoff = *(uint32_t *)(header + 32); // Section Header 表偏移
+  uint16_t shnum = *(uint16_t *)(header + 48); // Section Header 数量
+  // uint16_t shstrndx = *(uint16_t *)(header + 50); // 节区名称字符串表索引
+
+  // 读取 Section Header 表
+  fseek(fp, shoff, SEEK_SET);
+  uint8_t *shdrs = malloc(shnum * 40); // 每个 Section Header 大小为 40 字节
+  int check1=fread(shdrs, 40, shnum, fp);
+  assert(check1==shnum);
+
+  // 找到符号表和字符串表
+  uint32_t symtab_offset = 0, symtab_size = 0;
+  uint32_t strtab_offset = 0, strtab_size = 0;
+
+  for (int i = 0; i < shnum; i++) {
+    uint8_t *shdr = shdrs + i * 40;
+    uint32_t sh_type = *(uint32_t *)(shdr + 4);
+
+    if (sh_type == 2) { // SHT_SYMTAB
+      symtab_offset = *(uint32_t *)(shdr + 16);
+      symtab_size = *(uint32_t *)(shdr + 20);
+    } else if (sh_type == 3) { // SHT_STRTAB
+      strtab_offset = *(uint32_t *)(shdr + 16);
+      strtab_size = *(uint32_t *)(shdr + 20);
+    }
+  }
+
+  // 读取符号表
+  fseek(fp, symtab_offset, SEEK_SET);
+  int8_t *symtab = malloc(symtab_size);
+  int check2=fread(symtab, 1, symtab_size, fp);
+  assert(check2==symtab_size);
+
+  // 读取字符串表
+  fseek(fp, strtab_offset, SEEK_SET);
+  uint8_t *strtab = malloc(strtab_size);
+  int check3=fread(strtab, 1, strtab_size, fp);
+  assert(check3==strtab_size);
+  // 解析符号表
+  int num_symbols = symtab_size / 16; // 每个符号表项大小为 16 字节
+  for (int i = 0; i < num_symbols; i++) {
+    uint8_t *symtab=malloc(symtab_size);
+    uint8_t *sym = symtab + i * 16;
+    uint32_t st_name = *(uint32_t *)sym;
+    uint32_t st_value = *(uint32_t *)(sym + 4);
+    uint8_t st_info = *(uint8_t *)(sym + 12);
+
+    if (ELF32_ST_TYPE(st_info) == STT_FUNC) { // 只记录函数符号
+      func_table[func_count].addr = st_value;
+      const char *name = (const char *)(strtab + st_name);
+      strncpy(func_table[func_count].name, name, sizeof(func_table[func_count].name) - 1);
+      func_table[func_count].name[sizeof(func_table[func_count].name) - 1] = '\0'; // 确保字符串以 '\0' 结尾
+      func_count++;
+    }
+  }
+
+    // 释放内存
+  free(shdrs);
+  free(symtab);
+  free(strtab);
+  fclose(fp);
+}
+
 static int parse_args(int argc, char *argv[]) {
   const struct option table[] = {
     {"batch"    , no_argument      , NULL, 'b'},
@@ -86,7 +182,7 @@ static int parse_args(int argc, char *argv[]) {
       case 'p': sscanf(optarg, "%d", &difftest_port); break;
       case 'l': log_file = optarg; break;
       case 'd': diff_so_file = optarg; break;
-      case 'e': elf_file = optarg; break;
+      case 'e': elf_file = optarg;load_func_table(elf_file); break;
       case 1: img_file = optarg; return 0;
       default:
         printf("Usage: %s [OPTION...] IMAGE [args]\n\n", argv[0]);

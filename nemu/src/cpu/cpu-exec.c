@@ -45,14 +45,6 @@ typedef struct{
 
 static Iringbuf iringbuf;
 
-// typedef struct{
-//   vaddr_t pc;                      //函数调用地址
-//   char *name;                      //函数名
-// }ftrace_info;
-
-// static ftrace_info ftrace[MAX_FTRACE_SIZE];
-// static int ftrace_size=0;//当前调用栈深度
-
 void iringbuf_init(){
   iringbuf.w_ptr=0;
   iringbuf.r_ptr=0;
@@ -86,6 +78,45 @@ void iringbuf_dummy(vaddr_t error_pc){
               iringbuf.entries[index].inst & 0xff);
   }
 }
+
+
+// typedef struct{
+//   vaddr_t pc;                      //函数调用地址
+//   char *name;                      //函数名
+// }ftrace_info;
+
+// static ftrace_info ftrace[MAX_FTRACE_SIZE];
+// static int ftrace_size=0;//当前调用栈深度
+
+// void ftrace_log_call(vaddr_t pc, vaddr_t target, const char *name) {
+//   if (call_stack_depth >= MAX_CALL_STACK_DEPTH) {
+//       printf("Call stack overflow!\n");
+//       return;
+//   }
+//   // 输出调用信息
+//   for (int i = 0; i < call_stack_depth; i++) {
+//       printf("  "); // 缩进
+//   }
+//   printf("call [%s@0x%08x]\n", name, pc);
+//   // 压栈
+//   call_stack[call_stack_depth].pc = pc;
+//   call_stack[call_stack_depth].name = name;
+//   call_stack_depth++;
+// }
+
+// void ftrace_log_ret(vaddr_t pc, const char *name) {
+//   if (call_stack_depth <= 0) {
+//       printf("Call stack underflow!\n");
+//       return;
+//   }
+//   // 出栈
+//   call_stack_depth--;
+//   // 输出返回信息
+//   for (int i = 0; i < call_stack_depth; i++) {
+//       printf("  "); // 缩进
+//   }
+//   printf("ret  [%s]\n", name);
+// }
 
 // const char *get_func_name(vaddr_t addr) {
 //   for (int i = 0; i < func_count; i++) {
@@ -132,6 +163,14 @@ static void exec_once(Decode *s, vaddr_t pc) {
   s->pc = pc;
   s->snpc = pc;
   isa_exec_once(s);
+  // if (s->isa.inst == JAL || s->isa.inst == JALR) {
+  //   const char *name = get_func_name(s->dnpc); // 根据地址获取函数名
+  //   if (s->isa.inst == JAL) {
+  //       ftrace_log_call(pc, s->dnpc, name); // 函数调用
+  //   } else if (s->isa.inst == JALR && s->dnpc == cpu.gpr[1]) { // ra 寄存器
+  //       ftrace_log_ret(pc, name); // 函数返回
+  //   }
+  // }
   cpu.pc = s->dnpc;
 #ifdef CONFIG_ITRACE
   char *p = s->logbuf;
