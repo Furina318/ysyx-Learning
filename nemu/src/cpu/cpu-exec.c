@@ -82,6 +82,7 @@ void iringbuf_dummy(vaddr_t error_pc){
 
 typedef struct {
   uint32_t addr;  // 函数地址
+  uint32_t size;  // 函数大小
   char name[64];  // 函数名
 } func_symbol_t;
 extern int func_count;
@@ -127,7 +128,7 @@ void ftrace_log_ret(vaddr_t pc, const char *name){
 
 char *get_func_name(vaddr_t addr){
   for(int i=0;i<func_count;i++){
-    if(func_table[i].addr == addr){
+    if(addr >= func_table[i].addr && addr < func_table[i].addr + func_table[i].size){
       return func_table[i].name;
     }
   }

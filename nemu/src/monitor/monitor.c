@@ -77,6 +77,7 @@ static long load_img() {
 //太TM难了，这个elf解析没一个是自己写的
 typedef struct {
   uint32_t addr;  // 函数地址
+  uint32_t size;  // 函数大小
   char name[64];  // 函数名
 } func_symbol_t;
 
@@ -143,10 +144,12 @@ void load_func_table(const char *elf_file) {
     uint8_t *sym = symtab + i * 16;//获取当前符号表项的指针
     uint32_t st_name = *(uint32_t *)sym;
     uint32_t st_value = *(uint32_t *)(sym + 4);
+    uint32_t st_size = *(uint32_t *)(sym + 8);//函数大小
     uint8_t st_info = *(uint8_t *)(sym + 12);//读取符号的类型和绑定信息
 
     if (ELF32_ST_TYPE(st_info) == STT_FUNC) { // 只记录函数符号
       func_table[func_count].addr = st_value;
+      func_table[func_count].size = st_size;
       const char *name = (const char *)(strtab + st_name);
       strncpy(func_table[func_count].name, name, sizeof(func_table[func_count].name) - 1);
       func_table[func_count].name[sizeof(func_table[func_count].name) - 1] = '\0'; // 确保字符串以 '\0' 结尾
