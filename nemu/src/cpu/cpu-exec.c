@@ -89,15 +89,15 @@ extern int func_count;
 extern func_symbol_t func_table[];
 
 typedef struct{
-  vaddr_t pc;                      //函数调用地址
-  char *name;                      //函数名
-  vaddr_t ra;                      //返回地址
+  vaddr_t pc;//函数调用地址
+  char *name;//函数名
+  vaddr_t back;//返回地址
 }ftrace_info;
 
 static ftrace_info ftrace[MAX_FTRACE_SIZE];
 static int ftrace_size=0;//当前调用栈深度
 
-void ftrace_call(vaddr_t pc,char *name,vaddr_t ra){
+void ftrace_call(vaddr_t pc,char *name,vaddr_t back){
   if(ftrace_size>=MAX_FTRACE_SIZE){
     printf("Call stack overflow!\n");
     return;
@@ -108,27 +108,27 @@ void ftrace_call(vaddr_t pc,char *name,vaddr_t ra){
     printf("  "); // 缩进
   }
   printf("call [%s@0x%08x]\n",name,pc);
-  // printf("call [0x%x]\n",ra);
+  // printf("call [0x%x]\n",back);
   // 压栈
-  ftrace[ftrace_size].pc = pc;
-  ftrace[ftrace_size].name = name;
-  ftrace[ftrace_size].ra = ra;
+  ftrace[ftrace_size].pc=pc;
+  ftrace[ftrace_size].name=name;
+  ftrace[ftrace_size].back=back;
   ftrace_size++;
 }
 
-void ftrace_ret(vaddr_t pc, const char *name){
-  if (ftrace_size <= 0) {
+void ftrace_ret(vaddr_t pc,char *name){
+  if(ftrace_size <= 0){
     printf("Call stack underflow!\n");
     return;
   }
   // 检查返回地址是否匹配栈顶记录
-  if (pc != ftrace[ftrace_size - 1].ra) {
+  if(pc!=ftrace[ftrace_size-1].back){
     printf("Mismatched return address! Expected 0x%08x, got 0x%08x\n",
-           ftrace[ftrace_size - 1].ra, pc);
+           ftrace[ftrace_size-1].back,pc);
   }
   ftrace_size--;
   // 输出返回信息
-  printf("0x%x: ", pc);
+  printf("0x%x: ",pc);
   for (int i = 0; i < ftrace_size; i++) {
     printf("  "); // 缩进
   }
@@ -137,7 +137,7 @@ void ftrace_ret(vaddr_t pc, const char *name){
 
 char *get_func_name(vaddr_t addr){
   for(int i=0;i<func_count;i++){
-    if(addr>=func_table[i].addr && addr<func_table[i].addr+func_table[i].size){
+    if(addr>=func_table[i].addr && addr<func_table[i].addr+func_table[i].size){// 检查给出的地址是否落在区间[Value, Value + Size)内
       return func_table[i].name;
     }
   }
@@ -181,19 +181,14 @@ static void exec_once(Decode *s, vaddr_t pc) {
   s->snpc = pc;
   isa_exec_once(s);
   uint32_t opcode = s->isa.inst & 0x7f;
-  if (opcode == 0x6f) { //JAL指令（函数调用）
-    vaddr_t target = s->dnpc;
-    vaddr_t ret_addr = pc + 4;
-    char *name = get_func_name(target);
-    ftrace_call(pc, name, ret_addr);
-  } else if (opcode == 0x67) {//JALR指令
-    vaddr_t target = s->dnpc;
-    if (s->isa.inst == 0x00008067){//ret指令
-      if(ftrace_size > 0){
-        ftrace_ret(pc,ftrace[ftrace_size - 1].name);
-      }
-    }else if(ftrace_size > 0 && target==ftrace[ftrace_size - 1].ra){//判断是否为函数返回
-      ftrace_ret(pc, ftrace[ftrace_size - 1].name);
+  vaddr_t target=s->dnpc;
+  if(opcode==0x6f || opcode==0x67){ //JAL指令（函数调用）11011 11//JALR指令11001 11
+    vaddr_t ret_addr=pc+4;
+    char *name=get_func_name(target);
+    ftrace_call(pc,name,ret_addr);
+  }else if(s->isa.inst==0x00008067){//RET指令11000 11
+    if(ftrace_size>0 && target==ftrace[ftrace_size-1].back){//判断是否为函数返回
+      ftrace_ret(pc,ftrace[ftrace_size-1].name);
     }
   }
   cpu.pc = s->dnpc;
