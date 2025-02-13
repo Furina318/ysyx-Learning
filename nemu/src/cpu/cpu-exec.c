@@ -29,7 +29,7 @@
  */
 #define MAX_INST_TO_PRINT 10
 #define IRINGBUF_SIZE 16
-#define MAX_FTRACE_SIZE 64
+#define MAX_FTRACE_SIZE 1000
 
 typedef struct {
   vaddr_t pc;                      //指令pc
