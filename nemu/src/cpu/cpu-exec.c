@@ -183,13 +183,14 @@ static void exec_once(Decode *s, vaddr_t pc) {
   uint32_t opcode = s->isa.inst & 0x7f;
   vaddr_t target=s->dnpc;
   if(opcode==0x6f){ //JAL指令（函数调用）11011 11//JALR指令11001 11
-    // vaddr_t ret_addr=pc+4;
+    vaddr_t ret_addr=pc+4;
     char *name=get_func_name(target);
-    ftrace_call(pc,name,s->dnpc);
+    ftrace_call(pc,name,ret_addr);
   }else if(opcode==0x67){//JALR指令11001 11
     if(s->isa.inst==0x00008067){
       if(ftrace_size>0){
-        ftrace_call(pc,ftrace[ftrace_size-1].name,s->dnpc);
+        char *name=get_func_name(target);
+        ftrace_call(pc,name,pc+4);
       }
     }
     if(ftrace_size>0 && target==ftrace[ftrace_size-1].back){//判断是否为函数返回
