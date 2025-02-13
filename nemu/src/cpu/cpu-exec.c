@@ -138,6 +138,7 @@ char *get_func_name(vaddr_t addr){
       return func_table[i].name;
     }
   }
+  if (addr >= 0x80000000 && addr < 0x80000010) return "_start";
   return "unknown"; // 未知函数
 }
 

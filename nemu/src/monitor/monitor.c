@@ -122,7 +122,7 @@ void load_func_table(const char *elf_file) {
     if(sh_type == SHT_SYMTAB){ // SHT_SYMTAB
       symtab_offset = *(uint32_t *)(shdr + 16);
       symtab_size = *(uint32_t *)(shdr + 20);
-      symtab_strndx = *(uint16_t *)(shdr + 36);
+      symtab_strndx = *(uint16_t *)(shdr + 36);//sh_link字段
     }
     // else if(sh_type == SHT_STRTAB){ // SHT_STRTAB
     //   strtab_offset = *(uint32_t *)(shdr + 16);
