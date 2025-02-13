@@ -103,7 +103,7 @@ void ftrace_log_call(vaddr_t pc,char *name,vaddr_t ra){
     return;
   }
   // 输出调用信息
-  printf("0x%x: ",pc);
+  printf("%x: ",pc);
   for(int i=0;i<ftrace_size;i++){
     printf("  "); // 缩进
   }
@@ -131,7 +131,7 @@ void ftrace_log_ret(vaddr_t pc, const char *name){
   for(int i=0;i<ftrace_size;i++){
     printf("  "); // 缩进
   }
-  printf("ret  [%s]\n", name);
+  printf("ret  [0x%x]\n",ftrace[ftrace_size].ra);
 }
 
 char *get_func_name(vaddr_t addr){
