@@ -192,7 +192,7 @@ static void exec_once(Decode *s, vaddr_t pc) {
         ftrace_ret(pc,ftrace[ftrace_size-1].name);
       }
     }
-    if(ftrace_size>0){
+    if(ftrace_size>0 && target==ftrace[ftrace_size-1].back){
       char *name=get_func_name(target);
       ftrace_call(target,name,pc+4);
     }
