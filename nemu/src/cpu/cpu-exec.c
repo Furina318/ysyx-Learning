@@ -107,7 +107,7 @@ void ftrace_call(vaddr_t pc,char *name,vaddr_t back,Decode *s){
   for(int i=0;i<ftrace_size;i++){
     printf("  "); // 缩进
   }
-  printf("call [%s@0x%08x]\n",name,s->dnpc);
+  printf("call [%s @ 0x%08x]\n",name,s->dnpc);
   // printf("call [0x%x]\n",back);
   // 压栈
   ftrace[ftrace_size].pc=pc;
