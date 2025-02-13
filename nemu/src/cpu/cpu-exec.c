@@ -107,7 +107,8 @@ void ftrace_log_call(vaddr_t pc,char *name,vaddr_t ra){
   for(int i=0;i<ftrace_size;i++){
     printf("  "); // 缩进
   }
-  printf("call [%s@0x%08x]\n",name,pc);
+  // printf("call [%s@0x%08x]\n",name,pc);
+  printf("call [0x%x]\n",ra);
   // 压栈
   ftrace[ftrace_size].pc = pc;
   ftrace[ftrace_size].name = name;
@@ -132,6 +133,7 @@ void ftrace_log_ret(vaddr_t pc, const char *name){
     printf("  "); // 缩进
   }
   printf("ret  [0x%x]\n",ftrace[ftrace_size].ra);
+  // printf("ret  [%s]\n",name);
 }
 
 char *get_func_name(vaddr_t addr){
