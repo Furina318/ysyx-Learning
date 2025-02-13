@@ -97,7 +97,7 @@ typedef struct{
 static ftrace_info ftrace[MAX_FTRACE_SIZE];
 static int ftrace_size=0;//当前调用栈深度
 
-void ftrace_call(vaddr_t pc,char *name,vaddr_t back,Decode *s){
+void ftrace_call(vaddr_t pc,char *name,vaddr_t back,vaddr_t dnpc){
   if(ftrace_size>=MAX_FTRACE_SIZE){
     printf("Call stack overflow!\n");
     return;
@@ -107,7 +107,7 @@ void ftrace_call(vaddr_t pc,char *name,vaddr_t back,Decode *s){
   for(int i=0;i<ftrace_size;i++){
     printf("  "); // 缩进
   }
-  printf("call [%s @ 0x%08x]\n",name,s->dnpc);
+  printf("call [%s @ 0x%08x]\n",name,dnpc);
   // printf("call [0x%x]\n",back);
   // 压栈
   ftrace[ftrace_size].pc=pc;
@@ -185,7 +185,7 @@ static void exec_once(Decode *s, vaddr_t pc) {
   if(opcode==0x6f){ //JAL指令（函数调用）11011 11//JALR指令11001 11
     vaddr_t ret_addr=pc+4;
     char *name=get_func_name(target);
-    ftrace_call(pc,name,ret_addr,s);
+    ftrace_call(pc,name,ret_addr,s->dnpc);
   }else if(opcode==0x67){//JALR指令11001 11
     if(s->isa.inst==0x00008067){//ret指令
       if(ftrace_size>0){//判断是否为函数返回

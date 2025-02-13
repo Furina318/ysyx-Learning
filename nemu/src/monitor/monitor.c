@@ -74,105 +74,132 @@ static long load_img() {
   return size;
 }
 
-//太TM难了，这个elf解析没一个是自己写的
+// // ELF文件头结构（32位）
+// typedef struct {
+//   unsigned char e_ident[16];
+//   uint16_t      e_type;
+//   uint16_t      e_machine;
+//   uint32_t      e_version;
+//   uint32_t      e_entry;
+//   uint32_t      e_phoff;
+//   uint32_t      e_shoff;    // 节头表偏移
+//   uint32_t      e_flags;
+//   uint16_t      e_ehsize;
+//   uint16_t      e_phentsize;
+//   uint16_t      e_phnum;
+//   uint16_t      e_shentsize;
+//   uint16_t      e_shnum;    // 节头数量
+//   uint16_t      e_shstrndx;
+// } Elf32_Ehdr;
+
+// // 节头表结构（32位）
+// typedef struct {
+//   uint32_t sh_name;
+//   uint32_t sh_type;
+//   uint32_t sh_flags;
+//   uint32_t sh_addr;
+//   uint32_t sh_offset;
+//   uint32_t sh_size;
+//   uint32_t sh_link;
+//   uint32_t sh_info;
+//   uint32_t sh_addralign;
+//   uint32_t sh_entsize;
+// } Elf32_Shdr;
+
+// // 符号表项结构（32位）
+// typedef struct {
+//   uint32_t st_name;
+//   uint32_t st_value;
+//   uint32_t st_size;
+//   unsigned char st_info;
+//   unsigned char st_other;
+//   uint16_t st_shndx;
+// } Elf32_Sym;
+
+// #define SHT_SYMTAB 2          // 符号表类型
+// #define STT_FUNC 2            // 函数符号类型
+#define CODE_BASE_ADDR 0x80000000  // 代码段加载基址
+
 typedef struct {
-  uint32_t addr;  // 函数地址
-  uint32_t size;  // 函数大小
-  char name[64];  // 函数名
+  uint32_t addr;
+  uint32_t size;
+  char name[64];
 } func_symbol_t;
 
-func_symbol_t func_table[4096]; // 符号表
-int func_count = 0;             // 符号数量
-#define CODE_BASE_ADDR 0x80000000;  // 根据 ELF 的 Program Header 动态获取
+func_symbol_t func_table[4096];
+int func_count = 0;
+
 
 void load_func_table(const char *elf_file) {
-  FILE *fp = fopen(elf_file, "rb");
-  if (fp == NULL) {
-    printf("Failed to open ELF file: %s\n", elf_file);
-    return;
-  }
+  FILE* fp = fopen(elf_file, "rb");
+    assert(fp && "Can't open ELF file");
 
-  uint8_t header[64];
-  int check0 = fread(header, 1, 64, fp);
-  assert(check0 == 64);
+    // 1. 读取ELF头
+    Elf32_Ehdr ehdr;
+    int check1=fread(&ehdr, sizeof(Elf32_Ehdr), 1, fp);
+    assert(check1==1);
+    // 验证ELF魔数
+    assert(memcmp(ehdr.e_ident, "\x7F" "ELF", 4) == 0 && "Invalid ELF");
 
-  if (header[0] != 0x7F || header[1] != 'E' || header[2] != 'L' || header[3] != 'F') {
-    printf("Invalid ELF file: %s\n", elf_file);
+    // 2. 定位节头表
+    fseek(fp, ehdr.e_shoff, SEEK_SET);
+
+    // 3. 遍历节头表寻找符号表
+    Elf32_Shdr symtab_shdr, strtab_shdr;
+    int symtab_found = 0;
+    
+    for (int i = 0; i < ehdr.e_shnum; ++i) {
+        Elf32_Shdr shdr;
+        int check2=fread(&shdr, sizeof(Elf32_Shdr), 1, fp);
+        assert(check2==1);
+        if (shdr.sh_type == SHT_SYMTAB) {
+            symtab_shdr = shdr;  // 找到符号表
+            symtab_found = 1;
+            
+            // 获取关联的字符串表（通过sh_link）
+            fseek(fp, ehdr.e_shoff + shdr.sh_link * sizeof(Elf32_Shdr), SEEK_SET);
+            int check3=fread(&strtab_shdr, sizeof(Elf32_Shdr), 1, fp);
+            assert(check3==1);
+            break;
+        }
+    }
+    assert(symtab_found && "Symbol table not found");
+
+    // 4. 读取符号表
+    Elf32_Sym* symtab = malloc(symtab_shdr.sh_size);
+    fseek(fp, symtab_shdr.sh_offset, SEEK_SET);
+    int check4=fread(symtab, symtab_shdr.sh_size, 1, fp);
+    assert(check4==1);
+    // 5. 读取字符串表
+    char* strtab = malloc(strtab_shdr.sh_size);
+    fseek(fp, strtab_shdr.sh_offset, SEEK_SET);
+    int check5=fread(strtab, strtab_shdr.sh_size, 1, fp);
+    assert(check5==1);
+    // 6. 解析符号表项
+    int sym_count = symtab_shdr.sh_size / sizeof(Elf32_Sym);
+    for (int i = 0; i < sym_count; ++i) {
+        Elf32_Sym* sym = &symtab[i];
+        unsigned char type = sym->st_info & 0xF;
+
+        if (type == STT_FUNC && sym->st_size > 0) {  // 仅处理函数符号
+            func_table[func_count].addr = sym->st_value + CODE_BASE_ADDR;
+            func_table[func_count].size = sym->st_size;
+            
+            // 从字符串表获取名称
+            strncpy(func_table[func_count].name, 
+                   &strtab[sym->st_name], 
+                   sizeof(func_table[0].name) - 1);
+            func_table[func_count].name[sizeof(func_table[0].name)-1] = '\0';
+            
+            func_count++;
+            if (func_count >= 4096) break;
+        }
+    }
+
+    // 7. 清理资源
+    free(symtab);
+    free(strtab);
     fclose(fp);
-    return;
-  }
-
-  uint32_t shoff = *(uint32_t *)(header + 32);
-  uint16_t shnum = *(uint16_t *)(header + 48);
-
-  fseek(fp, shoff, SEEK_SET);
-  uint8_t *shdrs = malloc(shnum * 40);
-  int check1 = fread(shdrs, 40, shnum, fp);
-  assert(check1 == shnum);
-
-  // uint32_t symtab_offset = 0, symtab_size = 0;
-  // uint32_t strtab_offset = 0, strtab_size = 0;
-  uint32_t symtab_size = 0, strtab_size = 0;
-  uint16_t symtab_strndx = 0;
-
-  for (int i = 0; i < shnum; i++) {
-    uint8_t *shdr = shdrs + i * 40;
-    uint32_t sh_type = *(uint32_t *)(shdr + 4);
-
-    if (sh_type == 0x2) { // SHT_SYMTAB
-      // symtab_offset = *(uint32_t *)(shdr + 16);
-      symtab_size = *(uint32_t *)(shdr + 20);
-      symtab_strndx = *(uint16_t *)(shdr + 36);
-    }
-  }
-
-  for (int i = 0; i < shnum; i++) {
-    uint8_t *shdr = shdrs + i * 40;
-    if (i == symtab_strndx) {
-      // strtab_offset = *(uint32_t *)(shdr + 16);
-      strtab_size = *(uint32_t *)(shdr + 20);
-      break;
-    }
-  }
-
-  uint8_t *symtab = malloc(symtab_size);
-  int check2 = fread(symtab, 1, symtab_size, fp);
-  assert(check2 == symtab_size);
-
-  uint8_t *strtab = malloc(strtab_size);
-  int check3 = fread(strtab, 1, strtab_size, fp);
-  assert(check3 == strtab_size);
-
-  int num_symbols = symtab_size / 16;
-  for (int i = 0; i < num_symbols; i++) {
-    uint8_t *sym = symtab + i * 16;
-    uint32_t st_name = *(uint32_t *)sym;
-    uint32_t st_value = *(uint32_t *)(sym + 4);
-    uint32_t st_size = *(uint32_t *)(sym + 8);
-    uint8_t st_info = *(uint8_t *)(sym + 12);
-
-    if ((st_info & 0xF) == 0x2) { // STT_FUNC
-      if (st_name == 0 || st_value == 0) continue;
-
-      // 处理 st_size 为0的情况
-      if (st_size == 0 && i < num_symbols - 1) {
-        uint32_t next_value = *(uint32_t *)(symtab + (i + 1) * 16 + 4);
-        st_size = next_value - st_value;
-      }
-
-      func_table[func_count].addr = st_value + CODE_BASE_ADDR;
-      func_table[func_count].size = st_size;
-      const char *name = (const char *)(strtab + st_name);
-      strncpy(func_table[func_count].name, name, sizeof(func_table[0].name) - 1);
-      func_table[func_count].name[sizeof(func_table[0].name) - 1] = '\0';
-      func_count++;
-    }
-  }
-
-  free(shdrs);
-  free(symtab);
-  free(strtab);
-  fclose(fp);
 }
 
 static int parse_args(int argc, char *argv[]) {
