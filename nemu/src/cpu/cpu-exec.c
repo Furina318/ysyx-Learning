@@ -103,6 +103,7 @@ void ftrace_log_call(vaddr_t pc,char *name,vaddr_t ra){
     return;
   }
   // 输出调用信息
+  printf("%x: ",pc);
   for(int i=0;i<ftrace_size;i++){
     printf("  "); // 缩进
   }
@@ -126,6 +127,7 @@ void ftrace_log_ret(vaddr_t pc, const char *name){
   }
   ftrace_size--;
   // 输出返回信息
+  printf("%x: ",pc);
   for(int i=0;i<ftrace_size;i++){
     printf("  "); // 缩进
   }
