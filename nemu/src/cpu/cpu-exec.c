@@ -134,11 +134,11 @@ void ftrace_log_ret(vaddr_t pc, const char *name){
 
 char *get_func_name(vaddr_t addr){
   for(int i=0;i<func_count;i++){
-    if(addr>=func_table[i].addr && addr<func_table[i].addr+func_table[i].size){
-      return func_table[i].name;
-    }
+    // if(addr>=func_table[i].addr && addr<func_table[i].addr+func_table[i].size){
+    //   return func_table[i].name;
+    // }
+    return func_table[i].name;
   }
-  if (addr >= 0x80000000 && addr < 0x80000010) return "_start";
   return "unknown"; // 未知函数
 }
 
