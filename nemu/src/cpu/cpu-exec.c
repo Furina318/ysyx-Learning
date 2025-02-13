@@ -122,10 +122,10 @@ void ftrace_ret(vaddr_t pc,char *name){
     return;
   }
   // 检查返回地址是否匹配栈顶记录
-  if(pc!=ftrace[ftrace_size-1].back){
-    printf("Mismatched return address! Expected 0x%08x, got 0x%08x\n",
-           ftrace[ftrace_size-1].back,pc);
-  }
+  // if(pc!=ftrace[ftrace_size-1].back){
+  //   printf("Mismatched return address! Expected 0x%08x, got 0x%08x\n",
+  //          ftrace[ftrace_size-1].back,pc);
+  // }
   ftrace_size--;
   // 输出返回信息
   printf("0x%x: ",pc);
@@ -192,10 +192,10 @@ static void exec_once(Decode *s, vaddr_t pc) {
         ftrace_ret(pc,ftrace[ftrace_size-1].name);
       }
     }
-    if(ftrace_size>0 && target==ftrace[ftrace_size-1].back){
-      char *name=get_func_name(target);
-      ftrace_call(target,name,pc+4);
-    }
+    // if(ftrace_size>0 && target==ftrace[ftrace_size-1].back){
+    //   char *name=get_func_name(target);
+    //   ftrace_call(target,name,pc+4);
+    // }
   }
   cpu.pc = s->dnpc;
 #ifdef CONFIG_ITRACE
