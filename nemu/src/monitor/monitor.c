@@ -81,8 +81,9 @@ typedef struct {
   char name[64];  // 函数名
 } func_symbol_t;
 
-func_symbol_t func_table[1024]; // 符号表
+func_symbol_t func_table[4096]; // 符号表
 int func_count = 0;             // 符号数量
+#define code_vaddr 0x80000000;  // 根据 ELF 的 Program Header 动态获取
 
 void load_func_table(const char *elf_file) {
   FILE *fp = fopen(elf_file, "rb");//二进制模式打开
@@ -112,6 +113,7 @@ void load_func_table(const char *elf_file) {
   // 找到符号表和字符串表
   uint32_t symtab_offset = 0, symtab_size = 0;//定义变量存储符号表的偏移量和大小
   uint32_t strtab_offset = 0, strtab_size = 0;//定义变量存储字符串表的偏移量和大小
+  uint16_t symtab_strndx = 0;//定义变量存储字符串表的索引
 
   for (int i = 0; i < shnum; i++) {//遍历 Section Header 表
     uint8_t *shdr = shdrs + i * 40;//获取当前 Section Header 的指针
@@ -120,15 +122,27 @@ void load_func_table(const char *elf_file) {
     if(sh_type == SHT_SYMTAB){ // SHT_SYMTAB
       symtab_offset = *(uint32_t *)(shdr + 16);
       symtab_size = *(uint32_t *)(shdr + 20);
-    }else if(sh_type == SHT_STRTAB){ // SHT_STRTAB
+      symtab_strndx = *(uint16_t *)(shdr + 36);
+    }
+    // else if(sh_type == SHT_STRTAB){ // SHT_STRTAB
+    //   strtab_offset = *(uint32_t *)(shdr + 16);
+    //   strtab_size = *(uint32_t *)(shdr + 20);
+    // }
+  }
+  // 根据 symtab_strndx 找到对应的字符串表
+  for (int i = 0; i < shnum; i++) {
+    uint8_t *shdr = shdrs + i * 40;
+    // uint32_t sh_type = *(uint32_t *)(shdr + 4);
+    if (i == symtab_strndx) {  // 匹配符号表关联的字符串表
       strtab_offset = *(uint32_t *)(shdr + 16);
       strtab_size = *(uint32_t *)(shdr + 20);
+      break;
     }
   }
 
   // 读取符号表
   fseek(fp, symtab_offset, SEEK_SET);//将文件指针移动到符号表的位置
-  int8_t *symtab = malloc(symtab_size);
+  uint8_t *symtab = malloc(symtab_size);
   int check2=fread(symtab, 1, symtab_size, fp);
   assert(check2==symtab_size);
 
@@ -139,20 +153,22 @@ void load_func_table(const char *elf_file) {
   assert(check3==strtab_size);
   // 解析符号表
   int num_symbols = symtab_size / 16; // 每个符号表项大小为 16 字节
-  for (int i = 0; i < num_symbols; i++) {//遍历符号表
-    uint8_t *symtab=malloc(symtab_size);
-    uint8_t *sym = symtab + i * 16;//获取当前符号表项的指针
+  for (int i = 0; i < num_symbols; i++) {
+    uint8_t *sym = symtab + i * 16;  // 符号表项大小为 16 字节
     uint32_t st_name = *(uint32_t *)sym;
     uint32_t st_value = *(uint32_t *)(sym + 4);
-    uint32_t st_size = *(uint32_t *)(sym + 8);//函数大小
-    uint8_t st_info = *(uint8_t *)(sym + 12);//读取符号的类型和绑定信息
-
-    if (ELF32_ST_TYPE(st_info) == STT_FUNC) { // 只记录函数符号
-      func_table[func_count].addr = st_value;
-      func_table[func_count].size = st_size;
+    uint32_t st_size = *(uint32_t *)(sym + 8);
+    uint8_t st_info = *(uint8_t *)(sym + 12);
+    // uint8_t st_bind = ELF32_ST_BIND(st_info);
+  
+    // 过滤条件：类型为函数 (STT_FUNC) 且绑定为全局或局部 (排除 SECTION/UNDEF 等)
+    if (ELF32_ST_TYPE(st_info) == STT_FUNC) {
+      if (st_name == 0 || st_value == 0) continue;  // 跳过无效符号
+      func_table[func_count].addr=st_value+code_vaddr;
+      func_table[func_count].size=st_size;
       const char *name = (const char *)(strtab + st_name);
-      strncpy(func_table[func_count].name, name, sizeof(func_table[func_count].name) - 1);
-      func_table[func_count].name[sizeof(func_table[func_count].name) - 1] = '\0'; // 确保字符串以 '\0' 结尾
+      strncpy(func_table[func_count].name, name, sizeof(func_table[0].name) - 1);
+      func_table[func_count].name[sizeof(func_table[0].name) - 1] = '\0';
       func_count++;
     }
   }

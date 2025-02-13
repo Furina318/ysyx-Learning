@@ -91,12 +91,13 @@ extern func_symbol_t func_table[];
 typedef struct{
   vaddr_t pc;                      //函数调用地址
   char *name;                      //函数名
+  vaddr_t ra;                      //返回地址
 }ftrace_info;
 
 static ftrace_info ftrace[MAX_FTRACE_SIZE];
 static int ftrace_size=0;//当前调用栈深度
 
-void ftrace_log_call(vaddr_t pc,char *name) {
+void ftrace_log_call(vaddr_t pc,char *name,vaddr_t ra){
   if(ftrace_size>=MAX_FTRACE_SIZE){
     printf("Call stack overflow!\n");
     return;
@@ -109,6 +110,7 @@ void ftrace_log_call(vaddr_t pc,char *name) {
   // 压栈
   ftrace[ftrace_size].pc = pc;
   ftrace[ftrace_size].name = name;
+  ftrace[ftrace_size].ra = ra;
   ftrace_size++;
 }
 
@@ -117,7 +119,11 @@ void ftrace_log_ret(vaddr_t pc, const char *name){
     printf("Call stack underflow!\n");
     return;
   }
-  // 出栈
+  // 检查返回地址是否匹配栈顶的调用记录
+  if (pc != ftrace[ftrace_size - 1].ra) {
+    printf("Mismatched return address! Expected 0x%08x, got 0x%08x\n",
+           ftrace[ftrace_size - 1].ra, pc);
+  }
   ftrace_size--;
   // 输出返回信息
   for(int i=0;i<ftrace_size;i++){
@@ -171,13 +177,18 @@ static void exec_once(Decode *s, vaddr_t pc) {
   s->pc = pc;
   s->snpc = pc;
   isa_exec_once(s);
-  uint32_t opcode = s->isa.inst & 0x7f; // 提取指令的操作码
-  if(opcode == 0x6f || opcode == 0x67){ // JAL 或 JALR 指令
-    char *name = get_func_name(s->dnpc); // 根据地址获取函数名
-    if(opcode == 0x6f){ // JAL 指令
-      ftrace_log_call(pc,name); // 函数调用
-    } else if(opcode == 0x67 && s->dnpc == cpu.gpr[1]) { // JALR 指令且目标地址为 ra 寄存器
-      ftrace_log_ret(pc,name); // 函数返回
+  uint32_t opcode = s->isa.inst & 0x7f;
+  if (opcode == 0x6f) { // JAL 指令（函数调用）
+    vaddr_t target = s->dnpc;
+    vaddr_t ret_addr = pc + 4;  // JAL 的返回地址是 pc + 4
+    char *name = get_func_name(target);
+    ftrace_log_call(pc, name, ret_addr);  // 传入返回地址
+  } else if (opcode == 0x67) { // JALR 指令（可能是函数返回）
+    vaddr_t target = s->dnpc;
+    // 判断是否为返回指令：目标地址是否等于调用栈顶的返回地址
+    if (ftrace_size > 0 && target == ftrace[ftrace_size - 1].ra) {
+      char *name = get_func_name(ftrace[ftrace_size - 1].pc);
+      ftrace_log_ret(pc, name);
     }
   }
   cpu.pc = s->dnpc;
