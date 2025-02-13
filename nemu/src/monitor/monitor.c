@@ -104,7 +104,7 @@ void load_func_table(const char *elf_file) {
   uint32_t shoff = *(uint32_t *)(header + 32); // Section Header 表偏移
   uint16_t shnum = *(uint16_t *)(header + 48); // Section Header 数量
   // uint16_t shstrndx = *(uint16_t *)(header + 50); // 节区名称字符串表索引
-  
+
   fseek(fp, shoff, SEEK_SET);// 读取 Section Header 表
   uint8_t *shdrs = malloc(shnum * 40); // 每个 Section Header 大小为 40 字节
   int check1=fread(shdrs, 40, shnum, fp);
@@ -160,7 +160,7 @@ void load_func_table(const char *elf_file) {
     uint32_t st_size = *(uint32_t *)(sym + 8);
     uint8_t st_info = *(uint8_t *)(sym + 12);
     // uint8_t st_bind = ELF32_ST_BIND(st_info);
-  
+
     // 过滤条件：类型为函数 (STT_FUNC) 且绑定为全局或局部 (排除 SECTION/UNDEF 等)
     if (ELF32_ST_TYPE(st_info) == STT_FUNC) {
       if (st_name == 0 || st_value == 0) continue;  // 跳过无效符号
