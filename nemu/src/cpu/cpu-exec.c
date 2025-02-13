@@ -180,9 +180,9 @@ static void exec_once(Decode *s, vaddr_t pc) {
   uint32_t opcode = s->isa.inst & 0x7f;
   if (opcode == 0x6f) { // JAL 指令（函数调用）
     vaddr_t target = s->dnpc;
-    // vaddr_t ret_addr = pc + 4;  // JAL 的返回地址是 pc + 4
+    vaddr_t ret_addr = pc + 4;  // JAL 的返回地址是 pc + 4
     char *name = get_func_name(target);
-    ftrace_log_call(pc, name, target);  // 传入返回地址
+    ftrace_log_call(pc, name, ret_addr);  // 传入返回地址
   } else if (opcode == 0x67) { // JALR 指令（可能是函数返回）
     vaddr_t target = s->dnpc;
     // 判断是否为返回指令：目标地址是否等于调用栈顶的返回地址
