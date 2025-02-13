@@ -97,7 +97,7 @@ typedef struct{
 static ftrace_info ftrace[MAX_FTRACE_SIZE];
 static int ftrace_size=0;//当前调用栈深度
 
-void ftrace_log_call(vaddr_t pc,char *name,vaddr_t ra){
+void ftrace_call(vaddr_t pc,char *name,vaddr_t ra){
   if(ftrace_size>=MAX_FTRACE_SIZE){
     printf("Call stack overflow!\n");
     return;
@@ -116,7 +116,7 @@ void ftrace_log_call(vaddr_t pc,char *name,vaddr_t ra){
   ftrace_size++;
 }
 
-void ftrace_log_ret(vaddr_t pc, const char *name){
+void ftrace_ret(vaddr_t pc, const char *name){
   if (ftrace_size <= 0) {
     printf("Call stack underflow!\n");
     return;
@@ -181,20 +181,19 @@ static void exec_once(Decode *s, vaddr_t pc) {
   s->snpc = pc;
   isa_exec_once(s);
   uint32_t opcode = s->isa.inst & 0x7f;
-  if (opcode == 0x6f) { // JAL 指令（函数调用）
+  if (opcode == 0x6f) { //JAL指令（函数调用）
     vaddr_t target = s->dnpc;
-    vaddr_t ret_addr = pc + 4;  // JAL 的返回地址是 pc + 4
+    vaddr_t ret_addr = pc + 4;
     char *name = get_func_name(target);
-    ftrace_log_call(pc, name, ret_addr);
-  } else if (opcode == 0x67) { // JALR 指令
+    ftrace_call(pc, name, ret_addr);
+  } else if (opcode == 0x67) {//JALR指令
     vaddr_t target = s->dnpc;
-    if (s->isa.inst == 0x00008067) {  // ret 指令
-      if (ftrace_size > 0) {
-        ftrace_log_ret(pc, ftrace[ftrace_size - 1].name);
+    if (s->isa.inst == 0x00008067){//ret指令
+      if(ftrace_size > 0){
+        ftrace_ret(pc,ftrace[ftrace_size - 1].name);
       }
-    } else if (ftrace_size > 0 && target == ftrace[ftrace_size - 1].ra) {
-      // 判断是否为函数返回
-      ftrace_log_ret(pc, ftrace[ftrace_size - 1].name);
+    }else if(ftrace_size > 0 && target==ftrace[ftrace_size - 1].ra){//判断是否为函数返回
+      ftrace_ret(pc, ftrace[ftrace_size - 1].name);
     }
   }
   cpu.pc = s->dnpc;

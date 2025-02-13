@@ -173,7 +173,7 @@ void load_func_table(const char *elf_file) {
     }
   }
 
-    // 释放内存
+  // 释放内存
   free(shdrs);
   free(symtab);
   free(strtab);
