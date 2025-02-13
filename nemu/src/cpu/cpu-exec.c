@@ -103,12 +103,12 @@ void ftrace_log_call(vaddr_t pc,char *name,vaddr_t ra){
     return;
   }
   // 输出调用信息
-  printf("%x: ",pc);
+  printf("0x%x: ",pc);
   for(int i=0;i<ftrace_size;i++){
     printf("  "); // 缩进
   }
-  // printf("call [%s@0x%08x]\n",name,pc);
-  printf("call [0x%x]\n",ra);
+  printf("call [%s@0x%08x]\n",name,pc);
+  // printf("call [0x%x]\n",ra);
   // 压栈
   ftrace[ftrace_size].pc = pc;
   ftrace[ftrace_size].name = name;
@@ -117,23 +117,22 @@ void ftrace_log_call(vaddr_t pc,char *name,vaddr_t ra){
 }
 
 void ftrace_log_ret(vaddr_t pc, const char *name){
-  if(ftrace_size<=0){
+  if (ftrace_size <= 0) {
     printf("Call stack underflow!\n");
     return;
   }
-  // 检查返回地址是否匹配栈顶的调用记录
+  // 检查返回地址是否匹配栈顶记录
   if (pc != ftrace[ftrace_size - 1].ra) {
     printf("Mismatched return address! Expected 0x%08x, got 0x%08x\n",
            ftrace[ftrace_size - 1].ra, pc);
   }
   ftrace_size--;
   // 输出返回信息
-  printf("0x%x: ",pc);
-  for(int i=0;i<ftrace_size;i++){
+  printf("0x%x: ", pc);
+  for (int i = 0; i < ftrace_size; i++) {
     printf("  "); // 缩进
   }
-  printf("ret  [0x%x]\n",ftrace[ftrace_size].ra);
-  // printf("ret  [%s]\n",name);
+  printf("ret  [%s]\n", name);
 }
 
 char *get_func_name(vaddr_t addr){
@@ -186,13 +185,16 @@ static void exec_once(Decode *s, vaddr_t pc) {
     vaddr_t target = s->dnpc;
     vaddr_t ret_addr = pc + 4;  // JAL 的返回地址是 pc + 4
     char *name = get_func_name(target);
-    ftrace_log_call(pc, name, ret_addr);  // 传入返回地址
-  } else if (opcode == 0x67) { // JALR 指令（可能是函数返回）
+    ftrace_log_call(pc, name, ret_addr);
+  } else if (opcode == 0x67) { // JALR 指令
     vaddr_t target = s->dnpc;
-    // 判断是否为返回指令：目标地址是否等于调用栈顶的返回地址
-    if (ftrace_size > 0 && target == ftrace[ftrace_size - 1].ra) {
-      char *name = get_func_name(ftrace[ftrace_size - 1].pc);
-      ftrace_log_ret(pc, name);
+    if (s->isa.inst == 0x00008067) {  // ret 指令
+      if (ftrace_size > 0) {
+        ftrace_log_ret(pc, ftrace[ftrace_size - 1].name);
+      }
+    } else if (ftrace_size > 0 && target == ftrace[ftrace_size - 1].ra) {
+      // 判断是否为函数返回
+      ftrace_log_ret(pc, ftrace[ftrace_size - 1].name);
     }
   }
   cpu.pc = s->dnpc;
