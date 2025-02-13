@@ -182,7 +182,7 @@ static void exec_once(Decode *s, vaddr_t pc) {
   isa_exec_once(s);
   uint32_t opcode = s->isa.inst & 0x7f;
   vaddr_t target=s->dnpc;
-  if(opcode==0x6f || opcode==0x67){ //JAL指令（函数调用）11011 11//JALR指令11001 11
+  if(opcode==0x6f){ //JAL指令（函数调用）11011 11//JALR指令11001 11
     vaddr_t ret_addr=pc+4;
     char *name=get_func_name(target);
     ftrace_call(pc,name,ret_addr);
