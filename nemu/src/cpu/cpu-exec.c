@@ -188,7 +188,7 @@ static void exec_once(Decode *s, vaddr_t pc) {
     ftrace_call(pc,name,ret_addr);
   }else if(opcode==0x67){//JALR指令11001 11
     if(s->isa.inst==0x00008067){
-      if(ftrace_size>0 && target==ftrace[ftrace_size-1].back){//判断是否为函数返回
+      if(ftrace_size>0){//判断是否为函数返回
         ftrace_ret(pc,ftrace[ftrace_size-1].name);
       }
     }
