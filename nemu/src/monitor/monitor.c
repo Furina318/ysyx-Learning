@@ -132,34 +132,31 @@ int func_count = 0;
 
 void load_func_table(const char *elf_file) {
   FILE* fp = fopen(elf_file, "rb");
-    assert(fp && "Can't open ELF file");
+    assert(fp && "Failed to open ELF file");
 
     // 1. 读取ELF头
     Elf32_Ehdr ehdr;
-    int check1=fread(&ehdr, sizeof(Elf32_Ehdr), 1, fp);
-    assert(check1==1);
-    // 验证ELF魔数
-    assert(memcmp(ehdr.e_ident, "\x7F" "ELF", 4) == 0 && "Invalid ELF");
+    assert(fread(&ehdr, sizeof(Elf32_Ehdr), 1, fp) == 1 && "Failed to read ELF header");
+    assert(memcmp(ehdr.e_ident, "\x7F" "ELF", 4) == 0 && "Invalid ELF file");
 
     // 2. 定位节头表
     fseek(fp, ehdr.e_shoff, SEEK_SET);
 
-    // 3. 遍历节头表寻找符号表
+    // 3. 遍历节头表寻找符号表和字符串表
     Elf32_Shdr symtab_shdr, strtab_shdr;
     int symtab_found = 0;
-    
+
     for (int i = 0; i < ehdr.e_shnum; ++i) {
         Elf32_Shdr shdr;
-        int check2=fread(&shdr, sizeof(Elf32_Shdr), 1, fp);
-        assert(check2==1);
-        if (shdr.sh_type == SHT_SYMTAB) {
-            symtab_shdr = shdr;  // 找到符号表
+        assert(fread(&shdr, sizeof(Elf32_Shdr), 1, fp) == 1 && "Failed to read section header");
+
+        if (shdr.sh_type == SHT_SYMTAB) {  // 找到符号表
+            symtab_shdr = shdr;
             symtab_found = 1;
-            
-            // 获取关联的字符串表（通过sh_link）
+
+            // 获取关联的字符串表（通过sh_link字段）
             fseek(fp, ehdr.e_shoff + shdr.sh_link * sizeof(Elf32_Shdr), SEEK_SET);
-            int check3=fread(&strtab_shdr, sizeof(Elf32_Shdr), 1, fp);
-            assert(check3==1);
+            assert(fread(&strtab_shdr, sizeof(Elf32_Shdr), 1, fp) == 1 && "Failed to read string table header");
             break;
         }
     }
@@ -168,31 +165,40 @@ void load_func_table(const char *elf_file) {
     // 4. 读取符号表
     Elf32_Sym* symtab = malloc(symtab_shdr.sh_size);
     fseek(fp, symtab_shdr.sh_offset, SEEK_SET);
-    int check4=fread(symtab, symtab_shdr.sh_size, 1, fp);
-    assert(check4==1);
+    assert(fread(symtab, symtab_shdr.sh_size, 1, fp) == 1 && "Failed to read symbol table");
+
     // 5. 读取字符串表
     char* strtab = malloc(strtab_shdr.sh_size);
     fseek(fp, strtab_shdr.sh_offset, SEEK_SET);
-    int check5=fread(strtab, strtab_shdr.sh_size, 1, fp);
-    assert(check5==1);
+    assert(fread(strtab, strtab_shdr.sh_size, 1, fp) == 1 && "Failed to read string table");
+
     // 6. 解析符号表项
     int sym_count = symtab_shdr.sh_size / sizeof(Elf32_Sym);
     for (int i = 0; i < sym_count; ++i) {
         Elf32_Sym* sym = &symtab[i];
-        unsigned char type = sym->st_info & 0xF;
+        unsigned char type = ELF32_ST_TYPE(sym->st_info);
 
-        if (type == STT_FUNC && sym->st_size > 0) {  // 仅处理函数符号
+        if (type == STT_FUNC) {  // 仅处理函数符号
+            // 跳过无效符号（地址为0或名称无定义）
+            if (sym->st_name == 0 || sym->st_value == 0) continue;
+
+            // 处理Size为0的情况（例如_end符号）
+            uint32_t size = sym->st_size;
+            if (size == 0 && i < sym_count - 1) {
+                uint32_t next_value = symtab[i + 1].st_value;
+                size = next_value - sym->st_value;
+            }
+
+            // 填充符号信息
             func_table[func_count].addr = sym->st_value + CODE_BASE_ADDR;
-            func_table[func_count].size = sym->st_size;
-            
-            // 从字符串表获取名称
+            func_table[func_count].size = size;
             strncpy(func_table[func_count].name, 
                    &strtab[sym->st_name], 
                    sizeof(func_table[0].name) - 1);
-            func_table[func_count].name[sizeof(func_table[0].name)-1] = '\0';
+            func_table[func_count].name[sizeof(func_table[0].name) - 1] = '\0';
             
             func_count++;
-            if (func_count >= 4096) break;
+            if (func_count >= 4096) break;  // 防止溢出
         }
     }
 

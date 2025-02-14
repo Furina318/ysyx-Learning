@@ -141,7 +141,7 @@ char *get_func_name(vaddr_t addr){
       return func_table[i].name;
     }
   }
-  return "unknown"; // 未知函数
+  return "???"; // 未知函数
 }
 
 CPU_state cpu = {};
