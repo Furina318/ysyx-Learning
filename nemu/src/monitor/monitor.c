@@ -132,80 +132,60 @@ int func_count = 0;
 
 void load_func_table(const char *elf_file) {
   FILE* fp = fopen(elf_file, "rb");
-    assert(fp && "Failed to open ELF file");
+  Assert(fp, "Can not open '%s'", elf_file);
+  fseek(fp, 0, SEEK_END);
+  long size = ftell(fp);
+  Log("The ELF file is %s, size = %ld", elf_file, size);
+  printf("ftrace log : The ELF file is %s, size = %ld\n", elf_file, size);
 
-    // 1. 读取ELF头
-    Elf32_Ehdr ehdr;
-    assert(fread(&ehdr, sizeof(Elf32_Ehdr), 1, fp) == 1 && "Failed to read ELF header");
-    assert(memcmp(ehdr.e_ident, "\x7F" "ELF", 4) == 0 && "Invalid ELF file");
+  // Read ELF header
+  fseek(fp, 0, SEEK_SET);
+  Elf32_Ehdr elf_header;
+  assert(fread(&elf_header, sizeof(Elf32_Ehdr), 1, fp)==1);
 
-    // 2. 定位节头表
-    fseek(fp, ehdr.e_shoff, SEEK_SET);
+  // Locate and read section headers
+  // Elf32_Shdr shdr;
+  fseek(fp, elf_header.e_shoff, SEEK_SET);
+  Elf32_Shdr sh_table[elf_header.e_shnum];
+  assert(fread(sh_table, sizeof(Elf32_Shdr), elf_header.e_shnum, fp)==elf_header.e_shnum);
 
-    // 3. 遍历节头表寻找符号表和字符串表
-    Elf32_Shdr symtab_shdr, strtab_shdr;
-    int symtab_found = 0;
-
-    for (int i = 0; i < ehdr.e_shnum; ++i) {
-        Elf32_Shdr shdr;
-        assert(fread(&shdr, sizeof(Elf32_Shdr), 1, fp) == 1 && "Failed to read section header");
-
-        if (shdr.sh_type == SHT_SYMTAB) {  // 找到符号表
-            symtab_shdr = shdr;
-            symtab_found = 1;
-
-            // 获取关联的字符串表（通过sh_link字段）
-            fseek(fp, ehdr.e_shoff + shdr.sh_link * sizeof(Elf32_Shdr), SEEK_SET);
-            assert(fread(&strtab_shdr, sizeof(Elf32_Shdr), 1, fp) == 1 && "Failed to read string table header");
-            break;
-        }
+  // Locate symbol table and string table
+  Elf32_Shdr *symtab = NULL;
+  Elf32_Shdr *strtab = NULL;
+  for (int i = 0; i < elf_header.e_shnum; i++) {
+    if (sh_table[i].sh_type == SHT_SYMTAB) {
+      symtab = &sh_table[i];
     }
-    assert(symtab_found && "Symbol table not found");
-
-    // 4. 读取符号表
-    Elf32_Sym* symtab = malloc(symtab_shdr.sh_size);
-    fseek(fp, symtab_shdr.sh_offset, SEEK_SET);
-    assert(fread(symtab, symtab_shdr.sh_size, 1, fp) == 1 && "Failed to read symbol table");
-
-    // 5. 读取字符串表
-    char* strtab = malloc(strtab_shdr.sh_size);
-    fseek(fp, strtab_shdr.sh_offset, SEEK_SET);
-    assert(fread(strtab, strtab_shdr.sh_size, 1, fp) == 1 && "Failed to read string table");
-
-    // 6. 解析符号表项
-    int sym_count = symtab_shdr.sh_size / sizeof(Elf32_Sym);
-    for (int i = 0; i < sym_count; ++i) {
-        Elf32_Sym* sym = &symtab[i];
-        unsigned char type = ELF32_ST_TYPE(sym->st_info);
-
-        if (type == STT_FUNC) {  // 仅处理函数符号
-            // 跳过无效符号（地址为0或名称无定义）
-            if (sym->st_name == 0 || sym->st_value == 0) continue;
-
-            // 处理Size为0的情况（例如_end符号）
-            uint32_t size = sym->st_size;
-            if (size == 0 && i < sym_count - 1) {
-                uint32_t next_value = symtab[i + 1].st_value;
-                size = next_value - sym->st_value;
-            }
-
-            // 填充符号信息
-            func_table[func_count].addr = sym->st_value + CODE_BASE_ADDR;
-            func_table[func_count].size = size;
-            strncpy(func_table[func_count].name, 
-                   &strtab[sym->st_name], 
-                   sizeof(func_table[0].name) - 1);
-            func_table[func_count].name[sizeof(func_table[0].name) - 1] = '\0';
-            
-            func_count++;
-            if (func_count >= 4096) break;  // 防止溢出
-        }
+    if (sh_table[i].sh_type == SHT_STRTAB && i != elf_header.e_shstrndx) {
+      strtab = &sh_table[i];
     }
+  }
+  Assert(symtab && strtab, "Failed to locate symbol table or string table");
 
-    // 7. 清理资源
-    free(symtab);
-    free(strtab);
-    fclose(fp);
+  // Read symbol table
+  Elf32_Sym symbols[symtab->sh_size / sizeof(Elf32_Sym)];
+  fseek(fp, symtab->sh_offset, SEEK_SET);
+  assert(fread(symbols, symtab->sh_size, 1, fp)==1);
+
+  // Read string table
+  char strtab_data[strtab->sh_size];
+  fseek(fp, strtab->sh_offset, SEEK_SET);
+  assert(fread(strtab_data, strtab->sh_size, 1, fp)==1);
+
+  // Parse symbols and store function symbols in func_table
+  func_count = 0;
+  for (int i = 0; i < symtab->sh_size / sizeof(Elf32_Sym); i++) {
+    if (ELF32_ST_TYPE(symbols[i].st_info) == STT_FUNC) {
+      func_table[func_count].addr = symbols[i].st_value;
+      func_table[func_count].size = symbols[i].st_size;
+      strncpy(func_table[func_count].name, &strtab_data[symbols[i].st_name], sizeof(func_table[func_count].name) - 1);
+      func_table[func_count].name[sizeof(func_table[func_count].name) - 1] = '\0';
+      func_count++;
+    }
+  }
+
+  fclose(fp);
+  Log("Loaded %d function symbols from ELF file", func_count);
 }
 
 static int parse_args(int argc, char *argv[]) {
