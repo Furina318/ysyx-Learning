@@ -187,7 +187,7 @@ void init_monitor(int argc, char *argv[]) {
 
   /* Open the log file. */
   init_log(log_file);
-  // load_func_table(elf_file);
+  load_func_table(elf_file);
   /* Initialize memory. */
   init_mem();
 
