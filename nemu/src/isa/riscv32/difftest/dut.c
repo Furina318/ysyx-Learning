@@ -18,7 +18,20 @@
 #include "../local-include/reg.h"
 
 bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc) {
-  return false;
+  if (cpu.pc != ref_r->pc) {
+    printf("PC mismatch: NEMU = 0x%x, REF = 0x%x\n", cpu.pc, ref_r->pc);
+    nemu_state.state = NEMU_ABORT;
+    return false;
+  }
+  // 2. 检查通用寄存器 (x0-x31)
+  for (int i = 0; i < 32; i++) {
+    if (cpu.gpr[i] != ref_r->gpr[i]) {
+      printf("x%d mismatch: NEMU = 0x%x, REF = 0x%x\n", i, cpu.gpr[i], ref_r->gpr[i]);
+      nemu_state.state = NEMU_ABORT;
+      return false;
+    }
+  }
+  return true;
 }
 
 void isa_difftest_attach() {
