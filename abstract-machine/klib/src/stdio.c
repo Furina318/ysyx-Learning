@@ -23,17 +23,19 @@ void int_to_str(int num, char *buffer, int *index) {
       buffer[(*index)++] = '-';
       num = -num;
   }
-  // 反转数字
-  int reversed = 0;
-  while (num > 0) {
-      reversed = reversed * 10 + (num % 10);
-      num /= 10;
+  //计算位数进行处理
+  int dit=0;
+  int tmp=num;
+  while(tmp){
+      tmp/=10;
+      dit++;
   }
-  // 写入缓冲区
-  while (reversed > 0) {
-      buffer[(*index)++] = (char)((reversed % 10) + '0');
-      reversed /= 10;
-  }
+  // 从最高位开始写入缓冲区
+  for (int i = dit - 1; i >= 0; i--) {
+    buffer[(*index) + i] = (char)((num % 10) + '0');
+    num /= 10;
+    }
+    *index += dit; // 更新索引
 }
 
 // va_list 是一个类型，用于存储可变参数列表。

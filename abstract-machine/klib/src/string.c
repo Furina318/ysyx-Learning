@@ -31,7 +31,7 @@ char *strncpy(char *dst, const char *src, size_t n) {
 char *strcat(char *dst, const char *src) {
   if(dst==NULL || src==NULL) return dst;
   char *ptr=dst;
-  while(*ptr!='\0') ptr++;
+  while(*ptr!='\0') ptr++;//!!!!!!!!!!!!!!!!
   while((*ptr++ = *src++)!='\0');
   // *dst='\0';
   return dst;
