@@ -15,7 +15,7 @@ char *strcpy(char *dst, const char *src) {
   if(dst==NULL || src==NULL) return dst;
   char *ptr=dst;//dst指针会在复制过程中移动，所以需要保存其起始地址以便返回
   while((*dst++ = *src++)!='\0');
-  *dst='\0';//复制结束后在末尾添加空字符
+  // *dst='\0';//复制结束后在末尾添加空字符
   return ptr;
 }
 
@@ -33,7 +33,7 @@ char *strcat(char *dst, const char *src) {
   char *ptr=dst;
   while(*dst++!='\0');
   while((*dst++ = *src++)!='\0');
-  *dst='\0';
+  // *dst='\0';
   return ptr;
 }
 
@@ -89,6 +89,7 @@ void *memmove(void *dst, const void *src, size_t n) {
 }
 
 void *memcpy(void *out, const void *in, size_t n) {
+  if (out == NULL || in == NULL) return NULL;
   char *dst=(char *)out;
   const char *src=(const char *)in;
   while(n--) *dst++ = *src++;
