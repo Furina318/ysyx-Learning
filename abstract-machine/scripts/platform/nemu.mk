@@ -15,7 +15,7 @@ LDFLAGS   += --gc-sections -e _start
 NEMUFLAGS += -l $(shell dirname $(IMAGE).elf)/nemu-log.txt
 NEMUFLAGS += -e $(IMAGE).elf #elf文件解析
 #NEMUFLAGS += -b  #批处理模式
-
+#ARGS="$(NEMUFLAGS)"：传递 NEMU 运行选项
 MAINARGS_MAX_LEN = 64
 MAINARGS_PLACEHOLDER = The insert-arg rule in Makefile will insert mainargs here.
 CFLAGS += -DMAINARGS_MAX_LEN=$(MAINARGS_MAX_LEN) -DMAINARGS_PLACEHOLDER=\""$(MAINARGS_PLACEHOLDER)"\"
