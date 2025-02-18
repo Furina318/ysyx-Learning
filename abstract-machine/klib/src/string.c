@@ -64,6 +64,7 @@ void *memset(void *s, int c, size_t n) {
   return s;
 }
 
+//memmove用于将一块内存区域的内容复制到另一块内存区域， 会处理源内存和目标内存重叠的情况
 void *memmove(void *dst, const void *src, size_t n) {
   if (dst == NULL || src == NULL) return dst;
   char *d=(char *)dst;
