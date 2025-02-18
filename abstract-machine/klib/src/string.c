@@ -31,10 +31,10 @@ char *strncpy(char *dst, const char *src, size_t n) {
 char *strcat(char *dst, const char *src) {
   if(dst==NULL || src==NULL) return dst;
   char *ptr=dst;
-  while(*dst++!='\0');
-  while((*dst++ = *src++)!='\0');
+  while(*ptr++!='\0');
+  while((*ptr++ = *src++)!='\0');
   // *dst='\0';
-  return ptr;
+  return dst;
 }
 
 int strcmp(const char *s1, const char *s2) {
