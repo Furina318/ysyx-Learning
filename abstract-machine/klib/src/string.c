@@ -26,13 +26,13 @@ char *strncpy(char *dst, const char *src, size_t n) {
   return dst;
 }
 
+//用于将一个字符串（源字符串）追加到另一个字符串（目标字符串）的末尾
 char *strcat(char *dst, const char *src) {
   if(dst==NULL || src==NULL) return dst;
   char *ptr=dst;
-  while(*ptr++!='\0');
-  while((*ptr++ = *src++)!='\0');
-  return dst;
-  
+  while(*dst++!='\0');
+  while((*dst++ = *src++)!='\0');
+  return ptr;
 }
 
 int strcmp(const char *s1, const char *s2) {
