@@ -13,9 +13,10 @@ size_t strlen(const char *s) {
 
 char *strcpy(char *dst, const char *src) {
   if(dst==NULL || src==NULL) return dst;
-  char *aim_dst=dst;//dst指针会在复制过程中移动，所以需要保存其起始地址以便返回
+  char *ptr=dst;//dst指针会在复制过程中移动，所以需要保存其起始地址以便返回
   while((*dst++ = *src++)!='\0');
-  return aim_dst;
+  *dst='\0';//复制结束后在末尾添加空字符
+  return ptr;
 }
 
 char *strncpy(char *dst, const char *src, size_t n) {
@@ -32,6 +33,7 @@ char *strcat(char *dst, const char *src) {
   char *ptr=dst;
   while(*dst++!='\0');
   while((*dst++ = *src++)!='\0');
+  *dst='\0';
   return ptr;
 }
 
