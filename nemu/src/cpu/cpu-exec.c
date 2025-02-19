@@ -180,6 +180,7 @@ static void exec_once(Decode *s, vaddr_t pc) {
   s->pc = pc;
   s->snpc = pc;
   isa_exec_once(s);
+#ifdef CONFIG_FUNC_TRACE
   uint32_t opcode = s->isa.inst & 0x7f;
   vaddr_t target=s->dnpc;
   if(opcode==0x6f){ //JAL指令（函数调用）11011 11//JALR指令11001 11
@@ -197,6 +198,7 @@ static void exec_once(Decode *s, vaddr_t pc) {
     //   ftrace_call(target,name,pc+4);
     // }
   }
+#endif
   cpu.pc = s->dnpc;
 #ifdef CONFIG_ITRACE
   char *p = s->logbuf;

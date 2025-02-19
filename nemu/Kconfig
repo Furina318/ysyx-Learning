@@ -134,9 +134,13 @@ config MEMORY_TRACE
   bool "Enable memory trace"
   default n
 
-config TRACE
-  bool "Enable tracer"
+config INST_TRACE
+  bool "Enable inst tracer"
   default y
+
+config FUNC_TRACE
+  bool "Enable function tracer"
+  default n
 
 config TRACE_START
   depends on TRACE
