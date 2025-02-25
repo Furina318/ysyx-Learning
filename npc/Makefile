@@ -1,47 +1,31 @@
-TOP_NAME=lfsr_num
-VERILATOR=verilator
-NXDC_FILE=constr/lfsr_num.nxdc
-INC_PATH ?= 
-#CSRCS= $(abspath ./csrc/light_main.cpp)
+# Define variables
+VERILATOR=$(shell which verilator)
+BUILD_DIR=obj_dir
+TOP_MODULE=Vriscv_single_cycle
+EXE_NAME=riscv_single_cycle_sim
+VERILOG_SOURCES=riscv_single_cycle.v
+CPP_SOURCES=tb_riscv_single_cycle.cpp
+VCD_FILE=wave.vcd
 
-VERILATOR_CFLAGS += -MMD --build -cc \
-				-O3 --x-assign fast --x-initial fast --noassert
+all:
+	@echo "Write this Makefile by yourself."
 
-BUILD_DIR=./build
-OBJ_DIR=$(BUILD_DIR)/obj_dir
-BIN=$(BUILD_DIR)/$(TOP_NAME)
-
-default:$(BIN)
-$(shell mkdir -p $(BUILD_DIR))
-SRC_AUTO_BIND = $(abspath $(BUILD_DIR)/auto_bind.cpp)
-$(SRC_AUTO_BIND):$(NXDC_FILE)
-	python3 $(NVBOARD_HOME)/scripts/auto_pin_bind.py $^ $@
-
-VSRCS=$(shell find $(abspath ./vsrc) -name "*.v")
-CSRCS = $(shell find $(abspath ./csrc) -name "*.c" -or -name "*.cc" -or -name "*.cpp")
-CSRCS += $(SRC_AUTO_BIND)
-
-include $(NVBOARD_HOME)/scripts/nvboard.mk
-
-INCFLAGS = $(addprefix -I, $(INC_PATH))
-CXXFLAGS += $(INCFLAGS) -DTOP_NAME="\"V$(TOP_NAME)\""
-
-$(BIN): $(VSRCS) $(CSRCS) $(NVBOARD_ARCHIVE)
-	@rm -rf $(OBJ_DIR)
-	$(VERILATOR) $(VERILATOR_CFLAGS) \
-		--top-module $(TOP_NAME) $^ \
-		$(addprefix -CFLAGS , $(CXXFLAGS)) $(addprefix -LDFLAGS , $(LDFLAGS)) \
-		--Mdir $(OBJ_DIR) --exe -o $(abspath $(BIN))
-
-all:default
-	@echo "Write this Makefile by your self."
-
-sim: $(BIN)
+sim: $(BUILD_DIR)/$(TOP_MODULE)
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
-	@echo "Write this Makefile by your self."
-	@$^
-clean:
-	rm -rf $(BUILD_DIR)
-.PHONY: all sim clean default
+	@echo "Write this Makefile by yourself."
+	./$(BUILD_DIR)/$(TOP_MODULE)
+	gtkwave $(VCD_FILE)
 
-include ../Makefile
+$(BUILD_DIR)/$(TOP_MODULE): $(VERILOG_SOURCES) $(CPP_SOURCES) | $(BUILD_DIR)
+	$(VERILATOR) --cc --exe --build -Wall --trace \
+		--Mdir $(BUILD_DIR) $(CPP_SOURCES) $(VERILOG_SOURCES)	
+
+$(BUILD_DIR):
+	mkdir -p $@
+
+clean:
+	rm -rf $(BUILD_DIR) $(VCD_FILE)
+
+.PHONY: all sim clean
+
+# include ../Makefile
