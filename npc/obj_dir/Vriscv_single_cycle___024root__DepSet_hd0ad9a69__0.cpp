@@ -20,6 +20,12 @@ VL_INLINE_OPT void Vriscv_single_cycle___024root___nba_sequent__TOP__0(Vriscv_si
     Vriscv_single_cycle__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vriscv_single_cycle___024root___nba_sequent__TOP__0\n"); );
     // Init
+    CData/*4:0*/ __Vdlyvdim0__riscv_single_cycle__DOT__data_mem__v0;
+    __Vdlyvdim0__riscv_single_cycle__DOT__data_mem__v0 = 0;
+    IData/*31:0*/ __Vdlyvval__riscv_single_cycle__DOT__data_mem__v0;
+    __Vdlyvval__riscv_single_cycle__DOT__data_mem__v0 = 0;
+    CData/*0:0*/ __Vdlyvset__riscv_single_cycle__DOT__data_mem__v0;
+    __Vdlyvset__riscv_single_cycle__DOT__data_mem__v0 = 0;
     CData/*0:0*/ __Vdlyvset__riscv_single_cycle__DOT__regs__v0;
     __Vdlyvset__riscv_single_cycle__DOT__regs__v0 = 0;
     CData/*4:0*/ __Vdlyvdim0__riscv_single_cycle__DOT__regs__v32;
@@ -32,8 +38,9 @@ VL_INLINE_OPT void Vriscv_single_cycle___024root___nba_sequent__TOP__0(Vriscv_si
     if (((~ (IData)(vlSelf->reset)) & (0x100073U == vlSelf->riscv_single_cycle__DOT__instruction))) {
         Vriscv_single_cycle___024root____Vdpiimwrap_riscv_single_cycle__DOT__dpi_ebreak_TOP();
     }
+    __Vdlyvset__riscv_single_cycle__DOT__data_mem__v0 = 0U;
     if (VL_UNLIKELY((1U & (~ (IData)(vlSelf->reset))))) {
-        VL_WRITEF("Time: %0t | PC: %x | Instr: %x | x1: %10# | x2: %10# | x3: %10# | x4: %10# | x5: %10#\n",
+        VL_WRITEF("Time: %0t | PC: %x | Instr: %x | x1: %10# | x2: %10# | x3: %10# | x4: %10# | x5: %x | Mem[0]: %10#\n",
                   64,VL_TIME_UNITED_Q(1),-12,32,vlSelf->pc,
                   32,vlSelf->riscv_single_cycle__DOT__instruction,
                   32,vlSelf->riscv_single_cycle__DOT__regs
@@ -41,27 +48,67 @@ VL_INLINE_OPT void Vriscv_single_cycle___024root___nba_sequent__TOP__0(Vriscv_si
                   [2U],32,vlSelf->riscv_single_cycle__DOT__regs
                   [3U],32,vlSelf->riscv_single_cycle__DOT__regs
                   [4U],32,vlSelf->riscv_single_cycle__DOT__regs
-                  [5U]);
+                  [5U],32,vlSelf->riscv_single_cycle__DOT__data_mem
+                  [0U]);
+        if (VL_UNLIKELY((0x100073U == vlSelf->riscv_single_cycle__DOT__instruction))) {
+            VL_WRITEF("Simulation ended. Final register state:\nx1: %10#, x2: %10#, x3: %10#, x4: %10#, x5: %x\nData memory sample: Mem[0]: %10#, Mem[1]: %10#\n",
+                      32,vlSelf->riscv_single_cycle__DOT__regs
+                      [1U],32,vlSelf->riscv_single_cycle__DOT__regs
+                      [2U],32,vlSelf->riscv_single_cycle__DOT__regs
+                      [3U],32,vlSelf->riscv_single_cycle__DOT__regs
+                      [4U],32,vlSelf->riscv_single_cycle__DOT__regs
+                      [5U],32,vlSelf->riscv_single_cycle__DOT__data_mem
+                      [0U],32,vlSelf->riscv_single_cycle__DOT__data_mem
+                      [1U]);
+        }
     }
     __Vdlyvset__riscv_single_cycle__DOT__regs__v0 = 0U;
     __Vdlyvset__riscv_single_cycle__DOT__regs__v32 = 0U;
     if (vlSelf->reset) {
         vlSelf->riscv_single_cycle__DOT__i = 0x20U;
-        vlSelf->pc = 0x80000000U;
         __Vdlyvset__riscv_single_cycle__DOT__regs__v0 = 1U;
+        vlSelf->pc = 0x80000000U;
     } else {
-        vlSelf->pc = ((0x80000014U > vlSelf->pc) ? 
-                      ((IData)(4U) + vlSelf->pc) : vlSelf->pc);
-        if (((IData)((0x13U == (0x707fU & vlSelf->riscv_single_cycle__DOT__instruction))) 
+        if ((((IData)(vlSelf->riscv_single_cycle__DOT__is_addi) 
+              | ((0x6fU == (0x7fU & vlSelf->riscv_single_cycle__DOT__instruction)) 
+                 | ((IData)(vlSelf->riscv_single_cycle__DOT__is_jalr) 
+                    | ((0x17U == (0x7fU & vlSelf->riscv_single_cycle__DOT__instruction)) 
+                       | (0x37U == (0x7fU & vlSelf->riscv_single_cycle__DOT__instruction)))))) 
              & (0U != (0x1fU & (vlSelf->riscv_single_cycle__DOT__instruction 
                                 >> 7U))))) {
             __Vdlyvval__riscv_single_cycle__DOT__regs__v32 
-                = vlSelf->riscv_single_cycle__DOT__alu_result;
+                = ((IData)(vlSelf->riscv_single_cycle__DOT__is_addi)
+                    ? vlSelf->riscv_single_cycle__DOT__alu_result
+                    : (((0x6fU == (0x7fU & vlSelf->riscv_single_cycle__DOT__instruction)) 
+                        | (IData)(vlSelf->riscv_single_cycle__DOT__is_jalr))
+                        ? ((IData)(4U) + vlSelf->pc)
+                        : ((0x17U == (0x7fU & vlSelf->riscv_single_cycle__DOT__instruction))
+                            ? vlSelf->riscv_single_cycle__DOT____VdfgTmp_h8a6dd36a__0
+                            : ((0x37U == (0x7fU & vlSelf->riscv_single_cycle__DOT__instruction))
+                                ? vlSelf->riscv_single_cycle__DOT__imm
+                                : 0U))));
             __Vdlyvset__riscv_single_cycle__DOT__regs__v32 = 1U;
             __Vdlyvdim0__riscv_single_cycle__DOT__regs__v32 
                 = (0x1fU & (vlSelf->riscv_single_cycle__DOT__instruction 
                             >> 7U));
         }
+        vlSelf->pc = vlSelf->riscv_single_cycle__DOT__pc_next;
+    }
+    if ((IData)((0x2023U == (0x707fU & vlSelf->riscv_single_cycle__DOT__instruction)))) {
+        __Vdlyvval__riscv_single_cycle__DOT__data_mem__v0 
+            = ((0U == (0x1fU & (vlSelf->riscv_single_cycle__DOT__instruction 
+                                >> 0x14U))) ? 0U : 
+               vlSelf->riscv_single_cycle__DOT__regs
+               [(0x1fU & (vlSelf->riscv_single_cycle__DOT__instruction 
+                          >> 0x14U))]);
+        __Vdlyvset__riscv_single_cycle__DOT__data_mem__v0 = 1U;
+        __Vdlyvdim0__riscv_single_cycle__DOT__data_mem__v0 
+            = (0x1fU & (vlSelf->riscv_single_cycle__DOT__alu_result 
+                        >> 2U));
+    }
+    if (__Vdlyvset__riscv_single_cycle__DOT__data_mem__v0) {
+        vlSelf->riscv_single_cycle__DOT__data_mem[__Vdlyvdim0__riscv_single_cycle__DOT__data_mem__v0] 
+            = __Vdlyvval__riscv_single_cycle__DOT__data_mem__v0;
     }
     if (__Vdlyvset__riscv_single_cycle__DOT__regs__v0) {
         vlSelf->riscv_single_cycle__DOT__regs[0U] = 0U;
@@ -101,10 +148,6 @@ VL_INLINE_OPT void Vriscv_single_cycle___024root___nba_sequent__TOP__0(Vriscv_si
         vlSelf->riscv_single_cycle__DOT__regs[__Vdlyvdim0__riscv_single_cycle__DOT__regs__v32] 
             = __Vdlyvval__riscv_single_cycle__DOT__regs__v32;
     }
-    vlSelf->riscv_single_cycle__DOT__instruction = 
-        vlSelf->riscv_single_cycle__DOT__instr_mem[
-        (0x1fU & ((vlSelf->pc - (IData)(0x80000000U)) 
-                  >> 2U))];
     vlSelf->x1 = vlSelf->riscv_single_cycle__DOT__regs
         [1U];
     vlSelf->x2 = vlSelf->riscv_single_cycle__DOT__regs
@@ -115,6 +158,158 @@ VL_INLINE_OPT void Vriscv_single_cycle___024root___nba_sequent__TOP__0(Vriscv_si
         [4U];
     vlSelf->x5 = vlSelf->riscv_single_cycle__DOT__regs
         [5U];
+    vlSelf->riscv_single_cycle__DOT__instruction = 
+        vlSelf->riscv_single_cycle__DOT__instr_mem[
+        (0x1fU & ((vlSelf->pc - (IData)(0x80000000U)) 
+                  >> 2U))];
+    vlSelf->riscv_single_cycle__DOT__is_addi = (IData)(
+                                                       (0x13U 
+                                                        == 
+                                                        (0x707fU 
+                                                         & vlSelf->riscv_single_cycle__DOT__instruction)));
+    vlSelf->riscv_single_cycle__DOT__is_jalr = (IData)(
+                                                       (0x67U 
+                                                        == 
+                                                        (0x707fU 
+                                                         & vlSelf->riscv_single_cycle__DOT__instruction)));
+    vlSelf->riscv_single_cycle__DOT____VdfgExtracted_ha0d62377__0 
+        = (((- (IData)((vlSelf->riscv_single_cycle__DOT__instruction 
+                        >> 0x1fU))) << 0xcU) | (vlSelf->riscv_single_cycle__DOT__instruction 
+                                                >> 0x14U));
+    vlSelf->riscv_single_cycle__DOT__imm = ((0x40U 
+                                             & vlSelf->riscv_single_cycle__DOT__instruction)
+                                             ? ((0x20U 
+                                                 & vlSelf->riscv_single_cycle__DOT__instruction)
+                                                 ? 
+                                                ((0x10U 
+                                                  & vlSelf->riscv_single_cycle__DOT__instruction)
+                                                  ? 0U
+                                                  : 
+                                                 ((8U 
+                                                   & vlSelf->riscv_single_cycle__DOT__instruction)
+                                                   ? 
+                                                  ((4U 
+                                                    & vlSelf->riscv_single_cycle__DOT__instruction)
+                                                    ? 
+                                                   ((2U 
+                                                     & vlSelf->riscv_single_cycle__DOT__instruction)
+                                                     ? 
+                                                    ((1U 
+                                                      & vlSelf->riscv_single_cycle__DOT__instruction)
+                                                      ? 
+                                                     (((- (IData)(
+                                                                  (vlSelf->riscv_single_cycle__DOT__instruction 
+                                                                   >> 0x1fU))) 
+                                                       << 0x14U) 
+                                                      | ((0xff000U 
+                                                          & vlSelf->riscv_single_cycle__DOT__instruction) 
+                                                         | ((0x800U 
+                                                             & (vlSelf->riscv_single_cycle__DOT__instruction 
+                                                                >> 9U)) 
+                                                            | (0x7feU 
+                                                               & (vlSelf->riscv_single_cycle__DOT__instruction 
+                                                                  >> 0x14U)))))
+                                                      : 0U)
+                                                     : 0U)
+                                                    : 0U)
+                                                   : 
+                                                  ((4U 
+                                                    & vlSelf->riscv_single_cycle__DOT__instruction)
+                                                    ? 
+                                                   ((2U 
+                                                     & vlSelf->riscv_single_cycle__DOT__instruction)
+                                                     ? 
+                                                    ((1U 
+                                                      & vlSelf->riscv_single_cycle__DOT__instruction)
+                                                      ? vlSelf->riscv_single_cycle__DOT____VdfgExtracted_ha0d62377__0
+                                                      : 0U)
+                                                     : 0U)
+                                                    : 0U)))
+                                                 : 0U)
+                                             : ((0x20U 
+                                                 & vlSelf->riscv_single_cycle__DOT__instruction)
+                                                 ? 
+                                                ((0x10U 
+                                                  & vlSelf->riscv_single_cycle__DOT__instruction)
+                                                  ? 
+                                                 ((8U 
+                                                   & vlSelf->riscv_single_cycle__DOT__instruction)
+                                                   ? 0U
+                                                   : 
+                                                  ((4U 
+                                                    & vlSelf->riscv_single_cycle__DOT__instruction)
+                                                    ? 
+                                                   ((2U 
+                                                     & vlSelf->riscv_single_cycle__DOT__instruction)
+                                                     ? 
+                                                    ((1U 
+                                                      & vlSelf->riscv_single_cycle__DOT__instruction)
+                                                      ? 
+                                                     (0xfffff000U 
+                                                      & vlSelf->riscv_single_cycle__DOT__instruction)
+                                                      : 0U)
+                                                     : 0U)
+                                                    : 0U))
+                                                  : 
+                                                 ((8U 
+                                                   & vlSelf->riscv_single_cycle__DOT__instruction)
+                                                   ? 0U
+                                                   : 
+                                                  ((4U 
+                                                    & vlSelf->riscv_single_cycle__DOT__instruction)
+                                                    ? 0U
+                                                    : 
+                                                   ((2U 
+                                                     & vlSelf->riscv_single_cycle__DOT__instruction)
+                                                     ? 
+                                                    ((1U 
+                                                      & vlSelf->riscv_single_cycle__DOT__instruction)
+                                                      ? 
+                                                     (((- (IData)(
+                                                                  (vlSelf->riscv_single_cycle__DOT__instruction 
+                                                                   >> 0x1fU))) 
+                                                       << 0xcU) 
+                                                      | ((0xfe0U 
+                                                          & (vlSelf->riscv_single_cycle__DOT__instruction 
+                                                             >> 0x14U)) 
+                                                         | (0x1fU 
+                                                            & (vlSelf->riscv_single_cycle__DOT__instruction 
+                                                               >> 7U))))
+                                                      : 0U)
+                                                     : 0U))))
+                                                 : 
+                                                ((0x10U 
+                                                  & vlSelf->riscv_single_cycle__DOT__instruction)
+                                                  ? 
+                                                 ((8U 
+                                                   & vlSelf->riscv_single_cycle__DOT__instruction)
+                                                   ? 0U
+                                                   : 
+                                                  ((4U 
+                                                    & vlSelf->riscv_single_cycle__DOT__instruction)
+                                                    ? 
+                                                   ((2U 
+                                                     & vlSelf->riscv_single_cycle__DOT__instruction)
+                                                     ? 
+                                                    ((1U 
+                                                      & vlSelf->riscv_single_cycle__DOT__instruction)
+                                                      ? 
+                                                     (0xfffff000U 
+                                                      & vlSelf->riscv_single_cycle__DOT__instruction)
+                                                      : 0U)
+                                                     : 0U)
+                                                    : 
+                                                   ((2U 
+                                                     & vlSelf->riscv_single_cycle__DOT__instruction)
+                                                     ? 
+                                                    ((1U 
+                                                      & vlSelf->riscv_single_cycle__DOT__instruction)
+                                                      ? vlSelf->riscv_single_cycle__DOT____VdfgExtracted_ha0d62377__0
+                                                      : 0U)
+                                                     : 0U)))
+                                                  : 0U)));
+    vlSelf->riscv_single_cycle__DOT____VdfgTmp_h8a6dd36a__0 
+        = (vlSelf->pc + vlSelf->riscv_single_cycle__DOT__imm);
     vlSelf->riscv_single_cycle__DOT__alu_result = (
                                                    ((0U 
                                                      == 
@@ -128,13 +323,26 @@ VL_INLINE_OPT void Vriscv_single_cycle___024root___nba_sequent__TOP__0(Vriscv_si
                                                     (0x1fU 
                                                      & (vlSelf->riscv_single_cycle__DOT__instruction 
                                                         >> 0xfU))]) 
-                                                   + 
-                                                   (((- (IData)(
-                                                                (vlSelf->riscv_single_cycle__DOT__instruction 
-                                                                 >> 0x1fU))) 
-                                                     << 0xcU) 
-                                                    | (vlSelf->riscv_single_cycle__DOT__instruction 
-                                                       >> 0x14U)));
+                                                   + vlSelf->riscv_single_cycle__DOT__imm);
+    vlSelf->riscv_single_cycle__DOT__pc_next = ((0x6fU 
+                                                 == 
+                                                 (0x7fU 
+                                                  & vlSelf->riscv_single_cycle__DOT__instruction))
+                                                 ? vlSelf->riscv_single_cycle__DOT____VdfgTmp_h8a6dd36a__0
+                                                 : 
+                                                ((IData)(vlSelf->riscv_single_cycle__DOT__is_jalr)
+                                                  ? 
+                                                 (0xfffffffeU 
+                                                  & vlSelf->riscv_single_cycle__DOT__alu_result)
+                                                  : 
+                                                 (((0x100073U 
+                                                    != vlSelf->riscv_single_cycle__DOT__instruction) 
+                                                   & (0x80000018U 
+                                                      > vlSelf->pc))
+                                                   ? 
+                                                  ((IData)(4U) 
+                                                   + vlSelf->pc)
+                                                   : vlSelf->pc)));
 }
 
 void Vriscv_single_cycle___024root___eval_nba(Vriscv_single_cycle___024root* vlSelf) {

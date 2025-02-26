@@ -1,4 +1,4 @@
-module riscv_single_cycle (
+module only_addi (
     input wire clk,          // 时钟信号
     input wire reset,        // 复位信号
     output reg [31:0] pc,     // 程序计数器
@@ -40,7 +40,7 @@ module riscv_single_cycle (
             pc <= pc;            // 停止更新PC
     end
 
-    // 指令存储器（简单ROM）
+    // Instruction memory
     reg [31:0] instr_mem [0:31];
     initial begin
         instr_mem[0] = 32'h00500093; // addi x1, x0, 5    (x1 = 0 + 5)

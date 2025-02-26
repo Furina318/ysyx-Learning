@@ -16,7 +16,7 @@ extern "C" {
 
 
     // DPI IMPORTS
-    // DPI import at riscv_single_cycle.v:13:34
+    // DPI import at riscv_single_cycle.v:12:34
     extern void dpi_ebreak();
 
 #ifdef __cplusplus

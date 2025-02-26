@@ -11,39 +11,55 @@ VL_ATTR_COLD void Vriscv_single_cycle___024root__trace_init_sub__TOP__0(Vriscv_s
     // Init
     const int c = vlSymsp->__Vm_baseCode;
     // Body
-    tracep->declBit(c+76,"clk", false,-1);
-    tracep->declBit(c+77,"reset", false,-1);
-    tracep->declBus(c+78,"pc", false,-1, 31,0);
-    tracep->declBus(c+79,"x1", false,-1, 31,0);
-    tracep->declBus(c+80,"x2", false,-1, 31,0);
-    tracep->declBus(c+81,"x3", false,-1, 31,0);
-    tracep->declBus(c+82,"x4", false,-1, 31,0);
-    tracep->declBus(c+83,"x5", false,-1, 31,0);
+    tracep->declBit(c+117,"clk", false,-1);
+    tracep->declBit(c+118,"reset", false,-1);
+    tracep->declBus(c+119,"pc", false,-1, 31,0);
+    tracep->declBus(c+120,"x1", false,-1, 31,0);
+    tracep->declBus(c+121,"x2", false,-1, 31,0);
+    tracep->declBus(c+122,"x3", false,-1, 31,0);
+    tracep->declBus(c+123,"x4", false,-1, 31,0);
+    tracep->declBus(c+124,"x5", false,-1, 31,0);
     tracep->pushNamePrefix("riscv_single_cycle ");
-    tracep->declBit(c+76,"clk", false,-1);
-    tracep->declBit(c+77,"reset", false,-1);
-    tracep->declBus(c+78,"pc", false,-1, 31,0);
-    tracep->declBus(c+79,"x1", false,-1, 31,0);
-    tracep->declBus(c+80,"x2", false,-1, 31,0);
-    tracep->declBus(c+81,"x3", false,-1, 31,0);
-    tracep->declBus(c+82,"x4", false,-1, 31,0);
-    tracep->declBus(c+83,"x5", false,-1, 31,0);
+    tracep->declBit(c+117,"clk", false,-1);
+    tracep->declBit(c+118,"reset", false,-1);
+    tracep->declBus(c+119,"pc", false,-1, 31,0);
+    tracep->declBus(c+120,"x1", false,-1, 31,0);
+    tracep->declBus(c+121,"x2", false,-1, 31,0);
+    tracep->declBus(c+122,"x3", false,-1, 31,0);
+    tracep->declBus(c+123,"x4", false,-1, 31,0);
+    tracep->declBus(c+124,"x5", false,-1, 31,0);
     tracep->declBus(c+34,"instruction", false,-1, 31,0);
     tracep->declBus(c+35,"rs1_data", false,-1, 31,0);
-    tracep->declBus(c+36,"imm_ext", false,-1, 31,0);
-    tracep->declBus(c+37,"alu_result", false,-1, 31,0);
-    tracep->declBus(c+38,"rs1", false,-1, 4,0);
-    tracep->declBus(c+39,"rd", false,-1, 4,0);
-    tracep->declBus(c+40,"imm", false,-1, 11,0);
-    tracep->declBit(c+41,"reg_write", false,-1);
-    tracep->declBit(c+42,"is_ebreak", false,-1);
+    tracep->declBus(c+36,"rs2_data", false,-1, 31,0);
+    tracep->declBus(c+37,"imm_ext", false,-1, 31,0);
+    tracep->declBus(c+38,"alu_result", false,-1, 31,0);
+    tracep->declBus(c+39,"rs1", false,-1, 4,0);
+    tracep->declBus(c+40,"rs2", false,-1, 4,0);
+    tracep->declBus(c+41,"rd", false,-1, 4,0);
+    tracep->declBus(c+125,"pc_next", false,-1, 31,0);
+    tracep->declBus(c+42,"opcode", false,-1, 6,0);
+    tracep->declBus(c+43,"funct3", false,-1, 2,0);
+    tracep->declBus(c+37,"imm", false,-1, 31,0);
+    tracep->declBit(c+44,"is_addi", false,-1);
+    tracep->declBit(c+45,"is_jal", false,-1);
+    tracep->declBit(c+46,"is_jalr", false,-1);
+    tracep->declBit(c+47,"is_sw", false,-1);
+    tracep->declBit(c+48,"is_auipc", false,-1);
+    tracep->declBit(c+49,"is_lui", false,-1);
+    tracep->declBit(c+50,"is_ebreak", false,-1);
+    tracep->declBit(c+51,"reg_write", false,-1);
+    tracep->declBit(c+47,"mem_write", false,-1);
     for (int i = 0; i < 32; ++i) {
         tracep->declBus(c+1+i*1,"instr_mem", true,(i+0), 31,0);
     }
     for (int i = 0; i < 32; ++i) {
-        tracep->declBus(c+43+i*1,"regs", true,(i+0), 31,0);
+        tracep->declBus(c+52+i*1,"regs", true,(i+0), 31,0);
     }
-    tracep->declBus(c+75,"i", false,-1, 31,0);
+    tracep->declBus(c+84,"i", false,-1, 31,0);
+    for (int i = 0; i < 32; ++i) {
+        tracep->declBus(c+85+i*1,"data_mem", true,(i+0), 31,0);
+    }
+    tracep->declBus(c+126,"write_data", false,-1, 31,0);
     tracep->pushNamePrefix("unnamedblk1 ");
     tracep->declBus(c+33,"i", false,-1, 31,0);
     tracep->popNamePrefix(2);
@@ -128,67 +144,135 @@ VL_ATTR_COLD void Vriscv_single_cycle___024root__trace_full_sub_0(Vriscv_single_
                                ? 0U : vlSelf->riscv_single_cycle__DOT__regs
                               [(0x1fU & (vlSelf->riscv_single_cycle__DOT__instruction 
                                          >> 0xfU))])),32);
-    bufp->fullIData(oldp+36,((((- (IData)((vlSelf->riscv_single_cycle__DOT__instruction 
-                                           >> 0x1fU))) 
-                               << 0xcU) | (vlSelf->riscv_single_cycle__DOT__instruction 
-                                           >> 0x14U))),32);
-    bufp->fullIData(oldp+37,((((0U == (0x1fU & (vlSelf->riscv_single_cycle__DOT__instruction 
-                                                >> 0xfU)))
-                                ? 0U : vlSelf->riscv_single_cycle__DOT__regs
-                               [(0x1fU & (vlSelf->riscv_single_cycle__DOT__instruction 
-                                          >> 0xfU))]) 
-                              + (((- (IData)((vlSelf->riscv_single_cycle__DOT__instruction 
-                                              >> 0x1fU))) 
-                                  << 0xcU) | (vlSelf->riscv_single_cycle__DOT__instruction 
-                                              >> 0x14U)))),32);
-    bufp->fullCData(oldp+38,((0x1fU & (vlSelf->riscv_single_cycle__DOT__instruction 
-                                       >> 0xfU))),5);
+    bufp->fullIData(oldp+36,(((0U == (0x1fU & (vlSelf->riscv_single_cycle__DOT__instruction 
+                                               >> 0x14U)))
+                               ? 0U : vlSelf->riscv_single_cycle__DOT__regs
+                              [(0x1fU & (vlSelf->riscv_single_cycle__DOT__instruction 
+                                         >> 0x14U))])),32);
+    bufp->fullIData(oldp+37,(vlSelf->riscv_single_cycle__DOT__imm),32);
+    bufp->fullIData(oldp+38,(vlSelf->riscv_single_cycle__DOT__alu_result),32);
     bufp->fullCData(oldp+39,((0x1fU & (vlSelf->riscv_single_cycle__DOT__instruction 
+                                       >> 0xfU))),5);
+    bufp->fullCData(oldp+40,((0x1fU & (vlSelf->riscv_single_cycle__DOT__instruction 
+                                       >> 0x14U))),5);
+    bufp->fullCData(oldp+41,((0x1fU & (vlSelf->riscv_single_cycle__DOT__instruction 
                                        >> 7U))),5);
-    bufp->fullSData(oldp+40,((vlSelf->riscv_single_cycle__DOT__instruction 
-                              >> 0x14U)),12);
-    bufp->fullBit(oldp+41,((IData)((0x13U == (0x707fU 
-                                              & vlSelf->riscv_single_cycle__DOT__instruction)))));
-    bufp->fullBit(oldp+42,((0x100073U == vlSelf->riscv_single_cycle__DOT__instruction)));
-    bufp->fullIData(oldp+43,(vlSelf->riscv_single_cycle__DOT__regs[0]),32);
-    bufp->fullIData(oldp+44,(vlSelf->riscv_single_cycle__DOT__regs[1]),32);
-    bufp->fullIData(oldp+45,(vlSelf->riscv_single_cycle__DOT__regs[2]),32);
-    bufp->fullIData(oldp+46,(vlSelf->riscv_single_cycle__DOT__regs[3]),32);
-    bufp->fullIData(oldp+47,(vlSelf->riscv_single_cycle__DOT__regs[4]),32);
-    bufp->fullIData(oldp+48,(vlSelf->riscv_single_cycle__DOT__regs[5]),32);
-    bufp->fullIData(oldp+49,(vlSelf->riscv_single_cycle__DOT__regs[6]),32);
-    bufp->fullIData(oldp+50,(vlSelf->riscv_single_cycle__DOT__regs[7]),32);
-    bufp->fullIData(oldp+51,(vlSelf->riscv_single_cycle__DOT__regs[8]),32);
-    bufp->fullIData(oldp+52,(vlSelf->riscv_single_cycle__DOT__regs[9]),32);
-    bufp->fullIData(oldp+53,(vlSelf->riscv_single_cycle__DOT__regs[10]),32);
-    bufp->fullIData(oldp+54,(vlSelf->riscv_single_cycle__DOT__regs[11]),32);
-    bufp->fullIData(oldp+55,(vlSelf->riscv_single_cycle__DOT__regs[12]),32);
-    bufp->fullIData(oldp+56,(vlSelf->riscv_single_cycle__DOT__regs[13]),32);
-    bufp->fullIData(oldp+57,(vlSelf->riscv_single_cycle__DOT__regs[14]),32);
-    bufp->fullIData(oldp+58,(vlSelf->riscv_single_cycle__DOT__regs[15]),32);
-    bufp->fullIData(oldp+59,(vlSelf->riscv_single_cycle__DOT__regs[16]),32);
-    bufp->fullIData(oldp+60,(vlSelf->riscv_single_cycle__DOT__regs[17]),32);
-    bufp->fullIData(oldp+61,(vlSelf->riscv_single_cycle__DOT__regs[18]),32);
-    bufp->fullIData(oldp+62,(vlSelf->riscv_single_cycle__DOT__regs[19]),32);
-    bufp->fullIData(oldp+63,(vlSelf->riscv_single_cycle__DOT__regs[20]),32);
-    bufp->fullIData(oldp+64,(vlSelf->riscv_single_cycle__DOT__regs[21]),32);
-    bufp->fullIData(oldp+65,(vlSelf->riscv_single_cycle__DOT__regs[22]),32);
-    bufp->fullIData(oldp+66,(vlSelf->riscv_single_cycle__DOT__regs[23]),32);
-    bufp->fullIData(oldp+67,(vlSelf->riscv_single_cycle__DOT__regs[24]),32);
-    bufp->fullIData(oldp+68,(vlSelf->riscv_single_cycle__DOT__regs[25]),32);
-    bufp->fullIData(oldp+69,(vlSelf->riscv_single_cycle__DOT__regs[26]),32);
-    bufp->fullIData(oldp+70,(vlSelf->riscv_single_cycle__DOT__regs[27]),32);
-    bufp->fullIData(oldp+71,(vlSelf->riscv_single_cycle__DOT__regs[28]),32);
-    bufp->fullIData(oldp+72,(vlSelf->riscv_single_cycle__DOT__regs[29]),32);
-    bufp->fullIData(oldp+73,(vlSelf->riscv_single_cycle__DOT__regs[30]),32);
-    bufp->fullIData(oldp+74,(vlSelf->riscv_single_cycle__DOT__regs[31]),32);
-    bufp->fullIData(oldp+75,(vlSelf->riscv_single_cycle__DOT__i),32);
-    bufp->fullBit(oldp+76,(vlSelf->clk));
-    bufp->fullBit(oldp+77,(vlSelf->reset));
-    bufp->fullIData(oldp+78,(vlSelf->pc),32);
-    bufp->fullIData(oldp+79,(vlSelf->x1),32);
-    bufp->fullIData(oldp+80,(vlSelf->x2),32);
-    bufp->fullIData(oldp+81,(vlSelf->x3),32);
-    bufp->fullIData(oldp+82,(vlSelf->x4),32);
-    bufp->fullIData(oldp+83,(vlSelf->x5),32);
+    bufp->fullCData(oldp+42,((0x7fU & vlSelf->riscv_single_cycle__DOT__instruction)),7);
+    bufp->fullCData(oldp+43,((7U & (vlSelf->riscv_single_cycle__DOT__instruction 
+                                    >> 0xcU))),3);
+    bufp->fullBit(oldp+44,(vlSelf->riscv_single_cycle__DOT__is_addi));
+    bufp->fullBit(oldp+45,((0x6fU == (0x7fU & vlSelf->riscv_single_cycle__DOT__instruction))));
+    bufp->fullBit(oldp+46,(vlSelf->riscv_single_cycle__DOT__is_jalr));
+    bufp->fullBit(oldp+47,((IData)((0x2023U == (0x707fU 
+                                                & vlSelf->riscv_single_cycle__DOT__instruction)))));
+    bufp->fullBit(oldp+48,((0x17U == (0x7fU & vlSelf->riscv_single_cycle__DOT__instruction))));
+    bufp->fullBit(oldp+49,((0x37U == (0x7fU & vlSelf->riscv_single_cycle__DOT__instruction))));
+    bufp->fullBit(oldp+50,((0x100073U == vlSelf->riscv_single_cycle__DOT__instruction)));
+    bufp->fullBit(oldp+51,(((IData)(vlSelf->riscv_single_cycle__DOT__is_addi) 
+                            | ((0x6fU == (0x7fU & vlSelf->riscv_single_cycle__DOT__instruction)) 
+                               | ((IData)(vlSelf->riscv_single_cycle__DOT__is_jalr) 
+                                  | ((0x17U == (0x7fU 
+                                                & vlSelf->riscv_single_cycle__DOT__instruction)) 
+                                     | (0x37U == (0x7fU 
+                                                  & vlSelf->riscv_single_cycle__DOT__instruction))))))));
+    bufp->fullIData(oldp+52,(vlSelf->riscv_single_cycle__DOT__regs[0]),32);
+    bufp->fullIData(oldp+53,(vlSelf->riscv_single_cycle__DOT__regs[1]),32);
+    bufp->fullIData(oldp+54,(vlSelf->riscv_single_cycle__DOT__regs[2]),32);
+    bufp->fullIData(oldp+55,(vlSelf->riscv_single_cycle__DOT__regs[3]),32);
+    bufp->fullIData(oldp+56,(vlSelf->riscv_single_cycle__DOT__regs[4]),32);
+    bufp->fullIData(oldp+57,(vlSelf->riscv_single_cycle__DOT__regs[5]),32);
+    bufp->fullIData(oldp+58,(vlSelf->riscv_single_cycle__DOT__regs[6]),32);
+    bufp->fullIData(oldp+59,(vlSelf->riscv_single_cycle__DOT__regs[7]),32);
+    bufp->fullIData(oldp+60,(vlSelf->riscv_single_cycle__DOT__regs[8]),32);
+    bufp->fullIData(oldp+61,(vlSelf->riscv_single_cycle__DOT__regs[9]),32);
+    bufp->fullIData(oldp+62,(vlSelf->riscv_single_cycle__DOT__regs[10]),32);
+    bufp->fullIData(oldp+63,(vlSelf->riscv_single_cycle__DOT__regs[11]),32);
+    bufp->fullIData(oldp+64,(vlSelf->riscv_single_cycle__DOT__regs[12]),32);
+    bufp->fullIData(oldp+65,(vlSelf->riscv_single_cycle__DOT__regs[13]),32);
+    bufp->fullIData(oldp+66,(vlSelf->riscv_single_cycle__DOT__regs[14]),32);
+    bufp->fullIData(oldp+67,(vlSelf->riscv_single_cycle__DOT__regs[15]),32);
+    bufp->fullIData(oldp+68,(vlSelf->riscv_single_cycle__DOT__regs[16]),32);
+    bufp->fullIData(oldp+69,(vlSelf->riscv_single_cycle__DOT__regs[17]),32);
+    bufp->fullIData(oldp+70,(vlSelf->riscv_single_cycle__DOT__regs[18]),32);
+    bufp->fullIData(oldp+71,(vlSelf->riscv_single_cycle__DOT__regs[19]),32);
+    bufp->fullIData(oldp+72,(vlSelf->riscv_single_cycle__DOT__regs[20]),32);
+    bufp->fullIData(oldp+73,(vlSelf->riscv_single_cycle__DOT__regs[21]),32);
+    bufp->fullIData(oldp+74,(vlSelf->riscv_single_cycle__DOT__regs[22]),32);
+    bufp->fullIData(oldp+75,(vlSelf->riscv_single_cycle__DOT__regs[23]),32);
+    bufp->fullIData(oldp+76,(vlSelf->riscv_single_cycle__DOT__regs[24]),32);
+    bufp->fullIData(oldp+77,(vlSelf->riscv_single_cycle__DOT__regs[25]),32);
+    bufp->fullIData(oldp+78,(vlSelf->riscv_single_cycle__DOT__regs[26]),32);
+    bufp->fullIData(oldp+79,(vlSelf->riscv_single_cycle__DOT__regs[27]),32);
+    bufp->fullIData(oldp+80,(vlSelf->riscv_single_cycle__DOT__regs[28]),32);
+    bufp->fullIData(oldp+81,(vlSelf->riscv_single_cycle__DOT__regs[29]),32);
+    bufp->fullIData(oldp+82,(vlSelf->riscv_single_cycle__DOT__regs[30]),32);
+    bufp->fullIData(oldp+83,(vlSelf->riscv_single_cycle__DOT__regs[31]),32);
+    bufp->fullIData(oldp+84,(vlSelf->riscv_single_cycle__DOT__i),32);
+    bufp->fullIData(oldp+85,(vlSelf->riscv_single_cycle__DOT__data_mem[0]),32);
+    bufp->fullIData(oldp+86,(vlSelf->riscv_single_cycle__DOT__data_mem[1]),32);
+    bufp->fullIData(oldp+87,(vlSelf->riscv_single_cycle__DOT__data_mem[2]),32);
+    bufp->fullIData(oldp+88,(vlSelf->riscv_single_cycle__DOT__data_mem[3]),32);
+    bufp->fullIData(oldp+89,(vlSelf->riscv_single_cycle__DOT__data_mem[4]),32);
+    bufp->fullIData(oldp+90,(vlSelf->riscv_single_cycle__DOT__data_mem[5]),32);
+    bufp->fullIData(oldp+91,(vlSelf->riscv_single_cycle__DOT__data_mem[6]),32);
+    bufp->fullIData(oldp+92,(vlSelf->riscv_single_cycle__DOT__data_mem[7]),32);
+    bufp->fullIData(oldp+93,(vlSelf->riscv_single_cycle__DOT__data_mem[8]),32);
+    bufp->fullIData(oldp+94,(vlSelf->riscv_single_cycle__DOT__data_mem[9]),32);
+    bufp->fullIData(oldp+95,(vlSelf->riscv_single_cycle__DOT__data_mem[10]),32);
+    bufp->fullIData(oldp+96,(vlSelf->riscv_single_cycle__DOT__data_mem[11]),32);
+    bufp->fullIData(oldp+97,(vlSelf->riscv_single_cycle__DOT__data_mem[12]),32);
+    bufp->fullIData(oldp+98,(vlSelf->riscv_single_cycle__DOT__data_mem[13]),32);
+    bufp->fullIData(oldp+99,(vlSelf->riscv_single_cycle__DOT__data_mem[14]),32);
+    bufp->fullIData(oldp+100,(vlSelf->riscv_single_cycle__DOT__data_mem[15]),32);
+    bufp->fullIData(oldp+101,(vlSelf->riscv_single_cycle__DOT__data_mem[16]),32);
+    bufp->fullIData(oldp+102,(vlSelf->riscv_single_cycle__DOT__data_mem[17]),32);
+    bufp->fullIData(oldp+103,(vlSelf->riscv_single_cycle__DOT__data_mem[18]),32);
+    bufp->fullIData(oldp+104,(vlSelf->riscv_single_cycle__DOT__data_mem[19]),32);
+    bufp->fullIData(oldp+105,(vlSelf->riscv_single_cycle__DOT__data_mem[20]),32);
+    bufp->fullIData(oldp+106,(vlSelf->riscv_single_cycle__DOT__data_mem[21]),32);
+    bufp->fullIData(oldp+107,(vlSelf->riscv_single_cycle__DOT__data_mem[22]),32);
+    bufp->fullIData(oldp+108,(vlSelf->riscv_single_cycle__DOT__data_mem[23]),32);
+    bufp->fullIData(oldp+109,(vlSelf->riscv_single_cycle__DOT__data_mem[24]),32);
+    bufp->fullIData(oldp+110,(vlSelf->riscv_single_cycle__DOT__data_mem[25]),32);
+    bufp->fullIData(oldp+111,(vlSelf->riscv_single_cycle__DOT__data_mem[26]),32);
+    bufp->fullIData(oldp+112,(vlSelf->riscv_single_cycle__DOT__data_mem[27]),32);
+    bufp->fullIData(oldp+113,(vlSelf->riscv_single_cycle__DOT__data_mem[28]),32);
+    bufp->fullIData(oldp+114,(vlSelf->riscv_single_cycle__DOT__data_mem[29]),32);
+    bufp->fullIData(oldp+115,(vlSelf->riscv_single_cycle__DOT__data_mem[30]),32);
+    bufp->fullIData(oldp+116,(vlSelf->riscv_single_cycle__DOT__data_mem[31]),32);
+    bufp->fullBit(oldp+117,(vlSelf->clk));
+    bufp->fullBit(oldp+118,(vlSelf->reset));
+    bufp->fullIData(oldp+119,(vlSelf->pc),32);
+    bufp->fullIData(oldp+120,(vlSelf->x1),32);
+    bufp->fullIData(oldp+121,(vlSelf->x2),32);
+    bufp->fullIData(oldp+122,(vlSelf->x3),32);
+    bufp->fullIData(oldp+123,(vlSelf->x4),32);
+    bufp->fullIData(oldp+124,(vlSelf->x5),32);
+    bufp->fullIData(oldp+125,(((0x6fU == (0x7fU & vlSelf->riscv_single_cycle__DOT__instruction))
+                                ? vlSelf->riscv_single_cycle__DOT____VdfgTmp_h8a6dd36a__0
+                                : ((IData)(vlSelf->riscv_single_cycle__DOT__is_jalr)
+                                    ? (0xfffffffeU 
+                                       & vlSelf->riscv_single_cycle__DOT__alu_result)
+                                    : (((0x100073U 
+                                         != vlSelf->riscv_single_cycle__DOT__instruction) 
+                                        & (0x80000018U 
+                                           > vlSelf->pc))
+                                        ? ((IData)(4U) 
+                                           + vlSelf->pc)
+                                        : vlSelf->pc)))),32);
+    bufp->fullIData(oldp+126,(((IData)(vlSelf->riscv_single_cycle__DOT__is_addi)
+                                ? vlSelf->riscv_single_cycle__DOT__alu_result
+                                : (((0x6fU == (0x7fU 
+                                               & vlSelf->riscv_single_cycle__DOT__instruction)) 
+                                    | (IData)(vlSelf->riscv_single_cycle__DOT__is_jalr))
+                                    ? ((IData)(4U) 
+                                       + vlSelf->pc)
+                                    : ((0x17U == (0x7fU 
+                                                  & vlSelf->riscv_single_cycle__DOT__instruction))
+                                        ? vlSelf->riscv_single_cycle__DOT____VdfgTmp_h8a6dd36a__0
+                                        : ((0x37U == 
+                                            (0x7fU 
+                                             & vlSelf->riscv_single_cycle__DOT__instruction))
+                                            ? vlSelf->riscv_single_cycle__DOT__imm
+                                            : 0U))))),32);
 }
