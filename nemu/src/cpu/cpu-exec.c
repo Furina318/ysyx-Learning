@@ -347,12 +347,12 @@ static void statistic() {
   if (g_timer > 0) Log("simulation frequency = " NUMBERIC_FMT " inst/s", g_nr_guest_inst * 1000000 / g_timer);
   else Log("Finish running in less than 1 us and can not calculate the simulation frequency");
 
-  Log("Function call statistics:");
+  Log("\nFunction call statistics:");
   for (int i = 0; i < func_call_stats_size; i++) {
     Log("  %-20s: %" PRIu64 " calls", func_call_stats[i].name, func_call_stats[i].call_count);
   }
   // 添加分支预测器统计
-  Log("Branch Predictor Statistics:");
+  Log("\nBranch Predictor Statistics:");
   Log("  Total predictions: %" PRIu64, bht_hits + bht_misses);
   Log("  Hits: %" PRIu64, bht_hits);
   Log("  Misses: %" PRIu64, bht_misses);
