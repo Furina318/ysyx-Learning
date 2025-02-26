@@ -265,12 +265,12 @@ static void exec_once(Decode *s, vaddr_t pc) {
       bht[bht_idx].target = s->dnpc;
     }
 
-    // 调试输出（可选）
-    #ifdef CONFIG_ITRACE
-    printf("Branch at 0x%x: %s, predicted %s, actual %s\n",
-           s->pc, s->logbuf, predicted_taken ? "taken" : "not taken",
-           taken ? "taken" : "not taken");
-    #endif
+    // // 调试输出（可选）
+    // #ifdef CONFIG_ITRACE
+    // printf("Branch at 0x%x: %s, predicted %s, actual %s\n",
+    //        s->pc, s->logbuf, predicted_taken ? "taken" : "not taken",
+    //        taken ? "taken" : "not taken");
+    // #endif
   }
 #ifdef CONFIG_FUNC_TRACE
   // uint32_t opcode = s->isa.inst & 0x7f;
@@ -350,6 +350,15 @@ static void statistic() {
   Log("Function call statistics:");
   for (int i = 0; i < func_call_stats_size; i++) {
     Log("  %-20s: %" PRIu64 " calls", func_call_stats[i].name, func_call_stats[i].call_count);
+  }
+  // 添加分支预测器统计
+  Log("Branch Predictor Statistics:");
+  Log("  Total predictions: %" PRIu64, bht_hits + bht_misses);
+  Log("  Hits: %" PRIu64, bht_hits);
+  Log("  Misses: %" PRIu64, bht_misses);
+  if (bht_hits + bht_misses > 0) {
+    double hit_rate = (double)bht_hits / (bht_hits + bht_misses) * 100;
+    Log("  Hit rate: %.2f%%", hit_rate);
   }
 }
 
