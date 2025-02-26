@@ -259,13 +259,6 @@ static void exec_once(Decode *s, vaddr_t pc) {
     if (is_jal || is_jalr) {
       bht[bht_idx].target = s->dnpc;
     }
-
-    // // 调试输出（可选）
-    // #ifdef CONFIG_ITRACE
-    // printf("Branch at 0x%x: %s, predicted %s, actual %s\n",
-    //        s->pc, s->logbuf, predicted_jump ? "jump" : "not jump",
-    //        jump ? "jump" : "not jump");
-    // #endif
   }
   
 #ifdef CONFIG_FUNC_TRACE
