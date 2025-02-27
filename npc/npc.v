@@ -4,8 +4,10 @@ module npc(
 );
 
     import "DPI-C" function void dpi_enbreak();
+
+    import "DPI-C" function void dpi_instr();
     
-    reg [31:0] pc;
+    reg [31:0] pc,next_pc;
 
     wire [31:0] instr;
     wire [4:0] rd,rs1,rs2;

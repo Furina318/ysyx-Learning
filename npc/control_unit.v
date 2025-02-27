@@ -56,6 +56,10 @@ module control_unit (
                     result_src = 2'b10; // 写回PC+4
                 end
             end
+            //enbreak指令
+            7'b1110011: begin
+                dpi_enbreak();
+            end
         endcase
     end
 
