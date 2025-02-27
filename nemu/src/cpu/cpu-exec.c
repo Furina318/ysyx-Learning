@@ -208,7 +208,7 @@ void predictor_init(){
     btb[i].valid = false;
   }
   ghr = 0;
-  bht_hits = bht_misses = btb_hits = btb_misses = 0;
+  bht_hits=bht_misses=btb_hits=btb_misses=0;
 }
 
 CPU_state cpu = {};
@@ -269,12 +269,12 @@ static void exec_once(Decode *s, vaddr_t pc) {
     }else{
       bht_misses++;
     }
-    if(jump && predicted_target == s->dnpc){//跳转条件下，地址预测正确
+    if(jump && predicted_target==s->dnpc){//跳转条件下，地址预测正确
       btb_hits++;
     }else if(jump){
       btb_misses++;
     }
-    //更新BHT
+    //更新饱和计数器
     if(jump){
       if (bht[bht_idx].state < 3) bht[bht_idx].state++;//跳转条件下，若非强跳转，则增加状态
       bht[bht_idx].jump_count++;
