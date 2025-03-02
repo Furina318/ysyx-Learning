@@ -82,7 +82,7 @@ void mtrace_filter_output(paddr_t start_addr, paddr_t end_addr, bool filter_en, 
         if (filter_en && data != filter_data) {
             continue; 
         }
-        printf(" %c 0x%08x 0x%08x %d\n", type, addr, data, len);
+        printf(" %c --> 0x%08x value: 0x%08x %d\n", type, addr, data, len);
     }
     fclose(fp);
 }
