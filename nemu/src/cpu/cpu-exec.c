@@ -187,13 +187,13 @@ typedef struct {
   bool valid;           // 条目是否有效
 } BTB_entry;
 
-static BHT_entry bht[BHT_SIZE];    // 分支历史表
-static BTB_entry btb[BTB_SIZE];    // 分支目标缓冲区
-static uint8_t ghr = 0;            // 全局历史（记录跳转历史）
-static uint64_t bht_hits = 0;      // 预测命中次数
-static uint64_t bht_misses = 0;    // 预测失误次数
-static uint64_t btb_hits = 0;      // BTB 目标地址命中次数
-static uint64_t btb_misses = 0;    // BTB 目标地址失误次数
+static BHT_entry bht[BHT_SIZE];    //分支历史表
+static BTB_entry btb[BTB_SIZE];    //分支目标缓冲区
+static uint8_t ghr = 0;            //全局历史（记录跳转历史）
+static uint64_t bht_hits = 0;      //预测命中次数
+static uint64_t bht_misses = 0;    //预测失误次数
+static uint64_t btb_hits = 0;      //BTB目标地址命中次数
+static uint64_t btb_misses = 0;    //BTB目标地址失误次数
 
 // 初始化预测器
 void predictor_init(){
