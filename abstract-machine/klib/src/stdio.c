@@ -10,25 +10,24 @@ void int_to_str(int num, char *buffer, int *index) {
         buffer[(*index)++] = '0';
         return;
     }
-    // 处理负数
-    if (num < 0) {
-        buffer[(*index)++] = '-';
+    char temp[32];
+    int temp_index = 0;
+    int is_negative = num < 0;
+    if (is_negative) {
         num = -num;
     }
-    //计算位数进行处理
-    int dit=0;
-    int tmp=num;
-    while(tmp){
-        tmp/=10;
-        dit++;
+    while (num > 0) {
+        temp[temp_index++] = (char)((num % 10) + '0');
+        num /= 10;
     }
-    // 从最高位开始写入缓冲区
-    for (int i = dit - 1; i >= 0; i--) {
-      buffer[(*index) + i] = (char)((num % 10) + '0');
-      num /= 10;
-      }
-      *index += dit; // 更新索引
-  }
+    if (is_negative) {
+        buffer[(*index)++] = '-';
+    }
+    // 反向复制到缓冲区
+    for (int i = temp_index - 1; i >= 0; i--) {
+        buffer[(*index)++] = temp[i];
+    }
+}
 
 void int_to_base_str(unsigned int num, char *buffer, int *index, int base) {
     const char digits[] = "0123456789abcdef";
@@ -104,9 +103,10 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
     long long lld;
     short hd;
     char c;
-    char buffer[1024];
+    char buffer[1024] = {0};  // 初始化为零
     int index = 0;
-    int precision = 6; // 默认精度为6
+    int buffer_index;  // 添加独立的缓冲区索引
+    int precision = 6;
 
     for (; *fmt != '\0'; fmt++) {
         if (*fmt != '%') {
@@ -114,6 +114,8 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
             continue;
         }
         fmt++;
+        
+        // 处理精度
         if (*fmt == '.') {
             fmt++;
             precision = 0;
@@ -122,6 +124,8 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
                 fmt++;
             }
         }
+        
+        buffer_index = 0;  // 重置缓冲区索引
         switch (*fmt) {
             case 's':
                 str = va_arg(ap, char *);
@@ -131,40 +135,34 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
                 break;
             case 'd':
                 d = va_arg(ap, int);
-                int_to_str(d, buffer, &index);
-                for (int i = 0; buffer[i] != '\0'; i++) {
+                int_to_str(d, buffer, &buffer_index);
+                for (int i = 0; i < buffer_index; i++) {
                     out[index++] = buffer[i];
                 }
                 break;
             case 'x':
-                d = va_arg(ap, int);
-                int_to_base_str(d, buffer, &index, 16);
-                for (int i = 0; buffer[i] != '\0'; i++) {
+                d = va_arg(ap, unsigned int);  // 改为 unsigned int
+                int_to_base_str(d, buffer, &buffer_index, 16);
+                for (int i = 0; i < buffer_index; i++) {
                     out[index++] = buffer[i];
                 }
                 break;
             case 'o':
-                d = va_arg(ap, int);
-                int_to_base_str(d, buffer, &index, 8);
-                for (int i = 0; buffer[i] != '\0'; i++) {
+                d = va_arg(ap, unsigned int);  // 改为 unsigned int
+                int_to_base_str(d, buffer, &buffer_index, 8);
+                for (int i = 0; i < buffer_index; i++) {
                     out[index++] = buffer[i];
                 }
                 break;
-            // case 'f':
-            //     {
-            //         double f = va_arg(ap, double);
-            //         float_to_str(f, buffer, &index, precision);
-            //         for (int i = 0; buffer[i] != '\0'; i++) {
-            //             out[index++] = buffer[i];
-            //         }
-            //     }
-            //     break;
             case 'p':
                 {
                     void *p = va_arg(ap, void *);
                     uintptr_t addr = (uintptr_t)p;
-                    int_to_base_str(addr, buffer, &index, 16);
-                    for (int i = 0; buffer[i] != '\0'; i++) {
+                    buffer_index = 0;
+                    int_to_base_str(addr, buffer, &buffer_index, 16);
+                    out[index++] = '0';
+                    out[index++] = 'x';
+                    for (int i = 0; i < buffer_index; i++) {
                         out[index++] = buffer[i];
                     }
                 }
@@ -177,23 +175,18 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
                 fmt++;
                 if (*fmt == 'd') {
                     ld = va_arg(ap, long);
-                    long_to_str(ld, buffer, &index);
-                    for (int i = 0; buffer[i] != '\0'; i++) {
+                    buffer_index = 0;
+                    long_to_str(ld, buffer, &buffer_index);
+                    for (int i = 0; i < buffer_index; i++) {
                         out[index++] = buffer[i];
                     }
                 }
-                // else if (*fmt == 'f') {
-                //     double lf = va_arg(ap, double);
-                //     float_to_str(lf, buffer, &index, precision);
-                //     for (int i = 0; buffer[i] != '\0'; i++) {
-                //         out[index++] = buffer[i];
-                //     }
-                // } 
                 else if (*fmt == 'l' && *(fmt + 1) == 'd') {
                     fmt++;
                     lld = va_arg(ap, long long);
-                    long_to_str(lld, buffer, &index);
-                    for (int i = 0; buffer[i] != '\0'; i++) {
+                    buffer_index = 0;
+                    long_to_str(lld, buffer, &buffer_index);
+                    for (int i = 0; i < buffer_index; i++) {
                         out[index++] = buffer[i];
                     }
                 }
@@ -202,8 +195,9 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
                 fmt++;
                 if (*fmt == 'd') {
                     hd = (short)va_arg(ap, int);
-                    int_to_str(hd, buffer, &index);
-                    for (int i = 0; buffer[i] != '\0'; i++) {
+                    buffer_index = 0;
+                    int_to_str(hd, buffer, &buffer_index);
+                    for (int i = 0; i < buffer_index; i++) {
                         out[index++] = buffer[i];
                     }
                 }
