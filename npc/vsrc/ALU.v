@@ -8,12 +8,12 @@ module ALU (
     input [1:0]        ALUBsrc,     // ALU 输入 B 选择
     input [31:0]       imm,         // 立即数
     input [31:0]       PC,          // PC
-    input [31:0]       rs1;
-    input [31:0]       rs2;
+    input [31:0]       rs1,
+    input [31:0]       rs2,
 
-    output reg [31:0]  Result       // 输出结果
-    output reg         Less;        // 小于比较结果
-    output reg         zero;        // 零比较结果
+    output reg [31:0]  Result,       // 输出结果
+    output reg         Less,       // 小于比较结果
+    output reg         zero       // 零比较结果
 );
     import "DPI-C" function void ebreak(input int station, input int inst);
 
@@ -26,7 +26,7 @@ module ALU (
     reg [31:0] xor_out;      // 异或输出
     reg [31:0] or_out;       // 逻辑或输出
     reg [31:0] and_out;      // 逻辑与输出
-    reg Less;                // 小于比较结果
+    // reg Less;                // 小于比较结果
 
     //处理输入信号
     always @(*) begin
@@ -73,7 +73,10 @@ module ALU (
             3'b101: Result = shift_out;  // 右移,SRL/SRA
             3'b110: Result = or_out;     // 逻辑或,OR
             3'b111: Result = and_out;    // 逻辑与,AND
-            default: ebreak(`ABORT,32'hdeadbeaf)    $display("Something wrong in ALU");
+            default: begin
+                ebreak(`ABORT,32'hdeadbeaf);   
+                $display("Something wrong in ALU");
+            end
         endcase
         zero=(Result==32'b0) ? 1'b1 : 1'b0;//零比较
     end

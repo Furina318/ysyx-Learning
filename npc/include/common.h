@@ -9,7 +9,8 @@
 #include <assert.h>
 #include <stdbool.h>
 
-#include "conf.h"
+#include "../include/conf.h"
+// #include "../include/utils.h"
 #include "macro.h"
 
 typedef __uint64_t uint64_t;
@@ -22,8 +23,9 @@ typedef int32_t sword_t;
 typedef word_t paddr_t;
 typedef word_t vaddr_t;
 
-#define ARRLEN(arr) (int)(sizeof(arr)/sizeof(arr[0]))
-#define CONFIG_MBASE 0x80000000
-#define CONFIG_MSIZE 0x80000000
+// #define ARRLEN(arr) (int)(sizeof(arr)/sizeof(arr[0]))
+// #define PG_ALIGN    __attribute((aligned(4096)))
+// #define CONFIG_MBASE 0x80000000
+// #define CONFIG_MSIZE 0x80000000
 
 #endif

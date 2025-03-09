@@ -49,7 +49,7 @@ module rv32e (
     );
 
     // 寄存器文件实例化
-    register_files reg_file (
+    register_files register_files_inst (
         .clk(clk),
         .rst(rst),
         .RegWr(reg_wr),
@@ -63,7 +63,7 @@ module rv32e (
 
     // 立即数生成器实例化
     imm_gen imm_gen_inst (
-        .inst(inst),
+        .instr(inst),
         .i_type(i_type),
         .imm(imm)
     );
@@ -119,6 +119,6 @@ module rv32e (
     );
 
     // 写回数据选择
-    assign reg_write_data = mem_to_reg ? mem_data_out : alu_result;
+    // assign reg_write_data = mem_to_reg ? mem_data_out : alu_result;
 
 endmodule

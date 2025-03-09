@@ -13,11 +13,11 @@ typedef struct {
   uint32_t halt_ret;
 } NPCState;
 
-extern NPCState npc_state;
+static NPCState npc_state;
 
 // ----------- timer -----------
 
-uint64_t get_time();
+// uint64_t get_time();
 
 // ----------- log -----------
 

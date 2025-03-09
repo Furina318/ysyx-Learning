@@ -1,10 +1,10 @@
 `include "/home/furina/ysyx-workbench/npc/vsrc/defines.v"
 
 module register_files(
-    input clk, rst, RegWr; // clk, reset, enable
-    input [4:0] rs1,rs2,rd; // register address
-    input [31:0] busW; // data input
-    output [31:0] busA,busB; // data output
+    input clk, rst, RegWr,// clk, reset, enable
+    input [4:0] rs1,rs2,rd,// register address
+    input [31:0] busW,//data input
+    output [31:0] busA,busB // data output
 );
     reg [31:0] regs[31:0];//32个寄存器（0号寄存器不可写）（32位）
     //初始化寄存器

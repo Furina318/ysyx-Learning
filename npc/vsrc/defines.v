@@ -63,7 +63,7 @@
 
 // E type instruction
 `define INST_TYPE_E   7'b111_0011
-`define INST_EBREAK   12'b0000_0000_0001
+`define INST_EBREAK   32'b00000000000000000000000001110011
 `define HIT_TRAP      1
 `define ABORT         2
 // `define Unit_ALU      0   //alu

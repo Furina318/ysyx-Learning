@@ -15,6 +15,10 @@ module contr_gen(
 
     import "DPI-C" function void ebreak(input int station, input int inst);
 
+    reg [6:0] opcode; // 操作码
+    reg [2:0] func3; // 功能码3
+    reg [6:0] func7; // 功能码7
+
     assign opcode = inst[6:0];
     assign func3 = inst[14:12];
     assign func7 = inst[31:25];
@@ -100,6 +104,10 @@ module contr_gen(
                     3'b010: MemOP = 3'b010; // LW
                     3'b100: MemOP = 3'b100; // LBU
                     3'b101: MemOP = 3'b101; // LHU
+                    default: begin
+                        ebreak(`ABORT, inst);
+                        $display("Unknown load instruction with func3 = %b", func3);
+                    end
                 endcase
             end
 
@@ -114,6 +122,10 @@ module contr_gen(
                     3'b000: MemOP = 3'b000; // SB
                     3'b001: MemOP = 3'b001; // SH
                     3'b010: MemOP = 3'b010; // SW
+                    default: begin
+                        ebreak(`ABORT, inst);
+                        $display("Unknown store instruction with func3 = %b", func3);
+                    end
                 endcase
             end
 
@@ -147,9 +159,11 @@ module contr_gen(
             end
 
             //ebreak指令
-            `INST_EBREAK: begin
-                ebreak(`HIT_TRAP, inst);
-                $display("ebreak instruction");
+            `INST_TYPE_E: begin
+                if(inst == `INST_EBREAK) begin
+                    ebreak(`ABORT, inst);
+                    $display("ebreak instruction");
+                end
             end
 
             // 其他指令（默认）

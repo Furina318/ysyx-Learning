@@ -12,15 +12,17 @@ module mem(
     output wire [31:0] inst_data,
     output reg [31:0] data_out
 );
-    import "DPI-C" function int  pmem_read(input int raddr);
-    import "DPI-C" function void pmem_write(input int waddr, input int wdata, input int len);
+    import "DPI-C" function int unsigned pmem_read(input int unsigned raddr,input int len);
+    import "DPI-C" function void pmem_write(input int unsigned waddr, input int unsigned wdata, input int len);
     import "DPI-C" function void ebreak(input int station, input int inst);
 
     reg [31:0] mem[0:1023];
     wire [31:0] read_data;
+    reg [31:0] temp_data; // 中间寄存器
+
     //读指令
-    assign inst_data = pmem_read(inst_addr);  
-    assign read_data = pmem_read(addr);
+    assign inst_data = pmem_read(inst_addr,4);  
+    assign read_data = pmem_read(addr,4);
 
     always @(posedge clk) begin
         if(WrEn) begin//写使能
@@ -28,8 +30,14 @@ module mem(
                 3'b010: pmem_write(addr,data_in,4); // 4字节写
                 3'b001: pmem_write(addr,data_in,2);//mem[addr][15:0] <= data_in[15:0]; // 2字节写
                 3'b000: pmem_write(addr,data_in,1);//mem[addr][7:0] <= data_in[7:0]; // 1字节写
-                3'b101: data_in <= {16{1'b0},data_in[15:0]};pmem_write(addr,data_in,2);//mem[addr][15:0] <= data_in[15:0]; // 2字节写无符号拓展
-                3'b100: data_in <= {24{1'b0},data_in[7:0]};pmem_write(addr,data_in,1);//mem[addr][7:0] <= data_in[7:0]; // 1字节写无符号拓展
+                3'b101: begin
+                    temp_data <= {{16'b0}, data_in[15:0]};
+                    pmem_write(addr,temp_data,2);//mem[addr][15:0] <= data_in[15:0]; // 2字节写无符号拓展
+                end 
+                3'b100: begin
+                    temp_data <= {{24'b0}, data_in[7:0]};
+                    pmem_write(addr,temp_data,1);//mem[addr][7:0] <= data_in[7:0]; // 1字节写无符号拓展
+                end 
                 default: begin
                     ebreak(`ABORT, 32'hdeafbeaf); // 异常处理
                     $display("Something wrong in ram write module");

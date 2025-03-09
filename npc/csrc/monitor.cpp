@@ -10,13 +10,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-void init_rand();
+
 void init_log(const char *log_file);
 void init_mem();
-void init_difftest(char *ref_so_file, long img_size, int port);
-void init_device();
 void init_sdb();
-void init_disasm();
+
 
 static void welcome() {
   Log("MTrace: %s", MUXDEF(CONFIG_MTACE, ANSI_FMT("ON", ANSI_FG_GREEN), ANSI_FMT("OFF", ANSI_FG_RED)));
@@ -200,7 +198,7 @@ void init_monitor(int argc, char *argv[]) {
   parse_args(argc, argv);
 
   /* Set random seed. */
-  init_rand();
+  // init_rand();
 
   /* Open the log file. */
   init_log(log_file);
@@ -224,7 +222,7 @@ void init_monitor(int argc, char *argv[]) {
   long img_size = load_img();
 
   /* Initialize differential testing. */
-  init_difftest(diff_so_file, img_size, difftest_port);
+  // init_difftest(diff_so_file, img_size, difftest_port);
 
   /* Initialize the simple debugger. */
   init_sdb();

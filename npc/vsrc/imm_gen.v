@@ -1,12 +1,19 @@
 `include "/home/furina/ysyx-workbench/npc/vsrc/defines.v"
 
 module imm_gen(
-    input [31:0] inst,
+    input [31:0] instr,
     input [`TYPE_BUS] i_type,
-    output [31:0] imm
+    output reg [31:0] imm
 );
     import "DPI-C" function void ebreak(input int station, input int inst);
 
+    reg [31:0] immI;
+    reg [31:0] immU;
+    reg [31:0] immS;
+    reg [31:0] immB;
+    reg [31:0] immJ;
+    reg [31:0] immR;
+    
     assign immI = {{20{instr[31]}}, instr[31:20]};
     assign immU = {instr[31:12], 12'b0};
     assign immS = {{20{instr[31]}}, instr[31:25], instr[11:7]};
@@ -21,7 +28,11 @@ module imm_gen(
             `INST_B: imm = immB;
             `INST_J: imm = immJ;
             `INST_R: imm = immR;
-            default: imm = 32'b0; ebreak(`ABORT, 32'hdeadbeaf); $display("imm_gen: unknown i_type %d", i_type);
+            default: begin
+                imm = 32'b0; 
+                ebreak(`ABORT, 32'hdeadbeaf); 
+                $display("imm_gen: unknown i_type %d", i_type);
+            end
         endcase
     end
 endmodule
