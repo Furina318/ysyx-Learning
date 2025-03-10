@@ -232,7 +232,7 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
       if(val!=wp->old_val){
         // printf("Watchpoint NO.%d: Expression '%s' changed from 0x%08x to 0x%08x.\n", wp->NO, wp->expr, wp->old_val, val);
         _Log("Watchpoint NO.%d: Expression" ANSI_FG_YELLOW " '%s' " ANSI_NONE "changed from"
-        ANSI_FG_BLUE " 0x%08x " ANSI_NONE "to" ANSI_FG_BLUE "0x%08x\n",wp->NO, wp->expr, wp->old_val, val);
+        ANSI_FG_BLUE " 0x%08x " ANSI_NONE "to" ANSI_FG_BLUE " 0x%08x\n" ANSI_NONE,wp->NO, wp->expr, wp->old_val, val);
         nemu_state.state=NEMU_STOP;
         wp->old_val=val;
         //sdb_mainloop();
