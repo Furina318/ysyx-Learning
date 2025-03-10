@@ -87,7 +87,8 @@ static int cmd_info(char *args){
 #endif
       WP *wp=get_wp_head();
       if(wp == NULL){
-        printf("No watchpoints set.\n");
+        // printf("No watchpoints set.\n");
+        _Log(ANSI_FG_RED "No watchpoint set\n" ANSI_NONE);
         return 0;
       }
       // _Log(ANSI_FG_YELLOW "Current watchpoints state: %s\n" ANSI_NONE, wp_state);
@@ -156,7 +157,8 @@ static int cmd_w(char *args){
 
 static int cmd_d(char *args){
   if (args==NULL || strlen(args)==0) {
-    printf("Invalid index. Please enter a valid number.\n");
+    // printf("Invalid index. Please enter a valid number.\n");
+    _Log(ANSI_FG_RED "Invalid index. Please enter a valid number.\n" ANSI_NONE);
     return 0;
   }
   int no=atoi(strtok(NULL," "));
@@ -164,7 +166,8 @@ static int cmd_d(char *args){
   while(wp!=NULL){
     if(wp->NO==no){
       free_wp(wp);
-      printf("Watchpoint NO.%d deleted.\n", no);
+      // printf("Watchpoint NO.%d deleted.\n", no);
+      _Log("Watchpoint NO." ANSI_FG_YELLOW "%d" ANSI_NONE "deleted.\n",no);
       return 0;
     }
     wp=wp->next;
