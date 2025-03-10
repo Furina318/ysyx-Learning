@@ -14,7 +14,9 @@ module PC(
     reg [31:0] PCa;
     reg [31:0] PCb;
     // reg [31:0] pc;
-
+    initial begin
+        pc_next = 32'h80000000;
+    end
 always@(posedge clk or posedge rst) begin
     if(rst) begin
         // pc <= 32'h80000000;

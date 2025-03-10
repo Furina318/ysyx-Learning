@@ -36,6 +36,10 @@ module rv32e (
     wire [4:0] rs2 = inst[24:20];
     wire [4:0] rd  = inst[11:7];
 
+    // initial begin
+    //     pc = 32'h80000000;
+    // end
+
     // PC 模块实例化
     PC pc_inst (
         .clk(clk),

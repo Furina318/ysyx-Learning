@@ -32,6 +32,7 @@ VL_ATTR_COLD void Vrv32e___024root___eval_initial__TOP(Vrv32e___024root* vlSelf)
     Vrv32e__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vrv32e___024root___eval_initial__TOP\n"); );
     // Body
+    vlSelf->rv32e__DOT__pc_next = 0x80000000U;
     vlSelf->rv32e__DOT__register_files_inst__DOT__regs[0U] = 0U;
     vlSelf->rv32e__DOT__register_files_inst__DOT__regs[1U] = 0U;
     vlSelf->rv32e__DOT__register_files_inst__DOT__regs[2U] = 0U;
