@@ -90,7 +90,9 @@ static int cmd_info(char *args){
         printf("No watchpoints set.\n");
         return 0;
       }
-      _Log(ANSI_FG_YELLOW "Current watchpoints state: %s\n" ANSI_NONE, wp_state);
+      // _Log(ANSI_FG_YELLOW "Current watchpoints state: %s\n" ANSI_NONE, wp_state);
+      _Log("Current watchpoints state: ");
+      _Log(ANSI_FG_RED "%s\n" ANSI_NONE, wp_state);
       while (wp != NULL) { // 打印监视点信息
         _Log(ANSI_FG_GREEN "Watchpoint NO:%-2d: Expression '%s' Last Value: 0x%08x\n" ANSI_NONE,
           wp->NO, wp->expr ? wp->expr : "N/A", wp->old_val);
