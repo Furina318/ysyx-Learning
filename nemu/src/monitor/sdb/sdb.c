@@ -95,7 +95,7 @@ static int cmd_info(char *args){
       _Log(ANSI_FG_RED "%s\n" ANSI_NONE, wp_state);
       _Log(ANSI_FG_GREEN "Watchpoint NO\t Expression\t Last Value\n" ANSI_NONE);
       while (wp != NULL) { // 打印监视点信息
-        _Log("%-2d\t\t %s\t 0x%08x\n" ANSI_NONE,
+        _Log("%-2d\t\t %s\t\t 0x%08x\n" ANSI_NONE,
           wp->NO, wp->expr ? wp->expr : "N/A", wp->old_val);
         wp = wp->next;
       }
