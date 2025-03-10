@@ -167,7 +167,7 @@ static int cmd_d(char *args){
     if(wp->NO==no){
       free_wp(wp);
       // printf("Watchpoint NO.%d deleted.\n", no);
-      _Log("Watchpoint NO." ANSI_FG_YELLOW "%d" ANSI_NONE " deleted.\n",no);
+      _Log("Watchpoint " ANSI_FG_YELLOW "NO.%d" ANSI_NONE " deleted.\n",no);
       return 0;
     }
     wp=wp->next;
