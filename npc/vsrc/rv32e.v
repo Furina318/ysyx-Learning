@@ -122,7 +122,6 @@ module rv32e (
         .PCBsrc(pc_b_src)
     );
 
-    // 写回数据选择
-    // assign reg_write_data = mem_to_reg ? mem_data_out : alu_result;
-    // pc <= pc_next;
+    
+    // assign pc = pc_next;
 endmodule
