@@ -124,5 +124,5 @@ module rv32e (
 
     // 写回数据选择
     // assign reg_write_data = mem_to_reg ? mem_data_out : alu_result;
-
+    // pc <= pc_next;
 endmodule

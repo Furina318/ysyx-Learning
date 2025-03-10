@@ -32,7 +32,6 @@ void isa_reg_display() {
     _Log("0x%08x\t %010u\n", cpu.gpr[i], cpu.gpr[i]);
   }
   _Log(ANSI_FG_YELLOW "$%s\t " ANSI_NONE " 0x%08x\t %010u\n","pc",cpu.pc,cpu.pc);
-  printf("pc   : 0x%08x %d\n",cpu.pc,cpu.pc);
 }
 
 word_t isa_reg_str2val(const char *s) {
