@@ -21,17 +21,31 @@ VL_ATTR_COLD void Vrv32e___024root___eval_initial(Vrv32e___024root* vlSelf) {
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vrv32e___024root___eval_initial\n"); );
     // Body
     Vrv32e___024root___eval_initial__TOP(vlSelf);
+    vlSelf->__Vm_traceActivity[2U] = 1U;
     vlSelf->__Vm_traceActivity[1U] = 1U;
     vlSelf->__Vm_traceActivity[0U] = 1U;
     vlSelf->__Vtrigrprev__TOP__clk = vlSelf->clk;
     vlSelf->__Vtrigrprev__TOP__rst = vlSelf->rst;
 }
 
+void Vrv32e___024root____Vdpiimwrap_rv32e__DOT__pmem_read_TOP(IData/*31:0*/ raddr, IData/*31:0*/ len, IData/*31:0*/ &pmem_read__Vfuncrtn);
+
 VL_ATTR_COLD void Vrv32e___024root___eval_initial__TOP(Vrv32e___024root* vlSelf) {
     if (false && vlSelf) {}  // Prevent unused
     Vrv32e__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vrv32e___024root___eval_initial__TOP\n"); );
+    // Init
+    IData/*31:0*/ __Vfunc_rv32e__DOT__pmem_read__0__Vfuncout;
+    __Vfunc_rv32e__DOT__pmem_read__0__Vfuncout = 0;
     // Body
+    vlSelf->rv32e__DOT__pc_now = 0x80000000U;
+    Vrv32e___024root____Vdpiimwrap_rv32e__DOT__pmem_read_TOP(0x80000000U, 4U, __Vfunc_rv32e__DOT__pmem_read__0__Vfuncout);
+    vlSelf->rv32e__DOT__inst = __Vfunc_rv32e__DOT__pmem_read__0__Vfuncout;
+    vlSelf->rv32e__DOT__alu_result_reg = 0x80000000U;
+    vlSelf->rv32e__DOT__mem_wr_reg = 0U;
+    vlSelf->rv32e__DOT__mem_rd_reg = 0U;
+    vlSelf->rv32e__DOT__mem_op_reg = 0U;
+    vlSelf->rv32e__DOT__mem_to_reg_reg = 0U;
     vlSelf->rv32e__DOT__pc_next = 0x80000000U;
     vlSelf->rv32e__DOT__register_files_inst__DOT__regs[0U] = 0U;
     vlSelf->rv32e__DOT__register_files_inst__DOT__regs[1U] = 0U;
@@ -124,19 +138,17 @@ VL_ATTR_COLD void Vrv32e___024root___dump_triggers__stl(Vrv32e___024root* vlSelf
 }
 #endif  // VL_DEBUG
 
-void Vrv32e___024root____Vdpiimwrap_rv32e__DOT__mem_inst__DOT__pmem_read_TOP(IData/*31:0*/ raddr, IData/*31:0*/ len, IData/*31:0*/ &pmem_read__Vfuncrtn);
 void Vrv32e___024root____Vdpiimwrap_rv32e__DOT__imm_gen_inst__DOT__ebreak_TOP(IData/*31:0*/ station, IData/*31:0*/ inst);
 
 VL_ATTR_COLD void Vrv32e___024root___stl_sequent__TOP__0(Vrv32e___024root* vlSelf) {
     if (false && vlSelf) {}  // Prevent unused
     Vrv32e__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vrv32e___024root___stl_sequent__TOP__0\n"); );
-    // Init
-    IData/*31:0*/ __Vfunc_rv32e__DOT__mem_inst__DOT__pmem_read__1__Vfuncout;
-    __Vfunc_rv32e__DOT__mem_inst__DOT__pmem_read__1__Vfuncout = 0;
     // Body
-    Vrv32e___024root____Vdpiimwrap_rv32e__DOT__mem_inst__DOT__pmem_read_TOP(vlSelf->rv32e__DOT__pc, 4U, __Vfunc_rv32e__DOT__mem_inst__DOT__pmem_read__1__Vfuncout);
-    vlSelf->rv32e__DOT__inst = __Vfunc_rv32e__DOT__mem_inst__DOT__pmem_read__1__Vfuncout;
+    Vrv32e___024root____Vdpiimwrap_rv32e__DOT__pmem_read_TOP(vlSelf->rv32e__DOT__pc_now, 4U, vlSelf->__Vfunc_rv32e__DOT__mem_inst__DOT__pmem_read__36__Vfuncout);
+    vlSelf->rv32e__DOT__inst_next = vlSelf->__Vfunc_rv32e__DOT__mem_inst__DOT__pmem_read__36__Vfuncout;
+    Vrv32e___024root____Vdpiimwrap_rv32e__DOT__pmem_read_TOP(vlSelf->rv32e__DOT__alu_result_reg, 4U, vlSelf->__Vfunc_rv32e__DOT__mem_inst__DOT__pmem_read__37__Vfuncout);
+    vlSelf->rv32e__DOT__mem_inst__DOT__read_data = vlSelf->__Vfunc_rv32e__DOT__mem_inst__DOT__pmem_read__37__Vfuncout;
     vlSelf->rv32e__DOT__rs1_data = ((0U == (0x1fU & 
                                             (vlSelf->rv32e__DOT__inst 
                                              >> 0xfU)))
@@ -156,6 +168,7 @@ VL_ATTR_COLD void Vrv32e___024root___stl_sequent__TOP__0(Vrv32e___024root* vlSel
     vlSelf->rv32e__DOT__alu_ctr = 0U;
     vlSelf->rv32e__DOT__mem_to_reg = 0U;
     vlSelf->rv32e__DOT__mem_wr = 0U;
+    vlSelf->rv32e__DOT__mem_rd = 0U;
     vlSelf->rv32e__DOT__mem_op = 0U;
     vlSelf->rv32e__DOT__branch = 0U;
     if ((0x40U & vlSelf->rv32e__DOT__inst)) {
@@ -452,6 +465,7 @@ VL_ATTR_COLD void Vrv32e___024root___stl_sequent__TOP__0(Vrv32e___024root* vlSel
     } else if (VL_LIKELY((2U & vlSelf->rv32e__DOT__inst))) {
         if (VL_LIKELY((1U & vlSelf->rv32e__DOT__inst))) {
             vlSelf->rv32e__DOT__i_type = 0U;
+            vlSelf->rv32e__DOT__mem_rd = 1U;
             vlSelf->rv32e__DOT__reg_wr = 1U;
             vlSelf->rv32e__DOT__alu_a_src = 0U;
             vlSelf->rv32e__DOT__alu_b_src = 1U;
@@ -495,7 +509,7 @@ VL_ATTR_COLD void Vrv32e___024root___stl_sequent__TOP__0(Vrv32e___024root* vlSel
                   32,vlSelf->rv32e__DOT__inst);
     }
     vlSelf->rv32e__DOT__alu_inst__DOT__A = ((IData)(vlSelf->rv32e__DOT__alu_a_src)
-                                             ? vlSelf->rv32e__DOT__pc
+                                             ? vlSelf->rv32e__DOT__pc_next
                                              : vlSelf->rv32e__DOT__rs1_data);
     if ((4U & (IData)(vlSelf->rv32e__DOT__i_type))) {
         if (VL_UNLIKELY((2U & (IData)(vlSelf->rv32e__DOT__i_type)))) {
@@ -605,8 +619,6 @@ VL_ATTR_COLD void Vrv32e___024root___stl_sequent__TOP__0(Vrv32e___024root* vlSel
                                                   (vlSelf->rv32e__DOT__alu_inst__DOT__A 
                                                    + vlSelf->rv32e__DOT__alu_inst__DOT__B)))));
     vlSelf->rv32e__DOT__zero = (0U == vlSelf->rv32e__DOT__alu_result);
-    Vrv32e___024root____Vdpiimwrap_rv32e__DOT__mem_inst__DOT__pmem_read_TOP(vlSelf->rv32e__DOT__alu_result, 4U, vlSelf->__Vfunc_rv32e__DOT__mem_inst__DOT__pmem_read__2__Vfuncout);
-    vlSelf->rv32e__DOT__mem_inst__DOT__read_data = vlSelf->__Vfunc_rv32e__DOT__mem_inst__DOT__pmem_read__2__Vfuncout;
     if ((4U & (IData)(vlSelf->rv32e__DOT__branch))) {
         if ((2U & (IData)(vlSelf->rv32e__DOT__branch))) {
             if ((1U & (IData)(vlSelf->rv32e__DOT__branch))) {
@@ -671,6 +683,7 @@ VL_ATTR_COLD void Vrv32e___024root___eval_stl(Vrv32e___024root* vlSelf) {
     // Body
     if (vlSelf->__VstlTriggered.at(0U)) {
         Vrv32e___024root___stl_sequent__TOP__0(vlSelf);
+        vlSelf->__Vm_traceActivity[2U] = 1U;
         vlSelf->__Vm_traceActivity[1U] = 1U;
         vlSelf->__Vm_traceActivity[0U] = 1U;
     }
@@ -719,15 +732,15 @@ VL_ATTR_COLD void Vrv32e___024root___ctor_var_reset(Vrv32e___024root* vlSelf) {
     // Body
     vlSelf->clk = VL_RAND_RESET_I(1);
     vlSelf->rst = VL_RAND_RESET_I(1);
-    vlSelf->rv32e__DOT__pc = VL_RAND_RESET_I(32);
+    vlSelf->rv32e__DOT__pc_now = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__pc_next = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__inst = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__imm = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__rs1_data = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__rs2_data = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__alu_result = VL_RAND_RESET_I(32);
+    vlSelf->rv32e__DOT__alu_result_reg = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__mem_data_out = VL_RAND_RESET_I(32);
-    vlSelf->rv32e__DOT__reg_write_data = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__less = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__zero = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__i_type = VL_RAND_RESET_I(3);
@@ -737,25 +750,34 @@ VL_ATTR_COLD void Vrv32e___024root___ctor_var_reset(Vrv32e___024root* vlSelf) {
     vlSelf->rv32e__DOT__alu_ctr = VL_RAND_RESET_I(4);
     vlSelf->rv32e__DOT__mem_to_reg = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__mem_wr = VL_RAND_RESET_I(1);
+    vlSelf->rv32e__DOT__mem_rd = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__mem_op = VL_RAND_RESET_I(3);
     vlSelf->rv32e__DOT__branch = VL_RAND_RESET_I(3);
     vlSelf->rv32e__DOT__pc_a_src = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__pc_b_src = VL_RAND_RESET_I(1);
+    vlSelf->rv32e__DOT__mem_wr_reg = VL_RAND_RESET_I(1);
+    vlSelf->rv32e__DOT__mem_rd_reg = VL_RAND_RESET_I(1);
+    vlSelf->rv32e__DOT__mem_op_reg = VL_RAND_RESET_I(3);
+    vlSelf->rv32e__DOT__mem_to_reg_reg = VL_RAND_RESET_I(1);
+    vlSelf->rv32e__DOT__inst_next = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__pc_inst__DOT__PCa = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__pc_inst__DOT__PCb = VL_RAND_RESET_I(32);
     for (int __Vi0 = 0; __Vi0 < 32; ++__Vi0) {
         vlSelf->rv32e__DOT__register_files_inst__DOT__regs[__Vi0] = VL_RAND_RESET_I(32);
     }
     vlSelf->rv32e__DOT__register_files_inst__DOT__i = VL_RAND_RESET_I(32);
+    vlSelf->rv32e__DOT__mem_inst__DOT__read_data = VL_RAND_RESET_I(32);
+    vlSelf->rv32e__DOT__mem_inst__DOT__temp_data = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__alu_inst__DOT__A = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__alu_inst__DOT__B = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__alu_inst__DOT__shift_out = VL_RAND_RESET_I(32);
-    vlSelf->rv32e__DOT__mem_inst__DOT__read_data = VL_RAND_RESET_I(32);
-    vlSelf->rv32e__DOT__mem_inst__DOT__temp_data = VL_RAND_RESET_I(32);
-    vlSelf->__Vfunc_rv32e__DOT__mem_inst__DOT__pmem_read__2__Vfuncout = 0;
+    vlSelf->__Vfunc_rv32e__DOT__mem_inst__DOT__pmem_read__36__Vfuncout = 0;
+    vlSelf->__Vfunc_rv32e__DOT__mem_inst__DOT__pmem_read__37__Vfuncout = 0;
+    vlSelf->__Vdly__rv32e__DOT__pc_now = VL_RAND_RESET_I(32);
+    vlSelf->__Vdly__rv32e__DOT__inst = VL_RAND_RESET_I(32);
     vlSelf->__Vtrigrprev__TOP__clk = VL_RAND_RESET_I(1);
     vlSelf->__Vtrigrprev__TOP__rst = VL_RAND_RESET_I(1);
-    for (int __Vi0 = 0; __Vi0 < 2; ++__Vi0) {
+    for (int __Vi0 = 0; __Vi0 < 3; ++__Vi0) {
         vlSelf->__Vm_traceActivity[__Vi0] = 0;
     }
 }

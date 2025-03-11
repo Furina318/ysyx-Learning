@@ -35,40 +35,60 @@ Vrv32e *top = new Vrv32e("top");
 vluint64_t main_time = 0;  //initial 仿真时间
 
 extern "C" void ebreak(int station,int inst){
-    if(Verilated::gotFinish())
-    return;
+  if(Verilated::gotFinish()) return;
     
-    if(main_time >= start_time + 1)   // at the begining (main_time < start_time and before the reset), all regs are zeros
-    {
-        npc_state.halt_ret = top->rootp->rv32e__DOT__register_files_inst__DOT__regs[10]; //a0
-        npc_state.halt_pc = top->rootp->rv32e__DOT__pc;
+  //   if(main_time >= start_time + 1)   // at the begining (main_time < start_time and before the reset), all regs are zeros
+  //   {
+  //       npc_state.halt_ret = top->rootp->rv32e__DOT__register_files_inst__DOT__regs[10]; //a0
+  //       npc_state.halt_pc = top->rootp->rv32e__DOT__pc_now;
 
-        // Log("Ebreak takes place in the %s", names);
-        Log("maintime = %ld, state = %d, pc = 0x%08x, inst = 0x%08x", main_time, npc_state.state, top->rootp->rv32e__DOT__pc, top->rootp->rv32e__DOT__inst);
+  //       // Log("Ebreak takes place in the %s", names);
+  //       Log("maintime = %ld, state = %d, pc = 0x%08x, inst = 0x%08x", main_time, npc_state.state, top->rootp->rv32e__DOT__pc_now, top->rootp->rv32e__DOT__inst);
 
-    switch(station)
-    {
-      case HIT_TRAP:
-        npc_state.state = NPC_END;
-        break;
+  //   switch(station)
+  //   {
+  //     case HIT_TRAP:
+  //       npc_state.state = NPC_END;
+  //       break;
 
-      case ABORT:
-      default:
-        npc_state.state = NPC_ABORT;
-        break;
-    }
+  //     case ABORT:
+  //     default:
+  //       npc_state.state = NPC_ABORT;
+  //       break;
+  //   }
 
-    Verilated::gotFinish(true);
+  //   Verilated::gotFinish(true);
+  // }
+  npc_state.halt_ret = top->rootp->rv32e__DOT__register_files_inst__DOT__regs[10]; //a0
+  npc_state.halt_pc = top->rootp->rv32e__DOT__pc_now;
+
+  // Log("Ebreak takes place in the %s", names);
+  Log("maintime = %ld, state = %d, pc = 0x%08x, inst = 0x%08x", main_time, npc_state.state, top->rootp->rv32e__DOT__pc_now, top->rootp->rv32e__DOT__inst);
+
+  switch(station)
+  {
+    case HIT_TRAP:
+      npc_state.state = NPC_END;
+      break;
+
+    case ABORT:
+    default:
+      npc_state.state = NPC_ABORT;
+      break;
   }
+
+  Verilated::gotFinish(true);
 }
 
 extern "C" word_t pmem_read(paddr_t raddr,int len){
-  if(main_time >= start_time+1) return pmem_r(raddr, len);
-  return 0xdeafbeef;
+  // if(main_time >= start_time+1) return pmem_r(raddr, len);
+  // return 0xdeafbeef;
+  return pmem_r(raddr,len);
 }
 
 extern "C" void pmem_write(paddr_t waddr,word_t wdata,int len){
-  if(main_time >= start_time+1) pmem_w(waddr, len, wdata);
+  // if(main_time >= start_time+1) pmem_w(waddr, len, wdata);
+  pmem_w(waddr,len,wdata);
 }
 
 int is_exit_status_bad() {

@@ -3,6 +3,7 @@
 #include "../obj_dir/Vrv32e___024root.h"
 #include "../include/common.h"
 #include "../include/debug.h"
+#include "../include/reg.h"
 
 
 /********extern functions or variables********/
@@ -64,8 +65,9 @@ static inline bool in_pmem(paddr_t addr) {
 }
 
 static inline void out_of_bound(paddr_t addr) {
+  regs_display();
   panic("address = 0x%08x is out of bound of pmem [0x%08x, 0x%08x] at pc = 0x%08x  time = %ld", 
-         addr, PMEM_LEFT, PMEM_RIGHT, top->rootp->rv32e__DOT__pc, main_time);
+         addr, PMEM_LEFT, PMEM_RIGHT, top->rootp->rv32e__DOT__pc_now, main_time);
 }
 
 word_t pmem_r(paddr_t addr, int len) 

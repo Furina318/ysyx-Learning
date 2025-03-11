@@ -36,9 +36,9 @@ static void statistic() {
 static void execute_once() 
 {
     //观察波形图可以发现，执行reset后第一条指令已经执行了1/3，即取指、译码部分已经完成，此时的pc为当前pc，执行剩下的2/3后pc为dnpc
-    PCSet.pc = top->rootp->rv32e__DOT__pc;  PCSet.inst = top->rootp->rv32e__DOT__inst;
+    PCSet.pc = top->rootp->rv32e__DOT__pc_now;  PCSet.inst = top->rootp->rv32e__DOT__inst;
     single_cycle();  //single_cycle();  single_cycle();      // take 3 cycles to excute one instruction
-    PCSet.next_pc = top->rootp->rv32e__DOT__pc;  PCSet.ninst = top->rootp->rv32e__DOT__inst;
+    PCSet.next_pc = top->rootp->rv32e__DOT__pc_now;  PCSet.ninst = top->rootp->rv32e__DOT__inst;
 }
 
 static void execute(uint64_t n) 

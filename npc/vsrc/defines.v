@@ -66,22 +66,6 @@
 `define INST_EBREAK   32'b00000000000000000000000001110011
 `define HIT_TRAP      1
 `define ABORT         2
-// `define Unit_ALU      0   //alu
-// `define Unit_MEM      1   //memory
-// `define Unit_CU1      2   //contril unit
-// `define Unit_CU2      3   
-// `define Unit_CU3      4   
-// `define Unit_CU4      5   
-// `define Unit_CU5      6   
-// `define Unit_CU6      7   
-// `define Unit_CU7      8   
-// `define Unit_CU8      9   
-// `define Unit_CU9      10   
-// `define Unit_CU10     11   
-// `define Unit_CU11     12   
-// `define Unit_IE1      13   //imm extended unit
-// `define Unit_IE2      14  
-// `define Unit_IE3      15 
 
 
 // type
@@ -122,14 +106,6 @@
 
 
 // ALU
-// `define ADD       5'b00000
-// `define SUB       5'b00001
-// `define SLL       5'b00010
-// `define XOR       5'b00011
-// `define SRL       5'b00100
-// `define SRA       5'b00101
-// `define OR        5'b00110
-// `define AND       5'b00111
 `define ADD       4'b0000
 `define SUB       4'b1000
 `define SLL       4'b0001

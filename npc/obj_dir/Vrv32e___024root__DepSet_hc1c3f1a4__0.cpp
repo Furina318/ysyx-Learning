@@ -8,6 +8,20 @@
 #include "Vrv32e__Syms.h"
 #include "Vrv32e___024root.h"
 
+extern "C" unsigned int pmem_read(unsigned int raddr, int len);
+
+VL_INLINE_OPT void Vrv32e___024root____Vdpiimwrap_rv32e__DOT__pmem_read_TOP(IData/*31:0*/ raddr, IData/*31:0*/ len, IData/*31:0*/ &pmem_read__Vfuncrtn) {
+    VL_DEBUG_IF(VL_DBG_MSGF("+    Vrv32e___024root____Vdpiimwrap_rv32e__DOT__pmem_read_TOP\n"); );
+    // Body
+    unsigned int raddr__Vcvt;
+    for (size_t raddr__Vidx = 0; raddr__Vidx < 1; ++raddr__Vidx) raddr__Vcvt = raddr;
+    int len__Vcvt;
+    for (size_t len__Vidx = 0; len__Vidx < 1; ++len__Vidx) len__Vcvt = len;
+    unsigned int pmem_read__Vfuncrtn__Vcvt;
+    pmem_read__Vfuncrtn__Vcvt = pmem_read(raddr__Vcvt, len__Vcvt);
+    pmem_read__Vfuncrtn = pmem_read__Vfuncrtn__Vcvt;
+}
+
 extern "C" void ebreak(int station, int inst);
 
 VL_INLINE_OPT void Vrv32e___024root____Vdpiimwrap_rv32e__DOT__imm_gen_inst__DOT__ebreak_TOP(IData/*31:0*/ station, IData/*31:0*/ inst) {
@@ -18,20 +32,6 @@ VL_INLINE_OPT void Vrv32e___024root____Vdpiimwrap_rv32e__DOT__imm_gen_inst__DOT_
     int inst__Vcvt;
     for (size_t inst__Vidx = 0; inst__Vidx < 1; ++inst__Vidx) inst__Vcvt = inst;
     ebreak(station__Vcvt, inst__Vcvt);
-}
-
-extern "C" unsigned int pmem_read(unsigned int raddr, int len);
-
-VL_INLINE_OPT void Vrv32e___024root____Vdpiimwrap_rv32e__DOT__mem_inst__DOT__pmem_read_TOP(IData/*31:0*/ raddr, IData/*31:0*/ len, IData/*31:0*/ &pmem_read__Vfuncrtn) {
-    VL_DEBUG_IF(VL_DBG_MSGF("+    Vrv32e___024root____Vdpiimwrap_rv32e__DOT__mem_inst__DOT__pmem_read_TOP\n"); );
-    // Body
-    unsigned int raddr__Vcvt;
-    for (size_t raddr__Vidx = 0; raddr__Vidx < 1; ++raddr__Vidx) raddr__Vcvt = raddr;
-    int len__Vcvt;
-    for (size_t len__Vidx = 0; len__Vidx < 1; ++len__Vidx) len__Vcvt = len;
-    unsigned int pmem_read__Vfuncrtn__Vcvt;
-    pmem_read__Vfuncrtn__Vcvt = pmem_read(raddr__Vcvt, len__Vcvt);
-    pmem_read__Vfuncrtn = pmem_read__Vfuncrtn__Vcvt;
 }
 
 extern "C" void pmem_write(unsigned int waddr, unsigned int wdata, int len);

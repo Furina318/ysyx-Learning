@@ -9,6 +9,7 @@ module contr_gen(
     output reg [3:0] ALUctr,     // ALU操作控制
     output reg MemtoReg,         // 寄存器写回数据来源
     output reg MemWr,            // 数据存储器写控制
+    output reg MemRd,            // 数据存储器读控制
     output reg [2:0] MemOP,      // 数据存储器读写格式
     output reg [2:0] Branch      // 分支和跳转种类
 );
@@ -32,6 +33,7 @@ module contr_gen(
         ALUctr = `ADD;
         MemtoReg = 1'b0;
         MemWr = 1'b0;
+        MemRd = 1'b0;
         MemOP = 3'b000;
         Branch = `Branch_None;
 
@@ -93,6 +95,7 @@ module contr_gen(
             // Load 指令
             `INST_TYPE_L: begin
                 i_type = `INST_I; // I-type 立即数
+                MemRd = 1'b1;
                 RegWr = 1'b1;   // 写回寄存器
                 ALUAsrc = 1'b0; // ALU A 输入选择 rs1
                 ALUBsrc = 2'b01; // ALU B 输入选择 imm

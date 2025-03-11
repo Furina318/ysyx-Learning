@@ -18,9 +18,9 @@ extern "C" {
     // DPI IMPORTS
     // DPI import at /home/furina/ysyx-workbench/npc/vsrc/imm_gen.v:8:34
     extern void ebreak(int station, int inst);
-    // DPI import at /home/furina/ysyx-workbench/npc/vsrc/mem.v:15:42
+    // DPI import at /home/furina/ysyx-workbench/npc/vsrc/rv32e.v:45:42
     extern unsigned int pmem_read(unsigned int raddr, int len);
-    // DPI import at /home/furina/ysyx-workbench/npc/vsrc/mem.v:16:34
+    // DPI import at /home/furina/ysyx-workbench/npc/vsrc/mem.v:17:34
     extern void pmem_write(unsigned int waddr, unsigned int wdata, int len);
 
 #ifdef __cplusplus
