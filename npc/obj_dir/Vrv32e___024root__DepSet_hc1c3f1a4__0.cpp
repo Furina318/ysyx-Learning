@@ -57,14 +57,9 @@ void Vrv32e___024root___eval_triggers__act(Vrv32e___024root* vlSelf) {
     Vrv32e__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vrv32e___024root___eval_triggers__act\n"); );
     // Body
-    vlSelf->__VactTriggered.at(0U) = (((IData)(vlSelf->clk) 
-                                       & (~ (IData)(vlSelf->__Vtrigrprev__TOP__clk))) 
-                                      | ((IData)(vlSelf->rst) 
-                                         & (~ (IData)(vlSelf->__Vtrigrprev__TOP__rst))));
-    vlSelf->__VactTriggered.at(1U) = ((IData)(vlSelf->clk) 
+    vlSelf->__VactTriggered.at(0U) = ((IData)(vlSelf->clk) 
                                       & (~ (IData)(vlSelf->__Vtrigrprev__TOP__clk)));
     vlSelf->__Vtrigrprev__TOP__clk = vlSelf->clk;
-    vlSelf->__Vtrigrprev__TOP__rst = vlSelf->rst;
 #ifdef VL_DEBUG
     if (VL_UNLIKELY(vlSymsp->_vm_contextp__->debug())) {
         Vrv32e___024root___dump_triggers__act(vlSelf);

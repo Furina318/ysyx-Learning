@@ -106,12 +106,12 @@ void single_cycle(void)
   }
 }
 
-static void reset(void)
-{
-  top->rst = 0; single_cycle();
-  top->rst = 1; single_cycle();
-  top->rst = 0; 
-}
+// static void reset(void)
+// {
+//   top->rst = 0; single_cycle();
+//   top->rst = 1; single_cycle();
+//   top->rst = 0; 
+// }
 
 static void init_verilator(void)
 {
@@ -120,7 +120,7 @@ static void init_verilator(void)
   top->trace(tfp, 0);
   tfp->open("wave.vcd"); //打开vcd
 
-  reset();  //复位
+  // reset();  //复位
 }
 
 int main(int argc, char *argv[])

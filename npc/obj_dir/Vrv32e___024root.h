@@ -14,7 +14,6 @@ class Vrv32e___024root final : public VerilatedModule {
 
     // DESIGN SPECIFIC STATE
     VL_IN8(clk,0,0);
-    VL_IN8(rst,0,0);
     CData/*0:0*/ rv32e__DOT__less;
     CData/*0:0*/ rv32e__DOT__zero;
     CData/*2:0*/ rv32e__DOT__i_type;
@@ -34,18 +33,17 @@ class Vrv32e___024root final : public VerilatedModule {
     CData/*2:0*/ rv32e__DOT__mem_op_reg;
     CData/*0:0*/ rv32e__DOT__mem_to_reg_reg;
     CData/*0:0*/ __Vtrigrprev__TOP__clk;
-    CData/*0:0*/ __Vtrigrprev__TOP__rst;
     CData/*0:0*/ __VactContinue;
     IData/*31:0*/ rv32e__DOT__pc_now;
     IData/*31:0*/ rv32e__DOT__pc_next;
     IData/*31:0*/ rv32e__DOT__inst;
+    IData/*31:0*/ rv32e__DOT__inst_next;
     IData/*31:0*/ rv32e__DOT__imm;
     IData/*31:0*/ rv32e__DOT__rs1_data;
     IData/*31:0*/ rv32e__DOT__rs2_data;
     IData/*31:0*/ rv32e__DOT__alu_result;
     IData/*31:0*/ rv32e__DOT__alu_result_reg;
     IData/*31:0*/ rv32e__DOT__mem_data_out;
-    IData/*31:0*/ rv32e__DOT__inst_next;
     IData/*31:0*/ rv32e__DOT__pc_inst__DOT__PCa;
     IData/*31:0*/ rv32e__DOT__pc_inst__DOT__PCb;
     IData/*31:0*/ rv32e__DOT__register_files_inst__DOT__i;
@@ -56,15 +54,13 @@ class Vrv32e___024root final : public VerilatedModule {
     IData/*31:0*/ rv32e__DOT__alu_inst__DOT__shift_out;
     IData/*31:0*/ __Vfunc_rv32e__DOT__mem_inst__DOT__pmem_read__36__Vfuncout;
     IData/*31:0*/ __Vfunc_rv32e__DOT__mem_inst__DOT__pmem_read__37__Vfuncout;
-    IData/*31:0*/ __Vdly__rv32e__DOT__pc_now;
-    IData/*31:0*/ __Vdly__rv32e__DOT__inst;
     IData/*31:0*/ __VstlIterCount;
     IData/*31:0*/ __VactIterCount;
     VlUnpacked<IData/*31:0*/, 32> rv32e__DOT__register_files_inst__DOT__regs;
-    VlUnpacked<CData/*0:0*/, 3> __Vm_traceActivity;
+    VlUnpacked<CData/*0:0*/, 2> __Vm_traceActivity;
     VlTriggerVec<1> __VstlTriggered;
-    VlTriggerVec<2> __VactTriggered;
-    VlTriggerVec<2> __VnbaTriggered;
+    VlTriggerVec<1> __VactTriggered;
+    VlTriggerVec<1> __VnbaTriggered;
 
     // INTERNAL VARIABLES
     Vrv32e__Syms* const vlSymsp;

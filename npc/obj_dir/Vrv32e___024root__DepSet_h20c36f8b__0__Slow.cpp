@@ -21,11 +21,9 @@ VL_ATTR_COLD void Vrv32e___024root___eval_initial(Vrv32e___024root* vlSelf) {
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vrv32e___024root___eval_initial\n"); );
     // Body
     Vrv32e___024root___eval_initial__TOP(vlSelf);
-    vlSelf->__Vm_traceActivity[2U] = 1U;
     vlSelf->__Vm_traceActivity[1U] = 1U;
     vlSelf->__Vm_traceActivity[0U] = 1U;
     vlSelf->__Vtrigrprev__TOP__clk = vlSelf->clk;
-    vlSelf->__Vtrigrprev__TOP__rst = vlSelf->rst;
 }
 
 void Vrv32e___024root____Vdpiimwrap_rv32e__DOT__pmem_read_TOP(IData/*31:0*/ raddr, IData/*31:0*/ len, IData/*31:0*/ &pmem_read__Vfuncrtn);
@@ -46,6 +44,8 @@ VL_ATTR_COLD void Vrv32e___024root___eval_initial__TOP(Vrv32e___024root* vlSelf)
     vlSelf->rv32e__DOT__mem_rd_reg = 0U;
     vlSelf->rv32e__DOT__mem_op_reg = 0U;
     vlSelf->rv32e__DOT__mem_to_reg_reg = 0U;
+    VL_WRITEF("Initial pc_now=80000000, inst=%x\n",
+              32,vlSelf->rv32e__DOT__inst);
     vlSelf->rv32e__DOT__pc_next = 0x80000000U;
     vlSelf->rv32e__DOT__register_files_inst__DOT__regs[0U] = 0U;
     vlSelf->rv32e__DOT__register_files_inst__DOT__regs[1U] = 0U;
@@ -145,7 +145,7 @@ VL_ATTR_COLD void Vrv32e___024root___stl_sequent__TOP__0(Vrv32e___024root* vlSel
     Vrv32e__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vrv32e___024root___stl_sequent__TOP__0\n"); );
     // Body
-    Vrv32e___024root____Vdpiimwrap_rv32e__DOT__pmem_read_TOP(vlSelf->rv32e__DOT__pc_now, 4U, vlSelf->__Vfunc_rv32e__DOT__mem_inst__DOT__pmem_read__36__Vfuncout);
+    Vrv32e___024root____Vdpiimwrap_rv32e__DOT__pmem_read_TOP(vlSelf->rv32e__DOT__pc_next, 4U, vlSelf->__Vfunc_rv32e__DOT__mem_inst__DOT__pmem_read__36__Vfuncout);
     vlSelf->rv32e__DOT__inst_next = vlSelf->__Vfunc_rv32e__DOT__mem_inst__DOT__pmem_read__36__Vfuncout;
     Vrv32e___024root____Vdpiimwrap_rv32e__DOT__pmem_read_TOP(vlSelf->rv32e__DOT__alu_result_reg, 4U, vlSelf->__Vfunc_rv32e__DOT__mem_inst__DOT__pmem_read__37__Vfuncout);
     vlSelf->rv32e__DOT__mem_inst__DOT__read_data = vlSelf->__Vfunc_rv32e__DOT__mem_inst__DOT__pmem_read__37__Vfuncout;
@@ -683,7 +683,6 @@ VL_ATTR_COLD void Vrv32e___024root___eval_stl(Vrv32e___024root* vlSelf) {
     // Body
     if (vlSelf->__VstlTriggered.at(0U)) {
         Vrv32e___024root___stl_sequent__TOP__0(vlSelf);
-        vlSelf->__Vm_traceActivity[2U] = 1U;
         vlSelf->__Vm_traceActivity[1U] = 1U;
         vlSelf->__Vm_traceActivity[0U] = 1U;
     }
@@ -699,10 +698,7 @@ VL_ATTR_COLD void Vrv32e___024root___dump_triggers__act(Vrv32e___024root* vlSelf
         VL_DBG_MSGF("         No triggers active\n");
     }
     if (vlSelf->__VactTriggered.at(0U)) {
-        VL_DBG_MSGF("         'act' region trigger index 0 is active: @(posedge clk or posedge rst)\n");
-    }
-    if (vlSelf->__VactTriggered.at(1U)) {
-        VL_DBG_MSGF("         'act' region trigger index 1 is active: @(posedge clk)\n");
+        VL_DBG_MSGF("         'act' region trigger index 0 is active: @(posedge clk)\n");
     }
 }
 #endif  // VL_DEBUG
@@ -717,10 +713,7 @@ VL_ATTR_COLD void Vrv32e___024root___dump_triggers__nba(Vrv32e___024root* vlSelf
         VL_DBG_MSGF("         No triggers active\n");
     }
     if (vlSelf->__VnbaTriggered.at(0U)) {
-        VL_DBG_MSGF("         'nba' region trigger index 0 is active: @(posedge clk or posedge rst)\n");
-    }
-    if (vlSelf->__VnbaTriggered.at(1U)) {
-        VL_DBG_MSGF("         'nba' region trigger index 1 is active: @(posedge clk)\n");
+        VL_DBG_MSGF("         'nba' region trigger index 0 is active: @(posedge clk)\n");
     }
 }
 #endif  // VL_DEBUG
@@ -731,10 +724,10 @@ VL_ATTR_COLD void Vrv32e___024root___ctor_var_reset(Vrv32e___024root* vlSelf) {
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vrv32e___024root___ctor_var_reset\n"); );
     // Body
     vlSelf->clk = VL_RAND_RESET_I(1);
-    vlSelf->rst = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__pc_now = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__pc_next = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__inst = VL_RAND_RESET_I(32);
+    vlSelf->rv32e__DOT__inst_next = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__imm = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__rs1_data = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__rs2_data = VL_RAND_RESET_I(32);
@@ -759,7 +752,6 @@ VL_ATTR_COLD void Vrv32e___024root___ctor_var_reset(Vrv32e___024root* vlSelf) {
     vlSelf->rv32e__DOT__mem_rd_reg = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__mem_op_reg = VL_RAND_RESET_I(3);
     vlSelf->rv32e__DOT__mem_to_reg_reg = VL_RAND_RESET_I(1);
-    vlSelf->rv32e__DOT__inst_next = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__pc_inst__DOT__PCa = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__pc_inst__DOT__PCb = VL_RAND_RESET_I(32);
     for (int __Vi0 = 0; __Vi0 < 32; ++__Vi0) {
@@ -773,11 +765,8 @@ VL_ATTR_COLD void Vrv32e___024root___ctor_var_reset(Vrv32e___024root* vlSelf) {
     vlSelf->rv32e__DOT__alu_inst__DOT__shift_out = VL_RAND_RESET_I(32);
     vlSelf->__Vfunc_rv32e__DOT__mem_inst__DOT__pmem_read__36__Vfuncout = 0;
     vlSelf->__Vfunc_rv32e__DOT__mem_inst__DOT__pmem_read__37__Vfuncout = 0;
-    vlSelf->__Vdly__rv32e__DOT__pc_now = VL_RAND_RESET_I(32);
-    vlSelf->__Vdly__rv32e__DOT__inst = VL_RAND_RESET_I(32);
     vlSelf->__Vtrigrprev__TOP__clk = VL_RAND_RESET_I(1);
-    vlSelf->__Vtrigrprev__TOP__rst = VL_RAND_RESET_I(1);
-    for (int __Vi0 = 0; __Vi0 < 3; ++__Vi0) {
+    for (int __Vi0 = 0; __Vi0 < 2; ++__Vi0) {
         vlSelf->__Vm_traceActivity[__Vi0] = 0;
     }
 }
