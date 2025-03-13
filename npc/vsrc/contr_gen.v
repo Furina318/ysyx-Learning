@@ -48,7 +48,8 @@ module contr_gen(
                     RegWr = 1'b1;   // 写回寄存器
                     ALUAsrc = 1'b0; // ALU A 输入选择 rs1
                     ALUBsrc = 2'b01; // ALU B 输入选择 imm
-                    ALUctr = `ADD; // ADD
+                    ALUctr = `DIR; // DIR
+                    Branch = `Branch_None;
                 end
 
                 // AUIPC 指令
@@ -58,6 +59,7 @@ module contr_gen(
                     ALUAsrc = 1'b1; // ALU A 输入选择 PC
                     ALUBsrc = 2'b01; // ALU B 输入选择 imm
                     ALUctr = `ADD; // ADD
+                    Branch = `Branch_None;
                 end
 
                 // I-type 指令（立即数运算）

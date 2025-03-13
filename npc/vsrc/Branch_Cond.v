@@ -8,7 +8,8 @@ module Branch_Cond(
     output reg PCBsrc
 );
     import "DPI-C" function void ebreak(input int station, input int inst);
-
+    // PCAsrc 0:imm   1时候:4
+    // PCBsrc 0:rs1   1时候:pc
     always @(*) begin
         if(rst) begin
             PCAsrc=1'b0;
