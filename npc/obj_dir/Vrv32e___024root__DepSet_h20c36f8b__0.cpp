@@ -445,7 +445,8 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSe
                         vlSelf->rv32e__DOT__reg_wr = 1U;
                         vlSelf->rv32e__DOT__alu_a_src = 0U;
                         vlSelf->rv32e__DOT__alu_b_src = 1U;
-                        vlSelf->rv32e__DOT__alu_ctr = 0U;
+                        vlSelf->rv32e__DOT__alu_ctr = 3U;
+                        vlSelf->rv32e__DOT__branch = 0U;
                     } else if (VL_UNLIKELY((0ULL != VL_TIME_UNITED_Q(1)))) {
                         Vrv32e___024root____Vdpiimwrap_rv32e__DOT__imm_gen_inst__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__inst);
                         VL_WRITEF("contr_gen : Unknown instruction with inst = %x\n",
@@ -568,6 +569,7 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSe
                     vlSelf->rv32e__DOT__alu_a_src = 1U;
                     vlSelf->rv32e__DOT__alu_b_src = 1U;
                     vlSelf->rv32e__DOT__alu_ctr = 0U;
+                    vlSelf->rv32e__DOT__branch = 0U;
                 } else if (VL_UNLIKELY((0ULL != VL_TIME_UNITED_Q(1)))) {
                     Vrv32e___024root____Vdpiimwrap_rv32e__DOT__imm_gen_inst__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__inst);
                     VL_WRITEF("contr_gen : Unknown instruction with inst = %x\n",
