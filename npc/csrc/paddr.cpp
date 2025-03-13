@@ -4,11 +4,15 @@
 #include "../include/common.h"
 #include "../include/debug.h"
 #include "../include/reg.h"
+#include "../include/utils.h"
 
 
 /********extern functions or variables********/
 extern Vrv32e *top;
 extern vluint64_t main_time;
+// extern void ebreak(int station, int inst);
+// extern NPCState npc_state;
+extern void die();
 /*********************************************/
 
 
@@ -66,8 +70,12 @@ static inline bool in_pmem(paddr_t addr) {
 
 static inline void out_of_bound(paddr_t addr) {
   regs_display();
-  panic("address = 0x%08x is out of bound of pmem [0x%08x, 0x%08x] at pc = 0x%08x  time = %ld", 
+  printf("address = 0x%08x is out of bound of pmem [0x%08x, 0x%08x] at pc = 0x%08x  time = %ld", 
          addr, PMEM_LEFT, PMEM_RIGHT, top->rootp->rv32e__DOT__pc_now, main_time);
+  npc_state.state=NPC_ABORT;
+  // die();
+  // _Log(ANSI_FG_RED "address = 0x%08x is out of bound of pmem [0x%08x, 0x%08x] at pc = 0x%08x  time = %ld", 
+  //        addr, PMEM_LEFT, PMEM_RIGHT, top->rootp->rv32e__DOT__pc_now, main_time ANSI_NONE);
 }
 
 word_t pmem_r(paddr_t addr, int len) 

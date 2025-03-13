@@ -24,7 +24,7 @@ extern word_t   host_read(void *addr, int len);
 extern word_t   expr(char *e);
 extern "C" void     pmem_write(paddr_t waddr,word_t wdata,int len);
 extern "C" word_t   pmem_read(paddr_t raddr,int len);
-extern NPCState npc_state;
+// extern NPCState npc_state;
 /*********************************************/
 
 /* We use the `readline' library to provide more flexibility to read from stdin. */

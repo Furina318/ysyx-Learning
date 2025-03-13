@@ -20,13 +20,14 @@ static const char *regs[] = {
 void regs_display() 
 {
     _Log(ANSI_FG_RED "RegName  Hex_Value       Dec_Value\n" ANSI_NONE);
-    _Log(ANSI_FG_YELLOW "$%s\t" ANSI_NONE " 0x%08x\t %010u\n", "pc", 
-         top->rootp->rv32e__DOT__pc_now, top->rootp->rv32e__DOT__pc_now);
     for(int i = 0; i < 32; i++)
     {
         _Log(ANSI_FG_YELLOW "$%s\t " ANSI_NONE, regs[i]);
         _Log("0x%08x\t %010u\n", gpr[i], gpr[i]);
     }
+    puts("");
+    _Log(ANSI_FG_YELLOW "$%s\t" ANSI_NONE " 0x%08x\t %010u\n", "pc", 
+        top->rootp->rv32e__DOT__pc_now, top->rootp->rv32e__DOT__pc_now);
 }
 
 word_t single_reg_display(char *reg_name) 
