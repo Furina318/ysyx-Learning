@@ -1,7 +1,7 @@
 `include "/home/furina/ysyx-workbench/npc/vsrc/defines.v"
 
 module contr_gen(
-    // input clk,
+    input clk,
     input rst,
     input [31:0] inst,           // 输入指令
     output reg [2:0] i_type,      // 立即数产生器输出类型
@@ -26,7 +26,7 @@ module contr_gen(
     assign func3 = inst[14:12];
     assign func7 = inst[31:25];
 
-    always @(*) begin
+    always @(posedge clk) begin
         // 默认值
         if (rst) begin
             i_type = 3'b000;

@@ -40,8 +40,7 @@ class Vrv32e___024root final : public VerilatedModule {
     IData/*31:0*/ rv32e__DOT__rs2_data;
     IData/*31:0*/ rv32e__DOT__alu_result;
     IData/*31:0*/ rv32e__DOT__mem_data_out;
-    IData/*31:0*/ rv32e__DOT__pc_inst__DOT__PCa;
-    IData/*31:0*/ rv32e__DOT__pc_inst__DOT__PCb;
+    IData/*31:0*/ rv32e__DOT__time_counter;
     IData/*31:0*/ rv32e__DOT__register_files_inst__DOT__unnamedblk1__DOT__i;
     IData/*31:0*/ rv32e__DOT__mem_inst__DOT__read_data;
     IData/*31:0*/ rv32e__DOT__mem_inst__DOT__temp_data;
@@ -61,7 +60,7 @@ class Vrv32e___024root final : public VerilatedModule {
     IData/*31:0*/ __VicoIterCount;
     IData/*31:0*/ __VactIterCount;
     VlUnpacked<IData/*31:0*/, 32> rv32e__DOT__register_files_inst__DOT__regs;
-    VlUnpacked<CData/*0:0*/, 5> __Vm_traceActivity;
+    VlUnpacked<CData/*0:0*/, 6> __Vm_traceActivity;
     VlTriggerVec<1> __VstlTriggered;
     VlTriggerVec<1> __VicoTriggered;
     VlTriggerVec<2> __VactTriggered;

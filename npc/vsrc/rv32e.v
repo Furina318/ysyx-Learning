@@ -37,18 +37,20 @@ module rv32e (
     wire [4:0] rs2 = inst[24:20];
     wire [4:0] rd  = inst[11:7];
 
+    reg [31:0] time_counter;
     import "DPI-C" function int unsigned pmem_read(input int unsigned raddr, input int len);
 
     // PC 更新
     always @(posedge clk) begin
         if (rst) begin
             pc_now <= 32'h80000000;
-            // pc_a_src <= 1'b0;
-            // pc_b_src <= 1'b0;
+            //pc_next <= 32'h80000004;
+            time_counter <= 0;
             $display("Rv32e reset: PC: 0x%08x | PC_next: 0x%08x", pc_now, pc_next);
         end else begin
             pc_now <= pc_next;
-            $display("Time: %0t | PC = 0x%08x | Inst = 0x%08x | ALU Result = 0x%08x", $time, pc_now, inst, alu_result);
+            time_counter <= time_counter+1;
+            $display("Time: %0d | PC = 0x%08x | Inst = 0x%08x | ALU Result = 0x%08x", time_counter, pc_now, inst, alu_result);
         end
     end
     
@@ -87,6 +89,7 @@ module rv32e (
 
     // 控制信号生成器实例化
     contr_gen contr_gen_inst (
+        .clk(clk),
         .rst(rst),
         .inst(inst),
         .i_type(i_type),

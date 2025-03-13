@@ -83,383 +83,18 @@ VL_ATTR_COLD void Vrv32e___024root___stl_sequent__TOP__0(Vrv32e___024root* vlSel
     Vrv32e__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vrv32e___024root___stl_sequent__TOP__0\n"); );
     // Body
-    vlSelf->rv32e__DOT__rs1_data = ((0U == (0x1fU & 
-                                            (vlSelf->rv32e__DOT__inst 
-                                             >> 0xfU)))
-                                     ? 0U : vlSelf->rv32e__DOT__register_files_inst__DOT__regs
-                                    [(0x1fU & (vlSelf->rv32e__DOT__inst 
-                                               >> 0xfU))]);
     vlSelf->rv32e__DOT__rs2_data = ((0U == (0x1fU & 
                                             (vlSelf->rv32e__DOT__inst 
                                              >> 0x14U)))
                                      ? 0U : vlSelf->rv32e__DOT__register_files_inst__DOT__regs
                                     [(0x1fU & (vlSelf->rv32e__DOT__inst 
                                                >> 0x14U))]);
-    if (vlSelf->rst) {
-        vlSelf->rv32e__DOT__i_type = 0U;
-        vlSelf->rv32e__DOT__reg_wr = 0U;
-        vlSelf->rv32e__DOT__alu_a_src = 0U;
-        vlSelf->rv32e__DOT__alu_b_src = 0U;
-        vlSelf->rv32e__DOT__alu_ctr = 0U;
-        vlSelf->rv32e__DOT__mem_to_reg = 0U;
-        vlSelf->rv32e__DOT__mem_wr = 0U;
-        vlSelf->rv32e__DOT__mem_rd = 0U;
-        vlSelf->rv32e__DOT__mem_op = 0U;
-        vlSelf->rv32e__DOT__branch = 0U;
-    } else if ((0x40U & vlSelf->rv32e__DOT__inst)) {
-        if ((0x20U & vlSelf->rv32e__DOT__inst)) {
-            if ((0x10U & vlSelf->rv32e__DOT__inst)) {
-                if ((8U & vlSelf->rv32e__DOT__inst)) {
-                    if (VL_UNLIKELY((0ULL != VL_TIME_UNITED_Q(1)))) {
-                        Vrv32e___024root____Vdpiimwrap_rv32e__DOT__imm_gen_inst__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__inst);
-                        VL_WRITEF("contr_gen : Unknown instruction with inst = %x\n",
-                                  32,vlSelf->rv32e__DOT__inst);
-                    }
-                } else if ((4U & vlSelf->rv32e__DOT__inst)) {
-                    if (VL_UNLIKELY((0ULL != VL_TIME_UNITED_Q(1)))) {
-                        Vrv32e___024root____Vdpiimwrap_rv32e__DOT__imm_gen_inst__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__inst);
-                        VL_WRITEF("contr_gen : Unknown instruction with inst = %x\n",
-                                  32,vlSelf->rv32e__DOT__inst);
-                    }
-                } else if ((2U & vlSelf->rv32e__DOT__inst)) {
-                    if ((1U & vlSelf->rv32e__DOT__inst)) {
-                        if (VL_UNLIKELY((0x73U == vlSelf->rv32e__DOT__inst))) {
-                            Vrv32e___024root____Vdpiimwrap_rv32e__DOT__imm_gen_inst__DOT__ebreak_TOP(1U, vlSelf->rv32e__DOT__inst);
-                            VL_WRITEF("ebreak instruction\n");
-                        }
-                    } else if (VL_UNLIKELY((0ULL != VL_TIME_UNITED_Q(1)))) {
-                        Vrv32e___024root____Vdpiimwrap_rv32e__DOT__imm_gen_inst__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__inst);
-                        VL_WRITEF("contr_gen : Unknown instruction with inst = %x\n",
-                                  32,vlSelf->rv32e__DOT__inst);
-                    }
-                } else if (VL_UNLIKELY((0ULL != VL_TIME_UNITED_Q(1)))) {
-                    Vrv32e___024root____Vdpiimwrap_rv32e__DOT__imm_gen_inst__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__inst);
-                    VL_WRITEF("contr_gen : Unknown instruction with inst = %x\n",
-                              32,vlSelf->rv32e__DOT__inst);
-                }
-            } else if ((8U & vlSelf->rv32e__DOT__inst)) {
-                if ((4U & vlSelf->rv32e__DOT__inst)) {
-                    if ((2U & vlSelf->rv32e__DOT__inst)) {
-                        if ((1U & vlSelf->rv32e__DOT__inst)) {
-                            vlSelf->rv32e__DOT__i_type = 4U;
-                            vlSelf->rv32e__DOT__reg_wr = 1U;
-                            vlSelf->rv32e__DOT__alu_a_src = 1U;
-                            vlSelf->rv32e__DOT__alu_b_src = 2U;
-                            vlSelf->rv32e__DOT__alu_ctr = 0U;
-                            vlSelf->rv32e__DOT__branch = 1U;
-                        } else if (VL_UNLIKELY((0ULL 
-                                                != VL_TIME_UNITED_Q(1)))) {
-                            Vrv32e___024root____Vdpiimwrap_rv32e__DOT__imm_gen_inst__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__inst);
-                            VL_WRITEF("contr_gen : Unknown instruction with inst = %x\n",
-                                      32,vlSelf->rv32e__DOT__inst);
-                        }
-                    } else if (VL_UNLIKELY((0ULL != VL_TIME_UNITED_Q(1)))) {
-                        Vrv32e___024root____Vdpiimwrap_rv32e__DOT__imm_gen_inst__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__inst);
-                        VL_WRITEF("contr_gen : Unknown instruction with inst = %x\n",
-                                  32,vlSelf->rv32e__DOT__inst);
-                    }
-                } else if (VL_UNLIKELY((0ULL != VL_TIME_UNITED_Q(1)))) {
-                    Vrv32e___024root____Vdpiimwrap_rv32e__DOT__imm_gen_inst__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__inst);
-                    VL_WRITEF("contr_gen : Unknown instruction with inst = %x\n",
-                              32,vlSelf->rv32e__DOT__inst);
-                }
-            } else if ((4U & vlSelf->rv32e__DOT__inst)) {
-                if ((2U & vlSelf->rv32e__DOT__inst)) {
-                    if ((1U & vlSelf->rv32e__DOT__inst)) {
-                        vlSelf->rv32e__DOT__i_type = 0U;
-                        vlSelf->rv32e__DOT__reg_wr = 1U;
-                        vlSelf->rv32e__DOT__alu_a_src = 0U;
-                        vlSelf->rv32e__DOT__alu_b_src = 1U;
-                        vlSelf->rv32e__DOT__alu_ctr = 0U;
-                        vlSelf->rv32e__DOT__branch = 2U;
-                    } else if (VL_UNLIKELY((0ULL != VL_TIME_UNITED_Q(1)))) {
-                        Vrv32e___024root____Vdpiimwrap_rv32e__DOT__imm_gen_inst__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__inst);
-                        VL_WRITEF("contr_gen : Unknown instruction with inst = %x\n",
-                                  32,vlSelf->rv32e__DOT__inst);
-                    }
-                } else if (VL_UNLIKELY((0ULL != VL_TIME_UNITED_Q(1)))) {
-                    Vrv32e___024root____Vdpiimwrap_rv32e__DOT__imm_gen_inst__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__inst);
-                    VL_WRITEF("contr_gen : Unknown instruction with inst = %x\n",
-                              32,vlSelf->rv32e__DOT__inst);
-                }
-            } else if ((2U & vlSelf->rv32e__DOT__inst)) {
-                if ((1U & vlSelf->rv32e__DOT__inst)) {
-                    vlSelf->rv32e__DOT__i_type = 3U;
-                    vlSelf->rv32e__DOT__alu_a_src = 0U;
-                    vlSelf->rv32e__DOT__alu_b_src = 0U;
-                    vlSelf->rv32e__DOT__alu_ctr = 2U;
-                    vlSelf->rv32e__DOT__branch = (7U 
-                                                  & (vlSelf->rv32e__DOT__inst 
-                                                     >> 0xcU));
-                } else if (VL_UNLIKELY((0ULL != VL_TIME_UNITED_Q(1)))) {
-                    Vrv32e___024root____Vdpiimwrap_rv32e__DOT__imm_gen_inst__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__inst);
-                    VL_WRITEF("contr_gen : Unknown instruction with inst = %x\n",
-                              32,vlSelf->rv32e__DOT__inst);
-                }
-            } else if (VL_UNLIKELY((0ULL != VL_TIME_UNITED_Q(1)))) {
-                Vrv32e___024root____Vdpiimwrap_rv32e__DOT__imm_gen_inst__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__inst);
-                VL_WRITEF("contr_gen : Unknown instruction with inst = %x\n",
-                          32,vlSelf->rv32e__DOT__inst);
-            }
-        } else if (VL_UNLIKELY((0ULL != VL_TIME_UNITED_Q(1)))) {
-            Vrv32e___024root____Vdpiimwrap_rv32e__DOT__imm_gen_inst__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__inst);
-            VL_WRITEF("contr_gen : Unknown instruction with inst = %x\n",
-                      32,vlSelf->rv32e__DOT__inst);
-        }
-    } else if ((0x20U & vlSelf->rv32e__DOT__inst)) {
-        if ((0x10U & vlSelf->rv32e__DOT__inst)) {
-            if ((8U & vlSelf->rv32e__DOT__inst)) {
-                if (VL_UNLIKELY((0ULL != VL_TIME_UNITED_Q(1)))) {
-                    Vrv32e___024root____Vdpiimwrap_rv32e__DOT__imm_gen_inst__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__inst);
-                    VL_WRITEF("contr_gen : Unknown instruction with inst = %x\n",
-                              32,vlSelf->rv32e__DOT__inst);
-                }
-            } else if ((4U & vlSelf->rv32e__DOT__inst)) {
-                if ((2U & vlSelf->rv32e__DOT__inst)) {
-                    if ((1U & vlSelf->rv32e__DOT__inst)) {
-                        vlSelf->rv32e__DOT__i_type = 1U;
-                        vlSelf->rv32e__DOT__reg_wr = 1U;
-                        vlSelf->rv32e__DOT__alu_a_src = 0U;
-                        vlSelf->rv32e__DOT__alu_b_src = 1U;
-                        vlSelf->rv32e__DOT__alu_ctr = 0U;
-                    } else if (VL_UNLIKELY((0ULL != VL_TIME_UNITED_Q(1)))) {
-                        Vrv32e___024root____Vdpiimwrap_rv32e__DOT__imm_gen_inst__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__inst);
-                        VL_WRITEF("contr_gen : Unknown instruction with inst = %x\n",
-                                  32,vlSelf->rv32e__DOT__inst);
-                    }
-                } else if (VL_UNLIKELY((0ULL != VL_TIME_UNITED_Q(1)))) {
-                    Vrv32e___024root____Vdpiimwrap_rv32e__DOT__imm_gen_inst__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__inst);
-                    VL_WRITEF("contr_gen : Unknown instruction with inst = %x\n",
-                              32,vlSelf->rv32e__DOT__inst);
-                }
-            } else if ((2U & vlSelf->rv32e__DOT__inst)) {
-                if ((1U & vlSelf->rv32e__DOT__inst)) {
-                    vlSelf->rv32e__DOT__i_type = 5U;
-                    vlSelf->rv32e__DOT__reg_wr = 1U;
-                    vlSelf->rv32e__DOT__alu_a_src = 0U;
-                    vlSelf->rv32e__DOT__alu_b_src = 0U;
-                    vlSelf->rv32e__DOT__alu_ctr = (
-                                                   (0x4000U 
-                                                    & vlSelf->rv32e__DOT__inst)
-                                                    ? 
-                                                   ((0x2000U 
-                                                     & vlSelf->rv32e__DOT__inst)
-                                                     ? 
-                                                    ((0x1000U 
-                                                      & vlSelf->rv32e__DOT__inst)
-                                                      ? 7U
-                                                      : 6U)
-                                                     : 
-                                                    ((0x1000U 
-                                                      & vlSelf->rv32e__DOT__inst)
-                                                      ? 
-                                                     ((0x40000000U 
-                                                       & vlSelf->rv32e__DOT__inst)
-                                                       ? 0xdU
-                                                       : 5U)
-                                                      : 4U))
-                                                    : 
-                                                   ((0x2000U 
-                                                     & vlSelf->rv32e__DOT__inst)
-                                                     ? 
-                                                    ((0x1000U 
-                                                      & vlSelf->rv32e__DOT__inst)
-                                                      ? 0xaU
-                                                      : 2U)
-                                                     : 
-                                                    ((0x1000U 
-                                                      & vlSelf->rv32e__DOT__inst)
-                                                      ? 1U
-                                                      : 
-                                                     ((0x40000000U 
-                                                       & vlSelf->rv32e__DOT__inst)
-                                                       ? 8U
-                                                       : 0U))));
-                } else if (VL_UNLIKELY((0ULL != VL_TIME_UNITED_Q(1)))) {
-                    Vrv32e___024root____Vdpiimwrap_rv32e__DOT__imm_gen_inst__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__inst);
-                    VL_WRITEF("contr_gen : Unknown instruction with inst = %x\n",
-                              32,vlSelf->rv32e__DOT__inst);
-                }
-            } else if (VL_UNLIKELY((0ULL != VL_TIME_UNITED_Q(1)))) {
-                Vrv32e___024root____Vdpiimwrap_rv32e__DOT__imm_gen_inst__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__inst);
-                VL_WRITEF("contr_gen : Unknown instruction with inst = %x\n",
-                          32,vlSelf->rv32e__DOT__inst);
-            }
-        } else if ((8U & vlSelf->rv32e__DOT__inst)) {
-            if (VL_UNLIKELY((0ULL != VL_TIME_UNITED_Q(1)))) {
-                Vrv32e___024root____Vdpiimwrap_rv32e__DOT__imm_gen_inst__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__inst);
-                VL_WRITEF("contr_gen : Unknown instruction with inst = %x\n",
-                          32,vlSelf->rv32e__DOT__inst);
-            }
-        } else if ((4U & vlSelf->rv32e__DOT__inst)) {
-            if (VL_UNLIKELY((0ULL != VL_TIME_UNITED_Q(1)))) {
-                Vrv32e___024root____Vdpiimwrap_rv32e__DOT__imm_gen_inst__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__inst);
-                VL_WRITEF("contr_gen : Unknown instruction with inst = %x\n",
-                          32,vlSelf->rv32e__DOT__inst);
-            }
-        } else if ((2U & vlSelf->rv32e__DOT__inst)) {
-            if ((1U & vlSelf->rv32e__DOT__inst)) {
-                vlSelf->rv32e__DOT__i_type = 2U;
-                vlSelf->rv32e__DOT__alu_a_src = 0U;
-                vlSelf->rv32e__DOT__alu_b_src = 1U;
-                vlSelf->rv32e__DOT__alu_ctr = 0U;
-                vlSelf->rv32e__DOT__mem_wr = 1U;
-                if ((0U == (7U & (vlSelf->rv32e__DOT__inst 
-                                  >> 0xcU)))) {
-                    vlSelf->rv32e__DOT__mem_op = 0U;
-                } else if ((1U == (7U & (vlSelf->rv32e__DOT__inst 
-                                         >> 0xcU)))) {
-                    vlSelf->rv32e__DOT__mem_op = 1U;
-                } else if (VL_LIKELY((2U == (7U & (vlSelf->rv32e__DOT__inst 
-                                                   >> 0xcU))))) {
-                    vlSelf->rv32e__DOT__mem_op = 2U;
-                } else {
-                    Vrv32e___024root____Vdpiimwrap_rv32e__DOT__imm_gen_inst__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__inst);
-                    VL_WRITEF("contr_gen : Unknown store instruction with func3 = %b\n",
-                              3,(7U & (vlSelf->rv32e__DOT__inst 
-                                       >> 0xcU)));
-                }
-            } else if (VL_UNLIKELY((0ULL != VL_TIME_UNITED_Q(1)))) {
-                Vrv32e___024root____Vdpiimwrap_rv32e__DOT__imm_gen_inst__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__inst);
-                VL_WRITEF("contr_gen : Unknown instruction with inst = %x\n",
-                          32,vlSelf->rv32e__DOT__inst);
-            }
-        } else if (VL_UNLIKELY((0ULL != VL_TIME_UNITED_Q(1)))) {
-            Vrv32e___024root____Vdpiimwrap_rv32e__DOT__imm_gen_inst__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__inst);
-            VL_WRITEF("contr_gen : Unknown instruction with inst = %x\n",
-                      32,vlSelf->rv32e__DOT__inst);
-        }
-    } else if ((0x10U & vlSelf->rv32e__DOT__inst)) {
-        if ((8U & vlSelf->rv32e__DOT__inst)) {
-            if (VL_UNLIKELY((0ULL != VL_TIME_UNITED_Q(1)))) {
-                Vrv32e___024root____Vdpiimwrap_rv32e__DOT__imm_gen_inst__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__inst);
-                VL_WRITEF("contr_gen : Unknown instruction with inst = %x\n",
-                          32,vlSelf->rv32e__DOT__inst);
-            }
-        } else if ((4U & vlSelf->rv32e__DOT__inst)) {
-            if ((2U & vlSelf->rv32e__DOT__inst)) {
-                if ((1U & vlSelf->rv32e__DOT__inst)) {
-                    vlSelf->rv32e__DOT__i_type = 1U;
-                    vlSelf->rv32e__DOT__reg_wr = 1U;
-                    vlSelf->rv32e__DOT__alu_a_src = 1U;
-                    vlSelf->rv32e__DOT__alu_b_src = 1U;
-                    vlSelf->rv32e__DOT__alu_ctr = 0U;
-                } else if (VL_UNLIKELY((0ULL != VL_TIME_UNITED_Q(1)))) {
-                    Vrv32e___024root____Vdpiimwrap_rv32e__DOT__imm_gen_inst__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__inst);
-                    VL_WRITEF("contr_gen : Unknown instruction with inst = %x\n",
-                              32,vlSelf->rv32e__DOT__inst);
-                }
-            } else if (VL_UNLIKELY((0ULL != VL_TIME_UNITED_Q(1)))) {
-                Vrv32e___024root____Vdpiimwrap_rv32e__DOT__imm_gen_inst__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__inst);
-                VL_WRITEF("contr_gen : Unknown instruction with inst = %x\n",
-                          32,vlSelf->rv32e__DOT__inst);
-            }
-        } else if ((2U & vlSelf->rv32e__DOT__inst)) {
-            if ((1U & vlSelf->rv32e__DOT__inst)) {
-                vlSelf->rv32e__DOT__i_type = 0U;
-                vlSelf->rv32e__DOT__reg_wr = 1U;
-                vlSelf->rv32e__DOT__alu_a_src = 0U;
-                vlSelf->rv32e__DOT__alu_b_src = 1U;
-                vlSelf->rv32e__DOT__alu_ctr = ((0x4000U 
-                                                & vlSelf->rv32e__DOT__inst)
-                                                ? (
-                                                   (0x2000U 
-                                                    & vlSelf->rv32e__DOT__inst)
-                                                    ? 
-                                                   ((0x1000U 
-                                                     & vlSelf->rv32e__DOT__inst)
-                                                     ? 7U
-                                                     : 6U)
-                                                    : 
-                                                   ((0x1000U 
-                                                     & vlSelf->rv32e__DOT__inst)
-                                                     ? 
-                                                    ((0x40000000U 
-                                                      & vlSelf->rv32e__DOT__inst)
-                                                      ? 0xdU
-                                                      : 5U)
-                                                     : 4U))
-                                                : (
-                                                   (0x2000U 
-                                                    & vlSelf->rv32e__DOT__inst)
-                                                    ? 
-                                                   ((0x1000U 
-                                                     & vlSelf->rv32e__DOT__inst)
-                                                     ? 0xaU
-                                                     : 2U)
-                                                    : 
-                                                   ((0x1000U 
-                                                     & vlSelf->rv32e__DOT__inst)
-                                                     ? 1U
-                                                     : 0U)));
-            } else if (VL_UNLIKELY((0ULL != VL_TIME_UNITED_Q(1)))) {
-                Vrv32e___024root____Vdpiimwrap_rv32e__DOT__imm_gen_inst__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__inst);
-                VL_WRITEF("contr_gen : Unknown instruction with inst = %x\n",
-                          32,vlSelf->rv32e__DOT__inst);
-            }
-        } else if (VL_UNLIKELY((0ULL != VL_TIME_UNITED_Q(1)))) {
-            Vrv32e___024root____Vdpiimwrap_rv32e__DOT__imm_gen_inst__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__inst);
-            VL_WRITEF("contr_gen : Unknown instruction with inst = %x\n",
-                      32,vlSelf->rv32e__DOT__inst);
-        }
-    } else if ((8U & vlSelf->rv32e__DOT__inst)) {
-        if (VL_UNLIKELY((0ULL != VL_TIME_UNITED_Q(1)))) {
-            Vrv32e___024root____Vdpiimwrap_rv32e__DOT__imm_gen_inst__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__inst);
-            VL_WRITEF("contr_gen : Unknown instruction with inst = %x\n",
-                      32,vlSelf->rv32e__DOT__inst);
-        }
-    } else if ((4U & vlSelf->rv32e__DOT__inst)) {
-        if (VL_UNLIKELY((0ULL != VL_TIME_UNITED_Q(1)))) {
-            Vrv32e___024root____Vdpiimwrap_rv32e__DOT__imm_gen_inst__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__inst);
-            VL_WRITEF("contr_gen : Unknown instruction with inst = %x\n",
-                      32,vlSelf->rv32e__DOT__inst);
-        }
-    } else if ((2U & vlSelf->rv32e__DOT__inst)) {
-        if ((1U & vlSelf->rv32e__DOT__inst)) {
-            vlSelf->rv32e__DOT__i_type = 0U;
-            vlSelf->rv32e__DOT__mem_rd = 1U;
-            vlSelf->rv32e__DOT__reg_wr = 1U;
-            vlSelf->rv32e__DOT__alu_a_src = 0U;
-            vlSelf->rv32e__DOT__alu_b_src = 1U;
-            vlSelf->rv32e__DOT__alu_ctr = 0U;
-            vlSelf->rv32e__DOT__mem_to_reg = 1U;
-            if ((0x4000U & vlSelf->rv32e__DOT__inst)) {
-                if (VL_UNLIKELY((0x2000U & vlSelf->rv32e__DOT__inst))) {
-                    Vrv32e___024root____Vdpiimwrap_rv32e__DOT__imm_gen_inst__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__inst);
-                    VL_WRITEF("contr_gen : Unknown load instruction with func3 = %b\n",
-                              3,(7U & (vlSelf->rv32e__DOT__inst 
-                                       >> 0xcU)));
-                } else {
-                    vlSelf->rv32e__DOT__mem_op = ((0x1000U 
-                                                   & vlSelf->rv32e__DOT__inst)
-                                                   ? 5U
-                                                   : 4U);
-                }
-            } else if ((0x2000U & vlSelf->rv32e__DOT__inst)) {
-                if (VL_UNLIKELY((0x1000U & vlSelf->rv32e__DOT__inst))) {
-                    Vrv32e___024root____Vdpiimwrap_rv32e__DOT__imm_gen_inst__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__inst);
-                    VL_WRITEF("contr_gen : Unknown load instruction with func3 = %b\n",
-                              3,(7U & (vlSelf->rv32e__DOT__inst 
-                                       >> 0xcU)));
-                } else {
-                    vlSelf->rv32e__DOT__mem_op = 2U;
-                }
-            } else {
-                vlSelf->rv32e__DOT__mem_op = ((0x1000U 
-                                               & vlSelf->rv32e__DOT__inst)
-                                               ? 1U
-                                               : 0U);
-            }
-        } else if (VL_UNLIKELY((0ULL != VL_TIME_UNITED_Q(1)))) {
-            Vrv32e___024root____Vdpiimwrap_rv32e__DOT__imm_gen_inst__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__inst);
-            VL_WRITEF("contr_gen : Unknown instruction with inst = %x\n",
-                      32,vlSelf->rv32e__DOT__inst);
-        }
-    } else if (VL_UNLIKELY((0ULL != VL_TIME_UNITED_Q(1)))) {
-        Vrv32e___024root____Vdpiimwrap_rv32e__DOT__imm_gen_inst__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__inst);
-        VL_WRITEF("contr_gen : Unknown instruction with inst = %x\n",
-                  32,vlSelf->rv32e__DOT__inst);
-    }
+    vlSelf->rv32e__DOT__rs1_data = ((0U == (0x1fU & 
+                                            (vlSelf->rv32e__DOT__inst 
+                                             >> 0xfU)))
+                                     ? 0U : vlSelf->rv32e__DOT__register_files_inst__DOT__regs
+                                    [(0x1fU & (vlSelf->rv32e__DOT__inst 
+                                               >> 0xfU))]);
     if (vlSelf->rst) {
         vlSelf->rv32e__DOT__imm = 0U;
     } else if ((4U & (IData)(vlSelf->rv32e__DOT__i_type))) {
@@ -651,6 +286,13 @@ VL_ATTR_COLD void Vrv32e___024root___stl_sequent__TOP__0(Vrv32e___024root* vlSel
         vlSelf->rv32e__DOT__pc_a_src = 0U;
         vlSelf->rv32e__DOT__pc_b_src = 0U;
     }
+    vlSelf->rv32e__DOT__pc_next = ((IData)(vlSelf->rst)
+                                    ? 0x80000000U : 
+                                   (((IData)(vlSelf->rv32e__DOT__pc_a_src)
+                                      ? vlSelf->rv32e__DOT__imm
+                                      : 4U) + ((IData)(vlSelf->rv32e__DOT__pc_b_src)
+                                                ? vlSelf->rv32e__DOT__rs1_data
+                                                : vlSelf->rv32e__DOT__pc_now)));
 }
 
 VL_ATTR_COLD void Vrv32e___024root___eval_stl(Vrv32e___024root* vlSelf) {
@@ -660,6 +302,7 @@ VL_ATTR_COLD void Vrv32e___024root___eval_stl(Vrv32e___024root* vlSelf) {
     // Body
     if (vlSelf->__VstlTriggered.at(0U)) {
         Vrv32e___024root___stl_sequent__TOP__0(vlSelf);
+        vlSelf->__Vm_traceActivity[5U] = 1U;
         vlSelf->__Vm_traceActivity[4U] = 1U;
         vlSelf->__Vm_traceActivity[3U] = 1U;
         vlSelf->__Vm_traceActivity[2U] = 1U;
@@ -748,8 +391,7 @@ VL_ATTR_COLD void Vrv32e___024root___ctor_var_reset(Vrv32e___024root* vlSelf) {
     vlSelf->rv32e__DOT__branch = VL_RAND_RESET_I(3);
     vlSelf->rv32e__DOT__pc_a_src = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__pc_b_src = VL_RAND_RESET_I(1);
-    vlSelf->rv32e__DOT__pc_inst__DOT__PCa = VL_RAND_RESET_I(32);
-    vlSelf->rv32e__DOT__pc_inst__DOT__PCb = VL_RAND_RESET_I(32);
+    vlSelf->rv32e__DOT__time_counter = VL_RAND_RESET_I(32);
     for (int __Vi0 = 0; __Vi0 < 32; ++__Vi0) {
         vlSelf->rv32e__DOT__register_files_inst__DOT__regs[__Vi0] = VL_RAND_RESET_I(32);
     }
@@ -770,7 +412,7 @@ VL_ATTR_COLD void Vrv32e___024root___ctor_var_reset(Vrv32e___024root* vlSelf) {
     vlSelf->__Vdly__rv32e__DOT__mem_inst__DOT__read_data = VL_RAND_RESET_I(32);
     vlSelf->__Vtrigrprev__TOP__clk = VL_RAND_RESET_I(1);
     vlSelf->__Vtrigrprev__TOP__rst = VL_RAND_RESET_I(1);
-    for (int __Vi0 = 0; __Vi0 < 5; ++__Vi0) {
+    for (int __Vi0 = 0; __Vi0 < 6; ++__Vi0) {
         vlSelf->__Vm_traceActivity[__Vi0] = 0;
     }
 }

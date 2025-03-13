@@ -52,7 +52,6 @@ static void execute(uint64_t n) {
         g_nr_guest_inst++;
 
         if (npc_state.state != NPC_RUNNING){
-            printf("some\n");
             break;
         }
     }
@@ -79,7 +78,7 @@ void cpu_exec(uint64_t n) {
 
         case NPC_END:
         case NPC_ABORT:
-            Log("NPC: %s at pc = 0x%08x",
+            Log("%s: %s at pc = 0x%08x",ANSI_FMT("NPC", ANSI_FG_YELLOW ANSI_BG_RED),
                 (npc_state.state == NPC_ABORT ? ANSI_FMT("ABORT", ANSI_FG_RED) :
                 (npc_state.halt_ret == 0 ? ANSI_FMT("HIT GOOD TRAP", ANSI_FG_GREEN) :
                                            ANSI_FMT("HIT BAD TRAP", ANSI_FG_RED))),

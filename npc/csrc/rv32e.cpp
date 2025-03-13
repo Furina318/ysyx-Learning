@@ -40,20 +40,20 @@ extern "C" void ebreak(int station, int inst) {
     switch (station) {
         case HIT_TRAP:
             npc_state.state = NPC_END;
-            _Log(ANSI_FG_GREEN "HIT GOOD TRAP\n" ANSI_NONE);
+            // _Log(ANSI_FG_GREEN "HIT GOOD TRAP\n" ANSI_NONE);
             break;
 
         case ABORT:
         default:
+            Log("maintime = %ld, pc = 0x%08x, inst = 0x%08x", main_time, top->rootp->rv32e__DOT__pc_now, top->rootp->rv32e__DOT__inst);
             npc_state.state = NPC_ABORT;
-            _Log(ANSI_FG_RED "HIT BAD TRAP\n" ANSI_NONE);
+            // _Log(ANSI_FG_RED "HIT BAD TRAP\n" ANSI_NONE);
             break;
     }
-    Log("maintime = %ld, pc = 0x%08x, inst = 0x%08x", main_time, top->rootp->rv32e__DOT__pc_now, top->rootp->rv32e__DOT__inst);
-    top->final();
-    tfp->close();
-    delete top;
-    Verilated::gotFinish(true);
+    // top->final();
+    // tfp->close();
+    // delete top;
+    // Verilated::gotFinish(true);
     
 }
 
