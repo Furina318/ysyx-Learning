@@ -118,15 +118,15 @@
 `define SRA       4'b1101
 `define DIR       4'b0011
 
-`define EQ        5'b01000
-`define NE        5'b01001
-`define LT        5'b01010
-`define GE        5'b01011
-`define LTU       5'b01100
-`define GEU       5'b01101
-`define ADD_LUI   5'b01110
-`define ADD_JALR  5'b01111
-`define AlucBus   4:0
+// `define EQ        5'b01000
+// `define NE        5'b01001
+// `define LT        5'b01010
+// `define GE        5'b01011
+// `define LTU       5'b01100
+// `define GEU       5'b01101
+// `define ADD_LUI   5'b01110
+// `define ADD_JALR  5'b01111
+// `define AlucBus   4:0
 
 
 // PC

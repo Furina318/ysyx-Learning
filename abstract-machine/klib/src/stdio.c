@@ -92,9 +92,9 @@ void long_to_str(long long num, char *buffer, int *index) {
   // va_arg用于从可变参数列表中提取参数。需要指定参数的类型。
   // va_end清理 va_list，结束可变参数的使用
 
-int printf(const char *fmt, ...) {
-  panic("Not implemented");
-}
+// int printf(const char *fmt, ...) {
+//   panic("Not implemented");
+// }
 
 int vsprintf(char *out, const char *fmt, va_list ap) {
     char *str;
@@ -109,6 +109,17 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
     int precision = 6;
 
     for (; *fmt != '\0'; fmt++) {
+        if(*fmt == '\\'){
+            fmt++;
+            if(*fmt == '\0') break;
+            switch(*fmt){
+                case 'n': out[index++]='\n';break;
+                case 't': out[index++]='\t';break;
+                case 'r': out[index++]='\r';break;
+                case '\\': out[index++]='\\';break;
+                default: out[index++]=*fmt;break;
+            }
+        }
         if (*fmt != '%') {
             out[index++] = *fmt;
             continue;
@@ -212,6 +223,22 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
     return index;
 }
 
+// void putstr(const char *str){
+//     while(*str){
+//         putch(*str++);
+//     }
+// }
+
+int printf(const char *fmt, ...){
+    char buf[2048];
+    va_list args;
+    va_start(args,fmt);
+    int val = vsprintf(buf,fmt,args);
+    putstr(buf);
+    va_end(args);
+    return val;
+}
+
 int sprintf(char *out, const char *fmt, ...) {
     va_list args;
     va_start(args, fmt);
@@ -222,11 +249,20 @@ int sprintf(char *out, const char *fmt, ...) {
 
 
 int snprintf(char *out, size_t n, const char *fmt, ...) {
-  panic("Not implemented");
+    va_list args;
+    va_start(args, fmt);
+    int len = vsnprintf(out, n, fmt, args);
+    va_end(args);
+    return len;
 }
 
 int vsnprintf(char *out, size_t n, const char *fmt, va_list ap) {
-  panic("Not implemented");
+    char buffer[1024]; // 临时缓冲区
+    int len = vsprintf(buffer, fmt, ap); // 先格式化到临时缓冲区
+    if (len >= n) len = n - 1; // 截断超出部分
+    memcpy(out, buffer, len); // 复制到输出缓冲区
+    out[len] = '\0'; // 确保字符串以\0结尾
+    return len;
 }
 
 #endif

@@ -50,6 +50,9 @@ module contr_gen(
                     ALUBsrc = 2'b01; // ALU B 输入选择 imm
                     ALUctr = `DIR; // DIR
                     Branch = `Branch_None;
+                    MemtoReg = 1'b0;
+                    MemWr = 1'b0;
+                    MemRd = 1'b0;
                 end
 
                 // AUIPC 指令
@@ -60,6 +63,9 @@ module contr_gen(
                     ALUBsrc = 2'b01; // ALU B 输入选择 imm
                     ALUctr = `ADD; // ADD
                     Branch = `Branch_None;
+                    MemtoReg = 1'b0;
+                    MemWr = 1'b0;
+                    MemRd = 1'b0;
                 end
 
                 // I-type 指令（立即数运算）
@@ -68,6 +74,10 @@ module contr_gen(
                     RegWr = 1'b1;   // 写回寄存器
                     ALUAsrc = 1'b0; // ALU A 输入选择 rs1
                     ALUBsrc = 2'b01; // ALU B 输入选择 imm
+                    Branch = `Branch_None;
+                    MemtoReg = 1'b0;
+                    MemWr = 1'b0;
+                    MemRd = 1'b0;
                     case (func3)
                         3'b000: ALUctr = `ADD; // ADDI
                         3'b010: ALUctr = `SLT; // SLTI
@@ -86,6 +96,10 @@ module contr_gen(
                     RegWr = 1'b1;   // 写回寄存器
                     ALUAsrc = 1'b0; // ALU A 输入选择 rs1
                     ALUBsrc = 2'b00; // ALU B 输入选择 rs2
+                    Branch = `Branch_None;
+                    MemtoReg = 1'b0;
+                    MemWr = 1'b0;
+                    MemRd = 1'b0;
                     case (func3)
                         3'b000: ALUctr = (func7[5]) ? `SUB : `ADD; //SUB/ADD
                         3'b001: ALUctr = `SLL; // SLL
@@ -102,6 +116,7 @@ module contr_gen(
                 `INST_TYPE_L: begin
                     i_type = `INST_I; // I-type 立即数
                     MemRd = 1'b1;
+                    MemWr = 1'b0;
                     RegWr = 1'b1;   // 写回寄存器
                     ALUAsrc = 1'b0; // ALU A 输入选择 rs1
                     ALUBsrc = 2'b01; // ALU B 输入选择 imm
@@ -127,13 +142,16 @@ module contr_gen(
                     ALUBsrc = 2'b01; // ALU B 输入选择 imm
                     ALUctr = `ADD; // ADD
                     MemWr = 1'b1;    // 写存储器
+                    MemRd = 1'b0;
+                    RegWr = 1'b0;
+                    Branch = `Branch_None;
                     case (func3)
                         3'b000: MemOP = 3'b000; // SB
                         3'b001: MemOP = 3'b001; // SH
                         3'b010: MemOP = 3'b010; // SW
                         default: begin
                             ebreak(`ABORT, inst);
-                            $display("contr_gen : Unknown store instruction with func3 = %b", func3);
+                            $display("contr_gen : Unknow store instruction with func3 = %b", func3);
                         end
                     endcase
                 end
@@ -143,8 +161,21 @@ module contr_gen(
                     i_type = `INST_B; // B-type 立即数
                     ALUAsrc = 1'b0; // ALU A 输入选择 rs1
                     ALUBsrc = 2'b00; // ALU B 输入选择 rs2
-                    ALUctr = `SLT; // SUB
-                    Branch = {func3}; // 分支类型由 func3 决定
+                    RegWr = 1'b0;
+                    MemWr = 1'b0;
+                    MemRd = 1'b0;
+                    case (func3)
+                        3'b000: begin Branch = `Branch_EQ; ALUctr = `SLT; end
+                        3'b001: begin Branch = `Branch_NE; ALUctr = `SLT; end
+                        3'b100: begin Branch = `Branch_LT; ALUctr = `SLT; end
+                        3'b101: begin Branch = `Branch_GE; ALUctr = `SLT; end
+                        3'b110: begin Branch = `Branch_LT; ALUctr = `SLTU; end
+                        3'b111: begin Branch = `Branch_GE; ALUctr = `SLTU; end
+                        default: begin
+                            ebreak(`ABORT,inst);
+                            $display("control_gen : Unknow branch instruction with func3 = %b",func3);
+                        end
+                    endcase
                 end
 
                 // JAL 指令
@@ -155,16 +186,24 @@ module contr_gen(
                     ALUBsrc = 2'b10; // ALU B 输入选择常数 4
                     ALUctr = `ADD; // ADD
                     Branch = `Branch_PC; // JAL
+                    MemtoReg = 1'b0;
+                    MemWr = 1'b0;
+                    MemRd = 1'b0;
                 end
 
                 // JALR 指令
                 `INST_TYPE_JALR: begin
-                    i_type = `INST_I; // I-type 立即数
-                    RegWr = 1'b1;   // 写回寄存器
-                    ALUAsrc = 1'b0; // ALU A 输入选择 rs1
-                    ALUBsrc = 2'b01; // ALU B 输入选择 imm
-                    ALUctr = `ADD; // ADD
-                    Branch = `Branch_Reg; // JALR
+                    if(func3 == 3'b000) begin
+                        i_type = `INST_I; // I-type 立即数
+                        RegWr = 1'b1;   // 写回寄存器
+                        ALUAsrc = 1'b0; // ALU A 输入选择 rs1
+                        ALUBsrc = 2'b01; // ALU B 输入选择 imm
+                        ALUctr = `ADD; // ADD
+                        Branch = `Branch_Reg; // JALR
+                        MemtoReg = 1'b0;
+                        MemWr = 1'b0;
+                        MemRd = 1'b0;
+                    end
                 end
 
                 //ebreak指令
@@ -179,7 +218,7 @@ module contr_gen(
                 default: begin
                     if($time != 0) begin
                         ebreak(`ABORT, inst);
-                        $display("contr_gen : Unknown instruction with inst = %h", inst);
+                        $display("contr_gen : Unknow instruction with inst = %h", inst);
                     end
                 end
             endcase
