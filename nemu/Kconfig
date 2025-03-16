@@ -134,6 +134,10 @@ config MEMORY_TRACE
   bool "Enable memory trace"
   default n
 
+config BRANCH_Predictor
+  bool "Enable branch predictor"
+  default n
+
 config TRACE
   bool "Enable tracer"
   default y

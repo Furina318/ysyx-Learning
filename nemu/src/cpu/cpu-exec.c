@@ -249,7 +249,7 @@ static void exec_once(Decode *s, vaddr_t pc) {
   s->pc = pc;
   s->snpc = pc;
   isa_exec_once(s);
-
+#ifdef CONFIG_BRANCH_Predictor
   // 分支预测器逻辑
   uint32_t opcode = s->isa.inst & 0x7f;
   bool is_branch = (opcode == 0x63);  //条件分支 (beq,bne等)
@@ -303,7 +303,8 @@ static void exec_once(Decode *s, vaddr_t pc) {
     //        jump ? "jump" : "not jump", s->dnpc);
     // #endif
   }
-  
+#endif
+
 #ifdef CONFIG_FUNC_TRACE
   // uint32_t opcode = s->isa.inst & 0x7f;
   vaddr_t target=s->dnpc;
@@ -378,7 +379,7 @@ static void statistic() {
   Log("total guest instructions = " NUMBERIC_FMT, g_nr_guest_inst);
   if (g_timer > 0) Log("simulation frequency = " NUMBERIC_FMT " inst/s", g_nr_guest_inst * 1000000 / g_timer);
   else Log("Finish running in less than 1 us and can not calculate the simulation frequency");
-  
+
 #ifdef CONFIG_FUNC_TRACE
   puts("");
   Log("Function call statistics:");
@@ -387,6 +388,7 @@ static void statistic() {
   }
 #endif
 
+#ifdef CONFIG_BRANCH_Predictor
   //添加分支预测器统计
   puts("");
   Log("Branch Predictor Statistics:");
@@ -404,6 +406,7 @@ static void statistic() {
     double target_hit_rate = (double)btb_hits / (btb_hits+btb_misses)*100;
     Log("  Target hit rate: %.2f%%", target_hit_rate);
   }
+#endif
 }
 
 void assert_fail_msg() {
