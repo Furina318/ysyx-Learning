@@ -130,7 +130,7 @@ void ftrace_call(vaddr_t pc,char *name,vaddr_t back,vaddr_t dnpc){
   // 输出调用信息
   printf("0x%x: ",pc);
   for(int i=0;i<ftrace_size;i++){
-    printf("  "); // 缩进
+    printf(" | "); // 缩进
   }
   printf("call [%s @ 0x%08x]\n",name,dnpc);
   // printf("call [0x%x]\n",back);
@@ -155,7 +155,7 @@ void ftrace_ret(vaddr_t pc,char *name){
   // 输出返回信息
   printf("0x%x: ",pc);
   for (int i = 0; i < ftrace_size; i++) {
-    printf("  "); // 缩进
+    printf(" | "); // 缩进
   }
   printf("ret  [%s]\n", name);
 }
