@@ -378,12 +378,15 @@ static void statistic() {
   Log("total guest instructions = " NUMBERIC_FMT, g_nr_guest_inst);
   if (g_timer > 0) Log("simulation frequency = " NUMBERIC_FMT " inst/s", g_nr_guest_inst * 1000000 / g_timer);
   else Log("Finish running in less than 1 us and can not calculate the simulation frequency");
-
+  
+#ifdef CONFIG_FUNC_TRACE
   puts("");
   Log("Function call statistics:");
   for (int i = 0; i < func_call_stats_size; i++) {
     Log("  %-20s: %" PRIu64 " calls", func_call_stats[i].name, func_call_stats[i].call_count);
   }
+#endif
+
   //添加分支预测器统计
   puts("");
   Log("Branch Predictor Statistics:");
