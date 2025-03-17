@@ -241,9 +241,13 @@ static int cmd_mtrace(char *args){
   return 0;
 }
 
-static int cmd_dtrace(){
+static int cmd_dtrace(char *args){
 #ifdef CONFIG_DEVICE_TRACE
-  print_dtrace_file();
+  char *arg1=strtok(args," ");
+  char *arg2=strtok(NULL," ");
+  char *device_name=(arg1!=NULL) ? arg1 : NULL;
+  char *op=(arg2!=NULL) ? arg2 : NULL;
+  print_dtrace_file(device_name,op);
   return 0;
 #endif
   _Log(ANSI_FG_RED "device trace not open\n" ANSI_NONE);

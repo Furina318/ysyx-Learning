@@ -17,6 +17,8 @@
 #include <memory/host.h>
 #include <memory/vaddr.h>
 #include <device/map.h>
+#include <string.h>
+#include <stdlib.h>
 
 static FILE *dtrace_file=NULL;
 #define DTRACE_LOG_FILE "dtrace.log"
@@ -41,7 +43,7 @@ void close_dtrace(){
     } \
   } while (0) \
 )
-void print_dtrace_file() {
+void print_dtrace_file(const char *device_name,const char *op) {
   FILE *file = fopen(DTRACE_LOG_FILE, "r");
   if (file == NULL) {
       printf("Failed to open file: %s\n", DTRACE_LOG_FILE);
@@ -49,7 +51,12 @@ void print_dtrace_file() {
   }
   char line[256];
   while (fgets(line, sizeof(line), file)) {
-      printf("%s", line); // 逐行输出文件内容
+    if(device_name != NULL && strstr(line,device_name) == NULL) continue;
+    if(op != NULL){
+      if(strcmp(op, "read") == 0 && strstr(line, "read") == NULL) continue;
+      if(strcmp(op, "write") == 0 && strstr(line, "write") == NULL) continue;
+    }
+    printf("%s", line); // 逐行输出文件内容
   }
   fclose(file);
 }
