@@ -31,6 +31,9 @@
 #define IRINGBUF_SIZE 16
 #define MAX_FTRACE_SIZE 1000
 
+extern void init_dtrace();
+extern void close_dtrace();
+
 typedef struct {
   vaddr_t pc;                      //指令pc
   uint32_t inst;                   //指令编码
@@ -356,6 +359,7 @@ static void exec_once(Decode *s, vaddr_t pc) {
 static void execute(uint64_t n) {
   Decode s;
   IFDEF(CONFIG_MEMORY_TRACE,init_mtrace());
+  IFDEF(CONFIG_DEVICE_TRACE,init_dtrace());
   for (;n > 0; n --) {
     exec_once(&s, cpu.pc);
     g_nr_guest_inst ++;
@@ -365,6 +369,7 @@ static void execute(uint64_t n) {
   }
   if(nemu_state.state==NEMU_END || nemu_state.state==NEMU_ABORT){
     IFDEF(CONFIG_MEMORY_TRACE,close_mtrace());
+    IFDEF(CONFIG_DEVICE_TRACE,close_dtrace());
   }
   if(nemu_state.state==NEMU_ABORT){//程序出错时
     vaddr_t error_pc=cpu.pc;

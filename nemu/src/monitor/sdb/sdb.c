@@ -24,7 +24,7 @@
 #include <utils.h>
 
 static int is_batch_mode = false;//批处理模式（省略c的键入）
-
+extern void print_dtrace_file();
 void init_regex();
 void init_wp_pool();
 WP *new_wp();
@@ -236,7 +236,16 @@ static int cmd_mtrace(char *args){
   mtrace_filter_output(start_addr,end_addr,filter_en,filter_data);
   return 0;
 #endif
-  printf("memory trace not open\n");
+  _Log(ANSI_FG_RED "memory trace not open\n" ANSI_NONE);
+  // printf("memory trace not open\n");
+  return 0;
+}
+
+static int cmd_dtrace(){
+#ifdef CONFIG_DEVICE_TRACE
+  print_dtrace_file();
+#endif
+  _Log(ANSI_FG_RED "device trace not open\n" ANSI_NONE);
   return 0;
 }
 
@@ -260,6 +269,7 @@ static struct {
   { "d", "Delete a watchpoint NO.n you set",cmd_d},
   { "test", "Open random-expressions-file to check expr() whether correct",cmd_test},
   { "mtrace", "(Use when nemu stop)Open mtrace log file to check memory behavior",cmd_mtrace},
+  { "dtrace", "Output the trace of device access",cmd_dtrace},
 };
 
 #define NR_CMD ARRLEN(cmd_table)
