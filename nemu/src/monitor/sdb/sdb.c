@@ -244,6 +244,7 @@ static int cmd_mtrace(char *args){
 static int cmd_dtrace(){
 #ifdef CONFIG_DEVICE_TRACE
   print_dtrace_file();
+  return 0;
 #endif
   _Log(ANSI_FG_RED "device trace not open\n" ANSI_NONE);
   return 0;
