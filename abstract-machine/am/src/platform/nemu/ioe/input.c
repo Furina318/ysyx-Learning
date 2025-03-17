@@ -6,7 +6,10 @@
 void __am_input_keybrd(AM_INPUT_KEYBRD_T *kbd) {
   // kbd->keydown = 0;
   // kbd->keycode = AM_KEY_NONE;
-  uint32_t kc = inl(KBD_ADDR);
+  uint32_t kc = inl(KBD_ADDR);//从键盘设备读取32位数据
   kbd->keydown = kc & KEYDOWN_MASK ? true : false;
   kbd->keycode = kc & ~KEYDOWN_MASK;
+  if (kbd->keycode == 0 && !kbd->keydown) {
+    kbd->keycode = AM_KEY_NONE; // 设置为无效键码
+  }
 }
