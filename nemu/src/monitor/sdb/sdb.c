@@ -194,23 +194,23 @@ static int cmd_p(char *args) {
 
 static int cmd_test(){
   FILE *file;
-    char line[256];
-    char *filename = "/home/furina/ysyx-workbench/nemu/tools/gen-expr/build/input";  // 替换为你的文件名
-    file = fopen(filename, "r");
-    assert(file!=NULL);
-    while (fgets(line, sizeof(line), file)) {// 逐行读取文件
-        line[strcspn(line, "\n")] = '\0';// 去掉行末的换行符
-        char *ans = strtok(line, " ");
-        char *expression = strtok(NULL, "");
-        word_t result = expr(expression);
-        // 输出第一个参数和 expr 的结果
-        printf("%s\ncorrect ans:%s   my_expr:%u\n\n",expression,ans,result);
-        // assert((word_t)ans==result);
-        // if(*((word_t *)ans)==result) printf("pass\n\n");
-        // else assert(0);
-    }
-    fclose(file);
-    return 0;
+  char line[256];
+  uint32_t expr_count=0;
+  char *filename = "/home/furina/ysyx-workbench/nemu/tools/gen-expr/build/input";  // 替换为你的文件名
+  file = fopen(filename, "r");
+  assert(file!=NULL);
+  while (fgets(line, sizeof(line), file)) {// 逐行读取文件
+    line[strcspn(line, "\n")] = '\0';// 去掉行末的换行符
+    char *ans = strtok(line, " ");
+    char *expression = strtok(NULL, "");
+    word_t result = expr(expression);
+    // 输出第一个参数和 expr 的结果
+    printf("%s\ncorrect ans:%s   my_expr:%u\n\n",expression,ans,result);
+    expr_count+=1;
+  }
+  _Log(ANSI_BG_GREEN "Success!" ANSI_NONE "total %u expr\n",expr_count);
+  fclose(file);
+  return 0;
 }
 
 static int cmd_mtrace(char *args){
