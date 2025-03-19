@@ -7,12 +7,12 @@
 // #define SCREEN_W (MUXDEF(CONFIG_VGA_SIZE_800x600, 800, 400))
 // #define SCREEN_H (MUXDEF(CONFIG_VGA_SIZE_800x600, 600, 300))
 void __am_gpu_init() {
-  int i;
-  int w=400;
-  int h=300;
-  uint32_t *fb=(uint32_t *)(uintptr_t)FB_ADDR;
-  for(i=0;i<w*h;i++) fb[i] = i;
-  outl(FB_ADDR,1);
+  // int i;
+  // int w=400;
+  // int h=300;
+  // uint32_t *fb=(uint32_t *)(uintptr_t)FB_ADDR;
+  // for(i=0;i<w*h;i++) fb[i] = i;
+  // outl(FB_ADDR,1);
 }
 
 void __am_gpu_config(AM_GPU_CONFIG_T *cfg) {//屏幕大小寄存器软件实现（AM）
