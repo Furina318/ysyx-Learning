@@ -34,7 +34,7 @@ void __am_gpu_fbdraw(AM_GPU_FBDRAW_T *ctl) {
   //先存储第一行的所有像素，再存储第二行的所有像素，依此类推
   uint32_t *pixels=ctl->pixels;//跟fb同类型才可以进行赋值
   uint32_t *fb=(uint32_t *)(uintptr_t)FB_ADDR;
-  uint32_t get_w=inl(VGACTL_ADDR)>>16 & 0xffff;
+  uint32_t get_w=inl(VGACTL_ADDR)>>16;
   for(int i=y;i<y+h;i++){//行遍历
     for(int j=x;j<x+w;j++){//列遍历，实际就是遍历每一行中各个元素然后进入下一行
       fb[i*get_w+j]=pixels[(i-y)*get_w+(j-x)];
