@@ -28,7 +28,7 @@ void __am_gpu_config(AM_GPU_CONFIG_T *cfg) {//屏幕大小寄存器软件实现�
 
 void __am_gpu_fbdraw(AM_GPU_FBDRAW_T *ctl) {
   int x=ctl->x, y=ctl->y, w=ctl->w, h=ctl->h;
-  if(!ctl->sync && w==0 && h==0) return;//如果 sync 为 false 且 w 和 h 都为 0，则直接返回，不进行绘图操作
+  if(!ctl->sync && (w==0 || h==0)) return;//如果 sync 为 false 且 w 和 h 都为 0，则直接返回，不进行绘图操作
 
   // 图像像素按行优先方式存储在pixels，其对应索引index=(row*w+col)
   //先存储第一行的所有像素，再存储第二行的所有像素，依此类推
