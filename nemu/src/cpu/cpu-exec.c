@@ -31,7 +31,6 @@
 #define IRINGBUF_SIZE 16
 #define MAX_FTRACE_SIZE 1000
 
-extern void init_dtrace();
 extern void close_dtrace();
 
 typedef struct {
@@ -358,8 +357,6 @@ static void exec_once(Decode *s, vaddr_t pc) {
 
 static void execute(uint64_t n) {
   Decode s;
-  IFDEF(CONFIG_MEMORY_TRACE,init_mtrace());
-  IFDEF(CONFIG_DEVICE_TRACE,init_dtrace());
   for (;n > 0; n --) {
     exec_once(&s, cpu.pc);
     g_nr_guest_inst ++;
@@ -373,7 +370,9 @@ static void execute(uint64_t n) {
   }
   if(nemu_state.state==NEMU_ABORT){//程序出错时
     vaddr_t error_pc=cpu.pc;
+#ifdef CONFIG_ITRACE
     iringbuf_dummy(error_pc);
+#endif
   }
 }
 
@@ -426,7 +425,7 @@ void cpu_exec(uint64_t n) {
     case NEMU_END: case NEMU_ABORT: case NEMU_QUIT:
       printf("Program execution has ended. To restart the program, exit NEMU and run again.\n");
       return;
-    default: nemu_state.state = NEMU_RUNNING;iringbuf_init();predictor_init();
+    default: nemu_state.state = NEMU_RUNNING;
   }
 
   uint64_t timer_start = get_time();
