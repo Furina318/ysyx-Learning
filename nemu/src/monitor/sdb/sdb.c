@@ -198,7 +198,7 @@ static int cmd_test(){
   uint32_t expr_count=0;
   bool success=true;
 
-  char *filename = "/home/furina/ysyx-workbench/nemu/tools/gen-expr/build/input";  // 替换为你的文件名
+  char *filename = "/home/furina/ysyx-workbench/nemu/tools/gen-expr/build/input";
   file = fopen(filename, "r");
   assert(file!=NULL);
   while (fgets(line, sizeof(line), file)) {// 逐行读取文件

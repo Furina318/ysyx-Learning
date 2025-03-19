@@ -1,6 +1,6 @@
-TOP_NAME=lfsr_num
+TOP_NAME=ps2_keyboard
 VERILATOR=verilator
-NXDC_FILE=constr/lfsr_num.nxdc
+NXDC_FILE=constr/ps2_keyboard.nxdc
 INC_PATH ?= 
 #CSRCS= $(abspath ./csrc/light_main.cpp)
 
@@ -44,4 +44,4 @@ clean:
 	rm -rf $(BUILD_DIR)
 .PHONY: all sim clean default
 
-include ../Makefile
+#include ../Makefile
