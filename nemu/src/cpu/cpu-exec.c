@@ -369,8 +369,8 @@ static void execute(uint64_t n) {
     IFDEF(CONFIG_DEVICE_TRACE,close_dtrace());
   }
   if(nemu_state.state==NEMU_ABORT){//程序出错时
-    vaddr_t error_pc=cpu.pc;
 #ifdef CONFIG_ITRACE
+    vaddr_t error_pc=cpu.pc;
     iringbuf_dummy(error_pc);
 #endif
   }
