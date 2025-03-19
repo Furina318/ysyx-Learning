@@ -29,11 +29,6 @@ void init_device();
 void init_sdb();
 void init_disasm();
 
-extern void iringbuf_init();
-extern void predictor_init();
-extern void init_dtrace();
-void init_mtrace();
-
 static void welcome() {
   Log("Trace: %s", MUXDEF(CONFIG_TRACE, ANSI_FMT("ON", ANSI_FG_GREEN), ANSI_FMT("OFF", ANSI_FG_RED)));
   IFDEF(CONFIG_TRACE, Log("If trace is enabled, a log file will be generated "
@@ -208,11 +203,6 @@ void init_monitor(int argc, char *argv[]) {
   /* Initialize differential testing. */
   init_difftest(diff_so_file, img_size, difftest_port);
 
-  /* Initialize Trace */
-  IFDEF(CONFIG_ITRACE,iringbuf_init());
-  IFDEF(CONFIG_BRANCH_Predictor,predictor_init());
-  IFDEF(CONFIG_MEMORY_TRACE,init_mtrace());
-  IFDEF(CONFIG_DEVICE_TRACE,init_dtrace());
   /* Initialize the simple debugger. */
   init_sdb();
 
