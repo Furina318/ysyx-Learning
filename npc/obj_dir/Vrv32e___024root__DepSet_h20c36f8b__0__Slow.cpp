@@ -406,7 +406,6 @@ VL_ATTR_COLD void Vrv32e___024root___ctor_var_reset(Vrv32e___024root* vlSelf) {
     vlSelf->rv32e__DOT__alu_inst__DOT__xor_out = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__alu_inst__DOT__or_out = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__alu_inst__DOT__and_out = VL_RAND_RESET_I(32);
-    vlSelf->__Vdly__rv32e__DOT__pc_now = VL_RAND_RESET_I(32);
     vlSelf->__Vdly__rv32e__DOT__mem_data_out = VL_RAND_RESET_I(32);
     vlSelf->__Vdly__rv32e__DOT__mem_inst__DOT__temp_data = VL_RAND_RESET_I(32);
     vlSelf->__Vdly__rv32e__DOT__mem_inst__DOT__read_data = VL_RAND_RESET_I(32);

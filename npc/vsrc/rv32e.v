@@ -107,7 +107,7 @@ module rv32e (
     // 内存模块实例化
     mem mem_inst (
         .addr(alu_result),        // 使用当前 ALU 结果
-        .inst_addr(pc_now),       // 使用当前 PC 取指令
+        .inst_addr(pc_next),       // 使用当前 PC 取指令
         .MemOp(mem_op),
         .data_in(rs2_data),
         .clk(clk),

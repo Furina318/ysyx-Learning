@@ -315,9 +315,11 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSe
     // Init
     IData/*31:0*/ __Vdly__rv32e__DOT__time_counter;
     __Vdly__rv32e__DOT__time_counter = 0;
+    IData/*31:0*/ __Vdly__rv32e__DOT__pc_now;
+    __Vdly__rv32e__DOT__pc_now = 0;
     // Body
     __Vdly__rv32e__DOT__time_counter = vlSelf->rv32e__DOT__time_counter;
-    vlSelf->__Vdly__rv32e__DOT__pc_now = vlSelf->rv32e__DOT__pc_now;
+    __Vdly__rv32e__DOT__pc_now = vlSelf->rv32e__DOT__pc_now;
     if (vlSelf->rst) {
         vlSelf->rv32e__DOT__i_type = 0U;
         vlSelf->rv32e__DOT__reg_wr = 0U;
@@ -746,7 +748,7 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSe
                   32,vlSelf->rv32e__DOT__pc_now,32,
                   vlSelf->rv32e__DOT__pc_next);
         __Vdly__rv32e__DOT__time_counter = 0U;
-        vlSelf->__Vdly__rv32e__DOT__pc_now = 0x80000000U;
+        __Vdly__rv32e__DOT__pc_now = 0x80000000U;
     } else {
         __Vdly__rv32e__DOT__time_counter = ((IData)(1U) 
                                             + vlSelf->rv32e__DOT__time_counter);
@@ -754,9 +756,10 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSe
                   32,vlSelf->rv32e__DOT__time_counter,
                   32,vlSelf->rv32e__DOT__pc_now,32,
                   vlSelf->rv32e__DOT__inst,32,vlSelf->rv32e__DOT__alu_result);
-        vlSelf->__Vdly__rv32e__DOT__pc_now = vlSelf->rv32e__DOT__pc_next;
+        __Vdly__rv32e__DOT__pc_now = vlSelf->rv32e__DOT__pc_next;
     }
     vlSelf->rv32e__DOT__time_counter = __Vdly__rv32e__DOT__time_counter;
+    vlSelf->rv32e__DOT__pc_now = __Vdly__rv32e__DOT__pc_now;
 }
 
 void Vrv32e___024root____Vdpiimwrap_rv32e__DOT__pmem_read_TOP(IData/*31:0*/ raddr, IData/*31:0*/ len, IData/*31:0*/ &pmem_read__Vfuncrtn);
@@ -776,7 +779,7 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__2(Vrv32e___024root* vlSe
         vlSelf->__Vdly__rv32e__DOT__mem_data_out = 0U;
         vlSelf->rv32e__DOT__inst = 0U;
     } else {
-        Vrv32e___024root____Vdpiimwrap_rv32e__DOT__pmem_read_TOP(vlSelf->rv32e__DOT__pc_now, 4U, __Vfunc_rv32e__DOT__mem_inst__DOT__pmem_read__36__Vfuncout);
+        Vrv32e___024root____Vdpiimwrap_rv32e__DOT__pmem_read_TOP(vlSelf->rv32e__DOT__pc_next, 4U, __Vfunc_rv32e__DOT__mem_inst__DOT__pmem_read__36__Vfuncout);
         vlSelf->rv32e__DOT__inst = __Vfunc_rv32e__DOT__mem_inst__DOT__pmem_read__36__Vfuncout;
         if (vlSelf->rv32e__DOT__mem_wr) {
             if ((4U & (IData)(vlSelf->rv32e__DOT__mem_op))) {
@@ -859,14 +862,6 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__2(Vrv32e___024root* vlSe
                                                >> 0xfU))]);
 }
 
-VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__3(Vrv32e___024root* vlSelf) {
-    if (false && vlSelf) {}  // Prevent unused
-    Vrv32e__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
-    VL_DEBUG_IF(VL_DBG_MSGF("+    Vrv32e___024root___nba_sequent__TOP__3\n"); );
-    // Body
-    vlSelf->rv32e__DOT__pc_now = vlSelf->__Vdly__rv32e__DOT__pc_now;
-}
-
 void Vrv32e___024root___eval_nba(Vrv32e___024root* vlSelf) {
     if (false && vlSelf) {}  // Prevent unused
     Vrv32e__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
@@ -883,9 +878,6 @@ void Vrv32e___024root___eval_nba(Vrv32e___024root* vlSelf) {
     if (vlSelf->__VnbaTriggered.at(1U)) {
         Vrv32e___024root___nba_sequent__TOP__2(vlSelf);
         vlSelf->__Vm_traceActivity[4U] = 1U;
-    }
-    if (vlSelf->__VnbaTriggered.at(0U)) {
-        Vrv32e___024root___nba_sequent__TOP__3(vlSelf);
     }
     if ((vlSelf->__VnbaTriggered.at(0U) | vlSelf->__VnbaTriggered.at(1U))) {
         Vrv32e___024root___ico_sequent__TOP__0(vlSelf);

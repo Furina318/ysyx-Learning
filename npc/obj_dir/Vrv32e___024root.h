@@ -52,7 +52,6 @@ class Vrv32e___024root final : public VerilatedModule {
     IData/*31:0*/ rv32e__DOT__alu_inst__DOT__xor_out;
     IData/*31:0*/ rv32e__DOT__alu_inst__DOT__or_out;
     IData/*31:0*/ rv32e__DOT__alu_inst__DOT__and_out;
-    IData/*31:0*/ __Vdly__rv32e__DOT__pc_now;
     IData/*31:0*/ __Vdly__rv32e__DOT__mem_data_out;
     IData/*31:0*/ __Vdly__rv32e__DOT__mem_inst__DOT__temp_data;
     IData/*31:0*/ __Vdly__rv32e__DOT__mem_inst__DOT__read_data;
