@@ -3,6 +3,7 @@
 #include "../include/debug.h"
 #include "../include/macro.h"
 #include "../include/conf.h"
+#include "../include/paddr.h"
 #include "Vrv32e.h"
 #include "Vrv32e__Dpi.h"
 #include "../obj_dir/Vrv32e___024root.h"
@@ -36,16 +37,17 @@ static void statistic() {
 }
 
 static void execute_once() {
-    PCSet.pc = top->rootp->rv32e__DOT__pc_now;
-    PCSet.inst = top->rootp->rv32e__DOT__inst;
+    PCSet.pc = top->rootp->rv32e__DOT__pc;
+    PCSet.inst = top->rootp->rv32e__DOT__instr;
     single_cycle();
     single_cycle(); // 执行一个时钟周期
  
-    PCSet.next_pc = top->rootp->rv32e__DOT__pc_now;
-    PCSet.ninst = top->rootp->rv32e__DOT__inst;
+    PCSet.next_pc = top->rootp->rv32e__DOT__pc;
+    PCSet.ninst = top->rootp->rv32e__DOT__instr;
 }
 
 static void execute(uint64_t n) {
+    IFDEF(CONFIG_MTRACE,init_mtrace());
     for (; n > 0; n--) {
         
         execute_once();
@@ -54,6 +56,9 @@ static void execute(uint64_t n) {
         if (npc_state.state != NPC_RUNNING){
             break;
         }
+    }
+    if(npc_state.state==NPC_END || npc_state.state==NPC_ABORT){
+        IFDEF(CONFIG_MTRACE,close_mtrace());
     }
 }
 

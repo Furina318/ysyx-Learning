@@ -19,6 +19,10 @@ paddr_t host_to_guest(uint8_t *haddr);
 // word_t paddr_read(paddr_t addr, int len);
 // void paddr_write(paddr_t addr, int len, word_t data);
 void init_mem();
+void init_mtrace();
+void close_mtrace();
+void mtrace_log(char type,paddr_t addr,word_t data,int len);
+void mtrace_filter_output(paddr_t start_addr, paddr_t end_addr, bool filter_en, uint32_t filter_data);
 word_t pmem_r(paddr_t addr, int len);
 void pmem_w(paddr_t addr, int len, word_t data);
 

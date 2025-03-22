@@ -13,7 +13,7 @@ Vrv32e::Vrv32e(VerilatedContext* _vcontextp__, const char* _vcname__)
     : VerilatedModel{*_vcontextp__}
     , vlSymsp{new Vrv32e__Syms(contextp(), _vcname__, this)}
     , clk{vlSymsp->TOP.clk}
-    , rst{vlSymsp->TOP.rst}
+    , reset{vlSymsp->TOP.reset}
     , rootp{&(vlSymsp->TOP)}
 {
     // Register model with the context

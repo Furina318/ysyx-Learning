@@ -14,7 +14,7 @@ extern uint8_t* guest_to_host(paddr_t paddr);
 
 #ifdef CONFIG_DIFFTEST
 
-#define top_regs top->rootp->rv32e__DOT__register_files_inst__DOT__regs
+#define top_regs top->rootp->rv32e__DOT__regfile__DOT__regs
 CPU_state cpu;
 static int skip_cnt_ref = 0;   // the amount to skip the ref
 static bool skip_flag = false; // the flag   to skip the ref 
@@ -37,7 +37,7 @@ const char *ref_regs[] = {
 
 static void update_cpu_state(CPU_state *cpu)
 {
-    cpu->pc = top->rootp->rv32e__DOT__pc_now;
+    cpu->pc = top->rootp->rv32e__DOT__pc;
     for(int i = 0; i < 32; i++)
         cpu->gpr[i] = top_regs[i];
 }

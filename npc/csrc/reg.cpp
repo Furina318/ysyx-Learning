@@ -8,7 +8,7 @@ extern Vrv32e *top;
 /*********************************************/
 
 
-#define gpr top->rootp->rv32e__DOT__register_files_inst__DOT__regs
+#define gpr top->rootp->rv32e__DOT__regfile__DOT__regs
 
 static const char *regs[] = {
     "$0", "ra", "sp", "gp", "tp", "t0", "t1", "t2",
@@ -27,7 +27,7 @@ void regs_display()
     }
     puts("");
     _Log(ANSI_FG_YELLOW "$%s\t" ANSI_NONE " 0x%08x\t %010u\n", "pc", 
-        top->rootp->rv32e__DOT__pc_now, top->rootp->rv32e__DOT__pc_now);
+        top->rootp->rv32e__DOT__pc, top->rootp->rv32e__DOT__pc);
 }
 
 word_t single_reg_display(char *reg_name) 
@@ -38,8 +38,8 @@ word_t single_reg_display(char *reg_name)
     if(strcmp(reg_name, "pc") == 0)
     {
         _Log(ANSI_FG_YELLOW "$%s\t" ANSI_NONE " 0x%08x\t %010u %010d\n", "pc", 
-             top->rootp->rv32e__DOT__pc_now, top->rootp->rv32e__DOT__pc_now, top->rootp->rv32e__DOT__pc_now);
-        return top->rootp->rv32e__DOT__pc_now;
+             top->rootp->rv32e__DOT__pc, top->rootp->rv32e__DOT__pc, top->rootp->rv32e__DOT__pc);
+        return top->rootp->rv32e__DOT__pc;
     }
 
     //others
@@ -60,7 +60,7 @@ word_t reg_str2val(const char *s, bool *success)
     int i;
     //pc
     if(strcmp(s, "pc") == 0)
-        return top->rootp->rv32e__DOT__pc_now; 
+        return top->rootp->rv32e__DOT__pc; 
         
     //reg $0
     if(strcmp(s, regs[0]) == 0)

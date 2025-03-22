@@ -34,8 +34,8 @@ extern "C" void ebreak(int station, int inst) {
     if (Verilated::gotFinish())
         return;
 
-    npc_state.halt_ret = top->rootp->rv32e__DOT__register_files_inst__DOT__regs[10]; // a0
-    npc_state.halt_pc = top->rootp->rv32e__DOT__pc_now;
+    npc_state.halt_ret = top->rootp->rv32e__DOT__regfile__DOT__regs[10]; // a0
+    npc_state.halt_pc = top->rootp->rv32e__DOT__pc;
 
     switch (station) {
         case HIT_TRAP:
@@ -45,7 +45,7 @@ extern "C" void ebreak(int station, int inst) {
 
         case ABORT:
         default:
-            Log("maintime = %ld, pc = 0x%08x, inst = 0x%08x", main_time, top->rootp->rv32e__DOT__pc_now, top->rootp->rv32e__DOT__inst);
+            Log("maintime = %ld, pc = 0x%08x, inst = 0x%08x", main_time, top->rootp->rv32e__DOT__pc, top->rootp->rv32e__DOT__instr);
             npc_state.state = NPC_ABORT;
             // _Log(ANSI_FG_RED "HIT BAD TRAP\n" ANSI_NONE);
             break;
@@ -79,7 +79,7 @@ void single_cycle(void) {
         top->clk = !top->clk; // 翻转时钟信号
 
         if (main_time == start_time) {
-            top->rst = 0; // 在指定时间释放复位
+            top->reset = 0; // 在指定时间释放复位
         }
 
         top->eval(); // 执行仿真
@@ -89,7 +89,7 @@ void single_cycle(void) {
 }
 
 void reset(void) {
-    top->rst = 1; // 复位信号置高
+    top->reset = 1; // 复位信号置高
     for (int i = 0; i < start_time; i++) {
         single_cycle(); // 执行复位周期
     }
