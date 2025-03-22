@@ -24,6 +24,7 @@ extern word_t   host_read(void *addr, int len);
 extern word_t   expr(char *e);
 extern "C" void     pmem_write(paddr_t waddr,word_t wdata,int len);
 extern "C" word_t   pmem_read(paddr_t raddr,int len);
+extern void die();
 // extern NPCState npc_state;
 /*********************************************/
 
@@ -53,6 +54,7 @@ static int cmd_c(char *args) {
 
 static int cmd_q(char *args) {
   npc_state.state=NPC_QUIT;//直接改变good的值，防止其直接退出时good！=0（/src/utils/state.c）导致return出现异常
+  die();
   return -1;//只有-1的时候会在sdb_mainloop触发中断影响good
 }
 

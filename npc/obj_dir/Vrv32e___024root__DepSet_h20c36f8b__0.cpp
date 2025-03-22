@@ -109,6 +109,8 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__2(Vrv32e___024root* vlSe
     vlSelf->rv32e__DOT__pc = vlSelf->__Vdly__rv32e__DOT__pc;
     Vrv32e___024root____Vdpiimwrap_rv32e__DOT__if_stage__DOT__pmem_read_TOP(vlSelf->rv32e__DOT__pc, 4U, vlSelf->__Vfunc_rv32e__DOT__if_stage__DOT__pmem_read__0__Vfuncout);
     vlSelf->rv32e__DOT__instr = vlSelf->__Vfunc_rv32e__DOT__if_stage__DOT__pmem_read__0__Vfuncout;
+    VL_WRITEF("PC=0x%08x | instr=0x%08x\n",32,vlSelf->rv32e__DOT__pc,
+              32,vlSelf->rv32e__DOT__instr);
     vlSelf->rv32e__DOT__id_stage__DOT__immI = (((- (IData)(
                                                            (vlSelf->rv32e__DOT__instr 
                                                             >> 0x1fU))) 
