@@ -109,6 +109,40 @@ char *get_func_name(vaddr_t addr){
   return "???"; // 未知函数
 }
 
+#ifdef CONFIG_FTRACE
+static void ftrace_handle() {
+    // 获取当前流水线级信号
+    uint32_t pc = top->rootp->rv32e__DOT__pc;
+    uint32_t instr = top->rootp->rv32e__DOT__instr;
+    uint32_t opcode = instr & 0x7F;
+    
+    // 获取译码阶段信号
+    uint32_t imm = top->rootp->rv32e__DOT__imm;
+    uint32_t rs1_val = top->rootp->rv32e__DOT__rs1_val;
+
+    // 计算真实跳转目标
+    if (opcode == 0x6F) { // JAL
+        uint32_t target = pc + imm;
+        char* name = get_func_name(target);
+        ftrace_call(pc, name, pc + 4, target);
+    }
+    else if (opcode == 0x67) { // JALR
+        uint32_t target = (rs1_val + imm) & ~0x1;
+        if (target != pc + 4) { // 排除简单的寄存器操作
+            char* name = get_func_name(target);
+            ftrace_call(pc, name, pc + 4, target);
+        }
+        
+        // 处理ret指令（JALR x0, x1, 0）
+        if ((instr & 0xFFFFF07F) == 0x00008067) {
+            if (ftrace_size > 0) {
+                ftrace_ret(pc, ftrace[ftrace_size-1].name);
+            }
+        }
+    }
+}
+#endif
+
 #define MAX_INST_TO_PRINT 20
 static uint64_t g_nr_guest_inst = 0;
 static bool g_print_step = false;
@@ -122,6 +156,13 @@ static struct {
 
 static void statistic() {
     Log("total guest instructions = %lu", g_nr_guest_inst);
+#ifdef CONFIG_FTRACE
+  puts("");
+  Log("Function call statistics:");
+  for (int i = 0; i < func_call_stats_size; i++) {
+    Log("  %-10s: %" PRIu64 " calls", func_call_stats[i].name, func_call_stats[i].call_count);
+  }
+#endif
 }
 
 static void execute_once() {
@@ -130,20 +171,7 @@ static void execute_once() {
     single_cycle();
     single_cycle(); // 执行一个时钟周期
 #ifdef CONFIG_FTRACE
-  uint32_t opcode = top->rootp->rv32e__DOT__instr & 0x7f;
-  vaddr_t target=top->rootp->rv32e__DOT__pc;
-  vaddr_t pc=top->rootp->rv32e__DOT__pc;
-  if(opcode==0x6f){ //JAL指令（函数调用）11011 11//JALR指令11001 11
-    vaddr_t ret_addr=pc+4;
-    char *name=get_func_name(target);
-    ftrace_call(pc,name,ret_addr,target);
-  }else if(opcode==0x67){//JALR指令11001 11
-    if(top->rootp->rv32e__DOT__instr==0x00008067){//ret指令
-      if(ftrace_size>0){//判断是否为函数返回
-        ftrace_ret(pc,ftrace[ftrace_size-1].name);
-      }
-    }
-  }
+  ftrace_handle();
 #endif 
     PCSet.next_pc = top->rootp->rv32e__DOT__pc;
     PCSet.ninst = top->rootp->rv32e__DOT__instr;
