@@ -29,7 +29,8 @@ module rv32e (
     IF if_stage (
         .clk(clk),
         .reset(reset),
-        .branch_target(is_jal ? jal_target : jalr_target),
+        // .branch_target(is_jal ? jal_target : jalr_target),
+        .branch_target(is_jalr ? jalr_target : jal_target),
         .pc_src(is_jal | is_jalr | take_branch),
         .pc(pc),
         .instr(instr)
@@ -98,5 +99,9 @@ module rv32e (
                      (opcode == `INST_JAL || opcode == `INST_JALR) ? (pc + 4) : // JAL, JALR
                      (opcode == `INST_LW) ? data_out :              // lw
                      (opcode == `INST_R || opcode == `INST_I) ? alu_result : 32'b0; // R-type, I-type
+    always @(posedge clk) begin
+        if (opcode == `INST_B)
+            $display("PC=%h, imm=%h, jal_target=%h, take_branch=%b", pc, imm, jal_target, take_branch);
+    end
 
 endmodule

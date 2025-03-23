@@ -227,7 +227,7 @@ void init_monitor(int argc, char *argv[]) {
   /* Initialize the simple debugger. */
   init_sdb();
 
-  IFDEF(CONFIG_ITRACE, init_disasm());
+  // IFDEF(CONFIG_ITRACE, init_disasm());
 
   /* Display welcome message. */
   welcome();

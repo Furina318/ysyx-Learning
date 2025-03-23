@@ -24,9 +24,9 @@
 #define CONFIG_RT_CHECK 1
 #define CONFIG_PC_RESET_OFFSET 0x0
 #define CONFIG_TRACE 1
-#define CONFIG_FTRACE 1
+// #define CONFIG_FTRACE 1
 #define CONFIG_MTRACE 1
 #define CONFIG_DIFFTEST 1
-// #define CONFIG_TRACE 1
+#define CONFIG_ITRACE 1
 // #define CONFIG_TARGET_AM 1
 #endif

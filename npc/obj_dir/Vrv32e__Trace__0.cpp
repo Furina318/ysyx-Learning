@@ -76,8 +76,7 @@ void Vrv32e___024root__trace_chg_sub_0(Vrv32e___024root* vlSelf, VerilatedVcd::B
         bufp->chgBit(oldp+44,(vlSelf->rv32e__DOT__MemRead));
         bufp->chgIData(oldp+45,(vlSelf->rv32e__DOT__jal_target),32);
         bufp->chgBit(oldp+46,((0x6fU == (IData)(vlSelf->rv32e__DOT__opcode))));
-        bufp->chgBit(oldp+47,(((0x67U == (IData)(vlSelf->rv32e__DOT__opcode)) 
-                               & (0U == (IData)(vlSelf->rv32e__DOT__func3)))));
+        bufp->chgBit(oldp+47,(vlSelf->rv32e__DOT__is_jalr));
         bufp->chgCData(oldp+48,(vlSelf->rv32e__DOT__alu_op),4);
         bufp->chgIData(oldp+49,(vlSelf->rv32e__DOT__id_stage__DOT__immI),32);
         bufp->chgIData(oldp+50,((0xfffff000U & vlSelf->rv32e__DOT__instr)),32);
@@ -149,12 +148,11 @@ void Vrv32e___024root__trace_chg_sub_0(Vrv32e___024root* vlSelf, VerilatedVcd::B
                                      & (IData)(vlSelf->rv32e__DOT__alu_less)) 
                                     | ((~ (IData)(vlSelf->rv32e__DOT__alu_less)) 
                                        & (5U == (IData)(vlSelf->rv32e__DOT__func3)))))))));
-    bufp->chgIData(oldp+67,(((0x6fU == (IData)(vlSelf->rv32e__DOT__opcode))
-                              ? vlSelf->rv32e__DOT__jal_target
-                              : (0xfffffffeU & vlSelf->rv32e__DOT____Vcellinp__mem_stage__addr))),32);
+    bufp->chgIData(oldp+67,(((IData)(vlSelf->rv32e__DOT__is_jalr)
+                              ? (0xfffffffeU & vlSelf->rv32e__DOT____Vcellinp__mem_stage__addr)
+                              : vlSelf->rv32e__DOT__jal_target)),32);
     bufp->chgBit(oldp+68,(((0x6fU == (IData)(vlSelf->rv32e__DOT__opcode)) 
-                           | (((0x67U == (IData)(vlSelf->rv32e__DOT__opcode)) 
-                               & (0U == (IData)(vlSelf->rv32e__DOT__func3))) 
+                           | ((IData)(vlSelf->rv32e__DOT__is_jalr) 
                               | ((0x63U == (IData)(vlSelf->rv32e__DOT__opcode)) 
                                  & (((0U != vlSelf->rv32e__DOT__alu_result) 
                                      & (1U == (IData)(vlSelf->rv32e__DOT__func3))) 

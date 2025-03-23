@@ -49,6 +49,7 @@ VM_USER_CLASSES = \
 	reg \
 	rv32e \
 	sdb \
+	trace \
 
 # User .cpp directories (from .cpp's on Verilator command line)
 VM_USER_DIR = \
@@ -79,6 +80,8 @@ reg.o: /home/furina/ysyx-workbench/npc/csrc/reg.cpp
 rv32e.o: /home/furina/ysyx-workbench/npc/csrc/rv32e.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
 sdb.o: /home/furina/ysyx-workbench/npc/csrc/sdb.cpp
+	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
+trace.o: /home/furina/ysyx-workbench/npc/csrc/trace.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
 
 ### Link rules... (from --exe)

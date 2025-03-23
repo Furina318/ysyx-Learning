@@ -18,7 +18,10 @@ extern Vrv32e *top;
 extern VerilatedVcdC *tfp;
 extern vluint64_t main_time;
 extern void die();
-
+#ifdef CONFIG_ITRACE 
+extern void append_iringbuf(char *s);
+extern void display_iringbuf(void);
+#endif
 /*********************************************/
 
 /*********** FUNC_TRACE ***********/
@@ -34,7 +37,7 @@ extern func_symbol_t func_table[];
 
 typedef struct{
   vaddr_t pc;//函数调用地址
-  char *name;//函数名
+  const char *name;//函数名
   vaddr_t back;//返回地址
 }ftrace_info;
 
@@ -42,14 +45,14 @@ static ftrace_info ftrace[MAX_FTRACE_SIZE];
 static int ftrace_size=0;//当前调用栈深度
 
 typedef struct {
-  char *name;
+  const char *name;
   uint64_t call_count;
 } func_call_stats_t;
 
 static func_call_stats_t func_call_stats[MAX_FTRACE_SIZE];
 static int func_call_stats_size = 0;
 
-void ftrace_call(vaddr_t pc,char *name,vaddr_t back,vaddr_t dnpc){
+void ftrace_call(vaddr_t pc,const char *name,vaddr_t back,vaddr_t dnpc){
   if(ftrace_size>=MAX_FTRACE_SIZE){
     printf("Call stack overflow!\n");
     return;
@@ -85,7 +88,7 @@ void ftrace_call(vaddr_t pc,char *name,vaddr_t back,vaddr_t dnpc){
   ftrace_size++;
 }
 
-void ftrace_ret(vaddr_t pc,char *name){
+void ftrace_ret(vaddr_t pc,const char *name){
   if(ftrace_size <= 0){
     printf("Call stack underflow!\n");
     return;
@@ -100,7 +103,7 @@ void ftrace_ret(vaddr_t pc,char *name){
   printf("ret  [%s]\n", name);
 }
 
-char *get_func_name(vaddr_t addr){
+const char *get_func_name(vaddr_t addr){
   for(int i=0;i<func_count;i++){
     if(addr>=func_table[i].addr && addr<func_table[i].addr+func_table[i].size){// 检查给出的地址是否落在区间[Value, Value + Size)内
       return func_table[i].name;
@@ -123,13 +126,13 @@ static void ftrace_handle() {
     // 计算真实跳转目标
     if (opcode == 0x6F) { // JAL
         uint32_t target = pc + imm;
-        char* name = get_func_name(target);
+        const char* name = get_func_name(target);
         ftrace_call(pc, name, pc + 4, target);
     }
     else if (opcode == 0x67) { // JALR
         uint32_t target = (rs1_val + imm) & ~0x1;
         if (target != pc + 4) { // 排除简单的寄存器操作
-            char* name = get_func_name(target);
+            const char* name = get_func_name(target);
             ftrace_call(pc, name, pc + 4, target);
         }
         
@@ -143,9 +146,12 @@ static void ftrace_handle() {
 }
 #endif
 
+/*********** FTRACE END ***********/
+
 #define MAX_INST_TO_PRINT 20
 static uint64_t g_nr_guest_inst = 0;
 static bool g_print_step = false;
+IFDEF(CONFIG_ITRACE,char logbuf[128]);
 
 static struct {
     word_t pc;
@@ -160,7 +166,7 @@ static void statistic() {
   puts("");
   Log("Function call statistics:");
   for (int i = 0; i < func_call_stats_size; i++) {
-    Log("  %-10s: %" PRIu64 " calls", func_call_stats[i].name, func_call_stats[i].call_count);
+    Log("  %-8s: %lu calls", func_call_stats[i].name, func_call_stats[i].call_count);
   }
 #endif
 }
@@ -175,7 +181,13 @@ static void execute_once() {
 #endif 
     PCSet.next_pc = top->rootp->rv32e__DOT__pc;
     PCSet.ninst = top->rootp->rv32e__DOT__instr;
+#ifdef CONFIG_ITRACE
+    char *p = logbuf;
+    p += snprintf(p, sizeof(logbuf), "0x%08x: 0x%08x ", PCSet.pc, PCSet.inst);
+    *p = '\0';
+    append_iringbuf(logbuf);
 }
+#endif
 
 static void execute(uint64_t n) {
     IFDEF(CONFIG_MTRACE,init_mtrace());
@@ -214,6 +226,7 @@ void cpu_exec(uint64_t n) {
 
         case NPC_END:
         case NPC_ABORT:
+            if(npc_state.state == NPC_ABORT) IFDEF(CONFIG_ITRACE,display_iringbuf());
             Log("%s: %s at pc = 0x%08x",ANSI_FMT("NPC", ANSI_FG_YELLOW ANSI_BG_RED),
                 (npc_state.state == NPC_ABORT ? ANSI_FMT("ABORT", ANSI_FG_RED) :
                 (npc_state.halt_ret == 0 ? ANSI_FMT("HIT GOOD TRAP", ANSI_FG_GREEN) :
