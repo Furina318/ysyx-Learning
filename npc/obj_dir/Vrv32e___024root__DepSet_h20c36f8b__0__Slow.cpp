@@ -86,8 +86,6 @@ VL_ATTR_COLD void Vrv32e___024root___stl_sequent__TOP__0(Vrv32e___024root* vlSel
     // Body
     Vrv32e___024root____Vdpiimwrap_rv32e__DOT__if_stage__DOT__pmem_read_TOP(vlSelf->rv32e__DOT__pc, 4U, vlSelf->__Vfunc_rv32e__DOT__if_stage__DOT__pmem_read__0__Vfuncout);
     vlSelf->rv32e__DOT__instr = vlSelf->__Vfunc_rv32e__DOT__if_stage__DOT__pmem_read__0__Vfuncout;
-    VL_WRITEF("PC=0x%08x | instr=0x%08x\n",32,vlSelf->rv32e__DOT__pc,
-              32,vlSelf->rv32e__DOT__instr);
     vlSelf->rv32e__DOT__rs1_val = ((0U == (0x1fU & 
                                            (vlSelf->rv32e__DOT__instr 
                                             >> 0xfU)))

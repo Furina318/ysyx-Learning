@@ -21,6 +21,94 @@ extern void die();
 
 /*********************************************/
 
+/*********** FUNC_TRACE ***********/
+#define MAX_FTRACE_SIZE 1000
+
+typedef struct {
+  uint32_t addr;  // 函数地址
+  uint32_t size;  // 函数大小
+  char name[64];  // 函数名
+} func_symbol_t;
+extern int func_count;
+extern func_symbol_t func_table[];
+
+typedef struct{
+  vaddr_t pc;//函数调用地址
+  char *name;//函数名
+  vaddr_t back;//返回地址
+}ftrace_info;
+
+static ftrace_info ftrace[MAX_FTRACE_SIZE];
+static int ftrace_size=0;//当前调用栈深度
+
+typedef struct {
+  char *name;
+  uint64_t call_count;
+} func_call_stats_t;
+
+static func_call_stats_t func_call_stats[MAX_FTRACE_SIZE];
+static int func_call_stats_size = 0;
+
+void ftrace_call(vaddr_t pc,char *name,vaddr_t back,vaddr_t dnpc){
+  if(ftrace_size>=MAX_FTRACE_SIZE){
+    printf("Call stack overflow!\n");
+    return;
+  }
+
+  // 查找或创建函数调用统计记录
+  int index = -1;
+  for (int i = 0; i < func_call_stats_size; i++) {
+    if (strcmp(func_call_stats[i].name, name) == 0) {
+      index = i;
+      break;
+    }
+  }
+  if (index == -1) {
+    index = func_call_stats_size++;
+    func_call_stats[index].name = name;
+    func_call_stats[index].call_count = 0;
+  }
+  // 增加调用次数
+  func_call_stats[index].call_count++;
+  
+  // 输出调用信息
+  printf("0x%x: ",pc);
+  for(int i=0;i<ftrace_size;i++){
+    printf(" | "); // 缩进
+  }
+  printf("call [%s @ 0x%08x]\n",name,dnpc);
+  // printf("call [0x%x]\n",back);
+  // 压栈
+  ftrace[ftrace_size].pc=pc;
+  ftrace[ftrace_size].name=name;
+  ftrace[ftrace_size].back=back;
+  ftrace_size++;
+}
+
+void ftrace_ret(vaddr_t pc,char *name){
+  if(ftrace_size <= 0){
+    printf("Call stack underflow!\n");
+    return;
+  }
+
+  ftrace_size--;
+  // 输出返回信息
+  printf("0x%x: ",pc);
+  for (int i = 0; i < ftrace_size; i++) {
+    printf(" | "); // 缩进
+  }
+  printf("ret  [%s]\n", name);
+}
+
+char *get_func_name(vaddr_t addr){
+  for(int i=0;i<func_count;i++){
+    if(addr>=func_table[i].addr && addr<func_table[i].addr+func_table[i].size){// 检查给出的地址是否落在区间[Value, Value + Size)内
+      return func_table[i].name;
+    }
+  }
+  return "???"; // 未知函数
+}
+
 #define MAX_INST_TO_PRINT 20
 static uint64_t g_nr_guest_inst = 0;
 static bool g_print_step = false;
@@ -41,7 +129,22 @@ static void execute_once() {
     PCSet.inst = top->rootp->rv32e__DOT__instr;
     single_cycle();
     single_cycle(); // 执行一个时钟周期
- 
+#ifdef CONFIG_FTRACE
+  uint32_t opcode = top->rootp->rv32e__DOT__instr & 0x7f;
+  vaddr_t target=top->rootp->rv32e__DOT__pc;
+  vaddr_t pc=top->rootp->rv32e__DOT__pc;
+  if(opcode==0x6f){ //JAL指令（函数调用）11011 11//JALR指令11001 11
+    vaddr_t ret_addr=pc+4;
+    char *name=get_func_name(target);
+    ftrace_call(pc,name,ret_addr,target);
+  }else if(opcode==0x67){//JALR指令11001 11
+    if(top->rootp->rv32e__DOT__instr==0x00008067){//ret指令
+      if(ftrace_size>0){//判断是否为函数返回
+        ftrace_ret(pc,ftrace[ftrace_size-1].name);
+      }
+    }
+  }
+#endif 
     PCSet.next_pc = top->rootp->rv32e__DOT__pc;
     PCSet.ninst = top->rootp->rv32e__DOT__instr;
 }

@@ -34,6 +34,7 @@
 extern void init_dtrace();
 extern void close_dtrace();
 
+/*********** INST_TRACE ***********/
 typedef struct {
   vaddr_t pc;                      //指令pc
   uint32_t inst;                   //指令编码
@@ -82,7 +83,7 @@ void iringbuf_dummy(vaddr_t error_pc){
               iringbuf.entries[index].inst & 0xff);
   }
 }
-
+/*********** FUNC_TRACE ***********/
 typedef struct {
   uint32_t addr;  // 函数地址
   uint32_t size;  // 函数大小

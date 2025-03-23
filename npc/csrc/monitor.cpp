@@ -82,7 +82,7 @@ void load_func_table(const char *elf_file) {
   fseek(fp, 0, SEEK_END);
   long size = ftell(fp);
   Log("The ELF file is %s, size = %ld", elf_file, size);
-  printf("ftrace log : The ELF file is %s, size = %ld\n", elf_file, size);
+  printf("[ftrace log] : The ELF file is %s, size = %ld\n", elf_file, size);
 
   // Read ELF header
   fseek(fp, 0, SEEK_SET);
