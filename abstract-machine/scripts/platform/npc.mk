@@ -7,11 +7,12 @@ AM_SRCS := riscv/npc/start.S \
            riscv/npc/trap.S \
            platform/dummy/vme.c \
            platform/dummy/mpe.c
-
+#AM_SRCS中部分文件需要修改增加
 CFLAGS    += -fdata-sections -ffunction-sections
 LDSCRIPTS += $(AM_HOME)/scripts/linker.ld
 LDFLAGS   += --defsym=_pmem_start=0x80000000 --defsym=_entry_offset=0x0
 LDFLAGS   += --gc-sections -e _start
+NPCFLAGS += -l $(shell dirname $(IMAGE).elf)/npc-log.txt
 
 MAINARGS_MAX_LEN = 64
 MAINARGS_PLACEHOLDER = The insert-arg rule in Makefile will insert mainargs here.

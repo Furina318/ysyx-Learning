@@ -30,7 +30,7 @@ module rv32e (
         .clk(clk),
         .reset(reset),
         .branch_target(is_jal ? jal_target : jalr_target),
-        .pc_src(is_jal | is_jalr),
+        .pc_src(is_jal | is_jalr | take_branch),
         .pc(pc),
         .instr(instr)
     );
@@ -66,7 +66,7 @@ module rv32e (
     ALU alu (
         .alu_op(alu_op),
         .a(rs1_val),
-        .b((opcode[6:2] == `INST_TYPE_R) ? rs2_val : imm), // R-type用rs2_val，I-type用imm
+        .b((opcode[6:2] == `INST_TYPE_R || opcode[6:2] == `INST_TYPE_B) ? rs2_val : imm), // R-type用rs2_val，I-type用imm
         .result(alu_result),
         .zero(alu_zero),
         .less(alu_less)
@@ -84,14 +84,19 @@ module rv32e (
     // 跳转目标计算
     assign jal_target = pc + imm;
     assign jalr_target = (rs1_val + imm) & ~32'h1;
-    assign is_jal = (opcode == 7'b1101111);
-    assign is_jalr = (opcode == 7'b1100111) & (func3 == 3'b000);
-    assign take_branch = (opcode == 7'b1100011) && (func3 == 3'b001) && (alu_zero == 1'b0); // bne: rs1 != rs2
+    assign is_jal = (opcode == `INST_JAL);
+    assign is_jalr = (opcode == `INST_JALR) & (func3 == 3'b000);
+    assign take_branch = (opcode == `INST_B) && (//B类型
+        (func3 == `F3_BNE && !alu_zero) ||//bne
+        (func3 == `F3_BEQ && alu_zero) ||//beq
+        (func3 == `F3_BLT && alu_less) ||//blt
+        (func3 == `F3_BGE && !alu_less) //bge
+    ); 
     // 写回数据选择
-    assign wb_data = (opcode == 7'b0110111) ? imm :                   // LUI
-                     (opcode == 7'b0010111) ? (pc + imm) :            // AUIPC
-                     (opcode == 7'b1101111 || opcode == 7'b1100111) ? (pc + 4) : // JAL, JALR
-                     (opcode == 7'b0000011) ? data_out :              // lw
-                     (opcode == 7'b0110011 || opcode == 7'b0010011) ? alu_result : 32'b0; // R-type, I-type
+    assign wb_data = (opcode == `INST_LUI) ? imm :                   // LUI
+                     (opcode == `INST_AUIPC) ? (pc + imm) :            // AUIPC
+                     (opcode == `INST_JAL || opcode == `INST_JALR) ? (pc + 4) : // JAL, JALR
+                     (opcode == `INST_LW) ? data_out :              // lw
+                     (opcode == `INST_R || opcode == `INST_I) ? alu_result : 32'b0; // R-type, I-type
 
 endmodule

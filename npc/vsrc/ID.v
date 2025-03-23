@@ -44,21 +44,7 @@ module ID (
         MemWrite = 1'b0;
         MemRead  = 1'b0;
         alu_op   = `ALU_ADD;
-
-        // reg [31:0] immI;
-        // reg [31:0] immU;
-        // reg [31:0] immS;
-        // reg [31:0] immB;
-        // reg [31:0] immJ;
-        // reg [31:0] immR;
-    
-        
-        // assign immI = {{20{instr[31]}}, instr[31:20]};
-        // immU = {instr[31:12], 12'b0};
-        // immS = {{20{instr[31]}}, instr[31:25], instr[11:7]};
-        // immB = {{19{instr[31]}}, instr[7], instr[30:25], instr[11:8], 1'b0};
-        // immJ = {{12{instr[31]}}, instr[19:12], instr[20], instr[30:21], 1'b0};
-        
+ 
         assign get_opcode = opcode[6:2];
 
         case(get_opcode)
@@ -120,6 +106,7 @@ module ID (
                     `F3_ADDI: alu_op = `ALU_ADD;
                     `F3_ANDI: alu_op = `ALU_AND;
                     `F3_ORI:  alu_op = `ALU_OR;
+                    `F3_SLTU: alu_op = `ALU_SLTU;//sltiu(支持seqz)
                     default:  begin
                         ebreak(`ABORT,instr);
                         $display("ID : Unknown I instruction with func3 = %b", func3);
@@ -127,10 +114,12 @@ module ID (
                 endcase
             end
             `INST_TYPE_B: begin
-                if (func3 == 3'b001) begin  // bne
-                    imm = immB;
-                    alu_op = 4'b0001; // 减法，用于比较
-                end
+                // if (func3 == 3'b001) begin  // bne
+                //     imm = immB;
+                //     alu_op = 4'b0001; // 减法，用于比较
+                // end
+                imm=immB;
+                alu_op=`ALU_SUB;//用于减法比较
             end
             `INST_TYPE_E: begin
                 if(instr==`INST_EBREAK) begin

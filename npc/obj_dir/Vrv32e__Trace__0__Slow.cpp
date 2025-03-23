@@ -11,11 +11,11 @@ VL_ATTR_COLD void Vrv32e___024root__trace_init_sub__TOP__0(Vrv32e___024root* vlS
     // Init
     const int c = vlSymsp->__Vm_baseCode;
     // Body
-    tracep->declBit(c+65,"clk", false,-1);
-    tracep->declBit(c+66,"reset", false,-1);
+    tracep->declBit(c+64,"clk", false,-1);
+    tracep->declBit(c+65,"reset", false,-1);
     tracep->pushNamePrefix("rv32e ");
-    tracep->declBit(c+65,"clk", false,-1);
-    tracep->declBit(c+66,"reset", false,-1);
+    tracep->declBit(c+64,"clk", false,-1);
+    tracep->declBit(c+65,"reset", false,-1);
     tracep->declBus(c+34,"pc", false,-1, 31,0);
     tracep->declBus(c+35,"instr", false,-1, 31,0);
     tracep->declBus(c+36,"opcode", false,-1, 6,0);
@@ -28,26 +28,26 @@ VL_ATTR_COLD void Vrv32e___024root__trace_init_sub__TOP__0(Vrv32e___024root* vlS
     tracep->declBit(c+43,"RegWrite", false,-1);
     tracep->declBit(c+44,"MemWrite", false,-1);
     tracep->declBit(c+45,"MemRead", false,-1);
-    tracep->declBus(c+57,"rs1_val", false,-1, 31,0);
-    tracep->declBus(c+58,"rs2_val", false,-1, 31,0);
-    tracep->declBus(c+67,"wb_data", false,-1, 31,0);
+    tracep->declBus(c+56,"rs1_val", false,-1, 31,0);
+    tracep->declBus(c+57,"rs2_val", false,-1, 31,0);
+    tracep->declBus(c+66,"wb_data", false,-1, 31,0);
     tracep->declBus(c+46,"jal_target", false,-1, 31,0);
-    tracep->declBus(c+59,"jalr_target", false,-1, 31,0);
+    tracep->declBus(c+58,"jalr_target", false,-1, 31,0);
     tracep->declBit(c+47,"is_jal", false,-1);
     tracep->declBit(c+48,"is_jalr", false,-1);
     tracep->declBus(c+1,"data_out", false,-1, 31,0);
     tracep->declBus(c+49,"alu_op", false,-1, 3,0);
-    tracep->declBus(c+60,"alu_result", false,-1, 31,0);
-    tracep->declBit(c+61,"alu_zero", false,-1);
-    tracep->declBit(c+62,"alu_less", false,-1);
-    tracep->declBit(c+68,"take_branch", false,-1);
+    tracep->declBus(c+59,"alu_result", false,-1, 31,0);
+    tracep->declBit(c+60,"alu_zero", false,-1);
+    tracep->declBit(c+61,"alu_less", false,-1);
+    tracep->declBit(c+67,"take_branch", false,-1);
     tracep->pushNamePrefix("alu ");
     tracep->declBus(c+49,"alu_op", false,-1, 3,0);
-    tracep->declBus(c+57,"a", false,-1, 31,0);
-    tracep->declBus(c+63,"b", false,-1, 31,0);
-    tracep->declBus(c+60,"result", false,-1, 31,0);
-    tracep->declBit(c+61,"zero", false,-1);
-    tracep->declBit(c+62,"less", false,-1);
+    tracep->declBus(c+56,"a", false,-1, 31,0);
+    tracep->declBus(c+62,"b", false,-1, 31,0);
+    tracep->declBus(c+59,"result", false,-1, 31,0);
+    tracep->declBit(c+60,"zero", false,-1);
+    tracep->declBit(c+61,"less", false,-1);
     tracep->popNamePrefix(1);
     tracep->pushNamePrefix("id_stage ");
     tracep->declBus(c+35,"instr", false,-1, 31,0);
@@ -71,30 +71,30 @@ VL_ATTR_COLD void Vrv32e___024root__trace_init_sub__TOP__0(Vrv32e___024root* vlS
     tracep->declBus(c+55,"get_opcode", false,-1, 4,0);
     tracep->popNamePrefix(1);
     tracep->pushNamePrefix("if_stage ");
-    tracep->declBit(c+65,"clk", false,-1);
-    tracep->declBit(c+66,"reset", false,-1);
-    tracep->declBus(c+69,"branch_target", false,-1, 31,0);
-    tracep->declBit(c+56,"pc_src", false,-1);
+    tracep->declBit(c+64,"clk", false,-1);
+    tracep->declBit(c+65,"reset", false,-1);
+    tracep->declBus(c+68,"branch_target", false,-1, 31,0);
+    tracep->declBit(c+69,"pc_src", false,-1);
     tracep->declBus(c+34,"pc", false,-1, 31,0);
     tracep->declBus(c+35,"instr", false,-1, 31,0);
     tracep->popNamePrefix(1);
     tracep->pushNamePrefix("mem_stage ");
-    tracep->declBit(c+65,"clk", false,-1);
+    tracep->declBit(c+64,"clk", false,-1);
     tracep->declBit(c+45,"MemRead", false,-1);
     tracep->declBit(c+44,"MemWrite", false,-1);
-    tracep->declBus(c+64,"addr", false,-1, 31,0);
-    tracep->declBus(c+58,"data_in", false,-1, 31,0);
+    tracep->declBus(c+63,"addr", false,-1, 31,0);
+    tracep->declBus(c+57,"data_in", false,-1, 31,0);
     tracep->declBus(c+1,"data_out", false,-1, 31,0);
     tracep->popNamePrefix(1);
     tracep->pushNamePrefix("regfile ");
-    tracep->declBit(c+65,"clk", false,-1);
+    tracep->declBit(c+64,"clk", false,-1);
     tracep->declBus(c+37,"rs1", false,-1, 4,0);
     tracep->declBus(c+38,"rs2", false,-1, 4,0);
     tracep->declBus(c+39,"rd", false,-1, 4,0);
     tracep->declBit(c+43,"we", false,-1);
-    tracep->declBus(c+67,"wd", false,-1, 31,0);
-    tracep->declBus(c+57,"rs1_val", false,-1, 31,0);
-    tracep->declBus(c+58,"rs2_val", false,-1, 31,0);
+    tracep->declBus(c+66,"wd", false,-1, 31,0);
+    tracep->declBus(c+56,"rs1_val", false,-1, 31,0);
+    tracep->declBus(c+57,"rs2_val", false,-1, 31,0);
     for (int i = 0; i < 32; ++i) {
         tracep->declBus(c+2+i*1,"regs", true,(i+0), 31,0);
     }
@@ -226,20 +226,17 @@ VL_ATTR_COLD void Vrv32e___024root__trace_full_sub_0(Vrv32e___024root* vlSelf, V
                                                   & (vlSelf->rv32e__DOT__instr 
                                                      >> 0x14U)))))),32);
     bufp->fullCData(oldp+55,(vlSelf->rv32e__DOT__id_stage__DOT__get_opcode),5);
-    bufp->fullBit(oldp+56,(((0x6fU == (IData)(vlSelf->rv32e__DOT__opcode)) 
-                            | ((0x67U == (IData)(vlSelf->rv32e__DOT__opcode)) 
-                               & (0U == (IData)(vlSelf->rv32e__DOT__func3))))));
-    bufp->fullIData(oldp+57,(vlSelf->rv32e__DOT__rs1_val),32);
-    bufp->fullIData(oldp+58,(vlSelf->rv32e__DOT__rs2_val),32);
-    bufp->fullIData(oldp+59,((0xfffffffeU & vlSelf->rv32e__DOT____Vcellinp__mem_stage__addr)),32);
-    bufp->fullIData(oldp+60,(vlSelf->rv32e__DOT__alu_result),32);
-    bufp->fullBit(oldp+61,((0U == vlSelf->rv32e__DOT__alu_result)));
-    bufp->fullBit(oldp+62,(VL_LTS_III(32, vlSelf->rv32e__DOT__rs1_val, vlSelf->rv32e__DOT____Vcellinp__alu__b)));
-    bufp->fullIData(oldp+63,(vlSelf->rv32e__DOT____Vcellinp__alu__b),32);
-    bufp->fullIData(oldp+64,(vlSelf->rv32e__DOT____Vcellinp__mem_stage__addr),32);
-    bufp->fullBit(oldp+65,(vlSelf->clk));
-    bufp->fullBit(oldp+66,(vlSelf->reset));
-    bufp->fullIData(oldp+67,(((0x37U == (IData)(vlSelf->rv32e__DOT__opcode))
+    bufp->fullIData(oldp+56,(vlSelf->rv32e__DOT__rs1_val),32);
+    bufp->fullIData(oldp+57,(vlSelf->rv32e__DOT__rs2_val),32);
+    bufp->fullIData(oldp+58,((0xfffffffeU & vlSelf->rv32e__DOT____Vcellinp__mem_stage__addr)),32);
+    bufp->fullIData(oldp+59,(vlSelf->rv32e__DOT__alu_result),32);
+    bufp->fullBit(oldp+60,((0U == vlSelf->rv32e__DOT__alu_result)));
+    bufp->fullBit(oldp+61,(vlSelf->rv32e__DOT__alu_less));
+    bufp->fullIData(oldp+62,(vlSelf->rv32e__DOT____Vcellinp__alu__b),32);
+    bufp->fullIData(oldp+63,(vlSelf->rv32e__DOT____Vcellinp__mem_stage__addr),32);
+    bufp->fullBit(oldp+64,(vlSelf->clk));
+    bufp->fullBit(oldp+65,(vlSelf->reset));
+    bufp->fullIData(oldp+66,(((0x37U == (IData)(vlSelf->rv32e__DOT__opcode))
                                ? vlSelf->rv32e__DOT__imm
                                : ((0x17U == (IData)(vlSelf->rv32e__DOT__opcode))
                                    ? vlSelf->rv32e__DOT__jal_target
@@ -255,11 +252,30 @@ VL_ATTR_COLD void Vrv32e___024root__trace_full_sub_0(Vrv32e___024root* vlSelf, V
                                                   == (IData)(vlSelf->rv32e__DOT__opcode)))
                                                ? vlSelf->rv32e__DOT__alu_result
                                                : 0U)))))),32);
-    bufp->fullBit(oldp+68,(((0x63U == (IData)(vlSelf->rv32e__DOT__opcode)) 
-                            & ((0U != vlSelf->rv32e__DOT__alu_result) 
-                               & (1U == (IData)(vlSelf->rv32e__DOT__func3))))));
-    bufp->fullIData(oldp+69,(((0x6fU == (IData)(vlSelf->rv32e__DOT__opcode))
+    bufp->fullBit(oldp+67,(((0x63U == (IData)(vlSelf->rv32e__DOT__opcode)) 
+                            & (((0U != vlSelf->rv32e__DOT__alu_result) 
+                                & (1U == (IData)(vlSelf->rv32e__DOT__func3))) 
+                               | (((0U == (IData)(vlSelf->rv32e__DOT__func3)) 
+                                   & (0U == vlSelf->rv32e__DOT__alu_result)) 
+                                  | (((4U == (IData)(vlSelf->rv32e__DOT__func3)) 
+                                      & (IData)(vlSelf->rv32e__DOT__alu_less)) 
+                                     | ((~ (IData)(vlSelf->rv32e__DOT__alu_less)) 
+                                        & (5U == (IData)(vlSelf->rv32e__DOT__func3)))))))));
+    bufp->fullIData(oldp+68,(((0x6fU == (IData)(vlSelf->rv32e__DOT__opcode))
                                ? vlSelf->rv32e__DOT__jal_target
                                : (0xfffffffeU & vlSelf->rv32e__DOT____Vcellinp__mem_stage__addr))),32);
+    bufp->fullBit(oldp+69,(((0x6fU == (IData)(vlSelf->rv32e__DOT__opcode)) 
+                            | (((0x67U == (IData)(vlSelf->rv32e__DOT__opcode)) 
+                                & (0U == (IData)(vlSelf->rv32e__DOT__func3))) 
+                               | ((0x63U == (IData)(vlSelf->rv32e__DOT__opcode)) 
+                                  & (((0U != vlSelf->rv32e__DOT__alu_result) 
+                                      & (1U == (IData)(vlSelf->rv32e__DOT__func3))) 
+                                     | (((0U == (IData)(vlSelf->rv32e__DOT__func3)) 
+                                         & (0U == vlSelf->rv32e__DOT__alu_result)) 
+                                        | (((4U == (IData)(vlSelf->rv32e__DOT__func3)) 
+                                            & (IData)(vlSelf->rv32e__DOT__alu_less)) 
+                                           | ((~ (IData)(vlSelf->rv32e__DOT__alu_less)) 
+                                              & (5U 
+                                                 == (IData)(vlSelf->rv32e__DOT__func3)))))))))));
     bufp->fullIData(oldp+70,(0U),32);
 }
