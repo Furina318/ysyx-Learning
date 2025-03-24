@@ -30,6 +30,7 @@ module ALU (
             `ALU_SLT:  result = {31'b0, less};
             `ALU_SRA:  result = $signed(a) >>> b[4:0];//算术右移sra,srai
             `ALU_SLL:  result = a << b[4:0];//逻辑左移sll,slli
+            `ALU_SRL:  result = a >> b[4:0];//逻辑右移，srl，srli
             default: begin
                 result = 32'b0;
                 ebreak(`ABORT,32'hdeadbeef);

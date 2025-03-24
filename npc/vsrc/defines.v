@@ -50,3 +50,4 @@
 `define ALU_SLTU   4'b0110//sltiu,sltu
 `define ALU_SLT    4'b0111
 `define ALU_SRA    4'b1000//sra,srai
+`define ALU_SRL    4'b1001//srl,srli

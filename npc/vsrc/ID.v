@@ -95,6 +95,7 @@ module ID (
                     3'b100:   alu_op = `ALU_XOR;// xor
                     `F3_SLTU: begin
                         if(func7==7'b0000000) alu_op=`ALU_SLTU;
+                        else if(func7==7'b0000000) alu_op=`ALU_SRL;
                     end
                     `F3_RSH: begin
                         if(func7 == 7'b0100000) alu_op=`ALU_SRA;
@@ -120,6 +121,7 @@ module ID (
                     `F3_XORI: alu_op = `ALU_XOR;
                     `F3_RSH: begin
                         if(func7==7'b0100000) alu_op=`ALU_SRA;
+                        else if(func7==7'b0000000) alu_op=`ALU_SRL;
                     end
                     `F3_LSH: begin
                         if(func7==7'b0000000) alu_op=`ALU_SLL;
