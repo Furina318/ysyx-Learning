@@ -89,10 +89,19 @@ module ID (
                 RegWrite = 1'b1;
                 imm = immR;
                 case (func3)
-                    3'b000: alu_op = (func7[5]) ? `ALU_SUB : `ALU_ADD; // add, sub
+                    3'b000:   alu_op = (func7[5]) ? `ALU_SUB : `ALU_ADD; // add, sub
                     `F3_ANDI: alu_op = `ALU_AND; // and
-                    `F3_ORI: alu_op = `ALU_OR; // or
-                    3'b100: alu_op = `ALU_XOR;// xor
+                    `F3_ORI:  alu_op = `ALU_OR; // or
+                    3'b100:   alu_op = `ALU_XOR;// xor
+                    `F3_SLTU: begin
+                        if(func7==7'b0000000) alu_op=`ALU_SLTU;
+                    end
+                    `F3_RSH: begin
+                        if(func7 == 7'b0100000) alu_op=`ALU_SRA;
+                    end
+                    `F3_LSH: begin
+                        if(func7==7'b0000000) alu_op=`ALU_SLL;
+                    end
                     default: begin
                         ebreak(`ABORT, instr);
                         $display("ID : Unknown R instruction with func3 = %b", func3);
@@ -107,6 +116,14 @@ module ID (
                     `F3_ANDI: alu_op = `ALU_AND;
                     `F3_ORI:  alu_op = `ALU_OR;
                     `F3_SLTU: alu_op = `ALU_SLTU;//sltiu(支持seqz)
+                    `F3_SLTI: alu_op = `ALU_SLT;
+                    `F3_XORI: alu_op = `ALU_XOR;
+                    `F3_RSH: begin
+                        if(func7==7'b0100000) alu_op=`ALU_SRA;
+                    end
+                    `F3_LSH: begin
+                        if(func7==7'b0000000) alu_op=`ALU_SLL;
+                    end
                     default:  begin
                         ebreak(`ABORT,instr);
                         $display("ID : Unknown I instruction with func3 = %b", func3);

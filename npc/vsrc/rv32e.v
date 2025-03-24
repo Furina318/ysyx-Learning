@@ -25,12 +25,15 @@ module rv32e (
     wire         alu_zero;
     wire         alu_less;
     wire         take_branch;
+
+    wire [31:0] branch_target;
+    assign branch_target=is_jalr ? jalr_target : jal_target;
     // 取指模块
     IF if_stage (
         .clk(clk),
         .reset(reset),
-        // .branch_target(is_jal ? jal_target : jalr_target),
-        .branch_target(is_jalr ? jalr_target : jal_target),
+        // .branch_target(is_jalr ? jalr_target : jal_target),
+        .branch_target(branch_target),
         .pc_src(is_jal | is_jalr | take_branch),
         .pc(pc),
         .instr(instr)

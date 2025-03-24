@@ -41,6 +41,7 @@ VL_ATTR_COLD void Vrv32e___024root__trace_init_sub__TOP__0(Vrv32e___024root* vlS
     tracep->declBit(c+60,"alu_zero", false,-1);
     tracep->declBit(c+61,"alu_less", false,-1);
     tracep->declBit(c+67,"take_branch", false,-1);
+    tracep->declBus(c+68,"branch_target", false,-1, 31,0);
     tracep->pushNamePrefix("alu ");
     tracep->declBus(c+49,"alu_op", false,-1, 3,0);
     tracep->declBus(c+56,"a", false,-1, 31,0);

@@ -36,11 +36,17 @@
 `define F3_BLT     3'b100
 `define F3_BGE     3'b101
 
+`define F3_RSH   3'b101
+`define F3_LSH   3'b001
+`define F3_XORI  3'b100
+
 // ALU 操作码
 `define ALU_ADD    4'b0000
 `define ALU_SUB    4'b0001
 `define ALU_AND    4'b0010
 `define ALU_OR     4'b0011
-`define ALU_XOR    4'b0100
-`define ALU_SLL    4'b0101
-`define ALU_SLTU   4'b0110
+`define ALU_XOR    4'b0100//xor,xori
+`define ALU_SLL    4'b0101//sll,slli
+`define ALU_SLTU   4'b0110//sltiu,sltu
+`define ALU_SLT    4'b0111
+`define ALU_SRA    4'b1000//sra,srai
