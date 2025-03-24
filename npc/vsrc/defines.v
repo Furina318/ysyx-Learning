@@ -25,7 +25,7 @@
 `define HIT_TRAP          1
 `define ABORT             2
 
-// funct3 值定义
+//funct3值定义
 `define F3_ADDI    3'b000
 `define F3_SLTI    3'b010
 `define F3_SLTU    3'b011
@@ -39,6 +39,13 @@
 `define F3_RSH   3'b101
 `define F3_LSH   3'b001
 `define F3_XORI  3'b100
+`define F3_SLT   3'b010
+`define F3_LW    3'b010
+`define F3_LH    3'b001
+`define F3_LBU   3'b100
+`define F3_SW    3'b010
+`define F3_SH    3'b001
+`define F3_SB    3'b000
 
 // ALU 操作码
 `define ALU_ADD    4'b0000
@@ -51,3 +58,8 @@
 `define ALU_SLT    4'b0111
 `define ALU_SRA    4'b1000//sra,srai
 `define ALU_SRL    4'b1001//srl,srli
+
+//Mem字节选取
+`define Mem_Word   2'b10
+`define Mem_Half   2'b01
+`define Mem_Bit    2'b00

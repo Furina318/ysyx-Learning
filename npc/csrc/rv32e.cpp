@@ -31,30 +31,31 @@ Vrv32e *top = new Vrv32e("top");
 vluint64_t main_time = 0; // 仿真时间
 
 extern "C" void ebreak(int station, int inst) {
-    if (Verilated::gotFinish())
-        return;
+    if(main_time>=start_time){
+        if (Verilated::gotFinish())
+            return;
 
-    npc_state.halt_ret = top->rootp->rv32e__DOT__regfile__DOT__regs[10]; // a0
-    npc_state.halt_pc = top->rootp->rv32e__DOT__pc;
+        npc_state.halt_ret = top->rootp->rv32e__DOT__regfile__DOT__regs[10]; // a0
+        npc_state.halt_pc = top->rootp->rv32e__DOT__pc;
 
-    switch (station) {
-        case HIT_TRAP:
-            npc_state.state = NPC_END;
-            // _Log(ANSI_FG_GREEN "HIT GOOD TRAP\n" ANSI_NONE);
-            break;
+        switch (station) {
+            case HIT_TRAP:
+                npc_state.state = NPC_END;
+                // _Log(ANSI_FG_GREEN "HIT GOOD TRAP\n" ANSI_NONE);
+                break;
 
-        case ABORT:
-        default:
-            Log("maintime = %ld, pc = 0x%08x, inst = 0x%08x", main_time, top->rootp->rv32e__DOT__pc, top->rootp->rv32e__DOT__instr);
-            npc_state.state = NPC_ABORT;
-            // _Log(ANSI_FG_RED "HIT BAD TRAP\n" ANSI_NONE);
-            break;
-    }
-    // top->final();
-    // tfp->close();
-    // delete top;
-    // Verilated::gotFinish(true);
-    
+            case ABORT:
+            default:
+                Log("maintime = %ld, pc = 0x%08x, inst = 0x%08x", main_time, top->rootp->rv32e__DOT__pc, top->rootp->rv32e__DOT__instr);
+                npc_state.state = NPC_ABORT;
+                // _Log(ANSI_FG_RED "HIT BAD TRAP\n" ANSI_NONE);
+                break;
+        }
+        // top->final();
+        // tfp->close();
+        // delete top;
+        // Verilated::gotFinish(true);
+    }      
 }
 
 extern "C" word_t pmem_read(paddr_t raddr, int len) {

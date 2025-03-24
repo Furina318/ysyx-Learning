@@ -23,6 +23,10 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__0(Vrv32e___024root* vlSe
     // Init
     IData/*31:0*/ __Vfunc_rv32e__DOT__mem_stage__DOT__pmem_read__15__Vfuncout;
     __Vfunc_rv32e__DOT__mem_stage__DOT__pmem_read__15__Vfuncout = 0;
+    IData/*31:0*/ __Vfunc_rv32e__DOT__mem_stage__DOT__pmem_read__16__Vfuncout;
+    __Vfunc_rv32e__DOT__mem_stage__DOT__pmem_read__16__Vfuncout = 0;
+    IData/*31:0*/ __Vfunc_rv32e__DOT__mem_stage__DOT__pmem_read__17__Vfuncout;
+    __Vfunc_rv32e__DOT__mem_stage__DOT__pmem_read__17__Vfuncout = 0;
     CData/*4:0*/ __Vdlyvdim0__rv32e__DOT__regfile__DOT__regs__v0;
     __Vdlyvdim0__rv32e__DOT__regfile__DOT__regs__v0 = 0;
     IData/*31:0*/ __Vdlyvval__rv32e__DOT__regfile__DOT__regs__v0;
@@ -46,10 +50,38 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__0(Vrv32e___024root* vlSe
     }
     __Vdlyvset__rv32e__DOT__regfile__DOT__regs__v0 = 0U;
     if (vlSelf->rv32e__DOT__MemRead) {
-        Vrv32e___024root____Vdpiimwrap_rv32e__DOT__if_stage__DOT__pmem_read_TOP(vlSelf->rv32e__DOT____Vcellinp__mem_stage__addr, 4U, __Vfunc_rv32e__DOT__mem_stage__DOT__pmem_read__15__Vfuncout);
-        vlSelf->rv32e__DOT__data_out = __Vfunc_rv32e__DOT__mem_stage__DOT__pmem_read__15__Vfuncout;
+        if ((0U == (IData)(vlSelf->rv32e__DOT__MemLen))) {
+            Vrv32e___024root____Vdpiimwrap_rv32e__DOT__if_stage__DOT__pmem_read_TOP(vlSelf->rv32e__DOT____Vcellinp__mem_stage__addr, 1U, __Vfunc_rv32e__DOT__mem_stage__DOT__pmem_read__15__Vfuncout);
+            vlSelf->rv32e__DOT__mem_stage__DOT__read_data 
+                = __Vfunc_rv32e__DOT__mem_stage__DOT__pmem_read__15__Vfuncout;
+            vlSelf->rv32e__DOT__data_out = (0xffU & vlSelf->rv32e__DOT__mem_stage__DOT__read_data);
+        } else if ((1U == (IData)(vlSelf->rv32e__DOT__MemLen))) {
+            Vrv32e___024root____Vdpiimwrap_rv32e__DOT__if_stage__DOT__pmem_read_TOP(vlSelf->rv32e__DOT____Vcellinp__mem_stage__addr, 2U, __Vfunc_rv32e__DOT__mem_stage__DOT__pmem_read__16__Vfuncout);
+            vlSelf->rv32e__DOT__mem_stage__DOT__read_data 
+                = __Vfunc_rv32e__DOT__mem_stage__DOT__pmem_read__16__Vfuncout;
+            vlSelf->rv32e__DOT__data_out = (((- (IData)(
+                                                        (1U 
+                                                         & (vlSelf->rv32e__DOT__mem_stage__DOT__read_data 
+                                                            >> 0xfU)))) 
+                                             << 0x10U) 
+                                            | (0xffffU 
+                                               & vlSelf->rv32e__DOT__mem_stage__DOT__read_data));
+        } else if ((2U == (IData)(vlSelf->rv32e__DOT__MemLen))) {
+            Vrv32e___024root____Vdpiimwrap_rv32e__DOT__if_stage__DOT__pmem_read_TOP(vlSelf->rv32e__DOT____Vcellinp__mem_stage__addr, 4U, __Vfunc_rv32e__DOT__mem_stage__DOT__pmem_read__17__Vfuncout);
+            vlSelf->rv32e__DOT__data_out = __Vfunc_rv32e__DOT__mem_stage__DOT__pmem_read__17__Vfuncout;
+        } else {
+            vlSelf->rv32e__DOT__data_out = 0U;
+        }
     } else if (vlSelf->rv32e__DOT__MemWrite) {
-        Vrv32e___024root____Vdpiimwrap_rv32e__DOT__mem_stage__DOT__pmem_write_TOP(vlSelf->rv32e__DOT____Vcellinp__mem_stage__addr, vlSelf->rv32e__DOT__rs2_val, 4U);
+        if ((0U == (IData)(vlSelf->rv32e__DOT__MemLen))) {
+            Vrv32e___024root____Vdpiimwrap_rv32e__DOT__mem_stage__DOT__pmem_write_TOP(vlSelf->rv32e__DOT____Vcellinp__mem_stage__addr, vlSelf->rv32e__DOT__rs2_val, 1U);
+        } else if ((1U == (IData)(vlSelf->rv32e__DOT__MemLen))) {
+            Vrv32e___024root____Vdpiimwrap_rv32e__DOT__mem_stage__DOT__pmem_write_TOP(vlSelf->rv32e__DOT____Vcellinp__mem_stage__addr, vlSelf->rv32e__DOT__rs2_val, 2U);
+        } else if ((2U == (IData)(vlSelf->rv32e__DOT__MemLen))) {
+            Vrv32e___024root____Vdpiimwrap_rv32e__DOT__mem_stage__DOT__pmem_write_TOP(vlSelf->rv32e__DOT____Vcellinp__mem_stage__addr, vlSelf->rv32e__DOT__rs2_val, 4U);
+        } else {
+            Vrv32e___024root____Vdpiimwrap_rv32e__DOT__mem_stage__DOT__pmem_write_TOP(vlSelf->rv32e__DOT____Vcellinp__mem_stage__addr, vlSelf->rv32e__DOT__rs2_val, 4U);
+        }
     } else {
         vlSelf->rv32e__DOT__data_out = 0U;
     }
@@ -147,6 +179,7 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSe
     vlSelf->rv32e__DOT__MemWrite = 0U;
     vlSelf->rv32e__DOT__MemRead = 0U;
     vlSelf->rv32e__DOT__alu_op = 0U;
+    vlSelf->rv32e__DOT__MemLen = 2U;
     vlSelf->rv32e__DOT__id_stage__DOT__get_opcode = 
         (0x1fU & ((IData)(vlSelf->rv32e__DOT__opcode) 
                   >> 2U));
@@ -237,16 +270,14 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSe
                         vlSelf->rv32e__DOT__alu_op = 4U;
                     }
                 } else if ((2U & (IData)(vlSelf->rv32e__DOT__func3))) {
-                    if (VL_LIKELY((1U & (IData)(vlSelf->rv32e__DOT__func3)))) {
+                    if ((1U & (IData)(vlSelf->rv32e__DOT__func3))) {
                         if ((0U == (IData)(vlSelf->rv32e__DOT__func7))) {
                             vlSelf->rv32e__DOT__alu_op = 6U;
                         } else if ((0U == (IData)(vlSelf->rv32e__DOT__func7))) {
                             vlSelf->rv32e__DOT__alu_op = 9U;
                         }
-                    } else {
-                        Vrv32e___024root____Vdpiimwrap_rv32e__DOT__id_stage__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__instr);
-                        VL_WRITEF("ID : Unknown R instruction with func3 = %b\n",
-                                  3,vlSelf->rv32e__DOT__func3);
+                    } else if ((0U == (IData)(vlSelf->rv32e__DOT__func7))) {
+                        vlSelf->rv32e__DOT__alu_op = 7U;
                     }
                 } else if ((1U & (IData)(vlSelf->rv32e__DOT__func3))) {
                     if ((0U == (IData)(vlSelf->rv32e__DOT__func7))) {
@@ -267,7 +298,7 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSe
             Vrv32e___024root____Vdpiimwrap_rv32e__DOT__id_stage__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__instr);
             VL_WRITEF("ID : Unknow instruction with inst = %x\n",
                       32,vlSelf->rv32e__DOT__instr);
-        } else if ((2U == (IData)(vlSelf->rv32e__DOT__func3))) {
+        } else {
             vlSelf->rv32e__DOT__imm = (((- (IData)(
                                                    (vlSelf->rv32e__DOT__instr 
                                                     >> 0x1fU))) 
@@ -278,6 +309,17 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSe
                                            (vlSelf->rv32e__DOT__instr 
                                             >> 7U))));
             vlSelf->rv32e__DOT__MemWrite = 1U;
+            if ((2U == (IData)(vlSelf->rv32e__DOT__func3))) {
+                vlSelf->rv32e__DOT__MemLen = 2U;
+            } else if ((1U == (IData)(vlSelf->rv32e__DOT__func3))) {
+                vlSelf->rv32e__DOT__MemLen = 1U;
+            } else if (VL_LIKELY((0U == (IData)(vlSelf->rv32e__DOT__func3)))) {
+                vlSelf->rv32e__DOT__MemLen = 0U;
+            } else {
+                Vrv32e___024root____Vdpiimwrap_rv32e__DOT__id_stage__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__instr);
+                VL_WRITEF("ID : Uknown S instruction with func3 = %b\n",
+                          3,vlSelf->rv32e__DOT__func3);
+            }
         }
     } else if ((4U & (IData)(vlSelf->rv32e__DOT__id_stage__DOT__get_opcode))) {
         if (VL_UNLIKELY((2U & (IData)(vlSelf->rv32e__DOT__id_stage__DOT__get_opcode)))) {
@@ -331,6 +373,20 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSe
         vlSelf->rv32e__DOT__imm = vlSelf->rv32e__DOT__id_stage__DOT__immI;
         vlSelf->rv32e__DOT__RegWrite = 1U;
         vlSelf->rv32e__DOT__MemRead = 1U;
+        vlSelf->rv32e__DOT__alu_op = 0U;
+        vlSelf->rv32e__DOT__MemLen = 2U;
+    } else if ((4U == (IData)(vlSelf->rv32e__DOT__func3))) {
+        vlSelf->rv32e__DOT__imm = vlSelf->rv32e__DOT__id_stage__DOT__immI;
+        vlSelf->rv32e__DOT__RegWrite = 1U;
+        vlSelf->rv32e__DOT__MemRead = 1U;
+        vlSelf->rv32e__DOT__alu_op = 0U;
+        vlSelf->rv32e__DOT__MemLen = 0U;
+    } else if ((1U == (IData)(vlSelf->rv32e__DOT__func3))) {
+        vlSelf->rv32e__DOT__imm = vlSelf->rv32e__DOT__id_stage__DOT__immI;
+        vlSelf->rv32e__DOT__RegWrite = 1U;
+        vlSelf->rv32e__DOT__MemRead = 1U;
+        vlSelf->rv32e__DOT__alu_op = 0U;
+        vlSelf->rv32e__DOT__MemLen = 1U;
     }
     vlSelf->rv32e__DOT__is_jalr = ((0x67U == (IData)(vlSelf->rv32e__DOT__opcode)) 
                                    & (0U == (IData)(vlSelf->rv32e__DOT__func3)));

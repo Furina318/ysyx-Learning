@@ -12,7 +12,8 @@ module ID (
     output reg        RegWrite,
     output reg        MemWrite,
     output reg        MemRead,
-    output reg [3:0]  alu_op
+    output reg [3:0]  alu_op,
+    output reg [1:0]  MemLen
 );
     import "DPI-C" function void ebreak(input int station, input int inst);
 
@@ -44,6 +45,7 @@ module ID (
         MemWrite = 1'b0;
         MemRead  = 1'b0;
         alu_op   = `ALU_ADD;
+        MemLen   = `Mem_Word;
  
         assign get_opcode = opcode[6:2];
 
@@ -71,20 +73,74 @@ module ID (
                     RegWrite = 1'b1;
                 end
             end
-            // SW
+    
             `INST_TYPE_S: begin
-                if (func3 == 3'b010) begin
-                    imm = immS;
-                    MemWrite = 1'b1;
-                end
+                // if (func3 == 3'b010) begin
+                //     imm=immS;
+                //     MemWrite=1'b1;
+                // end
+                // else if(func3 == 3'b001) begin
+                //     imm=immS;
+                //     MemWrite=1'b1;
+                //     MemLen=`Mem_Half;
+                // end
+                imm=immS;
+                MemWrite=1'b1;
+                case(func3)
+                    `F3_SW: MemLen=`Mem_Word;
+                    `F3_SH: MemLen=`Mem_Half;
+                    `F3_SB: MemLen=`Mem_Bit;
+                    default: begin
+                        ebreak(`ABORT,instr);
+                        $display("ID : Uknown S instruction with func3 = %b",func3);
+                    end
+                endcase
             end
+
             `INST_TYPE_L: begin
-                if(func3==3'b010) begin//lw
+                // imm=immI;
+                // RegWrite=1'b1;
+                // MemRead=1'b1;
+                // case(func3)
+                //     `F3_LW: begin
+                //         alu_op = `ALU_ADD;
+                //         MemLen = `Mem_Word;
+                //     end
+                //     `F3_LBU: begin
+                //         alu_op = `ALU_ADD;
+                //         MemLen = `Mem_R_Bit;//单字节读取
+                //     end
+                //     default: begin
+                //         ebreak(`ABORT,instr);
+                //         $display("ID : Unknown L instruction with func3 = %b",func3);
+                //     end
+                // endcase
+                if(func3 == `F3_LW) begin
                     imm=immI;
                     RegWrite=1'b1;
                     MemRead=1'b1;
+
+                    alu_op = `ALU_ADD;
+                    MemLen = `Mem_Word;
+                end
+                else if(func3 == `F3_LBU) begin
+                    imm=immI;
+                    RegWrite=1'b1;
+                    MemRead=1'b1;
+
+                    alu_op = `ALU_ADD;
+                    MemLen = `Mem_Bit;//单字节读取
+                end
+                else if(func3 == `F3_LH) begin
+                    imm=immI;
+                    RegWrite=1'b1;
+                    MemRead=1'b1;
+
+                    alu_op = `ALU_ADD;
+                    MemLen = `Mem_Half;
                 end
             end
+
             `INST_TYPE_R: begin
                 RegWrite = 1'b1;
                 imm = immR;
@@ -92,7 +148,7 @@ module ID (
                     3'b000:   alu_op = (func7[5]) ? `ALU_SUB : `ALU_ADD; // add, sub
                     `F3_ANDI: alu_op = `ALU_AND; // and
                     `F3_ORI:  alu_op = `ALU_OR; // or
-                    3'b100:   alu_op = `ALU_XOR;// xor
+                    `F3_XORI:   alu_op = `ALU_XOR;// xor
                     `F3_SLTU: begin
                         if(func7==7'b0000000) alu_op=`ALU_SLTU;
                         else if(func7==7'b0000000) alu_op=`ALU_SRL;
@@ -103,12 +159,16 @@ module ID (
                     `F3_LSH: begin
                         if(func7==7'b0000000) alu_op=`ALU_SLL;
                     end
+                    `F3_SLT: begin
+                        if(func7==7'b0000000) alu_op=`ALU_SLT;//slt
+                    end
                     default: begin
                         ebreak(`ABORT, instr);
                         $display("ID : Unknown R instruction with func3 = %b", func3);
                     end
                 endcase
             end
+
             `INST_TYPE_I: begin
                 imm=immI;
                 RegWrite=1'b1;
@@ -132,20 +192,19 @@ module ID (
                     end
                 endcase
             end
+
             `INST_TYPE_B: begin
-                // if (func3 == 3'b001) begin  // bne
-                //     imm = immB;
-                //     alu_op = 4'b0001; // 减法，用于比较
-                // end
                 imm=immB;
                 alu_op=`ALU_SUB;//用于减法比较
             end
+
             `INST_TYPE_E: begin
                 if(instr==`INST_EBREAK) begin
                     ebreak(`HIT_TRAP,instr);
                     $display("ebreak instruction");
                 end
             end
+
             default: begin
                     ebreak(`ABORT, instr);
                     $display("ID : Unknow instruction with inst = %h", instr);

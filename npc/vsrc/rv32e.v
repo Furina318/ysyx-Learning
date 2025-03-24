@@ -25,6 +25,7 @@ module rv32e (
     wire         alu_zero;
     wire         alu_less;
     wire         take_branch;
+    wire [1:0]   MemLen;
 
     wire [31:0] branch_target;
     assign branch_target=is_jalr ? jalr_target : jal_target;
@@ -52,7 +53,8 @@ module rv32e (
         .RegWrite(RegWrite),
         .MemWrite(MemWrite),
         .MemRead(MemRead),
-        .alu_op(alu_op)
+        .alu_op(alu_op),
+        .MemLen(MemLen)
     );
 
     // 寄存器文件
@@ -82,6 +84,7 @@ module rv32e (
         .MemWrite(MemWrite),
         .addr(rs1_val + imm),
         .data_in(rs2_val),
+        .MemLen(MemLen),
         .data_out(data_out)
     );
 
@@ -100,7 +103,7 @@ module rv32e (
     assign wb_data = (opcode == `INST_LUI) ? imm :                   // LUI
                      (opcode == `INST_AUIPC) ? (pc + imm) :            // AUIPC
                      (opcode == `INST_JAL || opcode == `INST_JALR) ? (pc + 4) : // JAL, JALR
-                     (opcode == `INST_LW) ? data_out :              // lw
+                     (opcode == `INST_LW) ? data_out :              // lw,lh,lbu共用
                      (opcode == `INST_R || opcode == `INST_I) ? alu_result : 32'b0; // R-type, I-type
     always @(posedge clk) begin
         if (opcode == `INST_B)
