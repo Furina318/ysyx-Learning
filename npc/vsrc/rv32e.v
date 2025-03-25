@@ -97,7 +97,9 @@ module rv32e (
         (func3 == `F3_BNE && !alu_zero) ||//bne
         (func3 == `F3_BEQ && alu_zero) ||//beq
         (func3 == `F3_BLT && alu_less) ||//blt
-        (func3 == `F3_BGE && !alu_less) //bge
+        (func3 == `F3_BGE && !alu_less) ||//bge
+        (func3 == `F3_BLTU && alu_less) ||//bltu
+        (func3 == `F3_BGEU && !alu_less)//begu
     ); 
     // 写回数据选择
     assign wb_data = (opcode == `INST_LUI) ? imm :                   // LUI

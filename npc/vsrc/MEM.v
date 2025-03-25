@@ -30,6 +30,10 @@ module MEM (
                     read_data = pmem_read(addr,2);
                     data_out  = {{16{read_data[15]}},read_data[15:0]};//符号扩展，支持lh
                 end
+                `Mem_UHalf: begin
+                    read_data = pmem_read(addr,2);
+                    data_out  = {16'b0,read_data[15:0]};//无符号扩展，支持lhu
+                end
                 `Mem_Word:  data_out = pmem_read(addr,4);//lw
                 default: data_out = 32'b0;
             endcase

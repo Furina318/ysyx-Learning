@@ -174,7 +174,18 @@ VL_ATTR_COLD void Vrv32e___024root___stl_sequent__TOP__0(Vrv32e___024root* vlSel
                                                  | (0x1eU 
                                                     & (vlSelf->rv32e__DOT__instr 
                                                        >> 7U)))));
-                vlSelf->rv32e__DOT__alu_op = 1U;
+                if ((4U & (IData)(vlSelf->rv32e__DOT__func3))) {
+                    vlSelf->rv32e__DOT__alu_op = ((2U 
+                                                   & (IData)(vlSelf->rv32e__DOT__func3))
+                                                   ? 6U
+                                                   : 7U);
+                } else if (VL_UNLIKELY((2U & (IData)(vlSelf->rv32e__DOT__func3)))) {
+                    Vrv32e___024root____Vdpiimwrap_rv32e__DOT__id_stage__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__instr);
+                    VL_WRITEF("ID : Unknown B instruction with func3 = %b\n",
+                              3,vlSelf->rv32e__DOT__func3);
+                } else {
+                    vlSelf->rv32e__DOT__alu_op = 1U;
+                }
             }
         } else {
             Vrv32e___024root____Vdpiimwrap_rv32e__DOT__id_stage__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__instr);
@@ -202,6 +213,8 @@ VL_ATTR_COLD void Vrv32e___024root___stl_sequent__TOP__0(Vrv32e___024root* vlSel
                     } else if ((1U & (IData)(vlSelf->rv32e__DOT__func3))) {
                         if ((0x20U == (IData)(vlSelf->rv32e__DOT__func7))) {
                             vlSelf->rv32e__DOT__alu_op = 8U;
+                        } else if ((0U == (IData)(vlSelf->rv32e__DOT__func7))) {
+                            vlSelf->rv32e__DOT__alu_op = 9U;
                         }
                     } else {
                         vlSelf->rv32e__DOT__alu_op = 4U;
@@ -324,6 +337,12 @@ VL_ATTR_COLD void Vrv32e___024root___stl_sequent__TOP__0(Vrv32e___024root* vlSel
         vlSelf->rv32e__DOT__MemRead = 1U;
         vlSelf->rv32e__DOT__alu_op = 0U;
         vlSelf->rv32e__DOT__MemLen = 1U;
+    } else if ((5U == (IData)(vlSelf->rv32e__DOT__func3))) {
+        vlSelf->rv32e__DOT__imm = vlSelf->rv32e__DOT__id_stage__DOT__immI;
+        vlSelf->rv32e__DOT__RegWrite = 1U;
+        vlSelf->rv32e__DOT__MemRead = 1U;
+        vlSelf->rv32e__DOT__alu_op = 0U;
+        vlSelf->rv32e__DOT__MemLen = 3U;
     }
     vlSelf->rv32e__DOT__is_jalr = ((0x67U == (IData)(vlSelf->rv32e__DOT__opcode)) 
                                    & (0U == (IData)(vlSelf->rv32e__DOT__func3)));

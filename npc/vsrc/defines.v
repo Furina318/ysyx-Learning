@@ -34,6 +34,7 @@
 `define F3_BEQ     3'b000
 `define F3_BNE     3'b001
 `define F3_BLT     3'b100
+`define F3_BLTU    3'b110
 `define F3_BGE     3'b101
 
 `define F3_RSH   3'b101
@@ -46,6 +47,8 @@
 `define F3_SW    3'b010
 `define F3_SH    3'b001
 `define F3_SB    3'b000
+`define F3_LHU   3'b101
+`define F3_BGEU  3'b111
 
 // ALU 操作码
 `define ALU_ADD    4'b0000
@@ -62,4 +65,5 @@
 //Mem字节选取
 `define Mem_Word   2'b10
 `define Mem_Half   2'b01
+`define Mem_UHalf  2'b11
 `define Mem_Bit    2'b00

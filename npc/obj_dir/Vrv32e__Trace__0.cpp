@@ -148,8 +148,13 @@ void Vrv32e___024root__trace_chg_sub_0(Vrv32e___024root* vlSelf, VerilatedVcd::B
                                   & (0U == vlSelf->rv32e__DOT__alu_result)) 
                                  | (((4U == (IData)(vlSelf->rv32e__DOT__func3)) 
                                      & (IData)(vlSelf->rv32e__DOT__alu_less)) 
-                                    | ((~ (IData)(vlSelf->rv32e__DOT__alu_less)) 
-                                       & (5U == (IData)(vlSelf->rv32e__DOT__func3)))))))));
+                                    | (((~ (IData)(vlSelf->rv32e__DOT__alu_less)) 
+                                        & (5U == (IData)(vlSelf->rv32e__DOT__func3))) 
+                                       | (((6U == (IData)(vlSelf->rv32e__DOT__func3)) 
+                                           & (IData)(vlSelf->rv32e__DOT__alu_less)) 
+                                          | ((~ (IData)(vlSelf->rv32e__DOT__alu_less)) 
+                                             & (7U 
+                                                == (IData)(vlSelf->rv32e__DOT__func3)))))))))));
     bufp->chgIData(oldp+69,(((IData)(vlSelf->rv32e__DOT__is_jalr)
                               ? (0xfffffffeU & vlSelf->rv32e__DOT____Vcellinp__mem_stage__addr)
                               : vlSelf->rv32e__DOT__jal_target)),32);
@@ -162,9 +167,15 @@ void Vrv32e___024root__trace_chg_sub_0(Vrv32e___024root* vlSelf, VerilatedVcd::B
                                         & (0U == vlSelf->rv32e__DOT__alu_result)) 
                                        | (((4U == (IData)(vlSelf->rv32e__DOT__func3)) 
                                            & (IData)(vlSelf->rv32e__DOT__alu_less)) 
-                                          | ((~ (IData)(vlSelf->rv32e__DOT__alu_less)) 
-                                             & (5U 
-                                                == (IData)(vlSelf->rv32e__DOT__func3)))))))))));
+                                          | (((~ (IData)(vlSelf->rv32e__DOT__alu_less)) 
+                                              & (5U 
+                                                 == (IData)(vlSelf->rv32e__DOT__func3))) 
+                                             | (((6U 
+                                                  == (IData)(vlSelf->rv32e__DOT__func3)) 
+                                                 & (IData)(vlSelf->rv32e__DOT__alu_less)) 
+                                                | ((~ (IData)(vlSelf->rv32e__DOT__alu_less)) 
+                                                   & (7U 
+                                                      == (IData)(vlSelf->rv32e__DOT__func3)))))))))))));
 }
 
 void Vrv32e___024root__trace_cleanup(void* voidSelf, VerilatedVcd* /*unused*/) {

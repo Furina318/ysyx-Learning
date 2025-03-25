@@ -119,25 +119,33 @@ module ID (
                     imm=immI;
                     RegWrite=1'b1;
                     MemRead=1'b1;
-
                     alu_op = `ALU_ADD;
+
                     MemLen = `Mem_Word;
                 end
                 else if(func3 == `F3_LBU) begin
                     imm=immI;
                     RegWrite=1'b1;
                     MemRead=1'b1;
-
                     alu_op = `ALU_ADD;
+
                     MemLen = `Mem_Bit;//单字节读取
                 end
                 else if(func3 == `F3_LH) begin
                     imm=immI;
                     RegWrite=1'b1;
                     MemRead=1'b1;
-
                     alu_op = `ALU_ADD;
+
                     MemLen = `Mem_Half;
+                end
+                else if(func3 == `F3_LHU) begin
+                    imm=immI;
+                    RegWrite=1'b1;
+                    MemRead=1'b1;
+                    alu_op = `ALU_ADD;
+
+                    MemLen = `Mem_UHalf;
                 end
             end
 
@@ -155,6 +163,7 @@ module ID (
                     end
                     `F3_RSH: begin
                         if(func7 == 7'b0100000) alu_op=`ALU_SRA;
+                        else if(func7 == 7'b0000000) alu_op=`ALU_SRL;
                     end
                     `F3_LSH: begin
                         if(func7==7'b0000000) alu_op=`ALU_SLL;
@@ -195,7 +204,19 @@ module ID (
 
             `INST_TYPE_B: begin
                 imm=immB;
-                alu_op=`ALU_SUB;//用于减法比较
+                // alu_op=`ALU_SUB;//用于减法比较
+                case(func3)
+                    `F3_BEQ:  alu_op = `ALU_SUB;
+                    `F3_BNE:  alu_op = `ALU_SUB;
+                    `F3_BLT:  alu_op = `ALU_SLT;//blt,bltz
+                    `F3_BGE:  alu_op = `ALU_SLT;//bge,blez
+                    `F3_BLTU: alu_op = `ALU_SLTU;
+                    `F3_BGEU: alu_op = `ALU_SLTU;
+                    default: begin
+                        ebreak(`ABORT,instr);
+                        $display("ID : Unknown B instruction with func3 = %b",func3);
+                    end
+                endcase
             end
 
             `INST_TYPE_E: begin

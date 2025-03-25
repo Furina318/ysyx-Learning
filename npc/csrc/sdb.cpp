@@ -54,7 +54,7 @@ static int cmd_c(char *args) {
 
 static int cmd_q(char *args) {
   npc_state.state=NPC_QUIT;//直接改变good的值，防止其直接退出时good！=0（/src/utils/state.c）导致return出现异常
-  die();
+  // die();
   return -1;//只有-1的时候会在sdb_mainloop触发中断影响good
 }
 
