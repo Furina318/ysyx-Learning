@@ -42,6 +42,15 @@ VM_USER_LDLIBS = \
 # User .cpp files (from .cpp's on Verilator command line)
 VM_USER_CLASSES = \
 	cpu \
+	alarm \
+	map \
+	mmio \
+	port-io \
+	keyboard \
+	rtc \
+	serial \
+	timer \
+	vga \
 	difftest \
 	expr \
 	monitor \
@@ -54,6 +63,8 @@ VM_USER_CLASSES = \
 # User .cpp directories (from .cpp's on Verilator command line)
 VM_USER_DIR = \
 	/home/furina/ysyx-workbench/npc/csrc \
+	/home/furina/ysyx-workbench/npc/csrc/device \
+	/home/furina/ysyx-workbench/npc/csrc/device/io \
 
 
 ### Default rules...
@@ -66,6 +77,24 @@ include $(VERILATOR_ROOT)/include/verilated.mk
 VPATH += $(VM_USER_DIR)
 
 cpu.o: /home/furina/ysyx-workbench/npc/csrc/cpu.cpp
+	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
+alarm.o: /home/furina/ysyx-workbench/npc/csrc/device/alarm.cpp
+	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
+map.o: /home/furina/ysyx-workbench/npc/csrc/device/io/map.cpp
+	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
+mmio.o: /home/furina/ysyx-workbench/npc/csrc/device/io/mmio.cpp
+	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
+port-io.o: /home/furina/ysyx-workbench/npc/csrc/device/io/port-io.cpp
+	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
+keyboard.o: /home/furina/ysyx-workbench/npc/csrc/device/keyboard.cpp
+	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
+rtc.o: /home/furina/ysyx-workbench/npc/csrc/device/rtc.cpp
+	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
+serial.o: /home/furina/ysyx-workbench/npc/csrc/device/serial.cpp
+	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
+timer.o: /home/furina/ysyx-workbench/npc/csrc/device/timer.cpp
+	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
+vga.o: /home/furina/ysyx-workbench/npc/csrc/device/vga.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
 difftest.o: /home/furina/ysyx-workbench/npc/csrc/difftest.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<

@@ -5,6 +5,7 @@
 #include "../include/debug.h"
 #include "../include/reg.h"
 #include "../include/utils.h"
+#include "../include/device/mmio.h"
 
 
 /********extern functions or variables********/
@@ -124,7 +125,7 @@ word_t host_read(void *addr, int len)
   }
 }
 
-static void host_write(void *addr, int len, word_t data) {
+void host_write(void *addr, int len, word_t data) {
   switch (len) {
     case 1: *(uint8_t  *)addr = data; return;
     case 2: *(uint16_t *)addr = data; return;
@@ -153,7 +154,8 @@ word_t pmem_r(paddr_t addr, int len)
 #ifdef CONFIG_MTRACE
   mtrace_log('R',addr,host_read(guest_to_host(addr), len),len);
 #endif
-  if(in_pmem(addr)) return host_read(guest_to_host(addr), len);
+  if(likely(in_pmem(addr))) return host_read(guest_to_host(addr), len);
+  IFDEF(CONFIG_DEVICE, return mmio_read(addr, len));
   out_of_bound(addr);
   return 0;
 }
@@ -163,11 +165,12 @@ void pmem_w(paddr_t addr, int len, word_t data)
 #ifdef CONFIG_MTRACE
   mtrace_log('W',addr,data,len);
 #endif
-  if(in_pmem(addr))
+  if(likely(in_pmem(addr)))
   {
     host_write(guest_to_host(addr), len, data);
     return;
   }  
+  IFDEF(CONFIG_DEVICE, mmio_write(addr, len, data); return);
   out_of_bound(addr);
 }
 
