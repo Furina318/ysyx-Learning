@@ -59,7 +59,8 @@ extern "C" void ebreak(int station, int inst) {
 }
 
 extern "C" word_t pmem_read(paddr_t raddr, int len) {
-    if (main_time >= start_time) return pmem_r(raddr, len); // 在复位结束后才读取真实内存
+    // if (main_time >= start_time) return pmem_r(raddr, len); // 在复位结束后才读取真实内存
+    if(main_time >= 1) return pmem_r(raddr,len);
     return 0; // 复位期间返回 0，避免未定义行为
 }
 

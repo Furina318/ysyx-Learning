@@ -112,20 +112,21 @@ void Vrv32e___024root__trace_chg_sub_0(Vrv32e___024root* vlSelf, VerilatedVcd::B
                                                      & (vlSelf->rv32e__DOT__instr 
                                                         >> 0x14U)))))),32);
         bufp->chgCData(oldp+56,(vlSelf->rv32e__DOT__id_stage__DOT__get_opcode),5);
+        bufp->chgBit(oldp+57,(vlSelf->rv32e__DOT__if_stage__DOT__check));
     }
     if (VL_UNLIKELY(vlSelf->__Vm_traceActivity[3U])) {
-        bufp->chgIData(oldp+57,(vlSelf->rv32e__DOT__rs1_val),32);
-        bufp->chgIData(oldp+58,(vlSelf->rv32e__DOT__rs2_val),32);
-        bufp->chgIData(oldp+59,((0xfffffffeU & vlSelf->rv32e__DOT____Vcellinp__mem_stage__addr)),32);
-        bufp->chgIData(oldp+60,(vlSelf->rv32e__DOT__alu_result),32);
-        bufp->chgBit(oldp+61,((0U == vlSelf->rv32e__DOT__alu_result)));
-        bufp->chgBit(oldp+62,(vlSelf->rv32e__DOT__alu_less));
-        bufp->chgIData(oldp+63,(vlSelf->rv32e__DOT____Vcellinp__alu__b),32);
-        bufp->chgIData(oldp+64,(vlSelf->rv32e__DOT____Vcellinp__mem_stage__addr),32);
+        bufp->chgIData(oldp+58,(vlSelf->rv32e__DOT__rs1_val),32);
+        bufp->chgIData(oldp+59,(vlSelf->rv32e__DOT__rs2_val),32);
+        bufp->chgIData(oldp+60,((0xfffffffeU & vlSelf->rv32e__DOT____Vcellinp__mem_stage__addr)),32);
+        bufp->chgIData(oldp+61,(vlSelf->rv32e__DOT__alu_result),32);
+        bufp->chgBit(oldp+62,((0U == vlSelf->rv32e__DOT__alu_result)));
+        bufp->chgBit(oldp+63,(vlSelf->rv32e__DOT__alu_less));
+        bufp->chgIData(oldp+64,(vlSelf->rv32e__DOT____Vcellinp__alu__b),32);
+        bufp->chgIData(oldp+65,(vlSelf->rv32e__DOT____Vcellinp__mem_stage__addr),32);
     }
-    bufp->chgBit(oldp+65,(vlSelf->clk));
-    bufp->chgBit(oldp+66,(vlSelf->reset));
-    bufp->chgIData(oldp+67,(((0x37U == (IData)(vlSelf->rv32e__DOT__opcode))
+    bufp->chgBit(oldp+66,(vlSelf->clk));
+    bufp->chgBit(oldp+67,(vlSelf->reset));
+    bufp->chgIData(oldp+68,(((0x37U == (IData)(vlSelf->rv32e__DOT__opcode))
                               ? vlSelf->rv32e__DOT__imm
                               : ((0x17U == (IData)(vlSelf->rv32e__DOT__opcode))
                                   ? vlSelf->rv32e__DOT__jal_target
@@ -141,7 +142,7 @@ void Vrv32e___024root__trace_chg_sub_0(Vrv32e___024root* vlSelf, VerilatedVcd::B
                                                  == (IData)(vlSelf->rv32e__DOT__opcode)))
                                               ? vlSelf->rv32e__DOT__alu_result
                                               : 0U)))))),32);
-    bufp->chgBit(oldp+68,(((0x63U == (IData)(vlSelf->rv32e__DOT__opcode)) 
+    bufp->chgBit(oldp+69,(((0x63U == (IData)(vlSelf->rv32e__DOT__opcode)) 
                            & (((0U != vlSelf->rv32e__DOT__alu_result) 
                                & (1U == (IData)(vlSelf->rv32e__DOT__func3))) 
                               | (((0U == (IData)(vlSelf->rv32e__DOT__func3)) 
@@ -155,10 +156,10 @@ void Vrv32e___024root__trace_chg_sub_0(Vrv32e___024root* vlSelf, VerilatedVcd::B
                                           | ((~ (IData)(vlSelf->rv32e__DOT__alu_less)) 
                                              & (7U 
                                                 == (IData)(vlSelf->rv32e__DOT__func3)))))))))));
-    bufp->chgIData(oldp+69,(((IData)(vlSelf->rv32e__DOT__is_jalr)
+    bufp->chgIData(oldp+70,(((IData)(vlSelf->rv32e__DOT__is_jalr)
                               ? (0xfffffffeU & vlSelf->rv32e__DOT____Vcellinp__mem_stage__addr)
                               : vlSelf->rv32e__DOT__jal_target)),32);
-    bufp->chgBit(oldp+70,(((0x6fU == (IData)(vlSelf->rv32e__DOT__opcode)) 
+    bufp->chgBit(oldp+71,(((0x6fU == (IData)(vlSelf->rv32e__DOT__opcode)) 
                            | ((IData)(vlSelf->rv32e__DOT__is_jalr) 
                               | ((0x63U == (IData)(vlSelf->rv32e__DOT__opcode)) 
                                  & (((0U != vlSelf->rv32e__DOT__alu_result) 

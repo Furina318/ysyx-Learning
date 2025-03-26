@@ -500,6 +500,7 @@ VL_ATTR_COLD void Vrv32e___024root___ctor_var_reset(Vrv32e___024root* vlSelf) {
     vlSelf->rv32e__DOT__MemLen = VL_RAND_RESET_I(2);
     vlSelf->rv32e__DOT____Vcellinp__alu__b = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT____Vcellinp__mem_stage__addr = VL_RAND_RESET_I(32);
+    vlSelf->rv32e__DOT__if_stage__DOT__check = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__id_stage__DOT__immI = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__id_stage__DOT__get_opcode = VL_RAND_RESET_I(5);
     for (int __Vi0 = 0; __Vi0 < 32; ++__Vi0) {

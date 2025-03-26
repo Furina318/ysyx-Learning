@@ -25,6 +25,7 @@ class Vrv32e___024root final : public VerilatedModule {
     CData/*3:0*/ rv32e__DOT__alu_op;
     CData/*0:0*/ rv32e__DOT__alu_less;
     CData/*1:0*/ rv32e__DOT__MemLen;
+    CData/*0:0*/ rv32e__DOT__if_stage__DOT__check;
     CData/*4:0*/ rv32e__DOT__id_stage__DOT__get_opcode;
     CData/*0:0*/ __Vtrigrprev__TOP__clk;
     CData/*0:0*/ __Vtrigrprev__TOP__reset;

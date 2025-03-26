@@ -98,21 +98,18 @@ module ID (
             end
 
             `INST_TYPE_L: begin
-                // imm=immI;
-                // RegWrite=1'b1;
-                // MemRead=1'b1;
+                // imm = immI;
+                // RegWrite = 1'b1;
+                // MemRead = 1'b1;
+                // alu_op = `ALU_ADD;
                 // case(func3)
-                //     `F3_LW: begin
-                //         alu_op = `ALU_ADD;
-                //         MemLen = `Mem_Word;
-                //     end
-                //     `F3_LBU: begin
-                //         alu_op = `ALU_ADD;
-                //         MemLen = `Mem_R_Bit;//单字节读取
-                //     end
+                //     `F3_LW:  MemLen = `Mem_Word;
+                //     `F3_LBU: MemLen = `Mem_Bit;
+                //     `F3_LH:  MemLen = `Mem_Half;
+                //     `F3_LHU: MemLen = `Mem_UHalf;
                 //     default: begin
                 //         ebreak(`ABORT,instr);
-                //         $display("ID : Unknown L instruction with func3 = %b",func3);
+                //         $display("ID : Uknown L instruction with func3 = %b",func3);
                 //     end
                 // endcase
                 if(func3 == `F3_LW) begin
