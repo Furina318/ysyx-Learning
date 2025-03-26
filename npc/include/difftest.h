@@ -15,5 +15,5 @@ typedef struct {
     word_t gpr[32];
     vaddr_t pc;
 }CPU_state;
-
+void init_difftest(char *ref_so_file, long img_size, int port);
 #endif

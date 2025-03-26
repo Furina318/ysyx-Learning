@@ -15,6 +15,7 @@ LDFLAGS   += --gc-sections -e _start
 NPCFLAGS += -l $(shell dirname $(IMAGE).elf)/npc-log.txt
 NPCFLAGS += -e $(IMAGE).elf#elf文件解析
 NPCFLAGS += -b#批处理模式
+#NPCFLAGS += -d /home/furina/ysyx-workbench/nemu/bulid/riscv32-nemu-interpreter-so
 
 MAINARGS_MAX_LEN = 64
 MAINARGS_PLACEHOLDER = The insert-arg rule in Makefile will insert mainargs here.

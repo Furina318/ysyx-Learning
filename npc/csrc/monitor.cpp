@@ -4,6 +4,7 @@
 #include "../include/common.h"
 #include "../include/debug.h"
 #include "../include/utils.h"
+#include "../include/difftest.h"
 #include <elf.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -222,8 +223,12 @@ void init_monitor(int argc, char *argv[]) {
   long img_size = load_img();
 
   /* Initialize differential testing. */
-  // init_difftest(diff_so_file, img_size, difftest_port);
-
+#ifdef CONFIG_DIFFTEST
+  if(diff_so_file!=NULL){
+    printf("Get difftest file : %s",diff_so_file);
+    init_difftest(diff_so_file, img_size, difftest_port);
+  }
+#endif
   /* Initialize the simple debugger. */
   init_sdb();
 

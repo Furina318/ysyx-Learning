@@ -116,11 +116,6 @@ void difftest_step(vaddr_t pc, vaddr_t npc)
 {
     CPU_state ref_r;
     update_cpu_state(&cpu);
-
-    // 观察波形图发现，由于testbench复位操作的代码编写以及寄存器结果要在下一个周期才写入reg_file，
-    // NPCState的更新和difftest的check必须要延迟一个周期才是正确的；
-    // 所以REF的SKIP也要延迟一个周期
-    // 这里的思路是若上一个周期的skip_cnt_ref一直不为0，则这一个周期的skip_flag始终为为true，那么执行skip操作。
     if(skip_cnt_ref) 
     {
         if(skip_flag == false)

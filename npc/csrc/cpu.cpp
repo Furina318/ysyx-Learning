@@ -18,9 +18,14 @@ extern Vrv32e *top;
 extern VerilatedVcdC *tfp;
 extern vluint64_t main_time;
 extern void die();
+
 #ifdef CONFIG_ITRACE 
 extern void append_iringbuf(char *s);
 extern void display_iringbuf(void);
+#endif
+
+#ifdef CONFIG_DIFFTEST
+extern void difftest_step(vaddr_t pc, vaddr_t npc);
 #endif
 /*********************************************/
 
@@ -174,20 +179,27 @@ static void statistic() {
 static void execute_once() {
     PCSet.pc = top->rootp->rv32e__DOT__pc;
     PCSet.inst = top->rootp->rv32e__DOT__instr;
+
     single_cycle();
     single_cycle(); // 执行一个时钟周期
+
 #ifdef CONFIG_FTRACE
   ftrace_handle();
 #endif 
+
     PCSet.next_pc = top->rootp->rv32e__DOT__pc;
     PCSet.ninst = top->rootp->rv32e__DOT__instr;
+
 #ifdef CONFIG_ITRACE
     char *p = logbuf;
     p += snprintf(p, sizeof(logbuf), "0x%08x: 0x%08x ", PCSet.pc, PCSet.inst);
     *p = '\0';
     append_iringbuf(logbuf);
-}
 #endif
+
+  IFDEF(CONFIG_DIFFTEST,difftest_step(PCSet.pc,PCSet.next_pc));
+}
+
 
 static void execute(uint64_t n) {
     IFDEF(CONFIG_MTRACE,init_mtrace());

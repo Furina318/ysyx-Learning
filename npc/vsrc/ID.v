@@ -144,6 +144,10 @@ module ID (
 
                     MemLen = `Mem_UHalf;
                 end
+                else begin
+                    ebreak(`ABORT,instr);
+                    $display("ID : Uknown L instruction with func3 = %b",func3);
+                end
             end
 
             `INST_TYPE_R: begin
