@@ -43,6 +43,7 @@ VM_USER_LDLIBS = \
 VM_USER_CLASSES = \
 	cpu \
 	alarm \
+	device \
 	map \
 	mmio \
 	port-io \
@@ -79,6 +80,8 @@ VPATH += $(VM_USER_DIR)
 cpu.o: /home/furina/ysyx-workbench/npc/csrc/cpu.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
 alarm.o: /home/furina/ysyx-workbench/npc/csrc/device/alarm.cpp
+	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
+device.o: /home/furina/ysyx-workbench/npc/csrc/device/device.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
 map.o: /home/furina/ysyx-workbench/npc/csrc/device/io/map.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<

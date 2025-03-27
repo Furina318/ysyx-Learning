@@ -86,8 +86,6 @@ VL_ATTR_COLD void Vrv32e___024root___stl_sequent__TOP__0(Vrv32e___024root* vlSel
     // Body
     Vrv32e___024root____Vdpiimwrap_rv32e__DOT__if_stage__DOT__pmem_read_TOP(vlSelf->rv32e__DOT__pc, 4U, vlSelf->__Vfunc_rv32e__DOT__if_stage__DOT__pmem_read__0__Vfuncout);
     vlSelf->rv32e__DOT__instr = vlSelf->__Vfunc_rv32e__DOT__if_stage__DOT__pmem_read__0__Vfuncout;
-    VL_WRITEF("PC=0x%08x | instr=0x%08x\n",32,vlSelf->rv32e__DOT__pc,
-              32,vlSelf->rv32e__DOT__instr);
     vlSelf->rv32e__DOT__rs1_val = ((0U == (0x1fU & 
                                            (vlSelf->rv32e__DOT__instr 
                                             >> 0xfU)))
@@ -350,10 +348,10 @@ VL_ATTR_COLD void Vrv32e___024root___stl_sequent__TOP__0(Vrv32e___024root* vlSel
     }
     vlSelf->rv32e__DOT__is_jalr = ((0x67U == (IData)(vlSelf->rv32e__DOT__opcode)) 
                                    & (0U == (IData)(vlSelf->rv32e__DOT__func3)));
-    vlSelf->rv32e__DOT__jal_target = (vlSelf->rv32e__DOT__imm 
-                                      + vlSelf->rv32e__DOT__pc);
     vlSelf->rv32e__DOT____Vcellinp__mem_stage__addr 
         = (vlSelf->rv32e__DOT__imm + vlSelf->rv32e__DOT__rs1_val);
+    vlSelf->rv32e__DOT__jal_target = (vlSelf->rv32e__DOT__imm 
+                                      + vlSelf->rv32e__DOT__pc);
     vlSelf->rv32e__DOT____Vcellinp__alu__b = (((0xcU 
                                                 == 
                                                 (0x1fU 
@@ -451,10 +449,10 @@ VL_ATTR_COLD void Vrv32e___024root___dump_triggers__act(Vrv32e___024root* vlSelf
         VL_DBG_MSGF("         No triggers active\n");
     }
     if (vlSelf->__VactTriggered.at(0U)) {
-        VL_DBG_MSGF("         'act' region trigger index 0 is active: @(posedge clk)\n");
+        VL_DBG_MSGF("         'act' region trigger index 0 is active: @(posedge clk or posedge reset)\n");
     }
     if (vlSelf->__VactTriggered.at(1U)) {
-        VL_DBG_MSGF("         'act' region trigger index 1 is active: @(posedge clk or posedge reset)\n");
+        VL_DBG_MSGF("         'act' region trigger index 1 is active: @(posedge clk)\n");
     }
 }
 #endif  // VL_DEBUG
@@ -469,10 +467,10 @@ VL_ATTR_COLD void Vrv32e___024root___dump_triggers__nba(Vrv32e___024root* vlSelf
         VL_DBG_MSGF("         No triggers active\n");
     }
     if (vlSelf->__VnbaTriggered.at(0U)) {
-        VL_DBG_MSGF("         'nba' region trigger index 0 is active: @(posedge clk)\n");
+        VL_DBG_MSGF("         'nba' region trigger index 0 is active: @(posedge clk or posedge reset)\n");
     }
     if (vlSelf->__VnbaTriggered.at(1U)) {
-        VL_DBG_MSGF("         'nba' region trigger index 1 is active: @(posedge clk or posedge reset)\n");
+        VL_DBG_MSGF("         'nba' region trigger index 1 is active: @(posedge clk)\n");
     }
 }
 #endif  // VL_DEBUG
@@ -512,6 +510,7 @@ VL_ATTR_COLD void Vrv32e___024root___ctor_var_reset(Vrv32e___024root* vlSelf) {
     }
     vlSelf->rv32e__DOT__mem_stage__DOT__read_data = VL_RAND_RESET_I(32);
     vlSelf->__Vfunc_rv32e__DOT__if_stage__DOT__pmem_read__0__Vfuncout = 0;
+    vlSelf->__Vdly__rv32e__DOT__pc = VL_RAND_RESET_I(32);
     vlSelf->__Vtrigrprev__TOP__clk = VL_RAND_RESET_I(1);
     vlSelf->__Vtrigrprev__TOP__reset = VL_RAND_RESET_I(1);
     for (int __Vi0 = 0; __Vi0 < 4; ++__Vi0) {

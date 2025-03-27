@@ -15,7 +15,7 @@
 void init_log(const char *log_file);
 void init_mem();
 void init_sdb();
-
+void init_device();
 
 static void welcome() {
   Log("MTrace: %s", MUXDEF(CONFIG_MTRACE, ANSI_FMT("ON", ANSI_FG_GREEN), ANSI_FMT("OFF", ANSI_FG_RED)));

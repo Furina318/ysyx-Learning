@@ -107,9 +107,9 @@ module rv32e (
                      (opcode == `INST_JAL || opcode == `INST_JALR) ? (pc + 4) : // JAL, JALR
                      (opcode == `INST_LW) ? data_out :              // lw,lh,lbu共用
                      (opcode == `INST_R || opcode == `INST_I) ? alu_result : 32'b0; // R-type, I-type
-    always @(posedge clk) begin
-        if (opcode == `INST_B)
-            $display("PC=%h, imm=%h, jal_target=%h, take_branch=%b", pc, imm, jal_target, take_branch);
-    end
+    // always @(posedge clk) begin
+    //     if (opcode == `INST_B)
+    //         $display("PC=%h, imm=%h, jal_target=%h, take_branch=%b", pc, imm, jal_target, take_branch);
+    // end
 
 endmodule

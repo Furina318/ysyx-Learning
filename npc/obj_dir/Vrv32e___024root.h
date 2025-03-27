@@ -43,6 +43,7 @@ class Vrv32e___024root final : public VerilatedModule {
     IData/*31:0*/ rv32e__DOT__id_stage__DOT__immI;
     IData/*31:0*/ rv32e__DOT__mem_stage__DOT__read_data;
     IData/*31:0*/ __Vfunc_rv32e__DOT__if_stage__DOT__pmem_read__0__Vfuncout;
+    IData/*31:0*/ __Vdly__rv32e__DOT__pc;
     IData/*31:0*/ __VstlIterCount;
     IData/*31:0*/ __VactIterCount;
     VlUnpacked<IData/*31:0*/, 32> rv32e__DOT__regfile__DOT__regs;
