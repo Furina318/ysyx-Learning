@@ -12,6 +12,7 @@ CFLAGS += -I$(INC_PATH)  # 包含路径，确保头文件被找到
 # 链接的库
 LIBS = -lreadline  # 链接 readline 库
 LIBS += -ldl       # 链接 dlfcn 库
+LIBS += -lSDL2     # 添加 SDL2 库链接
 
 # 可执行文件目标
 BINARY = ./obj_dir/V$(MODULE)

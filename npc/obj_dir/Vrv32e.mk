@@ -122,5 +122,5 @@ Vrv32e: $(VK_USER_OBJS) $(VK_GLOBAL_OBJS) $(VM_PREFIX)__ALL.a $(VM_HIER_LIBS)
 
 
 # Verilated -*- Makefile -*-
-LIBS += -lreadline   -ldl       
+LIBS += -lreadline   -ldl        -lSDL2     
 CXXFLAGS += -I/home/furina/ysyx-workbench/npc/include/

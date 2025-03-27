@@ -37,13 +37,12 @@ uint8_t pmem[CONFIG_MSIZE] PG_ALIGN = {};
 //   0x00100073,          // ebreak                  // 触发调试
 //   0xdeadbeef           // 数据段：0xdeadbeef
 // };
-static const word_t img[] = {
-  0x0080006f,    // jal x0, 8           // 跳转到 PC + 8 (0x80000008)
-  0x00100513,    // li a0, 1            // a0 = 1 (若跳转失败，a0 会变为 1)
-  // 0x00100073,    // ebreak              // 触发调试，验证跳转失败
-  0x00200513,    // li a0, 2            // a0 = 2 (跳转成功标记)
-  0x00100073,    // ebreak              // 触发调试，验证跳转成功
-  0xdeadbeef     // 数据段：0xdeadbeef
+static const uint32_t img [] = {
+  0x00000297,  // auipc t0,0
+  0x00028823,  // sb  zero,16(t0)
+  0x0102c503,  // lbu a0,16(t0)
+  0x00100073,  // ebreak (used as nemu_trap)
+  0xdeadbeef,  // some data
 };
 #define MTRACE_LOG_FILE "mtrace.log"
 static FILE *mtrace_file=NULL;
