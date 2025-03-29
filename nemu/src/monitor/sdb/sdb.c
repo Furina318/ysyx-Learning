@@ -53,8 +53,9 @@ static int cmd_c(char *args) {
 
 
 static int cmd_q(char *args) {
-  nemu_state.state=NEMU_QUIT;//直接改变good的值，防止其直接退出时good！=0（/src/utils/state.c）导致return出现异常
-  return -1;//只有-1的时候会在sdb_mainloop触发中断影响good
+  // nemu_state.state=NEMU_QUIT;//直接改变good的值，防止其直接退出时good！=0（/src/utils/state.c）导致return出现异常
+  // return -1;//只有-1的时候会在sdb_mainloop触发中断影响good
+  exit(0);
 }
 
 static int cmd_si(char *args){//自己编写的si命令，让程序单步执行N条指令后暂停执行,当N没有给出时, 缺省为1

@@ -45,12 +45,17 @@ static void update_cpu_state(CPU_state *cpu)
 
 void init_difftest(char *ref_so_file, long img_size, int port) 
 {
-    update_cpu_state(&cpu);
-
+    // update_cpu_state(&cpu);
+    // printf("%s\n",ref_so_file);
     assert(ref_so_file != NULL);
-
+    // printf("%s\n",ref_so_file);
     void *handle;
     handle = dlopen(ref_so_file, RTLD_LAZY);
+    if (!handle) {
+        fprintf(stderr, "dlopen error: %s\n", dlerror());
+        exit(1);
+    }
+    printf("%s\n",ref_so_file);
     assert(handle);
 
     ref_difftest_memcpy = (void (*)(uint32_t, void*, size_t, bool))dlsym(handle, "difftest_memcpy");
