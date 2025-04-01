@@ -25,6 +25,10 @@ module rv32e (
     wire         id_valid;
     wire         ex_ready;
 
+    //===== RegFile =====//
+    wire         reg_valid;
+    wire         reg_ready;
+
     //===== EX =====//
     wire [31:0]  rs1_val, rs2_val;
     wire [31:0]  alu_result;
@@ -47,6 +51,11 @@ module rv32e (
     wire [31:0]  branch_target;
     // assign branch_target=is_jalr ? jalr_target : jal_target;
     
+    wire [4:0]   rd_ex, rd_mem, rd_wb;
+    wire         RegWrite_ex, RegWrite_mem, RegWrite_wb;
+    wire         wb_MemRead, wb_MemWrite;
+    wire [1:0]   wb_MemLen;
+    wire [31:0]  wb_addr, wb_data_in;
     // 取指模块
     IF if_stage (
         .clk(clk),
@@ -71,7 +80,7 @@ module rv32e (
         .if_valid(if_valid),
         .id_ready(id_ready),
         .id_valid(id_valid),
-        .ex_ready(ex_ready),
+        .reg_ready(reg_ready),
         .opcode(opcode),
         .rs1(rs1),
         .rs2(rs2),
@@ -89,10 +98,15 @@ module rv32e (
     // 寄存器文件
     RegFile regfile (
         .clk(clk),
+        .reset(reset),
+        .id_valid(id_valid),
+        .ex_ready(ex_ready),
+        .reg_ready(reg_ready),
+        .reg_valid(reg_valid),
         .rs1(rs1),
         .rs2(rs2),
-        .rd(rd),
-        .we(RegWrite),
+        .rd(rd_wb),
+        .we(RegWrite_wb),
         .wd(wb_data),
         .rs1_val(rs1_val),
         .rs2_val(rs2_val)
@@ -101,18 +115,22 @@ module rv32e (
     EX ex_stage(
         .clk(clk), 
         .reset(reset),
-        .id_valid(id_valid),
+        .reg_valid(reg_valid),
         .ex_ready(ex_ready),
         .opcode(opcode), 
         .rs1_val(rs1_val),
         .rs2_val(rs2_val),
         .imm(imm),
         .alu_op(alu_op),
+        .id_rd(rd),
+        .id_RegWrite(RegWrite),
         .mem_ready(mem_ready),
         .ex_valid(ex_valid),
         .alu_result(alu_result),
         .alu_zero(alu_zero),   
-        .alu_less(alu_less)
+        .alu_less(alu_less),
+        .rd_ex(rd_ex),
+        .RegWrite_ex(RegWrite_ex)
     );
     // 内存模块
     MEM mem_stage(
@@ -122,12 +140,16 @@ module rv32e (
         .mem_ready(mem_ready),
         .wb_ready(wb_ready),
         .mem_valid(mem_valid),
-        .MemRead(MemRead),
-        .MemWrite(MemWrite),
-        .MemLen(MemLen),
-        .addr(rs1_val + imm),
-        .data_in(rs2_val),
-        .data_out(data_out)
+        .MemRead(wb_MemRead),
+        .MemWrite(wb_MemWrite),
+        .ex_rd(rd_ex),
+        .ex_RegWrite(RegWrite_ex),
+        .MemLen(wb_MemLen),
+        .addr(wb_addr),
+        .data_in(wb_data_in),
+        .data_out(data_out),
+        .rd_mem(rd_mem),
+        .RegWrite_mem(RegWrite_mem)
     );
 
     // 写回模块
@@ -140,6 +162,16 @@ module rv32e (
         .wb_valid(wb_valid),
         .opcode(opcode),
         .func3(func3),
+
+        .mem_rd(rd_mem),
+        .mem_RegWrite(RegWrite_mem),
+        .id_MemRead(MemRead),
+        .id_MemWrite(MemWrite),
+        .id_MemLen(MemLen),
+        .id_addr(alu_result),
+        // .id_addr(rs1_val + imm), 
+        .id_data_in(rs2_val),
+
         .pc(pc),
         .imm(imm),
         .rs1_val(rs1_val),
@@ -152,7 +184,15 @@ module rv32e (
         .take_branch(take_branch),
         .jal_target(jal_target),
         .jalr_target(jalr_target),
-        .wb_data(wb_data)
-    );
+        .wb_data(wb_data),
 
+        .rd_wb(rd_wb),
+        .RegWrite_wb(RegWrite_wb),
+        .wb_MemRead(wb_MemRead),
+        .wb_MemWrite(wb_MemWrite),
+        .wb_MemLen(wb_MemLen),
+        .wb_addr(wb_addr),
+        .wb_data_in(wb_data_in)
+    );
+    assign branch_target = is_jalr ? jalr_target : jal_target;
 endmodule

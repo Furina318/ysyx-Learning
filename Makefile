@@ -1,5 +1,5 @@
-STUID = ysyx_202401202056
-STUNAME = Qing
+STUID = ysyx_22040000
+STUNAME = 张三
 
 # DO NOT modify the following code!!!
 
@@ -37,7 +37,7 @@ endef
 
 .clean_index:
 	rm -f $(WORK_INDEX)
-	
+
 _default:
 	@echo "Please run 'make' under subprojects."
 

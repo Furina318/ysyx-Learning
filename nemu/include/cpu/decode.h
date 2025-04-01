@@ -43,9 +43,6 @@ static inline void pattern_decode(const char *str, int len,
       __shift = (c == '?' ? __shift + 1 : 0); \
     } \
   }
-  //key记录了模式字符串中关键位的期望值，用于与指令编码进行比较。
-  //mask用于标识哪些位是需要进行匹配的，1表示需要匹配的位，0表示可以任意值的位。
-  //shift的值表示关键位相对于最低位的偏移量，可以用于从指令编码中提取关键位的值
 
 #define macro2(i)  macro(i);   macro((i) + 1)
 #define macro4(i)  macro2(i);  macro2((i) + 2)

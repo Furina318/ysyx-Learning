@@ -15,7 +15,6 @@
 
 #include <isa.h>
 #include "local-include/reg.h"
-#include "cpu/cpu.h"
 
 const char *regs[] = {
   "$0", "ra", "sp", "gp", "tp", "t0", "t1", "t2",
@@ -25,21 +24,8 @@ const char *regs[] = {
 };
 
 void isa_reg_display() {
-  static int i;
-  _Log(ANSI_FG_RED "RegName  Hex_Value       Dec_Value\n" ANSI_NONE);
-  for(i=0;i<sizeof(regs)/sizeof(regs[0]);i++){
-    _Log(ANSI_FG_YELLOW "$%s\t " ANSI_NONE, regs[i]);
-    _Log("0x%08x\t %010u\n", cpu.gpr[i], cpu.gpr[i]);
-  }
-  _Log(ANSI_FG_YELLOW "$%s\t " ANSI_NONE "0x%08x\t %010u\n","pc",cpu.pc,cpu.pc);
 }
 
-word_t isa_reg_str2val(const char *s) {
-  if(strcmp(s,"pc")==0) return cpu.pc;
-  for(int i=0;i<sizeof(regs)/sizeof(regs[0]);i++){
-    if(strcmp(s,regs[i])==0){
-      return cpu.gpr[i];
-    }
-  }
+word_t isa_reg_str2val(const char *s, bool *success) {
   return 0;
 }
