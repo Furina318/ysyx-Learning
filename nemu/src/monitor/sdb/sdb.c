@@ -196,7 +196,7 @@ static int cmd_p(char *args) {
 static int cmd_test(){
   FILE *file;
   char line[256];
-  uint32_t expr_count=0;
+  uint32_t expr_count=1;
   bool success=true;
 
   char *filename = "/home/furina/ysyx-workbench/nemu/tools/gen-expr/build/input";
