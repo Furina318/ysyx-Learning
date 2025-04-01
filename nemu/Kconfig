@@ -126,10 +126,32 @@ endmenu
 
 menu "Testing and Debugging"
 
+config WATCHPOINTS
+  bool "Open watchpoints"
+  default y
+
+config BRANCH_Predictor
+  bool "Enable branch predictor"
+  default n
 
 config TRACE
   bool "Enable tracer"
   default y
+
+config FUNC_TRACE
+  depends on TRACE
+  bool "Enable function tracer"
+  default n
+
+config MEMORY_TRACE
+  depends on TRACE
+  bool "Enable memory trace"
+  default n
+
+config DEVICE_TRACE
+  depends on TRACE
+  bool "Enable device trace(depend on TRACE)"
+  default n
 
 config TRACE_START
   depends on TRACE
