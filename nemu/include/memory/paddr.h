@@ -31,6 +31,20 @@ static inline bool in_pmem(paddr_t addr) {
   return addr - CONFIG_MBASE < CONFIG_MSIZE;
 }
 
+// typedef struct{
+//   paddr_t start;
+//   paddr_t end;
+//   bool filter_en;
+//   word_t filter_data;
+// }mtrace_info;
+// mtrace_info mtrace_thing;
+
+void init_mtrace();
+void close_mtrace();
+// void mtrace_set(paddr_t start,paddr_t end,bool filter_en,word_t filter_data);
+void mtrace_log(char type,paddr_t addr,word_t data,int len);
+void mtrace_filter_output(paddr_t start_addr, paddr_t end_addr, bool filter_en, uint32_t filter_data);
+
 word_t paddr_read(paddr_t addr, int len);
 void paddr_write(paddr_t addr, int len, word_t data);
 
