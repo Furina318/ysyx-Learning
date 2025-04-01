@@ -3,22 +3,22 @@ module mem_sram #(
     parameter ADDR_WIDTH = 32,
     parameter DATA_WIDTH = 32
 )(
-    input  wire                  clk,
-    input  wire                  ren,
-    input  wire [ADDR_WIDTH-1:0] raddr,
-    output reg  [DATA_WIDTH-1:0] rdata,
+    input  logic                  clk,
+    input  logic                  ren,
+    input  logic [ADDR_WIDTH-1:0] raddr,
+    output logic  [DATA_WIDTH-1:0] rdata,
     
-    input  wire                  wen,
-    input  wire [ADDR_WIDTH-1:0] waddr,
-    input  wire [DATA_WIDTH-1:0] wdata,
-    input  wire [3:0]            wmask
+    input  logic                  wen,
+    input  logic [ADDR_WIDTH-1:0] waddr,
+    input  logic [DATA_WIDTH-1:0] wdata,
+    input  logic [3:0]            wmask
 );
     import "DPI-C" function int unsigned pmem_read(input int unsigned raddr, input int len);
     import "DPI-C" function void pmem_write(input int unsigned waddr, input int unsigned wdata, input int len);
 
     // 读请求寄存器
-    reg read_pending;
-    reg [ADDR_WIDTH-1:0] raddr_reg;
+    logic read_pending;
+    logic [ADDR_WIDTH-1:0] raddr_reg;
     
     // 写处理
     always @(posedge clk) begin
