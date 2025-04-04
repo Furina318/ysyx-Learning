@@ -56,11 +56,12 @@ module RegFile (
                     if(delay > 0) begin//牵手成功
                         if(we && rd != 0) begin
                             regs[rd] <= wd;
+                            $display("\033[35m[REG]: regs[%d] = %h\033[0m", rd, wd);
                         end
                         rs1_val = (rs1 != 0) ? regs[rs1] : 32'h0;
                         rs2_val = (rs2 != 0) ? regs[rs2] : 32'h0;
                         delay = delay - 1;
-                        $display("\033[31mREG: rd=%b we=%b\033[0m",rd,we);
+                        $display("\033[35m[REG]: rs1_val=%h | rs2_val=%h\033[0m",rs1_val, rs2_val);
                     end
                     next_state = (delay == 0) ? STALL : BUSY;
                 end
@@ -73,8 +74,6 @@ module RegFile (
         end
     end
     always @(*) begin
-        $display(" ");
-        $display("REG: state = %d | reg_ready=%b | reg_valid=%b", state, reg_ready, reg_valid);
-        $display(" ");
+        $display("\033[35m[REG]:state = %d | reg_ready=%b| reg_valid=%b\033[0m", state, reg_ready, reg_valid);
     end
 endmodule

@@ -101,14 +101,14 @@ module ID (
                             `INST_TYPE_LUI: begin
                                 imm = immU;
                                 RegWrite = 1'b1;
-                                $display("\033[31mID: LUI \033[0m");
+                                $display("\033[32m[ID]: LUI \033[0m");
                             end
                             // AUIPC
                             `INST_TYPE_AUIPC: begin
                                 imm = immU;
                                 RegWrite = 1'b1;
                                 alu_op=`ALU_ADD;//PC+imm
-                                $display("\033[31mID: AUIPC \033[0m");
+                                $display("\033[32m[ID]: AUIPC \033[0m");
                             end
                             // JAL
                             `INST_TYPE_JAL: begin
@@ -133,10 +133,10 @@ module ID (
                                     `F3_SB: MemLen=`Mem_Bit;
                                     default: begin
                                         ebreak(`ABORT,instr_reg);
-                                        $display("ID : Uknown S instruction with func3 = %b",func3);
+                                        $display("\033[32m[ID] : Unknown S instruction with func3 = %b\033[0m",func3);
                                     end
                                 endcase
-                                $display("\033[31mID: S Instr\033[0m");
+                                $display("\033[32m[ID]: S Instr\033[0m");
                             end
 
                             `INST_TYPE_L: begin
@@ -155,7 +155,7 @@ module ID (
                                     alu_op = `ALU_ADD;
 
                                     MemLen = `Mem_Bit;//单字节读取
-                                    $display("\033[31mID: LBU\033[0m");
+                                    $display("\033[32m[ID]: LBU\033[0m");
                                 end
                                 else if(func3 == `F3_LH) begin
                                     imm=immI;
@@ -199,7 +199,7 @@ module ID (
                                     end
                                     default: begin
                                         ebreak(`ABORT, instr_reg);
-                                        $display("ID : Unknown R instruction with func3 = %b", func3);
+                                        $display("\033[32m[ID] : Unknown R instruction with func3 = %b\033[0m",func3);
                                     end
                                 endcase
                             end
@@ -223,7 +223,7 @@ module ID (
                                     end
                                     default:  begin
                                         ebreak(`ABORT,instr_reg);
-                                        $display("ID : Unknown I instruction with func3 = %b", func3);
+                                        $display("\033[32m[ID] : Unknown I instruction with func3 = %b\033[0m",func3);
                                     end
                                 endcase
                             end
@@ -240,7 +240,7 @@ module ID (
                                     `F3_BGEU: alu_op = `ALU_SLTU;
                                     default: begin
                                         ebreak(`ABORT,instr_reg);
-                                        $display("ID : Unknown B instruction with func3 = %b",func3);
+                                        $display("\033[32m[ID] : Unknown B instruction with func3 = %b\033[0m",func3);
                                     end
                                 endcase
                             end
@@ -254,7 +254,7 @@ module ID (
 
                             default: begin
                                     ebreak(`ABORT, instr_reg);
-                                    $display("ID : Unknow instruction with inst = %h", instr_reg);
+                                    $display("\033[32m[ID] : Unknow instruction with inst = %h\033[0m", instr_reg);
                             end
                         endcase
                         delay = delay - 1;
@@ -276,8 +276,6 @@ module ID (
     end
 
     always @(*) begin
-        $display(" ");
-        $display("ID: state = %d | id_ready=%b | id_valid=%b", state, id_ready, id_valid);
-        $display(" ");
+        $display("\033[32m[ID]: state = %d | id_ready=%b | id_valid=%b\033[0m", state, id_ready, id_valid);
     end
 endmodule

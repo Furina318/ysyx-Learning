@@ -80,9 +80,7 @@ module IF (
 
     always @(*) begin
         //调试信息输出
-        $display(" ");
-        $display("IF: state = %d | PC=0x%08x | get_instr=0x%08x | instr=0x%08x | if_ready=%b | if_valid=%b", 
+        $display("\033[34m[IF]: state = %d | PC=0x%08x | get_instr=0x%08x | instr=0x%08x | if_ready=%b | if_valid=%b\033[0m", 
                 state, pc, get_instr, instr, if_ready, if_valid);
-        $display(" ");
     end
 endmodule

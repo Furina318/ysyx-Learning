@@ -67,6 +67,8 @@ module EX (
                         delay = delay - 1;
                     end
                     next_state = (delay == 0) ? STALL : BUSY;
+                    $display("\033[33m[EX]: alu_result = %h | alu_zero=%b | alu_less=%b\033[0m", alu_result, alu_zero, alu_less);
+                    $display("\033[33m[EX]: imm=%h | rs1_val=%h | rs2_val=%h\033[0m", imm, rs1_val, rs2_val);
                 end
                 STALL: begin
                     ex_ready = 1'b0;
@@ -82,8 +84,6 @@ module EX (
         end
     end
     always @(*) begin
-        $display(" ");
-        $display("EX: state = %d | ex_ready=%b | ex_valid=%b", state, ex_ready, ex_valid);
-        $display(" ");
+        $display("\033[33m[EX]: state = %d | ex_ready=%b | ex_valid=%b\033[0m", state, ex_ready, ex_valid);
     end
 endmodule

@@ -107,3 +107,7 @@ clean:
 	rm -rf ./obj_dir
 	rm -rf wave.vcd
 	rm -rf ./log/*
+
+.PHONY: wave
+wave:
+	gtkwave wave.vcd

@@ -48,7 +48,7 @@ module WB (
 
     always @(posedge clk or posedge reset) begin
         if(reset) begin
-            state = IDLE;
+            state = STALL;
             delay = DELAY_CYCLES;
             wb_ready = 1'b1;
             wb_valid = 1'b1;
@@ -97,11 +97,11 @@ module WB (
                         RegWrite_wb = mem_RegWrite;
                         wb_MemRead = id_MemRead;
                         wb_MemWrite = id_MemWrite;
-                        wb_MemLen = id_MemLen;
-                        wb_addr = id_addr;
-                        wb_data_in = id_data_in;
+                        // wb_MemLen = id_MemLen;
+                        // wb_addr = id_addr;
+                        // wb_data_in = id_data_in;
                         //=====写回数据=====
-                        $display("\033[31mWB: wb_data=0x%08x\033[0m",wb_data);
+                        $display("\033[31m[WB]: wb_data=0x%08x\033[0m",wb_data);
                         delay = delay - 1;
                     end
                     next_state = (delay == 0) ? STALL : BUSY;
@@ -120,8 +120,9 @@ module WB (
         end
     end
     always @(*) begin
-        $display(" ");
-        $display("WB: state = %d | wb_ready=%b | wb_valid=%b", state, wb_ready, wb_valid);
-        $display(" ");
+        wb_MemLen = id_MemLen;
+        wb_addr = id_addr;
+        wb_data_in = id_data_in;
+        $display("\033[31m[WB]: state = %d | wb_ready=%b | wb_valid=%b\033[0m", state, wb_ready, wb_valid);
     end
 endmodule

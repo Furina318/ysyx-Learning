@@ -53,7 +53,6 @@ class Vrv32e___024root final : public VerilatedModule {
         CData/*0:0*/ rv32e__DOT__RegWrite_wb;
         CData/*0:0*/ rv32e__DOT__wb_MemRead;
         CData/*0:0*/ rv32e__DOT__wb_MemWrite;
-        CData/*1:0*/ rv32e__DOT__wb_MemLen;
         CData/*1:0*/ rv32e__DOT__if_stage__DOT__delay;
         CData/*0:0*/ rv32e__DOT__if_stage__DOT__ren;
         CData/*0:0*/ rv32e__DOT__if_stage__DOT__ifu_sram_inst__DOT__read_pending;
@@ -62,6 +61,14 @@ class Vrv32e___024root final : public VerilatedModule {
         CData/*1:0*/ rv32e__DOT__regfile__DOT__delay;
         CData/*1:0*/ rv32e__DOT__ex_stage__DOT__delay;
         CData/*1:0*/ rv32e__DOT__mem_stage__DOT__delay;
+        CData/*0:0*/ rv32e__DOT__mem_stage__DOT__sram_arvalid;
+        CData/*0:0*/ rv32e__DOT__mem_stage__DOT__sram_arready;
+        CData/*0:0*/ rv32e__DOT__mem_stage__DOT__sram_rvalid;
+        CData/*0:0*/ rv32e__DOT__mem_stage__DOT__sram_rready;
+        CData/*3:0*/ rv32e__DOT__mem_stage__DOT__sram_wmask;
+        CData/*0:0*/ rv32e__DOT__mem_stage__DOT__sram_wvalid;
+        CData/*0:0*/ rv32e__DOT__mem_stage__DOT__sram_wready;
+        CData/*1:0*/ rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__delay_counter;
         CData/*1:0*/ rv32e__DOT__wb_stage__DOT__delay;
         CData/*0:0*/ __Vtrigrprev__TOP__clk;
         CData/*0:0*/ __Vtrigrprev__TOP__reset;
@@ -72,15 +79,13 @@ class Vrv32e___024root final : public VerilatedModule {
         IData/*31:0*/ rv32e__DOT__rs1_val;
         IData/*31:0*/ rv32e__DOT__rs2_val;
         IData/*31:0*/ rv32e__DOT__alu_result;
+    };
+    struct {
         IData/*31:0*/ rv32e__DOT__data_out;
         IData/*31:0*/ rv32e__DOT__wb_data;
         IData/*31:0*/ rv32e__DOT__jal_target;
         IData/*31:0*/ rv32e__DOT__jalr_target;
-        IData/*31:0*/ rv32e__DOT__wb_addr;
-        IData/*31:0*/ rv32e__DOT__wb_data_in;
         IData/*31:0*/ rv32e__DOT__if_stage__DOT__state;
-    };
-    struct {
         IData/*31:0*/ rv32e__DOT__if_stage__DOT__next_state;
         IData/*31:0*/ rv32e__DOT__if_stage__DOT__get_instr;
         IData/*31:0*/ rv32e__DOT__if_stage__DOT__ifu_sram_inst__DOT__raddr_reg;
@@ -99,7 +104,14 @@ class Vrv32e___024root final : public VerilatedModule {
         IData/*31:0*/ rv32e__DOT__ex_stage__DOT__next_state;
         IData/*31:0*/ rv32e__DOT__mem_stage__DOT__state;
         IData/*31:0*/ rv32e__DOT__mem_stage__DOT__next_state;
-        IData/*31:0*/ rv32e__DOT__mem_stage__DOT__read_data;
+        IData/*31:0*/ rv32e__DOT__mem_stage__DOT__sram_araddr;
+        IData/*31:0*/ rv32e__DOT__mem_stage__DOT__sram_rdata;
+        IData/*31:0*/ rv32e__DOT__mem_stage__DOT__sram_waddr;
+        IData/*31:0*/ rv32e__DOT__mem_stage__DOT__sram_wdata;
+        IData/*31:0*/ rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__sram_state;
+        IData/*31:0*/ rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__next_sram_state;
+        IData/*31:0*/ rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__araddr_reg;
+        IData/*31:0*/ rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__rdata_reg;
         IData/*31:0*/ rv32e__DOT__wb_stage__DOT__state;
         IData/*31:0*/ rv32e__DOT__wb_stage__DOT__next_state;
         IData/*31:0*/ __Vfunc_rv32e__DOT__if_stage__DOT__ifu_sram_inst__DOT__pmem_read__0__Vfuncout;
