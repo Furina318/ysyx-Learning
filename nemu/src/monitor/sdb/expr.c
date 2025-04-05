@@ -87,7 +87,7 @@ typedef struct token {
   char str[32];
 } Token;
 
-static Token tokens[1000] __attribute__((used)) = {};//tokens原来长度是32容易发生越界从而发生断言错误
+static Token tokens[6000] __attribute__((used)) = {};//tokens原来长度是32容易发生越界从而发生断言错误
 static int nr_token __attribute__((used))  = 0;
 
 // static int hex_char_to_decimal(char c) {
