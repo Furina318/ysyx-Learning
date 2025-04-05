@@ -193,7 +193,7 @@ static int cmd_p(char *args) {
   return 0;
 }
 
-static int cmd_test(){
+static int cmd_ext(){
   FILE *file;
   FILE *error_file;
   char line[256];
@@ -298,7 +298,7 @@ static struct {
   { "p", "Find the value of the expression 'EXPR' ",cmd_p},
   { "w", "Set watchpoint on 'EXPR',the programme will stop when it change",cmd_w},
   { "d", "Delete a watchpoint NO.n you set",cmd_d},
-  { "test", "Open random-expressions-file to check expr() whether correct",cmd_test},
+  { "test", "Open random-expressions-file to check expr() whether correct",cmd_ext},
   { "mtrace", "(Use when nemu stop)Open mtrace log file to check memory behavior",cmd_mtrace},
   { "dtrace", "Output the trace of device access",cmd_dtrace},
 };
