@@ -195,6 +195,7 @@ static int cmd_p(char *args) {
 
 static int cmd_test(){
   FILE *file;
+  FILE *error_file;
   char line[256];
   uint32_t expr_count=0;
   uint32_t pass_count=0;
@@ -202,8 +203,13 @@ static int cmd_test(){
   bool success=true;
 
   char *filename = "/home/furina/ysyx-workbench/nemu/tools/gen-expr/build/input";
+  char *error_filename = "/home/furina/ysyx-workbench/nemu/tools/gen-expr/build/error_expr";
+
   file = fopen(filename, "r");
   assert(file!=NULL);
+  error_file = fopen(error_filename,"w");
+  assert(error_file!=NULL);
+
   while (fgets(line, sizeof(line), file)) {// 逐行读取文件
     line[strcspn(line, "\n")] = '\0';// 去掉行末的换行符
     char *ans = strtok(line, " ");
@@ -216,7 +222,11 @@ static int cmd_test(){
     word_t correct_ans = strtoul(ans,NULL,10);
 
     if(result == correct_ans) pass_count++;
-    else fail_count++;
+    else{
+      fail_count++;
+      fprintf(error_file,"Expression: %s\n",expression);
+      fprintf(error_file,"Correct ans: %u   my_ans: %u\n\n",correct_ans,result);
+    }
   }
   if(pass_count == expr_count) success=true;
   else success=false;
