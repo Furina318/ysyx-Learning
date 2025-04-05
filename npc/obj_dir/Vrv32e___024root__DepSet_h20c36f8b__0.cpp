@@ -135,6 +135,257 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__0(Vrv32e___024root* vlSe
         }
     }
     if (vlSelf->reset) {
+        vlSelf->rv32e__DOT__ex_stage__DOT__state = 0U;
+        vlSelf->rv32e__DOT__ex_stage__DOT__delay = 1U;
+        vlSelf->rv32e__DOT__ex_ready = 1U;
+        vlSelf->rv32e__DOT__ex_valid = 0U;
+        vlSelf->rv32e__DOT__alu_result = 0U;
+        vlSelf->rv32e__DOT__alu_zero = 0U;
+        vlSelf->rv32e__DOT__alu_less = 0U;
+    } else {
+        vlSelf->rv32e__DOT__ex_stage__DOT__state = vlSelf->rv32e__DOT__ex_stage__DOT__next_state;
+        if ((0U == vlSelf->rv32e__DOT__ex_stage__DOT__state)) {
+            vlSelf->rv32e__DOT__ex_ready = 1U;
+            vlSelf->rv32e__DOT__ex_valid = 0U;
+            vlSelf->rv32e__DOT__ex_stage__DOT__delay = 1U;
+            vlSelf->rv32e__DOT__ex_stage__DOT__next_state 
+                = ((IData)(vlSelf->rv32e__DOT__reg_valid)
+                    ? 1U : 0U);
+        } else if (VL_UNLIKELY((1U == vlSelf->rv32e__DOT__ex_stage__DOT__state))) {
+            vlSelf->rv32e__DOT__ex_ready = 0U;
+            vlSelf->rv32e__DOT__ex_valid = 0U;
+            if ((0U < (IData)(vlSelf->rv32e__DOT__ex_stage__DOT__delay))) {
+                vlSelf->rv32e__DOT__alu_result = ((8U 
+                                                   & (IData)(vlSelf->rv32e__DOT__alu_op))
+                                                   ? 
+                                                  ((4U 
+                                                    & (IData)(vlSelf->rv32e__DOT__alu_op))
+                                                    ? 0U
+                                                    : 
+                                                   ((2U 
+                                                     & (IData)(vlSelf->rv32e__DOT__alu_op))
+                                                     ? 0U
+                                                     : 
+                                                    ((1U 
+                                                      & (IData)(vlSelf->rv32e__DOT__alu_op))
+                                                      ? 
+                                                     (vlSelf->rv32e__DOT__rs1_val 
+                                                      >> 
+                                                      (0x1fU 
+                                                       & (((0xcU 
+                                                            == 
+                                                            (0x1fU 
+                                                             & ((IData)(vlSelf->rv32e__DOT__opcode) 
+                                                                >> 2U))) 
+                                                           | (0x18U 
+                                                              == 
+                                                              (0x1fU 
+                                                               & ((IData)(vlSelf->rv32e__DOT__opcode) 
+                                                                  >> 2U))))
+                                                           ? vlSelf->rv32e__DOT__rs2_val
+                                                           : vlSelf->rv32e__DOT__imm)))
+                                                      : 
+                                                     VL_SHIFTRS_III(32,32,5, vlSelf->rv32e__DOT__rs1_val, 
+                                                                    (0x1fU 
+                                                                     & (((0xcU 
+                                                                          == 
+                                                                          (0x1fU 
+                                                                           & ((IData)(vlSelf->rv32e__DOT__opcode) 
+                                                                              >> 2U))) 
+                                                                         | (0x18U 
+                                                                            == 
+                                                                            (0x1fU 
+                                                                             & ((IData)(vlSelf->rv32e__DOT__opcode) 
+                                                                                >> 2U))))
+                                                                         ? vlSelf->rv32e__DOT__rs2_val
+                                                                         : vlSelf->rv32e__DOT__imm))))))
+                                                   : 
+                                                  ((4U 
+                                                    & (IData)(vlSelf->rv32e__DOT__alu_op))
+                                                    ? 
+                                                   ((2U 
+                                                     & (IData)(vlSelf->rv32e__DOT__alu_op))
+                                                     ? 
+                                                    ((1U 
+                                                      & (IData)(vlSelf->rv32e__DOT__alu_op))
+                                                      ? 
+                                                     (VL_LTS_III(32, vlSelf->rv32e__DOT__rs1_val, 
+                                                                 (((0xcU 
+                                                                    == 
+                                                                    (0x1fU 
+                                                                     & ((IData)(vlSelf->rv32e__DOT__opcode) 
+                                                                        >> 2U))) 
+                                                                   | (0x18U 
+                                                                      == 
+                                                                      (0x1fU 
+                                                                       & ((IData)(vlSelf->rv32e__DOT__opcode) 
+                                                                          >> 2U))))
+                                                                   ? vlSelf->rv32e__DOT__rs2_val
+                                                                   : vlSelf->rv32e__DOT__imm))
+                                                       ? 1U
+                                                       : 0U)
+                                                      : 
+                                                     ((vlSelf->rv32e__DOT__rs1_val 
+                                                       < 
+                                                       (((0xcU 
+                                                          == 
+                                                          (0x1fU 
+                                                           & ((IData)(vlSelf->rv32e__DOT__opcode) 
+                                                              >> 2U))) 
+                                                         | (0x18U 
+                                                            == 
+                                                            (0x1fU 
+                                                             & ((IData)(vlSelf->rv32e__DOT__opcode) 
+                                                                >> 2U))))
+                                                         ? vlSelf->rv32e__DOT__rs2_val
+                                                         : vlSelf->rv32e__DOT__imm))
+                                                       ? 1U
+                                                       : 0U))
+                                                     : 
+                                                    ((1U 
+                                                      & (IData)(vlSelf->rv32e__DOT__alu_op))
+                                                      ? 
+                                                     (vlSelf->rv32e__DOT__rs1_val 
+                                                      << 
+                                                      (0x1fU 
+                                                       & (((0xcU 
+                                                            == 
+                                                            (0x1fU 
+                                                             & ((IData)(vlSelf->rv32e__DOT__opcode) 
+                                                                >> 2U))) 
+                                                           | (0x18U 
+                                                              == 
+                                                              (0x1fU 
+                                                               & ((IData)(vlSelf->rv32e__DOT__opcode) 
+                                                                  >> 2U))))
+                                                           ? vlSelf->rv32e__DOT__rs2_val
+                                                           : vlSelf->rv32e__DOT__imm)))
+                                                      : 
+                                                     (vlSelf->rv32e__DOT__rs1_val 
+                                                      ^ 
+                                                      (((0xcU 
+                                                         == 
+                                                         (0x1fU 
+                                                          & ((IData)(vlSelf->rv32e__DOT__opcode) 
+                                                             >> 2U))) 
+                                                        | (0x18U 
+                                                           == 
+                                                           (0x1fU 
+                                                            & ((IData)(vlSelf->rv32e__DOT__opcode) 
+                                                               >> 2U))))
+                                                        ? vlSelf->rv32e__DOT__rs2_val
+                                                        : vlSelf->rv32e__DOT__imm))))
+                                                    : 
+                                                   ((2U 
+                                                     & (IData)(vlSelf->rv32e__DOT__alu_op))
+                                                     ? 
+                                                    ((1U 
+                                                      & (IData)(vlSelf->rv32e__DOT__alu_op))
+                                                      ? 
+                                                     (vlSelf->rv32e__DOT__rs1_val 
+                                                      | (((0xcU 
+                                                           == 
+                                                           (0x1fU 
+                                                            & ((IData)(vlSelf->rv32e__DOT__opcode) 
+                                                               >> 2U))) 
+                                                          | (0x18U 
+                                                             == 
+                                                             (0x1fU 
+                                                              & ((IData)(vlSelf->rv32e__DOT__opcode) 
+                                                                 >> 2U))))
+                                                          ? vlSelf->rv32e__DOT__rs2_val
+                                                          : vlSelf->rv32e__DOT__imm))
+                                                      : 
+                                                     (vlSelf->rv32e__DOT__rs1_val 
+                                                      & (((0xcU 
+                                                           == 
+                                                           (0x1fU 
+                                                            & ((IData)(vlSelf->rv32e__DOT__opcode) 
+                                                               >> 2U))) 
+                                                          | (0x18U 
+                                                             == 
+                                                             (0x1fU 
+                                                              & ((IData)(vlSelf->rv32e__DOT__opcode) 
+                                                                 >> 2U))))
+                                                          ? vlSelf->rv32e__DOT__rs2_val
+                                                          : vlSelf->rv32e__DOT__imm)))
+                                                     : 
+                                                    ((1U 
+                                                      & (IData)(vlSelf->rv32e__DOT__alu_op))
+                                                      ? 
+                                                     (vlSelf->rv32e__DOT__rs1_val 
+                                                      - 
+                                                      (((0xcU 
+                                                         == 
+                                                         (0x1fU 
+                                                          & ((IData)(vlSelf->rv32e__DOT__opcode) 
+                                                             >> 2U))) 
+                                                        | (0x18U 
+                                                           == 
+                                                           (0x1fU 
+                                                            & ((IData)(vlSelf->rv32e__DOT__opcode) 
+                                                               >> 2U))))
+                                                        ? vlSelf->rv32e__DOT__rs2_val
+                                                        : vlSelf->rv32e__DOT__imm))
+                                                      : 
+                                                     (vlSelf->rv32e__DOT__rs1_val 
+                                                      + 
+                                                      (((0xcU 
+                                                         == 
+                                                         (0x1fU 
+                                                          & ((IData)(vlSelf->rv32e__DOT__opcode) 
+                                                             >> 2U))) 
+                                                        | (0x18U 
+                                                           == 
+                                                           (0x1fU 
+                                                            & ((IData)(vlSelf->rv32e__DOT__opcode) 
+                                                               >> 2U))))
+                                                        ? vlSelf->rv32e__DOT__rs2_val
+                                                        : vlSelf->rv32e__DOT__imm))))));
+                vlSelf->rv32e__DOT__ex_stage__DOT__delay 
+                    = (3U & ((IData)(vlSelf->rv32e__DOT__ex_stage__DOT__delay) 
+                             - (IData)(1U)));
+                vlSelf->rv32e__DOT__alu_zero = (0U 
+                                                == vlSelf->rv32e__DOT__alu_result);
+                vlSelf->rv32e__DOT__alu_less = VL_LTS_III(32, vlSelf->rv32e__DOT__rs1_val, 
+                                                          (((0xcU 
+                                                             == 
+                                                             (0x1fU 
+                                                              & ((IData)(vlSelf->rv32e__DOT__opcode) 
+                                                                 >> 2U))) 
+                                                            | (0x18U 
+                                                               == 
+                                                               (0x1fU 
+                                                                & ((IData)(vlSelf->rv32e__DOT__opcode) 
+                                                                   >> 2U))))
+                                                            ? vlSelf->rv32e__DOT__rs2_val
+                                                            : vlSelf->rv32e__DOT__imm));
+                vlSelf->rv32e__DOT__rd_ex = vlSelf->rv32e__DOT__rd;
+                vlSelf->rv32e__DOT__RegWrite_ex = vlSelf->rv32e__DOT__RegWrite;
+            }
+            vlSelf->rv32e__DOT__ex_stage__DOT__next_state 
+                = ((0U == (IData)(vlSelf->rv32e__DOT__ex_stage__DOT__delay))
+                    ? 2U : 1U);
+            VL_WRITEF("\033[33m[EX]: alu_result = %x | alu_zero=%b | alu_less=%b\033[0m\n\033[33m[EX]: imm=%x | rs1_val=%x | rs2_val=%x\033[0m\n",
+                      32,vlSelf->rv32e__DOT__alu_result,
+                      1,(IData)(vlSelf->rv32e__DOT__alu_zero),
+                      1,vlSelf->rv32e__DOT__alu_less,
+                      32,vlSelf->rv32e__DOT__imm,32,
+                      vlSelf->rv32e__DOT__rs1_val,32,
+                      vlSelf->rv32e__DOT__rs2_val);
+        } else if ((2U == vlSelf->rv32e__DOT__ex_stage__DOT__state)) {
+            vlSelf->rv32e__DOT__ex_ready = 0U;
+            vlSelf->rv32e__DOT__ex_valid = 1U;
+            vlSelf->rv32e__DOT__ex_stage__DOT__next_state 
+                = ((IData)(vlSelf->rv32e__DOT__mem_ready)
+                    ? 0U : 2U);
+        } else {
+            vlSelf->rv32e__DOT__ex_ready = 0U;
+            vlSelf->rv32e__DOT__ex_valid = 0U;
+            vlSelf->rv32e__DOT__ex_stage__DOT__next_state = 0U;
+        }
+    }
+    if (vlSelf->reset) {
         vlSelf->rv32e__DOT__opcode = 0U;
         vlSelf->rv32e__DOT__rs1 = 0U;
         vlSelf->rv32e__DOT__rs2 = 0U;
@@ -413,257 +664,6 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__0(Vrv32e___024root* vlSe
         }
     }
     if (vlSelf->reset) {
-        vlSelf->rv32e__DOT__ex_stage__DOT__state = 0U;
-        vlSelf->rv32e__DOT__ex_stage__DOT__delay = 1U;
-        vlSelf->rv32e__DOT__ex_ready = 1U;
-        vlSelf->rv32e__DOT__ex_valid = 0U;
-        vlSelf->rv32e__DOT__alu_result = 0U;
-        vlSelf->rv32e__DOT__alu_zero = 0U;
-        vlSelf->rv32e__DOT__alu_less = 0U;
-    } else {
-        vlSelf->rv32e__DOT__ex_stage__DOT__state = vlSelf->rv32e__DOT__ex_stage__DOT__next_state;
-        if ((0U == vlSelf->rv32e__DOT__ex_stage__DOT__state)) {
-            vlSelf->rv32e__DOT__ex_ready = 1U;
-            vlSelf->rv32e__DOT__ex_valid = 0U;
-            vlSelf->rv32e__DOT__ex_stage__DOT__delay = 1U;
-            vlSelf->rv32e__DOT__ex_stage__DOT__next_state 
-                = ((IData)(vlSelf->rv32e__DOT__reg_valid)
-                    ? 1U : 0U);
-        } else if (VL_UNLIKELY((1U == vlSelf->rv32e__DOT__ex_stage__DOT__state))) {
-            vlSelf->rv32e__DOT__ex_ready = 0U;
-            vlSelf->rv32e__DOT__ex_valid = 0U;
-            if ((0U < (IData)(vlSelf->rv32e__DOT__ex_stage__DOT__delay))) {
-                vlSelf->rv32e__DOT__alu_result = ((8U 
-                                                   & (IData)(vlSelf->rv32e__DOT__alu_op))
-                                                   ? 
-                                                  ((4U 
-                                                    & (IData)(vlSelf->rv32e__DOT__alu_op))
-                                                    ? 0U
-                                                    : 
-                                                   ((2U 
-                                                     & (IData)(vlSelf->rv32e__DOT__alu_op))
-                                                     ? 0U
-                                                     : 
-                                                    ((1U 
-                                                      & (IData)(vlSelf->rv32e__DOT__alu_op))
-                                                      ? 
-                                                     (vlSelf->rv32e__DOT__rs1_val 
-                                                      >> 
-                                                      (0x1fU 
-                                                       & (((0xcU 
-                                                            == 
-                                                            (0x1fU 
-                                                             & ((IData)(vlSelf->rv32e__DOT__opcode) 
-                                                                >> 2U))) 
-                                                           | (0x18U 
-                                                              == 
-                                                              (0x1fU 
-                                                               & ((IData)(vlSelf->rv32e__DOT__opcode) 
-                                                                  >> 2U))))
-                                                           ? vlSelf->rv32e__DOT__rs2_val
-                                                           : vlSelf->rv32e__DOT__imm)))
-                                                      : 
-                                                     VL_SHIFTRS_III(32,32,5, vlSelf->rv32e__DOT__rs1_val, 
-                                                                    (0x1fU 
-                                                                     & (((0xcU 
-                                                                          == 
-                                                                          (0x1fU 
-                                                                           & ((IData)(vlSelf->rv32e__DOT__opcode) 
-                                                                              >> 2U))) 
-                                                                         | (0x18U 
-                                                                            == 
-                                                                            (0x1fU 
-                                                                             & ((IData)(vlSelf->rv32e__DOT__opcode) 
-                                                                                >> 2U))))
-                                                                         ? vlSelf->rv32e__DOT__rs2_val
-                                                                         : vlSelf->rv32e__DOT__imm))))))
-                                                   : 
-                                                  ((4U 
-                                                    & (IData)(vlSelf->rv32e__DOT__alu_op))
-                                                    ? 
-                                                   ((2U 
-                                                     & (IData)(vlSelf->rv32e__DOT__alu_op))
-                                                     ? 
-                                                    ((1U 
-                                                      & (IData)(vlSelf->rv32e__DOT__alu_op))
-                                                      ? 
-                                                     (VL_LTS_III(32, vlSelf->rv32e__DOT__rs1_val, 
-                                                                 (((0xcU 
-                                                                    == 
-                                                                    (0x1fU 
-                                                                     & ((IData)(vlSelf->rv32e__DOT__opcode) 
-                                                                        >> 2U))) 
-                                                                   | (0x18U 
-                                                                      == 
-                                                                      (0x1fU 
-                                                                       & ((IData)(vlSelf->rv32e__DOT__opcode) 
-                                                                          >> 2U))))
-                                                                   ? vlSelf->rv32e__DOT__rs2_val
-                                                                   : vlSelf->rv32e__DOT__imm))
-                                                       ? 1U
-                                                       : 0U)
-                                                      : 
-                                                     ((vlSelf->rv32e__DOT__rs1_val 
-                                                       < 
-                                                       (((0xcU 
-                                                          == 
-                                                          (0x1fU 
-                                                           & ((IData)(vlSelf->rv32e__DOT__opcode) 
-                                                              >> 2U))) 
-                                                         | (0x18U 
-                                                            == 
-                                                            (0x1fU 
-                                                             & ((IData)(vlSelf->rv32e__DOT__opcode) 
-                                                                >> 2U))))
-                                                         ? vlSelf->rv32e__DOT__rs2_val
-                                                         : vlSelf->rv32e__DOT__imm))
-                                                       ? 1U
-                                                       : 0U))
-                                                     : 
-                                                    ((1U 
-                                                      & (IData)(vlSelf->rv32e__DOT__alu_op))
-                                                      ? 
-                                                     (vlSelf->rv32e__DOT__rs1_val 
-                                                      << 
-                                                      (0x1fU 
-                                                       & (((0xcU 
-                                                            == 
-                                                            (0x1fU 
-                                                             & ((IData)(vlSelf->rv32e__DOT__opcode) 
-                                                                >> 2U))) 
-                                                           | (0x18U 
-                                                              == 
-                                                              (0x1fU 
-                                                               & ((IData)(vlSelf->rv32e__DOT__opcode) 
-                                                                  >> 2U))))
-                                                           ? vlSelf->rv32e__DOT__rs2_val
-                                                           : vlSelf->rv32e__DOT__imm)))
-                                                      : 
-                                                     (vlSelf->rv32e__DOT__rs1_val 
-                                                      ^ 
-                                                      (((0xcU 
-                                                         == 
-                                                         (0x1fU 
-                                                          & ((IData)(vlSelf->rv32e__DOT__opcode) 
-                                                             >> 2U))) 
-                                                        | (0x18U 
-                                                           == 
-                                                           (0x1fU 
-                                                            & ((IData)(vlSelf->rv32e__DOT__opcode) 
-                                                               >> 2U))))
-                                                        ? vlSelf->rv32e__DOT__rs2_val
-                                                        : vlSelf->rv32e__DOT__imm))))
-                                                    : 
-                                                   ((2U 
-                                                     & (IData)(vlSelf->rv32e__DOT__alu_op))
-                                                     ? 
-                                                    ((1U 
-                                                      & (IData)(vlSelf->rv32e__DOT__alu_op))
-                                                      ? 
-                                                     (vlSelf->rv32e__DOT__rs1_val 
-                                                      | (((0xcU 
-                                                           == 
-                                                           (0x1fU 
-                                                            & ((IData)(vlSelf->rv32e__DOT__opcode) 
-                                                               >> 2U))) 
-                                                          | (0x18U 
-                                                             == 
-                                                             (0x1fU 
-                                                              & ((IData)(vlSelf->rv32e__DOT__opcode) 
-                                                                 >> 2U))))
-                                                          ? vlSelf->rv32e__DOT__rs2_val
-                                                          : vlSelf->rv32e__DOT__imm))
-                                                      : 
-                                                     (vlSelf->rv32e__DOT__rs1_val 
-                                                      & (((0xcU 
-                                                           == 
-                                                           (0x1fU 
-                                                            & ((IData)(vlSelf->rv32e__DOT__opcode) 
-                                                               >> 2U))) 
-                                                          | (0x18U 
-                                                             == 
-                                                             (0x1fU 
-                                                              & ((IData)(vlSelf->rv32e__DOT__opcode) 
-                                                                 >> 2U))))
-                                                          ? vlSelf->rv32e__DOT__rs2_val
-                                                          : vlSelf->rv32e__DOT__imm)))
-                                                     : 
-                                                    ((1U 
-                                                      & (IData)(vlSelf->rv32e__DOT__alu_op))
-                                                      ? 
-                                                     (vlSelf->rv32e__DOT__rs1_val 
-                                                      - 
-                                                      (((0xcU 
-                                                         == 
-                                                         (0x1fU 
-                                                          & ((IData)(vlSelf->rv32e__DOT__opcode) 
-                                                             >> 2U))) 
-                                                        | (0x18U 
-                                                           == 
-                                                           (0x1fU 
-                                                            & ((IData)(vlSelf->rv32e__DOT__opcode) 
-                                                               >> 2U))))
-                                                        ? vlSelf->rv32e__DOT__rs2_val
-                                                        : vlSelf->rv32e__DOT__imm))
-                                                      : 
-                                                     (vlSelf->rv32e__DOT__rs1_val 
-                                                      + 
-                                                      (((0xcU 
-                                                         == 
-                                                         (0x1fU 
-                                                          & ((IData)(vlSelf->rv32e__DOT__opcode) 
-                                                             >> 2U))) 
-                                                        | (0x18U 
-                                                           == 
-                                                           (0x1fU 
-                                                            & ((IData)(vlSelf->rv32e__DOT__opcode) 
-                                                               >> 2U))))
-                                                        ? vlSelf->rv32e__DOT__rs2_val
-                                                        : vlSelf->rv32e__DOT__imm))))));
-                vlSelf->rv32e__DOT__ex_stage__DOT__delay 
-                    = (3U & ((IData)(vlSelf->rv32e__DOT__ex_stage__DOT__delay) 
-                             - (IData)(1U)));
-                vlSelf->rv32e__DOT__alu_zero = (0U 
-                                                == vlSelf->rv32e__DOT__alu_result);
-                vlSelf->rv32e__DOT__alu_less = VL_LTS_III(32, vlSelf->rv32e__DOT__rs1_val, 
-                                                          (((0xcU 
-                                                             == 
-                                                             (0x1fU 
-                                                              & ((IData)(vlSelf->rv32e__DOT__opcode) 
-                                                                 >> 2U))) 
-                                                            | (0x18U 
-                                                               == 
-                                                               (0x1fU 
-                                                                & ((IData)(vlSelf->rv32e__DOT__opcode) 
-                                                                   >> 2U))))
-                                                            ? vlSelf->rv32e__DOT__rs2_val
-                                                            : vlSelf->rv32e__DOT__imm));
-                vlSelf->rv32e__DOT__rd_ex = vlSelf->rv32e__DOT__rd;
-                vlSelf->rv32e__DOT__RegWrite_ex = vlSelf->rv32e__DOT__RegWrite;
-            }
-            vlSelf->rv32e__DOT__ex_stage__DOT__next_state 
-                = ((0U == (IData)(vlSelf->rv32e__DOT__ex_stage__DOT__delay))
-                    ? 2U : 1U);
-            VL_WRITEF("\033[33m[EX]: alu_result = %x | alu_zero=%b | alu_less=%b\033[0m\n\033[33m[EX]: imm=%x | rs1_val=%x | rs2_val=%x\033[0m\n",
-                      32,vlSelf->rv32e__DOT__alu_result,
-                      1,(IData)(vlSelf->rv32e__DOT__alu_zero),
-                      1,vlSelf->rv32e__DOT__alu_less,
-                      32,vlSelf->rv32e__DOT__imm,32,
-                      vlSelf->rv32e__DOT__rs1_val,32,
-                      vlSelf->rv32e__DOT__rs2_val);
-        } else if ((2U == vlSelf->rv32e__DOT__ex_stage__DOT__state)) {
-            vlSelf->rv32e__DOT__ex_ready = 0U;
-            vlSelf->rv32e__DOT__ex_valid = 1U;
-            vlSelf->rv32e__DOT__ex_stage__DOT__next_state 
-                = ((IData)(vlSelf->rv32e__DOT__mem_ready)
-                    ? 0U : 2U);
-        } else {
-            vlSelf->rv32e__DOT__ex_ready = 0U;
-            vlSelf->rv32e__DOT__ex_valid = 0U;
-            vlSelf->rv32e__DOT__ex_stage__DOT__next_state = 0U;
-        }
-    }
-    if (vlSelf->reset) {
         vlSelf->rv32e__DOT__wb_stage__DOT__state = 2U;
         vlSelf->rv32e__DOT__wb_stage__DOT__delay = 1U;
         vlSelf->rv32e__DOT__wb_ready = 1U;
@@ -822,7 +822,9 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__0(Vrv32e___024root* vlSe
                 = ((IData)(vlSelf->rv32e__DOT__id_valid)
                     ? 1U : 0U);
         } else if ((1U == vlSelf->rv32e__DOT__regfile__DOT__state)) {
-            if (VL_UNLIKELY((0U < (IData)(vlSelf->rv32e__DOT__regfile__DOT__delay)))) {
+            vlSelf->rv32e__DOT__reg_ready = 0U;
+            vlSelf->rv32e__DOT__reg_valid = 0U;
+            if ((0U < (IData)(vlSelf->rv32e__DOT__regfile__DOT__delay))) {
                 vlSelf->rv32e__DOT__regfile__DOT__delay 
                     = (3U & ((IData)(vlSelf->rv32e__DOT__regfile__DOT__delay) 
                              - (IData)(1U)));
@@ -837,22 +839,7 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__0(Vrv32e___024root* vlSe
                     __Vdlyvdim0__rv32e__DOT__regfile__DOT__regs__v0 
                         = vlSelf->rv32e__DOT__rd_wb;
                 }
-                vlSelf->rv32e__DOT__rs1_val = ((0U 
-                                                != (IData)(vlSelf->rv32e__DOT__rs1))
-                                                ? vlSelf->rv32e__DOT__regfile__DOT__regs
-                                               [vlSelf->rv32e__DOT__rs1]
-                                                : 0U);
-                vlSelf->rv32e__DOT__rs2_val = ((0U 
-                                                != (IData)(vlSelf->rv32e__DOT__rs2))
-                                                ? vlSelf->rv32e__DOT__regfile__DOT__regs
-                                               [vlSelf->rv32e__DOT__rs2]
-                                                : 0U);
-                VL_WRITEF("\033[35m[REG]: rs1_val=%x | rs2_val=%x\033[0m\n",
-                          32,vlSelf->rv32e__DOT__rs1_val,
-                          32,vlSelf->rv32e__DOT__rs2_val);
             }
-            vlSelf->rv32e__DOT__reg_ready = 0U;
-            vlSelf->rv32e__DOT__reg_valid = 0U;
             vlSelf->rv32e__DOT__regfile__DOT__next_state 
                 = ((0U == (IData)(vlSelf->rv32e__DOT__regfile__DOT__delay))
                     ? 2U : 1U);
@@ -932,8 +919,10 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__0(Vrv32e___024root* vlSe
         __Vdly__rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__sram_state 
             = vlSelf->rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__next_sram_state;
     }
-    VL_WRITEF("\033[32m[ID]: state = %11d | id_ready=%b | id_valid=%b\033[0m\n",
-              32,vlSelf->rv32e__DOT__id_stage__DOT__state,
+    VL_WRITEF("\033[33m[EX]: state = %11d | ex_ready=%b | ex_valid=%b\033[0m\n\033[32m[ID]: state = %11d | id_ready=%b | id_valid=%b\033[0m\n",
+              32,vlSelf->rv32e__DOT__ex_stage__DOT__state,
+              1,(IData)(vlSelf->rv32e__DOT__ex_ready),
+              1,vlSelf->rv32e__DOT__ex_valid,32,vlSelf->rv32e__DOT__id_stage__DOT__state,
               1,(IData)(vlSelf->rv32e__DOT__id_ready),
               1,vlSelf->rv32e__DOT__id_valid);
     vlSelf->rv32e__DOT__id_stage__DOT__immU = (0xfffff000U 
@@ -979,14 +968,10 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__0(Vrv32e___024root* vlSe
                                                      | (0x1eU 
                                                         & (vlSelf->rv32e__DOT__id_stage__DOT__instr_reg 
                                                            >> 7U)))));
-    VL_WRITEF("\033[33m[EX]: state = %11d | ex_ready=%b | ex_valid=%b\033[0m\n\033[31m[WB]: state = %11d | wb_ready=%b | wb_valid=%b\033[0m\n\033[35m[REG]:state = %11d | reg_ready=%b| reg_valid=%b\033[0m\n",
-              32,vlSelf->rv32e__DOT__ex_stage__DOT__state,
-              1,(IData)(vlSelf->rv32e__DOT__ex_ready),
-              1,vlSelf->rv32e__DOT__ex_valid,32,vlSelf->rv32e__DOT__wb_stage__DOT__state,
+    VL_WRITEF("\033[31m[WB]: state = %11d | wb_ready=%b | wb_valid=%b\033[0m\n",
+              32,vlSelf->rv32e__DOT__wb_stage__DOT__state,
               1,(IData)(vlSelf->rv32e__DOT__wb_ready),
-              1,vlSelf->rv32e__DOT__wb_valid,32,vlSelf->rv32e__DOT__regfile__DOT__state,
-              1,(IData)(vlSelf->rv32e__DOT__reg_ready),
-              1,vlSelf->rv32e__DOT__reg_valid);
+              1,vlSelf->rv32e__DOT__wb_valid);
     if (__Vdlyvset__rv32e__DOT__regfile__DOT__regs__v0) {
         vlSelf->rv32e__DOT__regfile__DOT__regs[__Vdlyvdim0__rv32e__DOT__regfile__DOT__regs__v0] 
             = __Vdlyvval__rv32e__DOT__regfile__DOT__regs__v0;
@@ -1107,6 +1092,19 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__0(Vrv32e___024root* vlSe
             vlSelf->rv32e__DOT__mem_valid = 0U;
         }
     }
+    vlSelf->rv32e__DOT__rs1_val = ((0U != (IData)(vlSelf->rv32e__DOT__rs1))
+                                    ? vlSelf->rv32e__DOT__regfile__DOT__regs
+                                   [vlSelf->rv32e__DOT__rs1]
+                                    : 0U);
+    vlSelf->rv32e__DOT__rs2_val = ((0U != (IData)(vlSelf->rv32e__DOT__rs2))
+                                    ? vlSelf->rv32e__DOT__regfile__DOT__regs
+                                   [vlSelf->rv32e__DOT__rs2]
+                                    : 0U);
+    VL_WRITEF("\033[35m[REG]:rs1_val=%x | rs2_val=%x\033[0m\n\033[35m[REG]:state = %11d | reg_ready=%b| reg_valid=%b\033[0m\n",
+              32,vlSelf->rv32e__DOT__rs1_val,32,vlSelf->rv32e__DOT__rs2_val,
+              32,vlSelf->rv32e__DOT__regfile__DOT__state,
+              1,(IData)(vlSelf->rv32e__DOT__reg_ready),
+              1,vlSelf->rv32e__DOT__reg_valid);
     vlSelf->rv32e__DOT__mem_stage__DOT__sram_rdata 
         = __Vdly__rv32e__DOT__mem_stage__DOT__sram_rdata;
     vlSelf->rv32e__DOT__mem_stage__DOT__sram_rready 

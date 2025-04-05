@@ -83,12 +83,10 @@ VL_ATTR_COLD void Vrv32e___024root___stl_sequent__TOP__0(Vrv32e___024root* vlSel
     Vrv32e__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vrv32e___024root___stl_sequent__TOP__0\n"); );
     // Body
-    VL_WRITEF("\033[32m[ID]: state = %11d | id_ready=%b | id_valid=%b\033[0m\n\033[35m[REG]:state = %11d | reg_ready=%b| reg_valid=%b\033[0m\n\033[33m[EX]: state = %11d | ex_ready=%b | ex_valid=%b\033[0m\n\033[36m[MEM]:state = %11d | mem_ready=%b| mem_valid=%b\033[0m\n \n\033[31m[WB]: state = %11d | wb_ready=%b | wb_valid=%b\033[0m\n",
+    VL_WRITEF("\033[32m[ID]: state = %11d | id_ready=%b | id_valid=%b\033[0m\n\033[33m[EX]: state = %11d | ex_ready=%b | ex_valid=%b\033[0m\n\033[36m[MEM]:state = %11d | mem_ready=%b| mem_valid=%b\033[0m\n \n\033[31m[WB]: state = %11d | wb_ready=%b | wb_valid=%b\033[0m\n",
               32,vlSelf->rv32e__DOT__id_stage__DOT__state,
               1,(IData)(vlSelf->rv32e__DOT__id_ready),
-              1,vlSelf->rv32e__DOT__id_valid,32,vlSelf->rv32e__DOT__regfile__DOT__state,
-              1,(IData)(vlSelf->rv32e__DOT__reg_ready),
-              1,vlSelf->rv32e__DOT__reg_valid,32,vlSelf->rv32e__DOT__ex_stage__DOT__state,
+              1,vlSelf->rv32e__DOT__id_valid,32,vlSelf->rv32e__DOT__ex_stage__DOT__state,
               1,(IData)(vlSelf->rv32e__DOT__ex_ready),
               1,vlSelf->rv32e__DOT__ex_valid,32,vlSelf->rv32e__DOT__mem_stage__DOT__state,
               1,(IData)(vlSelf->rv32e__DOT__mem_ready),
@@ -138,8 +136,19 @@ VL_ATTR_COLD void Vrv32e___024root___stl_sequent__TOP__0(Vrv32e___024root* vlSel
                                                      | (0x1eU 
                                                         & (vlSelf->rv32e__DOT__id_stage__DOT__instr_reg 
                                                            >> 7U)))));
-    VL_WRITEF("\033[1m[mem_sram]: state=%11d | araddr=%x | arvalid=%b | arready=%b | rdata=%x | rvalid=%b | waddr=%x | wdata=%x | wmask=%b | wvalid=%b | wready=%b\033[0m\n",
-              32,vlSelf->rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__sram_state,
+    vlSelf->rv32e__DOT__rs1_val = ((0U != (IData)(vlSelf->rv32e__DOT__rs1))
+                                    ? vlSelf->rv32e__DOT__regfile__DOT__regs
+                                   [vlSelf->rv32e__DOT__rs1]
+                                    : 0U);
+    vlSelf->rv32e__DOT__rs2_val = ((0U != (IData)(vlSelf->rv32e__DOT__rs2))
+                                    ? vlSelf->rv32e__DOT__regfile__DOT__regs
+                                   [vlSelf->rv32e__DOT__rs2]
+                                    : 0U);
+    VL_WRITEF("\033[35m[REG]:rs1_val=%x | rs2_val=%x\033[0m\n\033[35m[REG]:state = %11d | reg_ready=%b| reg_valid=%b\033[0m\n\033[1m[mem_sram]: state=%11d | araddr=%x | arvalid=%b | arready=%b | rdata=%x | rvalid=%b | waddr=%x | wdata=%x | wmask=%b | wvalid=%b | wready=%b\033[0m\n",
+              32,vlSelf->rv32e__DOT__rs1_val,32,vlSelf->rv32e__DOT__rs2_val,
+              32,vlSelf->rv32e__DOT__regfile__DOT__state,
+              1,(IData)(vlSelf->rv32e__DOT__reg_ready),
+              1,vlSelf->rv32e__DOT__reg_valid,32,vlSelf->rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__sram_state,
               32,vlSelf->rv32e__DOT__mem_stage__DOT__sram_araddr,
               1,(IData)(vlSelf->rv32e__DOT__mem_stage__DOT__sram_arvalid),
               1,vlSelf->rv32e__DOT__mem_stage__DOT__sram_arready,
