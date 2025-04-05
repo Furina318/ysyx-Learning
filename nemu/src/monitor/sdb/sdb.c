@@ -197,6 +197,8 @@ static int cmd_test(){
   FILE *file;
   char line[256];
   uint32_t expr_count=0;
+  uint32_t pass_count=0;
+  uint32_t fail_count=0;
   bool success=true;
 
   char *filename = "/home/furina/ysyx-workbench/nemu/tools/gen-expr/build/input";
@@ -210,11 +212,16 @@ static int cmd_test(){
     // 输出第一个参数和 expr 的结果
     printf("%s\ncorrect ans:%s   my_expr:%u\n\n",expression,ans,result);
     expr_count+=1;
-    // if((word_t)ans==result) continue;
-    // else success=false;
+
+    word_t correct_ans = strtoul(ans,NULL,10);
+
+    if(result == correct_ans) pass_count++;
+    else fail_count++;
   }
-  if(success) _Log(ANSI_BG_GREEN "Success!" ANSI_NONE "   Total %u expr\n",expr_count);
-  else _Log(ANSI_BG_RED "Fail!" ANSI_NONE "   Total %u expr\n",expr_count);
+  if(pass_count == expr_count) success=true;
+  else success=false;
+  if(success) _Log(ANSI_BG_GREEN "Success!" ANSI_NONE "   Total %u expr, Pass %u expr, Fail %u expr\n",expr_count,pass_count,fail_count);
+  else _Log(ANSI_BG_RED "Fail!" ANSI_NONE "   Total %u expr, Pass %u expr, Fail %u expr\n",expr_count,pass_count,fail_count);
   fclose(file);
   return 0;
 }
