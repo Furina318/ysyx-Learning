@@ -200,7 +200,7 @@ static int cmd_ext(){
   uint32_t expr_count=0;
   uint32_t pass_count=0;
   uint32_t fail_count=0;
-  // bool success=true;
+  bool success=true;
 
   char *filename = "/home/furina/ysyx-workbench/nemu/tools/gen-expr/build/input";
   char *error_filename = "/home/furina/ysyx-workbench/nemu/tools/gen-expr/build/error_expr";
@@ -228,14 +228,14 @@ static int cmd_ext(){
       fprintf(error_file,"Correct ans: %u   my_ans: %u\n\n",correct_ans,result);
     }
   }
-  // if(pass_count == expr_count) success=true;
-  // else success=false;
-  // if(success) _Log(ANSI_BG_GREEN "Success!" ANSI_NONE "   Total %u expr, Pass %u expr, Fail %u expr\n",expr_count,pass_count,fail_count);
-  // else {
-  //   _Log(ANSI_BG_RED "Fail!" ANSI_NONE "   Total %u expr, Pass %u expr, Fail %u expr\n",expr_count,pass_count,fail_count);
-  //   printf("Failed expressions have been saved to %s\n", error_filename);
-  // }
-  printf("pass:%d all:%d\n",pass_count,expr_count);
+  if(pass_count == expr_count) success=true;
+  else success=false;
+  if(success) _Log(ANSI_BG_GREEN "Success!" ANSI_NONE "   Total %u expr, Pass %u expr, Fail %u expr\n",expr_count,pass_count,fail_count);
+  else {
+    _Log(ANSI_BG_RED "Fail!" ANSI_NONE "   Total %u expr, Pass %u expr, Fail %u expr\n",expr_count,pass_count,fail_count);
+    printf("Failed expressions have been saved to %s\n", error_filename);
+  }
+  // printf("pass:%d all:%d\n",pass_count,expr_count);
   fclose(file);
   return 0;
 }
