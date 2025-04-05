@@ -35,7 +35,7 @@ static char *code_format =
 "  return 0; "
 "}";
 
-#define MAX_DEPTH 10 // 定义最大递归深度以防止无限递归,防止溢出
+#define MAX_DEPTH 8 // 定义最大递归深度以防止无限递归,防止溢出
 
 static void gen(char const *c){
   strncat(buf,c,1);
