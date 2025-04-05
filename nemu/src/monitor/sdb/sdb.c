@@ -231,7 +231,10 @@ static int cmd_test(){
   if(pass_count == expr_count) success=true;
   else success=false;
   if(success) _Log(ANSI_BG_GREEN "Success!" ANSI_NONE "   Total %u expr, Pass %u expr, Fail %u expr\n",expr_count,pass_count,fail_count);
-  else _Log(ANSI_BG_RED "Fail!" ANSI_NONE "   Total %u expr, Pass %u expr, Fail %u expr\n",expr_count,pass_count,fail_count);
+  else {
+    _Log(ANSI_BG_RED "Fail!" ANSI_NONE "   Total %u expr, Pass %u expr, Fail %u expr\n",expr_count,pass_count,fail_count);
+    printf("Failed expressions have been saved to %s\n", error_filename);
+  }
   fclose(file);
   return 0;
 }
