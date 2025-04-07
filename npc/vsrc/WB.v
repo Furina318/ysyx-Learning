@@ -97,9 +97,10 @@ module WB (
                         RegWrite_wb = mem_RegWrite;
                         wb_MemRead = id_MemRead;
                         wb_MemWrite = id_MemWrite;
-                        // wb_MemLen = id_MemLen;
-                        // wb_addr = id_addr;
-                        // wb_data_in = id_data_in;
+                        
+                        wb_MemLen = id_MemLen;
+                        wb_addr = id_addr;
+                        wb_data_in = id_data_in;
                         //=====写回数据=====
                         $display("\033[31m[WB]: wb_data=0x%08x\033[0m",wb_data);
                         delay = delay - 1;
@@ -120,9 +121,9 @@ module WB (
         end
     end
     always @(*) begin
-        wb_MemLen = id_MemLen;
-        wb_addr = id_addr;
-        wb_data_in = id_data_in;
+        // wb_MemLen = id_MemLen;
+        // wb_addr = id_addr;
+        // wb_data_in = id_data_in;
         $display("\033[31m[WB]: state = %d | wb_ready=%b | wb_valid=%b\033[0m", state, wb_ready, wb_valid);
     end
 endmodule

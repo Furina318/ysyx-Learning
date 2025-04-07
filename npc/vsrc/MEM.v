@@ -109,7 +109,8 @@ module MEM (
                     mem_ready <= 1'b0;
                     mem_valid <= 1'b0;
                     if(sram_arready && sram_arvalid) begin//读地址有效且sram准备好读取数据
-                        sram_arvalid <= 1'b0;//地址被接受，撤销读地址请求
+                        // sram_arvalid <= 1'b0;//地址被接受，撤销读地址请求
+                         $display("\033[31m[MEM]: READ_ADDR状态握手成功\033[0m");
                         sram_rready  <= 1'b1;//准备接受数据
                     end
                 end
@@ -118,7 +119,8 @@ module MEM (
                     mem_ready <= 1'b0;
                     mem_valid <= 1'b0;
                     if(sram_rvalid && sram_rready) begin//当读数据有效且cpu准备接受读数据
-                        sram_rready <= 1'b0;//数据被接受，撤销rready接受读数据信号
+                        // sram_rready <= 1'b0;//数据被接受，撤销rready接受读数据信号
+                        $display("\033[31m[MEM]: READ_DATA状态握手成功\033[0m");
                         case(MemLen)
                             `Mem_Bit:   data_out <= {24'b0,sram_rdata[7:0]};
                             `Mem_UHalf: data_out <= {16'b0,sram_rdata[15:0]};
@@ -135,10 +137,10 @@ module MEM (
                     mem_ready <= 1'b0;
                     mem_valid <= 1'b0;
                     if(sram_wready && sram_wvalid) begin
-                        sram_wvalid <= 1'b0;//写请求被接受，撤销wvalid信号
+                        // sram_wvalid <= 1'b0;//写请求被接受，撤销wvalid信号
                         rd_mem <= ex_rd;
                         RegWrite_mem <= ex_RegWrite;
-                        mem_valid <= 1'b1;
+                        // mem_valid <= 1'b1;
                         $display("\033[31m[MEM]: WRITE状态握手成功\033[0m");
                     end
                 end
@@ -147,7 +149,7 @@ module MEM (
                     mem_ready <= 1'b0;
                     mem_valid <= 1'b1;
                     sram_wvalid <= 1'b0;
-                    sram_rready <= 1'b0;
+                    // sram_rready <= 1'b0;
                     sram_arvalid <= 1'b0;
                     // rd_mem <= ex_rd;
                     // RegWrite_mem <= ex_RegWrite;

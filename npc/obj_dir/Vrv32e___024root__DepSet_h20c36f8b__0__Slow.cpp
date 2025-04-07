@@ -310,6 +310,9 @@ VL_ATTR_COLD void Vrv32e___024root___ctor_var_reset(Vrv32e___024root* vlSelf) {
     vlSelf->rv32e__DOT__RegWrite_wb = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__wb_MemRead = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__wb_MemWrite = VL_RAND_RESET_I(1);
+    vlSelf->rv32e__DOT__wb_MemLen = VL_RAND_RESET_I(2);
+    vlSelf->rv32e__DOT__wb_addr = VL_RAND_RESET_I(32);
+    vlSelf->rv32e__DOT__wb_data_in = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__if_stage__DOT__state = 0;
     vlSelf->rv32e__DOT__if_stage__DOT__next_state = 0;
     vlSelf->rv32e__DOT__if_stage__DOT__delay = VL_RAND_RESET_I(2);

@@ -754,6 +754,9 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__0(Vrv32e___024root* vlSe
                 vlSelf->rv32e__DOT__RegWrite_wb = vlSelf->rv32e__DOT__RegWrite_mem;
                 vlSelf->rv32e__DOT__wb_MemRead = vlSelf->rv32e__DOT__MemRead;
                 vlSelf->rv32e__DOT__wb_MemWrite = vlSelf->rv32e__DOT__MemWrite;
+                vlSelf->rv32e__DOT__wb_MemLen = vlSelf->rv32e__DOT__MemLen;
+                vlSelf->rv32e__DOT__wb_addr = vlSelf->rv32e__DOT__alu_result;
+                vlSelf->rv32e__DOT__wb_data_in = vlSelf->rv32e__DOT__rs2_val;
                 VL_WRITEF("\033[31m[WB]: wb_data=0x%08x\033[0m\n",
                           32,vlSelf->rv32e__DOT__wb_data);
             }
@@ -862,14 +865,12 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__0(Vrv32e___024root* vlSe
         __Vdly__rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__rdata_reg = 0U;
     } else {
         if ((0U == vlSelf->rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__sram_state)) {
-            __Vdly__rv32e__DOT__mem_stage__DOT__sram_arready = 1U;
             __Vdly__rv32e__DOT__mem_stage__DOT__sram_wready = 1U;
             __Vdly__rv32e__DOT__mem_stage__DOT__sram_rvalid = 0U;
             if (((IData)(vlSelf->rv32e__DOT__mem_stage__DOT__sram_arvalid) 
                  & (IData)(vlSelf->rv32e__DOT__mem_stage__DOT__sram_arready))) {
                 __Vdly__rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__araddr_reg 
                     = vlSelf->rv32e__DOT__mem_stage__DOT__sram_araddr;
-                __Vdly__rv32e__DOT__mem_stage__DOT__sram_arready = 0U;
                 __Vdly__rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__delay_counter = 1U;
                 __Vdly__rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__next_sram_state = 1U;
             } else if (((IData)(vlSelf->rv32e__DOT__mem_stage__DOT__sram_wvalid) 
@@ -888,7 +889,9 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__0(Vrv32e___024root* vlSe
             } else {
                 __Vdly__rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__next_sram_state = 0U;
             }
+            __Vdly__rv32e__DOT__mem_stage__DOT__sram_arready = 1U;
         } else if ((1U == vlSelf->rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__sram_state)) {
+            __Vdly__rv32e__DOT__mem_stage__DOT__sram_arready = 0U;
             if ((0U < (IData)(vlSelf->rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__delay_counter))) {
                 __Vdly__rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__delay_counter 
                     = (3U & ((IData)(vlSelf->rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__delay_counter) 
@@ -905,11 +908,14 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__0(Vrv32e___024root* vlSe
                  & (IData)(vlSelf->rv32e__DOT__mem_stage__DOT__sram_rvalid))) {
                 __Vdly__rv32e__DOT__mem_stage__DOT__sram_rdata 
                     = vlSelf->rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__rdata_reg;
-                __Vdly__rv32e__DOT__mem_stage__DOT__sram_rvalid = 0U;
                 __Vdly__rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__next_sram_state = 0U;
             }
         } else if ((3U == vlSelf->rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__sram_state)) {
-            if ((1U & (~ (IData)(vlSelf->rv32e__DOT__mem_stage__DOT__sram_wvalid)))) {
+            if ((0U < (IData)(vlSelf->rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__delay_counter))) {
+                __Vdly__rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__delay_counter 
+                    = (3U & ((IData)(vlSelf->rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__delay_counter) 
+                             - (IData)(1U)));
+            } else {
                 __Vdly__rv32e__DOT__mem_stage__DOT__sram_wready = 1U;
                 __Vdly__rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__next_sram_state = 0U;
             }
@@ -986,6 +992,19 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__0(Vrv32e___024root* vlSe
         = __Vdly__rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__next_sram_state;
     vlSelf->rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__sram_state 
         = __Vdly__rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__sram_state;
+    vlSelf->rv32e__DOT__rs1_val = ((0U != (IData)(vlSelf->rv32e__DOT__rs1))
+                                    ? vlSelf->rv32e__DOT__regfile__DOT__regs
+                                   [vlSelf->rv32e__DOT__rs1]
+                                    : 0U);
+    vlSelf->rv32e__DOT__rs2_val = ((0U != (IData)(vlSelf->rv32e__DOT__rs2))
+                                    ? vlSelf->rv32e__DOT__regfile__DOT__regs
+                                   [vlSelf->rv32e__DOT__rs2]
+                                    : 0U);
+    VL_WRITEF("\033[35m[REG]:rs1_val=%x | rs2_val=%x\033[0m\n\033[35m[REG]:state = %11d | reg_ready=%b| reg_valid=%b\033[0m\n",
+              32,vlSelf->rv32e__DOT__rs1_val,32,vlSelf->rv32e__DOT__rs2_val,
+              32,vlSelf->rv32e__DOT__regfile__DOT__state,
+              1,(IData)(vlSelf->rv32e__DOT__reg_ready),
+              1,vlSelf->rv32e__DOT__reg_valid);
     if (vlSelf->reset) {
         vlSelf->rv32e__DOT__mem_stage__DOT__state = 0U;
         vlSelf->rv32e__DOT__mem_stage__DOT__next_state = 0U;
@@ -1011,16 +1030,16 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__0(Vrv32e___024root* vlSe
                  & (IData)(vlSelf->rv32e__DOT__mem_ready))) {
                 if (vlSelf->rv32e__DOT__wb_MemRead) {
                     vlSelf->rv32e__DOT__mem_stage__DOT__sram_araddr 
-                        = vlSelf->rv32e__DOT__alu_result;
+                        = vlSelf->rv32e__DOT__wb_addr;
                     __Vdly__rv32e__DOT__mem_stage__DOT__sram_arvalid = 1U;
                 } else if (vlSelf->rv32e__DOT__wb_MemWrite) {
                     vlSelf->rv32e__DOT__mem_stage__DOT__sram_waddr 
-                        = vlSelf->rv32e__DOT__alu_result;
+                        = vlSelf->rv32e__DOT__wb_addr;
                     vlSelf->rv32e__DOT__mem_stage__DOT__sram_wdata 
-                        = vlSelf->rv32e__DOT__rs2_val;
+                        = vlSelf->rv32e__DOT__wb_data_in;
                     vlSelf->rv32e__DOT__mem_stage__DOT__sram_wmask 
-                        = ((0U == (IData)(vlSelf->rv32e__DOT__MemLen))
-                            ? 1U : ((1U == (IData)(vlSelf->rv32e__DOT__MemLen))
+                        = ((0U == (IData)(vlSelf->rv32e__DOT__wb_MemLen))
+                            ? 1U : ((1U == (IData)(vlSelf->rv32e__DOT__wb_MemLen))
                                      ? 3U : 0xfU));
                     __Vdly__rv32e__DOT__mem_stage__DOT__sram_wvalid = 1U;
                 } else {
@@ -1033,29 +1052,29 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__0(Vrv32e___024root* vlSe
         } else if ((1U == vlSelf->rv32e__DOT__mem_stage__DOT__state)) {
             __Vdly__rv32e__DOT__mem_ready = 0U;
             vlSelf->rv32e__DOT__mem_valid = 0U;
-            if (((IData)(vlSelf->rv32e__DOT__mem_stage__DOT__sram_arready) 
-                 & (IData)(vlSelf->rv32e__DOT__mem_stage__DOT__sram_arvalid))) {
-                __Vdly__rv32e__DOT__mem_stage__DOT__sram_arvalid = 0U;
+            if (VL_UNLIKELY(((IData)(vlSelf->rv32e__DOT__mem_stage__DOT__sram_arready) 
+                             & (IData)(vlSelf->rv32e__DOT__mem_stage__DOT__sram_arvalid)))) {
+                VL_WRITEF("\033[31m[MEM]: READ_ADDR\347\212\266\346\200\201\346\217\241\346\211\213\346\210\220\345\212\237\033[0m\n");
                 __Vdly__rv32e__DOT__mem_stage__DOT__sram_rready = 1U;
             }
         } else if ((2U == vlSelf->rv32e__DOT__mem_stage__DOT__state)) {
             __Vdly__rv32e__DOT__mem_ready = 0U;
             vlSelf->rv32e__DOT__mem_valid = 0U;
-            if (((IData)(vlSelf->rv32e__DOT__mem_stage__DOT__sram_rvalid) 
-                 & (IData)(vlSelf->rv32e__DOT__mem_stage__DOT__sram_rready))) {
-                __Vdly__rv32e__DOT__mem_stage__DOT__sram_rready = 0U;
+            if (VL_UNLIKELY(((IData)(vlSelf->rv32e__DOT__mem_stage__DOT__sram_rvalid) 
+                             & (IData)(vlSelf->rv32e__DOT__mem_stage__DOT__sram_rready)))) {
+                VL_WRITEF("\033[31m[MEM]: READ_DATA\347\212\266\346\200\201\346\217\241\346\211\213\346\210\220\345\212\237\033[0m\n");
                 vlSelf->rv32e__DOT__data_out = ((2U 
-                                                 & (IData)(vlSelf->rv32e__DOT__MemLen))
+                                                 & (IData)(vlSelf->rv32e__DOT__wb_MemLen))
                                                  ? 
                                                 ((1U 
-                                                  & (IData)(vlSelf->rv32e__DOT__MemLen))
+                                                  & (IData)(vlSelf->rv32e__DOT__wb_MemLen))
                                                   ? 
                                                  (0xffffU 
                                                   & vlSelf->rv32e__DOT__mem_stage__DOT__sram_rdata)
                                                   : vlSelf->rv32e__DOT__mem_stage__DOT__sram_rdata)
                                                  : 
                                                 ((1U 
-                                                  & (IData)(vlSelf->rv32e__DOT__MemLen))
+                                                  & (IData)(vlSelf->rv32e__DOT__wb_MemLen))
                                                   ? 
                                                  (((- (IData)(
                                                               (1U 
@@ -1076,35 +1095,19 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__0(Vrv32e___024root* vlSe
             if (VL_UNLIKELY(((IData)(vlSelf->rv32e__DOT__mem_stage__DOT__sram_wready) 
                              & (IData)(vlSelf->rv32e__DOT__mem_stage__DOT__sram_wvalid)))) {
                 VL_WRITEF("\033[31m[MEM]: WRITE\347\212\266\346\200\201\346\217\241\346\211\213\346\210\220\345\212\237\033[0m\n");
-                __Vdly__rv32e__DOT__mem_stage__DOT__sram_wvalid = 0U;
                 vlSelf->rv32e__DOT__rd_mem = vlSelf->rv32e__DOT__rd_ex;
                 vlSelf->rv32e__DOT__RegWrite_mem = vlSelf->rv32e__DOT__RegWrite_ex;
-                vlSelf->rv32e__DOT__mem_valid = 1U;
             }
         } else if ((4U == vlSelf->rv32e__DOT__mem_stage__DOT__state)) {
             __Vdly__rv32e__DOT__mem_ready = 0U;
             vlSelf->rv32e__DOT__mem_valid = 1U;
             __Vdly__rv32e__DOT__mem_stage__DOT__sram_wvalid = 0U;
-            __Vdly__rv32e__DOT__mem_stage__DOT__sram_rready = 0U;
             __Vdly__rv32e__DOT__mem_stage__DOT__sram_arvalid = 0U;
         } else {
             __Vdly__rv32e__DOT__mem_ready = 0U;
             vlSelf->rv32e__DOT__mem_valid = 0U;
         }
     }
-    vlSelf->rv32e__DOT__rs1_val = ((0U != (IData)(vlSelf->rv32e__DOT__rs1))
-                                    ? vlSelf->rv32e__DOT__regfile__DOT__regs
-                                   [vlSelf->rv32e__DOT__rs1]
-                                    : 0U);
-    vlSelf->rv32e__DOT__rs2_val = ((0U != (IData)(vlSelf->rv32e__DOT__rs2))
-                                    ? vlSelf->rv32e__DOT__regfile__DOT__regs
-                                   [vlSelf->rv32e__DOT__rs2]
-                                    : 0U);
-    VL_WRITEF("\033[35m[REG]:rs1_val=%x | rs2_val=%x\033[0m\n\033[35m[REG]:state = %11d | reg_ready=%b| reg_valid=%b\033[0m\n",
-              32,vlSelf->rv32e__DOT__rs1_val,32,vlSelf->rv32e__DOT__rs2_val,
-              32,vlSelf->rv32e__DOT__regfile__DOT__state,
-              1,(IData)(vlSelf->rv32e__DOT__reg_ready),
-              1,vlSelf->rv32e__DOT__reg_valid);
     vlSelf->rv32e__DOT__mem_stage__DOT__sram_rdata 
         = __Vdly__rv32e__DOT__mem_stage__DOT__sram_rdata;
     vlSelf->rv32e__DOT__mem_stage__DOT__sram_rready 

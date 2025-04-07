@@ -53,6 +53,7 @@ class Vrv32e___024root final : public VerilatedModule {
         CData/*0:0*/ rv32e__DOT__RegWrite_wb;
         CData/*0:0*/ rv32e__DOT__wb_MemRead;
         CData/*0:0*/ rv32e__DOT__wb_MemWrite;
+        CData/*1:0*/ rv32e__DOT__wb_MemLen;
         CData/*1:0*/ rv32e__DOT__if_stage__DOT__delay;
         CData/*0:0*/ rv32e__DOT__if_stage__DOT__ren;
         CData/*0:0*/ rv32e__DOT__if_stage__DOT__ifu_sram_inst__DOT__read_pending;
@@ -78,13 +79,15 @@ class Vrv32e___024root final : public VerilatedModule {
         IData/*31:0*/ rv32e__DOT__imm;
         IData/*31:0*/ rv32e__DOT__rs1_val;
         IData/*31:0*/ rv32e__DOT__rs2_val;
-        IData/*31:0*/ rv32e__DOT__alu_result;
     };
     struct {
+        IData/*31:0*/ rv32e__DOT__alu_result;
         IData/*31:0*/ rv32e__DOT__data_out;
         IData/*31:0*/ rv32e__DOT__wb_data;
         IData/*31:0*/ rv32e__DOT__jal_target;
         IData/*31:0*/ rv32e__DOT__jalr_target;
+        IData/*31:0*/ rv32e__DOT__wb_addr;
+        IData/*31:0*/ rv32e__DOT__wb_data_in;
         IData/*31:0*/ rv32e__DOT__if_stage__DOT__state;
         IData/*31:0*/ rv32e__DOT__if_stage__DOT__next_state;
         IData/*31:0*/ rv32e__DOT__if_stage__DOT__get_instr;

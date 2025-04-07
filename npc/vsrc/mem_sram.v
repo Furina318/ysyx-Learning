@@ -54,7 +54,7 @@ module mem_sram #(
                     rvalid  <= 1'b0;
                     if(arvalid && arready) begin//读握手
                         araddr_reg <= araddr;
-                        arready <= 1'b0;//接收地址后不再准备
+                        // arready <= 1'b0;//接收地址后不再准备
                         delay_counter <= DELAY_CYCLES - 1;
                         next_sram_state <= READ_ADDR;
                     end
@@ -73,6 +73,7 @@ module mem_sram #(
                     end
                 end
                 READ_ADDR:begin
+                    arready <= 1'b0;//接收地址后不再准备
                     if(delay_counter > 0) begin
                         delay_counter <= delay_counter - 1;
                     end
@@ -85,13 +86,20 @@ module mem_sram #(
                 READ_DATA: begin
                     if(rready && rvalid) begin
                         rdata <= rdata_reg;
-                        rvalid <= 1'b0;//数据被接受后关闭rvalid
+                        // rvalid <= 1'b0;//数据被接受后关闭rvalid
                         next_sram_state <= IDLE;
                     end
                 end
                 WRITE: begin
-                    if(!wvalid) begin//等待master撤销wvalid信号
-                        wready <= 1'b1;//写数据完成后准备好接收下一个写地址
+                    // if(!wvalid) begin//等待master撤销wvalid信号
+                    //     wready <= 1'b1;//写数据完成后准备好接收下一个写地址
+                    //     next_sram_state <= IDLE;
+                    // end
+                    if(delay_counter > 0) begin
+                        delay_counter <= delay_counter - 1;
+                    end
+                    else begin
+                        wready <= 1'b1;
                         next_sram_state <= IDLE;
                     end
                 end
