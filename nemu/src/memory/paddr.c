@@ -116,11 +116,8 @@ void init_mem() {
 
 word_t paddr_read(paddr_t addr, int len) {
 #ifdef CONFIG_MEMORY_TRACE
-#ifdef CONFIG_DEVICE
-  mtrace_log('R',addr,mmio_read(addr,len),len);
-#else
-  mtrace_log('R',addr,pmem_read(addr,len),len);
-#endif
+  if (likely(in_pmem(addr))) mtrace_log('R',addr,pmem_read(addr,len),len);
+  IFDEF(CONFIG_DEVICE, mtrace_log('R',addr,mmio_read(addr,len),len));
 #endif
   if (likely(in_pmem(addr)))return pmem_read(addr, len);
   IFDEF(CONFIG_DEVICE, return mmio_read(addr, len));
