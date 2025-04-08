@@ -368,7 +368,6 @@ static void execute(uint64_t n) {
     IFDEF(CONFIG_DEVICE, device_update());
   }
   if(nemu_state.state==NEMU_END || nemu_state.state==NEMU_ABORT){
-    printf("ahfeafefhewalifewali\n");
     IFDEF(CONFIG_MEMORY_TRACE,close_mtrace());
     IFDEF(CONFIG_DEVICE_TRACE,close_dtrace());
   }
