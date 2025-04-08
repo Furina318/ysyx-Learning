@@ -3,23 +3,23 @@ module mem_sram #(
     parameter ADDR_WIDTH = 32,
     parameter DATA_WIDTH = 32
 )(
-    input  logic                  clk,
-    input  logic                  reset,
+    input  wire                   clk,
+    input  wire                   reset,
 
     //读地址通道
-    input  logic [ADDR_WIDTH-1:0] araddr,
-    input  logic                  arvalid,
+    input  wire [ADDR_WIDTH-1:0]  araddr,
+    input  wire                   arvalid,
     output reg                    arready,
     //读数据通道
     output reg   [DATA_WIDTH-1:0] rdata,
     output reg                    rvalid,
-    input  logic                  rready,
+    input  wire                   rready,
     
     //写端口
-    input  logic [ADDR_WIDTH-1:0] waddr,
-    input  logic [DATA_WIDTH-1:0] wdata,
-    input  logic [3:0]            wmask,
-    input  logic                  wvalid,
+    input  wire [ADDR_WIDTH-1:0]  waddr,
+    input  wire [DATA_WIDTH-1:0]  wdata,
+    input  wire [3:0]             wmask,
+    input  wire                   wvalid,
     output reg                    wready
 );
     import "DPI-C" function int unsigned pmem_read(input int unsigned raddr, input int len);
@@ -55,7 +55,7 @@ module mem_sram #(
                     if(arvalid && arready) begin//读握手
                         araddr_reg <= araddr;
                         arready <= 1'b0;//接收地址后不再准备
-                        delay_counter <= DELAY_CYCLES - 1;
+                        delay_counter <= DELAY_CYCLES;
                         next_sram_state <= READ_ADDR;
                     end
                     else if(wvalid && wready) begin//写握手
@@ -75,25 +75,24 @@ module mem_sram #(
                 READ_ADDR:begin
                     if(delay_counter > 0) begin
                         delay_counter <= delay_counter - 1;
+                        next_sram_state <= READ_ADDR;
                     end
                     else begin
                         rdata_reg <= pmem_read(araddr_reg,4);
-                        rvalid <= 1'b1;//读取数据有效
+                        // rvalid <= 1'b1;//读取数据有效
                         next_sram_state <= READ_DATA;
                     end
                 end
                 READ_DATA: begin
-                    if(rready && rvalid) begin
+                    if(rready) begin
                         rdata <= rdata_reg;
-                        rvalid <= 1'b0;//数据被接受后关闭rvalid
+                        rvalid <= 1'b1;
+                        // rvalid <= 1'b0;//数据被接受后关闭rvalid
                         next_sram_state <= IDLE;
                     end
+                    else next_sram_state <= READ_DATA;
                 end
                 WRITE: begin
-                    // if(!wvalid) begin//等待master撤销wvalid信号
-                    //     wready <= 1'b1;//写数据完成后准备好接收下一个写地址
-                    //     next_sram_state <= IDLE;
-                    // end
                     if(delay_counter > 0) begin
                         delay_counter <= delay_counter - 1;
                     end
@@ -111,7 +110,9 @@ module mem_sram #(
 
     //调试输出
     always @(*) begin
-        $display("\033[1m[mem_sram]: state=%d | araddr=%h | arvalid=%b | arready=%b | rdata=%h | rvalid=%b | waddr=%h | wdata=%h | wmask=%b | wvalid=%b | wready=%b\033[0m",
-            sram_state, araddr, arvalid, arready, rdata, rvalid, waddr, wdata, wmask, wvalid, wready);
+        $display("\033[1m[mem_sram]: state=%d | araddr=%h | arvalid=%b | arready=%b | rready=%b | rvalid=%b | rdata=%h\033[0m",
+            sram_state, araddr, arvalid, arready, rready, rvalid,rdata);
+        $display("\033[1m[mem_sram]: waddr=%h | wdata=%h | wmask=%b | wvalid=%b | wready=%b\033[0m",
+            waddr, wdata, wmask, wvalid, wready);
     end
 endmodule

@@ -108,17 +108,20 @@ module MEM (
                 READ_ADDR: begin
                     mem_ready <= 1'b0;
                     mem_valid <= 1'b0;
+                    // sram_arvalid <= 1'b1;//发送sram读请求
                     if(sram_arready && sram_arvalid) begin//读地址有效且sram准备好读取数据
                         // sram_arvalid <= 1'b0;//地址被接受，撤销读地址请求
                          $display("\033[31m[MEM]: READ_ADDR状态握手成功\033[0m");
-                        sram_rready  <= 1'b1;//准备接受数据
+                        sram_rready <= 1'b1;//准备接受数据
                     end
                 end
 
                 READ_DATA: begin
                     mem_ready <= 1'b0;
                     mem_valid <= 1'b0;
+                    sram_rready <= 1'b1;//准备接受数据
                     if(sram_rvalid && sram_rready) begin//当读数据有效且cpu准备接受读数据
+                        sram_arvalid <= 1'b0;//撤掉arvalid地址有效信号
                         // sram_rready <= 1'b0;//数据被接受，撤销rready接受读数据信号
                          $display("\033[31m[MEM]: READ_DATA状态握手成功\033[0m");
                         case(MemLen)
@@ -149,7 +152,7 @@ module MEM (
                     mem_ready <= 1'b0;
                     mem_valid <= 1'b1;
                     sram_wvalid <= 1'b0;
-                    // sram_rready <= 1'b0;
+                    sram_rready <= 1'b0;
                     sram_arvalid <= 1'b0;
                     // rd_mem <= ex_rd;
                     // RegWrite_mem <= ex_RegWrite;
