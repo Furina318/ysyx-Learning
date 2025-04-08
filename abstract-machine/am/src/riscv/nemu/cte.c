@@ -21,7 +21,9 @@ Context* __am_irq_handle(Context *c) {
 extern void __am_asm_trap(void);
 
 bool cte_init(Context*(*handler)(Event, Context*)) {
-  // initialize exception entry
+  // initialize exception entry       内联汇编，异常处理的入口地址设置为__am_asm_trap
+  //%0是内联汇编中的操作数占位符，他表示内联汇编指令中的第一个操作数。在这里的内联汇编指令中，%0用来引用第一个输入操作数，即"r"(__am_asm_trap)中的__am_asm_trap
+  //"r"约束表示将一个寄存器作为输入操作数
   asm volatile("csrw mtvec, %0" : : "r"(__am_asm_trap));
 
   // register event handler
