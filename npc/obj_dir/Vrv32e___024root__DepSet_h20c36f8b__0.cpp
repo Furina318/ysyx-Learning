@@ -865,12 +865,14 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__0(Vrv32e___024root* vlSe
         __Vdly__rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__rdata_reg = 0U;
     } else {
         if ((0U == vlSelf->rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__sram_state)) {
+            __Vdly__rv32e__DOT__mem_stage__DOT__sram_arready = 1U;
             __Vdly__rv32e__DOT__mem_stage__DOT__sram_wready = 1U;
             __Vdly__rv32e__DOT__mem_stage__DOT__sram_rvalid = 0U;
             if (((IData)(vlSelf->rv32e__DOT__mem_stage__DOT__sram_arvalid) 
                  & (IData)(vlSelf->rv32e__DOT__mem_stage__DOT__sram_arready))) {
                 __Vdly__rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__araddr_reg 
                     = vlSelf->rv32e__DOT__mem_stage__DOT__sram_araddr;
+                __Vdly__rv32e__DOT__mem_stage__DOT__sram_arready = 0U;
                 __Vdly__rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__delay_counter = 1U;
                 __Vdly__rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__next_sram_state = 1U;
             } else if (((IData)(vlSelf->rv32e__DOT__mem_stage__DOT__sram_wvalid) 
@@ -889,9 +891,7 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__0(Vrv32e___024root* vlSe
             } else {
                 __Vdly__rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__next_sram_state = 0U;
             }
-            __Vdly__rv32e__DOT__mem_stage__DOT__sram_arready = 1U;
         } else if ((1U == vlSelf->rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__sram_state)) {
-            __Vdly__rv32e__DOT__mem_stage__DOT__sram_arready = 0U;
             if ((0U < (IData)(vlSelf->rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__delay_counter))) {
                 __Vdly__rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__delay_counter 
                     = (3U & ((IData)(vlSelf->rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__delay_counter) 
@@ -908,6 +908,7 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__0(Vrv32e___024root* vlSe
                  & (IData)(vlSelf->rv32e__DOT__mem_stage__DOT__sram_rvalid))) {
                 __Vdly__rv32e__DOT__mem_stage__DOT__sram_rdata 
                     = vlSelf->rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__rdata_reg;
+                __Vdly__rv32e__DOT__mem_stage__DOT__sram_rvalid = 0U;
                 __Vdly__rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__next_sram_state = 0U;
             }
         } else if ((3U == vlSelf->rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__sram_state)) {

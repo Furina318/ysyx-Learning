@@ -120,7 +120,7 @@ module MEM (
                     mem_valid <= 1'b0;
                     if(sram_rvalid && sram_rready) begin//当读数据有效且cpu准备接受读数据
                         // sram_rready <= 1'b0;//数据被接受，撤销rready接受读数据信号
-                        $display("\033[31m[MEM]: READ_DATA状态握手成功\033[0m");
+                         $display("\033[31m[MEM]: READ_DATA状态握手成功\033[0m");
                         case(MemLen)
                             `Mem_Bit:   data_out <= {24'b0,sram_rdata[7:0]};
                             `Mem_UHalf: data_out <= {16'b0,sram_rdata[15:0]};
