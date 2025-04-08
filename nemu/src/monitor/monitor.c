@@ -207,7 +207,8 @@ void init_monitor(int argc, char *argv[]) {
   init_sdb();
 
   IFDEF(CONFIG_ITRACE, init_disasm());
-
+  IFDEF(CONFIG_MEMORY_TRACE,init_mtrace());
+  IFDEF(CONFIG_DEVICE_TRACE,init_dtrace());
   /* Display welcome message. */
   welcome();
 }
