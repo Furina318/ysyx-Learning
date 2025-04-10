@@ -9,8 +9,14 @@
 
 struct Context {
   // TODO: fix the order of these members to match trap.S
-  uintptr_t mepc, mcause, gpr[NR_REGS], mstatus;
-  void *pdir;
+  //通过观察trap.S文件中的__am_asm_trap函数，上下文先存储32位通用寄存器再存储CSR寄存器
+  // uintptr_t mepc, mcause, gpr[NR_REGS], mstatus;
+  // void *pdir;
+
+  uintptr_t gpr[NR_REGS]; // general purpose registers
+  uintptr_t mcause,mstatus,mepc;
+  void *pdir; // page directory
+  // uintptr_t np;
 };
 
 #ifdef __riscv_e

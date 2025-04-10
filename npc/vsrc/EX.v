@@ -83,7 +83,7 @@ module EX (
             endcase
         end
     end
-    always @(*) begin
-        $display("\033[33m[EX]: state = %d | ex_ready=%b | ex_valid=%b\033[0m", state, ex_ready, ex_valid);
-    end
+    // always @(*) begin
+    //     $display("\033[33m[EX]: state = %d | ex_ready=%b | ex_valid=%b\033[0m", state, ex_ready, ex_valid);
+    // end
 endmodule
