@@ -18,10 +18,23 @@
 
 #include <common.h>
 
-typedef struct {
-  word_t gpr[MUXDEF(CONFIG_RVE, 16, 32)];
+typedef struct{
+  word_t mcause;//存放异常原因
+  vaddr_t mepc;//存放触发异常的地址PC
+  word_t mstatus;//存放当前状态
+  word_t mtvec;//存放异常向量表地址
+}riscv32_CSRs;
+
+typedef struct{
+  word_t gpr[32];
   vaddr_t pc;
-} MUXDEF(CONFIG_RV64, riscv64_CPU_state, riscv32_CPU_state);
+  riscv32_CSRs csr;
+}riscv32_CPU_state;
+
+// typedef struct {
+//   word_t gpr[MUXDEF(CONFIG_RVE, 16, 32)];
+//   vaddr_t pc;
+// } MUXDEF(CONFIG_RV64, riscv64_CPU_state, riscv32_CPU_state);
 
 // decode
 typedef struct {
