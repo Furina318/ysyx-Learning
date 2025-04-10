@@ -20,6 +20,12 @@ module ifu_sram #(
         raddr_reg <= raddr;
     end
 
+    always @(*) begin
+        if(read_pending) begin
+            $display("\nRead from IFU SRAM");
+        end
+    end
+
     // 组合逻辑输出读数据
     assign rdata = read_pending ? pmem_read(raddr_reg, 4) : 32'h0;
 

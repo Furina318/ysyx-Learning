@@ -113,13 +113,11 @@ class Vrv32e___024root final : public VerilatedModule {
         IData/*31:0*/ rv32e__DOT__mem_stage__DOT__sram_wdata;
         IData/*31:0*/ rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__sram_state;
         IData/*31:0*/ rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__next_sram_state;
-        IData/*31:0*/ rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__rdata_mid;
         IData/*31:0*/ rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__araddr_reg;
         IData/*31:0*/ rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__rdata_reg;
         IData/*31:0*/ rv32e__DOT__wb_stage__DOT__state;
         IData/*31:0*/ rv32e__DOT__wb_stage__DOT__next_state;
         IData/*31:0*/ __Vfunc_rv32e__DOT__if_stage__DOT__ifu_sram_inst__DOT__pmem_read__0__Vfuncout;
-        IData/*31:0*/ __Vfunc_rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__pmem_read__18__Vfuncout;
         IData/*31:0*/ __VstlIterCount;
         IData/*31:0*/ __VactIterCount;
         VlUnpacked<IData/*31:0*/, 32> rv32e__DOT__regfile__DOT__regs;

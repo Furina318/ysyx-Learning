@@ -112,7 +112,7 @@ module MEM (
                     if(sram_arready && sram_arvalid) begin//读地址有效且sram准备好读取数据
                         // sram_arvalid <= 1'b0;//地址被接受，撤销读地址请求
                          $display("\033[31m[MEM]: READ_ADDR状态握手成功\033[0m");
-                        sram_rready <= 1'b1;//准备接受数据
+                        // sram_rready <= 1'b1;//准备接受数据
                     end
                 end
 
@@ -120,13 +120,12 @@ module MEM (
                     mem_ready <= 1'b0;
                     mem_valid <= 1'b0;
                     sram_rready <= 1'b1;//准备接受数据
+                    // $display("FUCKING ERROR IS HERE");
                     if(sram_rvalid && sram_rready) begin//当读数据有效且cpu准备接受读数据
                         sram_arvalid <= 1'b0;//撤掉arvalid地址有效信号
                         // sram_rready <= 1'b0;//数据被接受，撤销rready接受读数据信号
                         //  $display("\033[31m[MEM]: READ_DATA状态握手成功\033[0m");
-                        $display("\033[1;32m=================================================");
-                        $display("\033[1;32m[MEM]: READ_DATA 状态握手成功！！！");
-                        $display("\033[1;32m=================================================\033[0m");
+                        $display("FUCKING ERROR IS HERE");
                         case(MemLen)
                             `Mem_Bit:   data_out <= {24'b0,sram_rdata[7:0]};
                             `Mem_UHalf: data_out <= {16'b0,sram_rdata[15:0]};
@@ -229,6 +228,7 @@ module MEM (
     end
     always @(*) begin
         $display("\033[36m[MEM]:state = %d | mem_ready=%b| mem_valid=%b\033[0m", state, mem_ready, mem_valid);
+        $display("\033[36m[MEM]:sram_rready=%b | sram_rvalid=%b | sram_rdata=%h\033[0m", sram_rready, sram_rvalid,sram_rdata);
         $display(" ");
     end
 endmodule

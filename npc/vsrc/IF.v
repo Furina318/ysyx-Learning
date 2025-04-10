@@ -15,7 +15,7 @@ module IF (
     //状态机定义(IDLE等待上游valid信号, BUSY处理, STALL等待下游ready信号)
     typedef enum {IDLE, BUSY, STALL} state_t;
     state_t state, next_state;
-    parameter DELAY_CYCLES = 1;//处理周期
+    parameter [1:0] DELAY_CYCLES = 1;//处理周期
     reg [1:0] delay;
     reg       ren;
     reg [31:0] get_instr;
@@ -34,7 +34,8 @@ module IF (
             if_ready = 1'b1;
             state = BUSY;
             next_state = BUSY;
-            delay = DELAY_CYCLES;
+            // delay = DELAY_CYCLES;
+            delay = 2'b01;
             ren = 1'b0;//ifu_sram读使能
         end 
         else begin
@@ -43,7 +44,9 @@ module IF (
             IDLE: begin
                 if_ready = 1'b1;
                 if_valid = 1'b0;
-                delay = DELAY_CYCLES;
+                // delay = DELAY_CYCLES;
+                ren = 1'b0;//ifu_sram读使能
+                delay = 2'b01;
                 if(wb_valid) pc = pc_src ? branch_target : pc + 4; //更新pc
                 next_state = wb_valid ? BUSY : IDLE;
             end

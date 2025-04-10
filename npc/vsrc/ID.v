@@ -275,7 +275,7 @@ module ID (
         end
     end
 
-    always @(*) begin
-        $display("\033[32m[ID]: state = %d | id_ready=%b | id_valid=%b\033[0m", state, id_ready, id_valid);
-    end
+    // always @(*) begin
+    //     $display("\033[32m[ID]: state = %d | id_ready=%b | id_valid=%b\033[0m", state, id_ready, id_valid);
+    // end
 endmodule
