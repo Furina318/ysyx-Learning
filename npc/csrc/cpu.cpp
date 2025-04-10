@@ -197,17 +197,26 @@ static void execute_once() {
     append_iringbuf(logbuf);
 #endif
 
+}
+
+static void trace_and_difftest(){
+  #ifdef CONFIG_ITRACE
+    log_write("%s\n",logbuf);
+  #endif
+  if(g_print_step){
+    IFDEF(CONFIG_ITRACE,puts(logbuf));
+  }
+  //difftest
   IFDEF(CONFIG_DIFFTEST,difftest_step(PCSet.pc,PCSet.next_pc));
 }
 
-
 static void execute(uint64_t n) {
-    IFDEF(CONFIG_MTRACE,init_mtrace());
+    
     for (; n > 0; n--) {
         
         execute_once();
         g_nr_guest_inst++;
-
+        trace_and_difftest();
         if (npc_state.state != NPC_RUNNING){
             break;
         }

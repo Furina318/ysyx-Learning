@@ -215,7 +215,7 @@ void init_monitor(int argc, char *argv[]) {
 
   /* Initialize devices. */
   IFDEF(CONFIG_DEVICE, init_device());
-
+  IFDEF(CONFIG_MTRACE,init_mtrace());
   /* Perform ISA dependent initialization. */
 //   init_isa();
 
@@ -225,9 +225,10 @@ void init_monitor(int argc, char *argv[]) {
   /* Initialize differential testing. */
 #ifdef CONFIG_DIFFTEST
   if(diff_so_file!=NULL){
-    printf("Get difftest file : %s",diff_so_file);
+    printf("Get difftest file : %s\n",diff_so_file);
     init_difftest(diff_so_file, img_size, difftest_port);
   }
+  printf("Yes\n");
 #endif
   /* Initialize the simple debugger. */
   init_sdb();
@@ -237,21 +238,3 @@ void init_monitor(int argc, char *argv[]) {
   /* Display welcome message. */
   welcome();
 }
-// #else // CONFIG_TARGET_AM
-// static long load_img() {
-//   extern char bin_start, bin_end;
-//   size_t size = &bin_end - &bin_start;
-//   Log("img size = %ld", size);
-//   memcpy(guest_to_host(RESET_VECTOR), &bin_start, size);
-//   return size;
-// }
-
-// void am_init_monitor() {
-//   init_rand();
-//   init_mem();
-//   init_isa();
-//   load_img();
-//   IFDEF(CONFIG_DEVICE, init_device());
-//   welcome();
-// }
-// #endif

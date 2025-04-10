@@ -15,6 +15,7 @@ LDFLAGS   += --gc-sections -e _start
 NPCFLAGS += -l $(shell dirname $(IMAGE).elf)/npc-log.txt
 NPCFLAGS += -e $(IMAGE).elf
 #NPCFLAGS += -b
+NPCFLAGS += -d $(NEMU_HOME)/build/riscv32-nemu-interpreter-so 
 
 MAINARGS_MAX_LEN = 64
 MAINARGS_PLACEHOLDER = The insert-arg rule in Makefile will insert mainargs here.

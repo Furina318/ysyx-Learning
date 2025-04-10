@@ -120,21 +120,21 @@ static void checkregs(CPU_state *ref, vaddr_t pc, vaddr_t npc)
 void difftest_step(vaddr_t pc, vaddr_t npc) 
 {
     CPU_state ref_r;
-    update_cpu_state(&cpu);
-    if(skip_cnt_ref) 
-    {
-        if(skip_flag == false)
-            skip_flag = true;
-        else
-        {
-            // to skip the checking of an instruction, just copy the reg state to reference design
-            ref_difftest_regcpy(&cpu, DIFFTEST_TO_REF);
-            skip_cnt_ref--;      assert(skip_cnt_ref >= 0);
-            if(skip_cnt_ref == 0)
-                skip_flag = false;
-            return;
-        }
-    }
+    // update_cpu_state(&cpu);
+    // if(skip_cnt_ref) 
+    // {
+    //     if(skip_flag == false)
+    //         skip_flag = true;
+    //     else
+    //     {
+    //         // to skip the checking of an instruction, just copy the reg state to reference design
+    //         ref_difftest_regcpy(&cpu, DIFFTEST_TO_REF);
+    //         skip_cnt_ref--;      assert(skip_cnt_ref >= 0);
+    //         if(skip_cnt_ref == 0)
+    //             skip_flag = false;
+    //         return;
+    //     }
+    // }
 
     ref_difftest_exec(1);
     ref_difftest_regcpy(&ref_r, DIFFTEST_TO_DUT);
