@@ -153,7 +153,7 @@ word_t pmem_r(paddr_t addr, int len)
 #ifdef CONFIG_MTRACE
   mtrace_log('R',addr,host_read(guest_to_host(addr), len),len);
 #endif
-  printf("[paddr_read] : addr=0x%08x\n\n",addr);
+  // printf("[paddr_read] : addr=0x%08x\n\n",addr);
   if(likely(in_pmem(addr))) return host_read(guest_to_host(addr), len);
   IFDEF(CONFIG_DEVICE, return mmio_read(addr, len));
   out_of_bound(addr);
