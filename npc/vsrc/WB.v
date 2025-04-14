@@ -9,8 +9,8 @@ module WB (
     input       [6:0]  opcode,
     input       [2:0]  func3,
 
-    input       [4:0]  mem_rd,//MEM阶段传入的rd
-    input              mem_RegWrite,//MEM阶段传入的RegWrite
+    input       [4:0]  id_rd,//MEM阶段传入的rd
+    input              id_RegWrite,//MEM阶段传入的RegWrite
     input              id_MemRead,
     input              id_MemWrite,
     input       [1:0]  id_MemLen,
@@ -93,8 +93,8 @@ module WB (
                                         (opcode == `INST_LW) ? data_out :              // LW
                                         (opcode == `INST_R || opcode == `INST_I) ? alu_result : 32'b0; // R-type, I-type
                         //=====写回数据=====
-                        rd_wb = mem_rd;
-                        RegWrite_wb = mem_RegWrite;
+                        rd_wb = id_rd;
+                        RegWrite_wb = id_RegWrite;
                         wb_MemRead = id_MemRead;
                         wb_MemWrite = id_MemWrite;
                         
@@ -118,6 +118,7 @@ module WB (
                     next_state = IDLE;
                 end
             endcase
+                $display("\033[31m[WB]: wb_data=0x%08x\033[0m",wb_data);
         end
     end
     // always @(*) begin

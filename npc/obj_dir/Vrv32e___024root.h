@@ -45,11 +45,7 @@ class Vrv32e___024root final : public VerilatedModule {
         CData/*0:0*/ rv32e__DOT__is_jal;
         CData/*0:0*/ rv32e__DOT__is_jalr;
         CData/*0:0*/ rv32e__DOT__take_branch;
-        CData/*4:0*/ rv32e__DOT__rd_ex;
-        CData/*4:0*/ rv32e__DOT__rd_mem;
         CData/*4:0*/ rv32e__DOT__rd_wb;
-        CData/*0:0*/ rv32e__DOT__RegWrite_ex;
-        CData/*0:0*/ rv32e__DOT__RegWrite_mem;
         CData/*0:0*/ rv32e__DOT__RegWrite_wb;
         CData/*0:0*/ rv32e__DOT__wb_MemRead;
         CData/*0:0*/ rv32e__DOT__wb_MemWrite;
@@ -79,12 +75,12 @@ class Vrv32e___024root final : public VerilatedModule {
         IData/*31:0*/ rv32e__DOT__imm;
         IData/*31:0*/ rv32e__DOT__rs1_val;
         IData/*31:0*/ rv32e__DOT__rs2_val;
-    };
-    struct {
         IData/*31:0*/ rv32e__DOT__alu_result;
         IData/*31:0*/ rv32e__DOT__data_out;
         IData/*31:0*/ rv32e__DOT__wb_data;
         IData/*31:0*/ rv32e__DOT__jal_target;
+    };
+    struct {
         IData/*31:0*/ rv32e__DOT__jalr_target;
         IData/*31:0*/ rv32e__DOT__wb_addr;
         IData/*31:0*/ rv32e__DOT__wb_data_in;

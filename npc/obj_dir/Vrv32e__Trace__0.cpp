@@ -65,27 +65,23 @@ void Vrv32e___024root__trace_chg_sub_0(Vrv32e___024root* vlSelf, VerilatedVcd::B
         bufp->chgIData(oldp+38,(((IData)(vlSelf->rv32e__DOT__is_jalr)
                                   ? vlSelf->rv32e__DOT__jalr_target
                                   : vlSelf->rv32e__DOT__jal_target)),32);
-        bufp->chgCData(oldp+39,(vlSelf->rv32e__DOT__rd_ex),5);
-        bufp->chgCData(oldp+40,(vlSelf->rv32e__DOT__rd_mem),5);
-        bufp->chgCData(oldp+41,(vlSelf->rv32e__DOT__rd_wb),5);
-        bufp->chgBit(oldp+42,(vlSelf->rv32e__DOT__RegWrite_ex));
-        bufp->chgBit(oldp+43,(vlSelf->rv32e__DOT__RegWrite_mem));
-        bufp->chgBit(oldp+44,(vlSelf->rv32e__DOT__RegWrite_wb));
-        bufp->chgBit(oldp+45,(vlSelf->rv32e__DOT__wb_MemRead));
-        bufp->chgBit(oldp+46,(vlSelf->rv32e__DOT__wb_MemWrite));
-        bufp->chgCData(oldp+47,(vlSelf->rv32e__DOT__wb_MemLen),2);
-        bufp->chgIData(oldp+48,(vlSelf->rv32e__DOT__wb_addr),32);
-        bufp->chgIData(oldp+49,(vlSelf->rv32e__DOT__wb_data_in),32);
-        bufp->chgIData(oldp+50,(vlSelf->rv32e__DOT__ex_stage__DOT__state),32);
-        bufp->chgIData(oldp+51,(vlSelf->rv32e__DOT__ex_stage__DOT__next_state),32);
-        bufp->chgCData(oldp+52,(vlSelf->rv32e__DOT__ex_stage__DOT__delay),2);
-        bufp->chgIData(oldp+53,(vlSelf->rv32e__DOT__id_stage__DOT__state),32);
-        bufp->chgIData(oldp+54,(vlSelf->rv32e__DOT__id_stage__DOT__next_state),32);
-        bufp->chgIData(oldp+55,(vlSelf->rv32e__DOT__id_stage__DOT__instr_reg),32);
-        bufp->chgCData(oldp+56,(vlSelf->rv32e__DOT__id_stage__DOT__delay),2);
-        bufp->chgIData(oldp+57,(vlSelf->rv32e__DOT__id_stage__DOT__immI),32);
-        bufp->chgIData(oldp+58,((0xfffff000U & vlSelf->rv32e__DOT__id_stage__DOT__instr_reg)),32);
-        bufp->chgIData(oldp+59,((((- (IData)((vlSelf->rv32e__DOT__id_stage__DOT__instr_reg 
+        bufp->chgCData(oldp+39,(vlSelf->rv32e__DOT__rd_wb),5);
+        bufp->chgBit(oldp+40,(vlSelf->rv32e__DOT__RegWrite_wb));
+        bufp->chgBit(oldp+41,(vlSelf->rv32e__DOT__wb_MemRead));
+        bufp->chgBit(oldp+42,(vlSelf->rv32e__DOT__wb_MemWrite));
+        bufp->chgCData(oldp+43,(vlSelf->rv32e__DOT__wb_MemLen),2);
+        bufp->chgIData(oldp+44,(vlSelf->rv32e__DOT__wb_addr),32);
+        bufp->chgIData(oldp+45,(vlSelf->rv32e__DOT__wb_data_in),32);
+        bufp->chgIData(oldp+46,(vlSelf->rv32e__DOT__ex_stage__DOT__state),32);
+        bufp->chgIData(oldp+47,(vlSelf->rv32e__DOT__ex_stage__DOT__next_state),32);
+        bufp->chgCData(oldp+48,(vlSelf->rv32e__DOT__ex_stage__DOT__delay),2);
+        bufp->chgIData(oldp+49,(vlSelf->rv32e__DOT__id_stage__DOT__state),32);
+        bufp->chgIData(oldp+50,(vlSelf->rv32e__DOT__id_stage__DOT__next_state),32);
+        bufp->chgIData(oldp+51,(vlSelf->rv32e__DOT__id_stage__DOT__instr_reg),32);
+        bufp->chgCData(oldp+52,(vlSelf->rv32e__DOT__id_stage__DOT__delay),2);
+        bufp->chgIData(oldp+53,(vlSelf->rv32e__DOT__id_stage__DOT__immI),32);
+        bufp->chgIData(oldp+54,((0xfffff000U & vlSelf->rv32e__DOT__id_stage__DOT__instr_reg)),32);
+        bufp->chgIData(oldp+55,((((- (IData)((vlSelf->rv32e__DOT__id_stage__DOT__instr_reg 
                                               >> 0x1fU))) 
                                   << 0xcU) | ((0xfe0U 
                                                & (vlSelf->rv32e__DOT__id_stage__DOT__instr_reg 
@@ -93,7 +89,7 @@ void Vrv32e___024root__trace_chg_sub_0(Vrv32e___024root* vlSelf, VerilatedVcd::B
                                               | (0x1fU 
                                                  & (vlSelf->rv32e__DOT__id_stage__DOT__instr_reg 
                                                     >> 7U))))),32);
-        bufp->chgIData(oldp+60,((((- (IData)((vlSelf->rv32e__DOT__id_stage__DOT__instr_reg 
+        bufp->chgIData(oldp+56,((((- (IData)((vlSelf->rv32e__DOT__id_stage__DOT__instr_reg 
                                               >> 0x1fU))) 
                                   << 0xcU) | ((0x800U 
                                                & (vlSelf->rv32e__DOT__id_stage__DOT__instr_reg 
@@ -104,7 +100,7 @@ void Vrv32e___024root__trace_chg_sub_0(Vrv32e___024root* vlSelf, VerilatedVcd::B
                                                  | (0x1eU 
                                                     & (vlSelf->rv32e__DOT__id_stage__DOT__instr_reg 
                                                        >> 7U)))))),32);
-        bufp->chgIData(oldp+61,((((- (IData)((vlSelf->rv32e__DOT__id_stage__DOT__instr_reg 
+        bufp->chgIData(oldp+57,((((- (IData)((vlSelf->rv32e__DOT__id_stage__DOT__instr_reg 
                                               >> 0x1fU))) 
                                   << 0x14U) | ((0xff000U 
                                                 & vlSelf->rv32e__DOT__id_stage__DOT__instr_reg) 
@@ -114,80 +110,80 @@ void Vrv32e___024root__trace_chg_sub_0(Vrv32e___024root* vlSelf, VerilatedVcd::B
                                                   | (0x7feU 
                                                      & (vlSelf->rv32e__DOT__id_stage__DOT__instr_reg 
                                                         >> 0x14U)))))),32);
-        bufp->chgCData(oldp+62,(vlSelf->rv32e__DOT__id_stage__DOT__get_opcode),5);
-        bufp->chgBit(oldp+63,(((IData)(vlSelf->rv32e__DOT__is_jal) 
+        bufp->chgCData(oldp+58,(vlSelf->rv32e__DOT__id_stage__DOT__get_opcode),5);
+        bufp->chgBit(oldp+59,(((IData)(vlSelf->rv32e__DOT__is_jal) 
                                | ((IData)(vlSelf->rv32e__DOT__is_jalr) 
                                   | (IData)(vlSelf->rv32e__DOT__take_branch)))));
-        bufp->chgIData(oldp+64,(vlSelf->rv32e__DOT__if_stage__DOT__state),32);
-        bufp->chgIData(oldp+65,(vlSelf->rv32e__DOT__if_stage__DOT__next_state),32);
-        bufp->chgCData(oldp+66,(vlSelf->rv32e__DOT__if_stage__DOT__delay),2);
-        bufp->chgBit(oldp+67,(vlSelf->rv32e__DOT__if_stage__DOT__ren));
-        bufp->chgIData(oldp+68,(vlSelf->rv32e__DOT__mem_stage__DOT__state),32);
-        bufp->chgIData(oldp+69,(vlSelf->rv32e__DOT__mem_stage__DOT__next_state),32);
-        bufp->chgCData(oldp+70,(vlSelf->rv32e__DOT__mem_stage__DOT__delay),2);
-        bufp->chgIData(oldp+71,(vlSelf->rv32e__DOT__mem_stage__DOT__sram_araddr),32);
-        bufp->chgBit(oldp+72,(vlSelf->rv32e__DOT__mem_stage__DOT__sram_arvalid));
-        bufp->chgBit(oldp+73,(vlSelf->rv32e__DOT__mem_stage__DOT__sram_arready));
-        bufp->chgIData(oldp+74,(vlSelf->rv32e__DOT__mem_stage__DOT__sram_rdata),32);
-        bufp->chgBit(oldp+75,(vlSelf->rv32e__DOT__mem_stage__DOT__sram_rvalid));
-        bufp->chgBit(oldp+76,(vlSelf->rv32e__DOT__mem_stage__DOT__sram_rready));
-        bufp->chgIData(oldp+77,(vlSelf->rv32e__DOT__mem_stage__DOT__sram_waddr),32);
-        bufp->chgIData(oldp+78,(vlSelf->rv32e__DOT__mem_stage__DOT__sram_wdata),32);
-        bufp->chgCData(oldp+79,(vlSelf->rv32e__DOT__mem_stage__DOT__sram_wmask),4);
-        bufp->chgBit(oldp+80,(vlSelf->rv32e__DOT__mem_stage__DOT__sram_wvalid));
-        bufp->chgBit(oldp+81,(vlSelf->rv32e__DOT__mem_stage__DOT__sram_wready));
-        bufp->chgIData(oldp+82,(vlSelf->rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__sram_state),32);
-        bufp->chgIData(oldp+83,(vlSelf->rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__next_sram_state),32);
-        bufp->chgCData(oldp+84,(vlSelf->rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__delay_counter),2);
-        bufp->chgIData(oldp+85,(vlSelf->rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__araddr_reg),32);
-        bufp->chgIData(oldp+86,(vlSelf->rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__rdata_reg),32);
-        bufp->chgIData(oldp+87,(vlSelf->rv32e__DOT__regfile__DOT__state),32);
-        bufp->chgIData(oldp+88,(vlSelf->rv32e__DOT__regfile__DOT__next_state),32);
-        bufp->chgCData(oldp+89,(vlSelf->rv32e__DOT__regfile__DOT__delay),2);
-        bufp->chgIData(oldp+90,(vlSelf->rv32e__DOT__regfile__DOT__regs[0]),32);
-        bufp->chgIData(oldp+91,(vlSelf->rv32e__DOT__regfile__DOT__regs[1]),32);
-        bufp->chgIData(oldp+92,(vlSelf->rv32e__DOT__regfile__DOT__regs[2]),32);
-        bufp->chgIData(oldp+93,(vlSelf->rv32e__DOT__regfile__DOT__regs[3]),32);
-        bufp->chgIData(oldp+94,(vlSelf->rv32e__DOT__regfile__DOT__regs[4]),32);
-        bufp->chgIData(oldp+95,(vlSelf->rv32e__DOT__regfile__DOT__regs[5]),32);
-        bufp->chgIData(oldp+96,(vlSelf->rv32e__DOT__regfile__DOT__regs[6]),32);
-        bufp->chgIData(oldp+97,(vlSelf->rv32e__DOT__regfile__DOT__regs[7]),32);
-        bufp->chgIData(oldp+98,(vlSelf->rv32e__DOT__regfile__DOT__regs[8]),32);
-        bufp->chgIData(oldp+99,(vlSelf->rv32e__DOT__regfile__DOT__regs[9]),32);
-        bufp->chgIData(oldp+100,(vlSelf->rv32e__DOT__regfile__DOT__regs[10]),32);
-        bufp->chgIData(oldp+101,(vlSelf->rv32e__DOT__regfile__DOT__regs[11]),32);
-        bufp->chgIData(oldp+102,(vlSelf->rv32e__DOT__regfile__DOT__regs[12]),32);
-        bufp->chgIData(oldp+103,(vlSelf->rv32e__DOT__regfile__DOT__regs[13]),32);
-        bufp->chgIData(oldp+104,(vlSelf->rv32e__DOT__regfile__DOT__regs[14]),32);
-        bufp->chgIData(oldp+105,(vlSelf->rv32e__DOT__regfile__DOT__regs[15]),32);
-        bufp->chgIData(oldp+106,(vlSelf->rv32e__DOT__regfile__DOT__regs[16]),32);
-        bufp->chgIData(oldp+107,(vlSelf->rv32e__DOT__regfile__DOT__regs[17]),32);
-        bufp->chgIData(oldp+108,(vlSelf->rv32e__DOT__regfile__DOT__regs[18]),32);
-        bufp->chgIData(oldp+109,(vlSelf->rv32e__DOT__regfile__DOT__regs[19]),32);
-        bufp->chgIData(oldp+110,(vlSelf->rv32e__DOT__regfile__DOT__regs[20]),32);
-        bufp->chgIData(oldp+111,(vlSelf->rv32e__DOT__regfile__DOT__regs[21]),32);
-        bufp->chgIData(oldp+112,(vlSelf->rv32e__DOT__regfile__DOT__regs[22]),32);
-        bufp->chgIData(oldp+113,(vlSelf->rv32e__DOT__regfile__DOT__regs[23]),32);
-        bufp->chgIData(oldp+114,(vlSelf->rv32e__DOT__regfile__DOT__regs[24]),32);
-        bufp->chgIData(oldp+115,(vlSelf->rv32e__DOT__regfile__DOT__regs[25]),32);
-        bufp->chgIData(oldp+116,(vlSelf->rv32e__DOT__regfile__DOT__regs[26]),32);
-        bufp->chgIData(oldp+117,(vlSelf->rv32e__DOT__regfile__DOT__regs[27]),32);
-        bufp->chgIData(oldp+118,(vlSelf->rv32e__DOT__regfile__DOT__regs[28]),32);
-        bufp->chgIData(oldp+119,(vlSelf->rv32e__DOT__regfile__DOT__regs[29]),32);
-        bufp->chgIData(oldp+120,(vlSelf->rv32e__DOT__regfile__DOT__regs[30]),32);
-        bufp->chgIData(oldp+121,(vlSelf->rv32e__DOT__regfile__DOT__regs[31]),32);
-        bufp->chgIData(oldp+122,(vlSelf->rv32e__DOT__regfile__DOT__unnamedblk1__DOT__i),32);
-        bufp->chgIData(oldp+123,(vlSelf->rv32e__DOT__wb_stage__DOT__state),32);
-        bufp->chgIData(oldp+124,(vlSelf->rv32e__DOT__wb_stage__DOT__next_state),32);
-        bufp->chgCData(oldp+125,(vlSelf->rv32e__DOT__wb_stage__DOT__delay),2);
+        bufp->chgIData(oldp+60,(vlSelf->rv32e__DOT__if_stage__DOT__state),32);
+        bufp->chgIData(oldp+61,(vlSelf->rv32e__DOT__if_stage__DOT__next_state),32);
+        bufp->chgCData(oldp+62,(vlSelf->rv32e__DOT__if_stage__DOT__delay),2);
+        bufp->chgBit(oldp+63,(vlSelf->rv32e__DOT__if_stage__DOT__ren));
+        bufp->chgIData(oldp+64,(vlSelf->rv32e__DOT__mem_stage__DOT__state),32);
+        bufp->chgIData(oldp+65,(vlSelf->rv32e__DOT__mem_stage__DOT__next_state),32);
+        bufp->chgCData(oldp+66,(vlSelf->rv32e__DOT__mem_stage__DOT__delay),2);
+        bufp->chgIData(oldp+67,(vlSelf->rv32e__DOT__mem_stage__DOT__sram_araddr),32);
+        bufp->chgBit(oldp+68,(vlSelf->rv32e__DOT__mem_stage__DOT__sram_arvalid));
+        bufp->chgBit(oldp+69,(vlSelf->rv32e__DOT__mem_stage__DOT__sram_arready));
+        bufp->chgIData(oldp+70,(vlSelf->rv32e__DOT__mem_stage__DOT__sram_rdata),32);
+        bufp->chgBit(oldp+71,(vlSelf->rv32e__DOT__mem_stage__DOT__sram_rvalid));
+        bufp->chgBit(oldp+72,(vlSelf->rv32e__DOT__mem_stage__DOT__sram_rready));
+        bufp->chgIData(oldp+73,(vlSelf->rv32e__DOT__mem_stage__DOT__sram_waddr),32);
+        bufp->chgIData(oldp+74,(vlSelf->rv32e__DOT__mem_stage__DOT__sram_wdata),32);
+        bufp->chgCData(oldp+75,(vlSelf->rv32e__DOT__mem_stage__DOT__sram_wmask),4);
+        bufp->chgBit(oldp+76,(vlSelf->rv32e__DOT__mem_stage__DOT__sram_wvalid));
+        bufp->chgBit(oldp+77,(vlSelf->rv32e__DOT__mem_stage__DOT__sram_wready));
+        bufp->chgIData(oldp+78,(vlSelf->rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__sram_state),32);
+        bufp->chgIData(oldp+79,(vlSelf->rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__next_sram_state),32);
+        bufp->chgCData(oldp+80,(vlSelf->rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__delay_counter),2);
+        bufp->chgIData(oldp+81,(vlSelf->rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__araddr_reg),32);
+        bufp->chgIData(oldp+82,(vlSelf->rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__rdata_reg),32);
+        bufp->chgIData(oldp+83,(vlSelf->rv32e__DOT__regfile__DOT__state),32);
+        bufp->chgIData(oldp+84,(vlSelf->rv32e__DOT__regfile__DOT__next_state),32);
+        bufp->chgCData(oldp+85,(vlSelf->rv32e__DOT__regfile__DOT__delay),2);
+        bufp->chgIData(oldp+86,(vlSelf->rv32e__DOT__regfile__DOT__regs[0]),32);
+        bufp->chgIData(oldp+87,(vlSelf->rv32e__DOT__regfile__DOT__regs[1]),32);
+        bufp->chgIData(oldp+88,(vlSelf->rv32e__DOT__regfile__DOT__regs[2]),32);
+        bufp->chgIData(oldp+89,(vlSelf->rv32e__DOT__regfile__DOT__regs[3]),32);
+        bufp->chgIData(oldp+90,(vlSelf->rv32e__DOT__regfile__DOT__regs[4]),32);
+        bufp->chgIData(oldp+91,(vlSelf->rv32e__DOT__regfile__DOT__regs[5]),32);
+        bufp->chgIData(oldp+92,(vlSelf->rv32e__DOT__regfile__DOT__regs[6]),32);
+        bufp->chgIData(oldp+93,(vlSelf->rv32e__DOT__regfile__DOT__regs[7]),32);
+        bufp->chgIData(oldp+94,(vlSelf->rv32e__DOT__regfile__DOT__regs[8]),32);
+        bufp->chgIData(oldp+95,(vlSelf->rv32e__DOT__regfile__DOT__regs[9]),32);
+        bufp->chgIData(oldp+96,(vlSelf->rv32e__DOT__regfile__DOT__regs[10]),32);
+        bufp->chgIData(oldp+97,(vlSelf->rv32e__DOT__regfile__DOT__regs[11]),32);
+        bufp->chgIData(oldp+98,(vlSelf->rv32e__DOT__regfile__DOT__regs[12]),32);
+        bufp->chgIData(oldp+99,(vlSelf->rv32e__DOT__regfile__DOT__regs[13]),32);
+        bufp->chgIData(oldp+100,(vlSelf->rv32e__DOT__regfile__DOT__regs[14]),32);
+        bufp->chgIData(oldp+101,(vlSelf->rv32e__DOT__regfile__DOT__regs[15]),32);
+        bufp->chgIData(oldp+102,(vlSelf->rv32e__DOT__regfile__DOT__regs[16]),32);
+        bufp->chgIData(oldp+103,(vlSelf->rv32e__DOT__regfile__DOT__regs[17]),32);
+        bufp->chgIData(oldp+104,(vlSelf->rv32e__DOT__regfile__DOT__regs[18]),32);
+        bufp->chgIData(oldp+105,(vlSelf->rv32e__DOT__regfile__DOT__regs[19]),32);
+        bufp->chgIData(oldp+106,(vlSelf->rv32e__DOT__regfile__DOT__regs[20]),32);
+        bufp->chgIData(oldp+107,(vlSelf->rv32e__DOT__regfile__DOT__regs[21]),32);
+        bufp->chgIData(oldp+108,(vlSelf->rv32e__DOT__regfile__DOT__regs[22]),32);
+        bufp->chgIData(oldp+109,(vlSelf->rv32e__DOT__regfile__DOT__regs[23]),32);
+        bufp->chgIData(oldp+110,(vlSelf->rv32e__DOT__regfile__DOT__regs[24]),32);
+        bufp->chgIData(oldp+111,(vlSelf->rv32e__DOT__regfile__DOT__regs[25]),32);
+        bufp->chgIData(oldp+112,(vlSelf->rv32e__DOT__regfile__DOT__regs[26]),32);
+        bufp->chgIData(oldp+113,(vlSelf->rv32e__DOT__regfile__DOT__regs[27]),32);
+        bufp->chgIData(oldp+114,(vlSelf->rv32e__DOT__regfile__DOT__regs[28]),32);
+        bufp->chgIData(oldp+115,(vlSelf->rv32e__DOT__regfile__DOT__regs[29]),32);
+        bufp->chgIData(oldp+116,(vlSelf->rv32e__DOT__regfile__DOT__regs[30]),32);
+        bufp->chgIData(oldp+117,(vlSelf->rv32e__DOT__regfile__DOT__regs[31]),32);
+        bufp->chgIData(oldp+118,(vlSelf->rv32e__DOT__regfile__DOT__unnamedblk1__DOT__i),32);
+        bufp->chgIData(oldp+119,(vlSelf->rv32e__DOT__wb_stage__DOT__state),32);
+        bufp->chgIData(oldp+120,(vlSelf->rv32e__DOT__wb_stage__DOT__next_state),32);
+        bufp->chgCData(oldp+121,(vlSelf->rv32e__DOT__wb_stage__DOT__delay),2);
     }
     if (VL_UNLIKELY(vlSelf->__Vm_traceActivity[2U])) {
-        bufp->chgIData(oldp+126,(vlSelf->rv32e__DOT__if_stage__DOT__get_instr),32);
-        bufp->chgBit(oldp+127,(vlSelf->rv32e__DOT__if_stage__DOT__ifu_sram_inst__DOT__read_pending));
-        bufp->chgIData(oldp+128,(vlSelf->rv32e__DOT__if_stage__DOT__ifu_sram_inst__DOT__raddr_reg),32);
+        bufp->chgIData(oldp+122,(vlSelf->rv32e__DOT__if_stage__DOT__get_instr),32);
+        bufp->chgBit(oldp+123,(vlSelf->rv32e__DOT__if_stage__DOT__ifu_sram_inst__DOT__read_pending));
+        bufp->chgIData(oldp+124,(vlSelf->rv32e__DOT__if_stage__DOT__ifu_sram_inst__DOT__raddr_reg),32);
     }
-    bufp->chgBit(oldp+129,(vlSelf->clk));
-    bufp->chgBit(oldp+130,(vlSelf->reset));
+    bufp->chgBit(oldp+125,(vlSelf->clk));
+    bufp->chgBit(oldp+126,(vlSelf->reset));
 }
 
 void Vrv32e___024root__trace_cleanup(void* voidSelf, VerilatedVcd* /*unused*/) {

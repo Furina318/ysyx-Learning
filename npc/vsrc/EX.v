@@ -1,23 +1,19 @@
 `include "/home/furina/ysyx-workbench/npc/vsrc/defines.v"
 module EX (
-    input         clk,
-    input         reset,
-    input         reg_valid,//reg模块的输出是否有效
-    output reg    ex_ready,//ex就绪状态
-    input  [6:0]  opcode,
-    input  [31:0] rs1_val,
-    input  [31:0] rs2_val,
-    input  [31:0] imm,
-    input  [3:0]  alu_op,
-    input  [4:0]  id_rd,//ID阶段传入的rd
-    input         id_RegWrite,//ID阶段传入的RegWrite
-    input         mem_ready,//下游mem是否就绪
-    output reg    ex_valid,//ex输出是否有效
+    input             clk,
+    input             reset,
+    input             reg_valid,//reg模块的输出是否有效
+    output reg        ex_ready,//ex就绪状态
+    input      [6:0]  opcode,
+    input      [31:0] rs1_val,
+    input      [31:0] rs2_val,
+    input      [31:0] imm,
+    input      [3:0]  alu_op,
+    input             mem_ready,//下游mem是否就绪
+    output reg        ex_valid,//ex输出是否有效
     output reg [31:0] alu_result,
     output reg        alu_zero,
-    output reg        alu_less,
-    output reg [4:0]  rd_ex,//EX阶段传入的rd
-    output reg        RegWrite_ex//EX阶段传入的RegWrite
+    output reg        alu_less
 );
     typedef enum { IDLE, BUSY, STALL } state_t;
     state_t state, next_state;
@@ -62,8 +58,6 @@ module EX (
                         endcase
                         alu_zero = (alu_result == 32'b0);
                         alu_less = ($signed(rs1_val) < $signed((opcode[6:2] == `INST_TYPE_R || opcode[6:2] == `INST_TYPE_B) ? rs2_val : imm));
-                        rd_ex = id_rd;//传递变量rd
-                        RegWrite_ex = id_RegWrite;//传递变量RegWrite
                         delay = delay - 1;
                     end
                     next_state = (delay == 0) ? STALL : BUSY;

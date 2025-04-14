@@ -76,7 +76,7 @@ module RegFile (
     always @(*) begin
         rs1_val = (rs1 != 0) ? regs[rs1] : 32'h0;
         rs2_val = (rs2 != 0) ? regs[rs2] : 32'h0;
-        // $display("\033[35m[REG]:rs1_val=%h | rs2_val=%h\033[0m",rs1_val, rs2_val);
+        $display("\033[35m[REG]: rd=%h | rs1_val=%h | rs2_val=%h\033[0m",rd, rs1_val, rs2_val);
         // $display("\033[35m[REG]:state = %d | reg_ready=%b| reg_valid=%b\033[0m", state, reg_ready, reg_valid);
     end
 endmodule

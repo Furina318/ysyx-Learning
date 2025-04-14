@@ -12,12 +12,7 @@ module MEM (
     input      [31:0] addr,
     input      [31:0] data_in,
     input      [1:0]  MemLen,
-    output reg [31:0] data_out,
-    //====数据传递到下游====//
-    input      [4:0]  ex_rd,//EX阶段传入的rd
-    input             ex_RegWrite,//EX阶段传入的RegWrite
-    output reg [4:0]  rd_mem,//MEM阶段传入的rd
-    output reg        RegWrite_mem//MEM阶段传入的RegWrite
+    output reg [31:0] data_out
 );
     //====状态机定义====//  
     typedef enum {IDLE,READ_ADDR,READ_DATA,WRITE,STALL} state_t;//将之前的BUSY状态分为READ_ADDR、READ_DATA、WRITE
@@ -101,8 +96,6 @@ module MEM (
                             next_state = WRITE;
                         end
                         else begin
-                            rd_mem <= ex_rd;
-                            RegWrite_mem <= ex_RegWrite;
                             next_state = STALL;
                         end
                     end
@@ -143,8 +136,6 @@ module MEM (
                             `Mem_Word:  data_out <= sram_rdata;
                             default:    data_out <= 32'h0;
                         endcase
-                        rd_mem <= ex_rd;
-                        RegWrite_mem <= ex_RegWrite;
                         next_state = STALL;
                     end
                     else begin
@@ -157,8 +148,6 @@ module MEM (
                     mem_valid <= 1'b0;
                     if(sram_wready && sram_wvalid) begin
                         // sram_wvalid <= 1'b0;//写请求被接受，撤销wvalid信号
-                        rd_mem <= ex_rd;
-                        RegWrite_mem <= ex_RegWrite;
                         // mem_valid <= 1'b1;
                         $display("\033[31m[MEM]: WRITE状态握手成功\033[0m");
                         next_state = STALL;
@@ -174,8 +163,6 @@ module MEM (
                     sram_wvalid <= 1'b0;
                     sram_rready <= 1'b0;
                     sram_arvalid <= 1'b0;
-                    // rd_mem <= ex_rd;
-                    // RegWrite_mem <= ex_RegWrite;
                     if(wb_ready) begin
                         next_state = IDLE;
                     end

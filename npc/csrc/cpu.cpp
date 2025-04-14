@@ -26,7 +26,12 @@ extern void display_iringbuf(void);
 
 #ifdef CONFIG_DIFFTEST
 extern void difftest_step(vaddr_t pc, vaddr_t npc);
+extern void (*ref_difftest_regcpy)(void *dut, bool direction);
 #endif
+
+extern vluint64_t main_time;
+#define start_time 10
+bool once = false;
 /*********************************************/
 
 /*********** FUNC_TRACE ***********/
@@ -208,6 +213,12 @@ static void trace_and_difftest(){
   }
   //difftest
   IFDEF(CONFIG_DIFFTEST,difftest_step(PCSet.pc,PCSet.next_pc));
+  #ifdef CONFIG_DIFFTEST
+    if(main_time>=start_time && !once){
+      ref_difftest_regcpy(&cpu, DIFFTEST_TO_REF);
+      once = ture;
+    }
+  #endif
 }
 
 static void execute(uint64_t n) {

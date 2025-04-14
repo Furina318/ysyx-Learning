@@ -34,6 +34,7 @@ word_t single_reg_display(char *reg_name)
 {
     static int i;
     //pc
+    printf("[npc]:\n");
     _Log(ANSI_FG_RED "RegName  Hex_Value       U-Dec_Value       Dec_Value\n\33[0m");
     if(strcmp(reg_name, "pc") == 0)
     {

@@ -51,8 +51,8 @@ module rv32e (
     wire [31:0]  branch_target;
     // assign branch_target=is_jalr ? jalr_target : jal_target;
     
-    wire [4:0]   rd_ex, rd_mem, rd_wb;
-    wire         RegWrite_ex, RegWrite_mem, RegWrite_wb;
+    wire [4:0]   rd_wb;
+    wire         RegWrite_wb;
     wire         wb_MemRead, wb_MemWrite;
     wire [1:0]   wb_MemLen;
     wire [31:0]  wb_addr, wb_data_in;
@@ -122,15 +122,11 @@ module rv32e (
         .rs2_val(rs2_val),
         .imm(imm),
         .alu_op(alu_op),
-        .id_rd(rd),
-        .id_RegWrite(RegWrite),
         .mem_ready(mem_ready),
         .ex_valid(ex_valid),
         .alu_result(alu_result),
         .alu_zero(alu_zero),   
-        .alu_less(alu_less),
-        .rd_ex(rd_ex),
-        .RegWrite_ex(RegWrite_ex)
+        .alu_less(alu_less)
     );
     // 内存模块
     MEM mem_stage(
@@ -142,14 +138,10 @@ module rv32e (
         .mem_valid(mem_valid),
         .MemRead(wb_MemRead),
         .MemWrite(wb_MemWrite),
-        .ex_rd(rd_ex),
-        .ex_RegWrite(RegWrite_ex),
         .MemLen(wb_MemLen),
         .addr(wb_addr),
         .data_in(wb_data_in),
-        .data_out(data_out),
-        .rd_mem(rd_mem),
-        .RegWrite_mem(RegWrite_mem)
+        .data_out(data_out)
     );
 
     // 写回模块
@@ -163,8 +155,8 @@ module rv32e (
         .opcode(opcode),
         .func3(func3),
 
-        .mem_rd(rd_mem),
-        .mem_RegWrite(RegWrite_mem),
+        .id_rd(rd),
+        .id_RegWrite(RegWrite),
         .id_MemRead(MemRead),
         .id_MemWrite(MemWrite),
         .id_MemLen(MemLen),

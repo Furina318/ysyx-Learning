@@ -129,6 +129,12 @@ VL_ATTR_COLD void Vrv32e___024root___stl_sequent__TOP__0(Vrv32e___024root* vlSel
                                                      | (0x1eU 
                                                         & (vlSelf->rv32e__DOT__id_stage__DOT__instr_reg 
                                                            >> 7U)))));
+    VL_WRITEF("\033[36m[MEM]:state = %11d | mem_ready=%b| mem_valid=%b\033[0m\n\033[36m[MEM]:sram_rready=%b | sram_rvalid=%b | sram_rdata=%x\033[0m\n \n",
+              32,vlSelf->rv32e__DOT__mem_stage__DOT__state,
+              1,(IData)(vlSelf->rv32e__DOT__mem_ready),
+              1,vlSelf->rv32e__DOT__mem_valid,1,(IData)(vlSelf->rv32e__DOT__mem_stage__DOT__sram_rready),
+              1,vlSelf->rv32e__DOT__mem_stage__DOT__sram_rvalid,
+              32,vlSelf->rv32e__DOT__mem_stage__DOT__sram_rdata);
     vlSelf->rv32e__DOT__rs1_val = ((0U != (IData)(vlSelf->rv32e__DOT__rs1))
                                     ? vlSelf->rv32e__DOT__regfile__DOT__regs
                                    [vlSelf->rv32e__DOT__rs1]
@@ -137,12 +143,9 @@ VL_ATTR_COLD void Vrv32e___024root___stl_sequent__TOP__0(Vrv32e___024root* vlSel
                                     ? vlSelf->rv32e__DOT__regfile__DOT__regs
                                    [vlSelf->rv32e__DOT__rs2]
                                     : 0U);
-    VL_WRITEF("\033[36m[MEM]:state = %11d | mem_ready=%b| mem_valid=%b\033[0m\n\033[36m[MEM]:sram_rready=%b | sram_rvalid=%b | sram_rdata=%x\033[0m\n \n",
-              32,vlSelf->rv32e__DOT__mem_stage__DOT__state,
-              1,(IData)(vlSelf->rv32e__DOT__mem_ready),
-              1,vlSelf->rv32e__DOT__mem_valid,1,(IData)(vlSelf->rv32e__DOT__mem_stage__DOT__sram_rready),
-              1,vlSelf->rv32e__DOT__mem_stage__DOT__sram_rvalid,
-              32,vlSelf->rv32e__DOT__mem_stage__DOT__sram_rdata);
+    VL_WRITEF("\033[35m[REG]: rd=%x | rs1_val=%x | rs2_val=%x\033[0m\n",
+              5,vlSelf->rv32e__DOT__rd_wb,32,vlSelf->rv32e__DOT__rs1_val,
+              32,vlSelf->rv32e__DOT__rs2_val);
     Vrv32e___024root____Vdpiimwrap_rv32e__DOT__if_stage__DOT__ifu_sram_inst__DOT__pmem_read_TOP(vlSelf->rv32e__DOT__if_stage__DOT__ifu_sram_inst__DOT__raddr_reg, 4U, vlSelf->__Vfunc_rv32e__DOT__if_stage__DOT__ifu_sram_inst__DOT__pmem_read__0__Vfuncout);
     vlSelf->rv32e__DOT__if_stage__DOT__get_instr = 
         ((IData)(vlSelf->rv32e__DOT__if_stage__DOT__ifu_sram_inst__DOT__read_pending)
@@ -262,11 +265,7 @@ VL_ATTR_COLD void Vrv32e___024root___ctor_var_reset(Vrv32e___024root* vlSelf) {
     vlSelf->rv32e__DOT__is_jal = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__is_jalr = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__take_branch = VL_RAND_RESET_I(1);
-    vlSelf->rv32e__DOT__rd_ex = VL_RAND_RESET_I(5);
-    vlSelf->rv32e__DOT__rd_mem = VL_RAND_RESET_I(5);
     vlSelf->rv32e__DOT__rd_wb = VL_RAND_RESET_I(5);
-    vlSelf->rv32e__DOT__RegWrite_ex = VL_RAND_RESET_I(1);
-    vlSelf->rv32e__DOT__RegWrite_mem = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__RegWrite_wb = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__wb_MemRead = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__wb_MemWrite = VL_RAND_RESET_I(1);

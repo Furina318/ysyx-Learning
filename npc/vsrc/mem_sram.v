@@ -90,6 +90,7 @@ module mem_sram #(
                     if(rready) begin
                         rdata <= rdata_reg;
                         rvalid <= 1'b1;
+                        araddr_reg <= 32'h0;//清空读地址寄存器
                         // rvalid <= 1'b0;//数据被接受后关闭rvalid
                         next_sram_state <= IDLE;
                     end
