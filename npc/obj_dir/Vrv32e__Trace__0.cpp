@@ -179,7 +179,7 @@ void Vrv32e___024root__trace_chg_sub_0(Vrv32e___024root* vlSelf, VerilatedVcd::B
         bufp->chgBit(oldp+124,(vlSelf->rv32e__DOT____Vcellinp__if_stage__pc_src));
         bufp->chgIData(oldp+125,(vlSelf->rv32e__DOT__if_stage__DOT__state),32);
         bufp->chgIData(oldp+126,(vlSelf->rv32e__DOT__if_stage__DOT__next_state),32);
-        bufp->chgCData(oldp+127,(vlSelf->rv32e__DOT__if_stage__DOT__delay),2);
+        bufp->chgCData(oldp+127,(vlSelf->rv32e__DOT__if_stage__DOT__delay_counter),2);
         bufp->chgIData(oldp+128,(vlSelf->rv32e__DOT__if_stage__DOT__sram_araddr),32);
         bufp->chgBit(oldp+129,(vlSelf->rv32e__DOT__if_stage__DOT__sram_arvalid));
         bufp->chgBit(oldp+130,(vlSelf->rv32e__DOT__if_stage__DOT__sram_arready));

@@ -137,7 +137,7 @@ VL_ATTR_COLD void Vrv32e___024root__trace_init_sub__TOP__0(Vrv32e___024root* vlS
     tracep->declBus(c+126,"state", false,-1, 31,0);
     tracep->declBus(c+127,"next_state", false,-1, 31,0);
     tracep->declBus(c+156,"DELAY_CYCLES", false,-1, 1,0);
-    tracep->declBus(c+128,"delay", false,-1, 1,0);
+    tracep->declBus(c+128,"delay_counter", false,-1, 1,0);
     tracep->declBit(c+157,"ren", false,-1);
     tracep->declBus(c+158,"get_instr", false,-1, 31,0);
     tracep->declBus(c+159,"rresp", false,-1, 1,0);
@@ -492,7 +492,7 @@ VL_ATTR_COLD void Vrv32e___024root__trace_full_sub_0(Vrv32e___024root* vlSelf, V
     bufp->fullBit(oldp+125,(vlSelf->rv32e__DOT____Vcellinp__if_stage__pc_src));
     bufp->fullIData(oldp+126,(vlSelf->rv32e__DOT__if_stage__DOT__state),32);
     bufp->fullIData(oldp+127,(vlSelf->rv32e__DOT__if_stage__DOT__next_state),32);
-    bufp->fullCData(oldp+128,(vlSelf->rv32e__DOT__if_stage__DOT__delay),2);
+    bufp->fullCData(oldp+128,(vlSelf->rv32e__DOT__if_stage__DOT__delay_counter),2);
     bufp->fullIData(oldp+129,(vlSelf->rv32e__DOT__if_stage__DOT__sram_araddr),32);
     bufp->fullBit(oldp+130,(vlSelf->rv32e__DOT__if_stage__DOT__sram_arvalid));
     bufp->fullBit(oldp+131,(vlSelf->rv32e__DOT__if_stage__DOT__sram_arready));

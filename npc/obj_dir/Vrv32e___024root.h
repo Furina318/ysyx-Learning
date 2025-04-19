@@ -54,7 +54,7 @@ class Vrv32e___024root final : public VerilatedModule {
         CData/*0:0*/ rv32e__DOT__wb_MemWrite;
         CData/*1:0*/ rv32e__DOT__wb_MemLen;
         CData/*0:0*/ rv32e__DOT____Vcellinp__if_stage__pc_src;
-        CData/*1:0*/ rv32e__DOT__if_stage__DOT__delay;
+        CData/*1:0*/ rv32e__DOT__if_stage__DOT__delay_counter;
         CData/*0:0*/ rv32e__DOT__if_stage__DOT__ren;
         CData/*1:0*/ rv32e__DOT__if_stage__DOT__rresp;
         CData/*0:0*/ rv32e__DOT__if_stage__DOT__sram_arvalid;
@@ -93,10 +93,11 @@ class Vrv32e___024root final : public VerilatedModule {
         CData/*0:0*/ rv32e__DOT__wb_stage__DOT__RegWrite_wb;
         CData/*4:0*/ rv32e__DOT__wb_stage__DOT__rd_wb;
         CData/*4:0*/ rv32e__DOT__wb_stage__DOT__rd_wb_pre;
-        CData/*1:0*/ __Vdly__rv32e__DOT__if_stage__DOT__delay;
+        CData/*1:0*/ __Vdly__rv32e__DOT__if_stage__DOT__delay_counter;
         CData/*0:0*/ __Vdly__rv32e__DOT__if_stage__DOT__sram_arvalid;
         CData/*0:0*/ __Vdly__rv32e__DOT__if_stage__DOT__sram_rready;
         CData/*0:0*/ __Vdly__rv32e__DOT__if_stage__DOT__sram_arready;
+        CData/*0:0*/ __Vdly__rv32e__DOT__if_stage__DOT__sram_rvalid;
         CData/*1:0*/ __Vdly__rv32e__DOT__if_stage__DOT__ifu_sram_inst__DOT__delay_counter;
         CData/*0:0*/ __Vtrigrprev__TOP__clk;
         CData/*0:0*/ __Vtrigrprev__TOP__reset;
@@ -144,9 +145,9 @@ class Vrv32e___024root final : public VerilatedModule {
         IData/*31:0*/ rv32e__DOT__mem_stage__DOT__sram_araddr;
         IData/*31:0*/ rv32e__DOT__mem_stage__DOT__sram_rdata;
         IData/*31:0*/ rv32e__DOT__mem_stage__DOT__sram_awaddr;
-        IData/*31:0*/ rv32e__DOT__mem_stage__DOT__sram_wdata;
     };
     struct {
+        IData/*31:0*/ rv32e__DOT__mem_stage__DOT__sram_wdata;
         IData/*31:0*/ rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__sram_state;
         IData/*31:0*/ rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__next_sram_state;
         IData/*31:0*/ rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__araddr_reg;

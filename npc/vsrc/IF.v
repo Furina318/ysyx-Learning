@@ -18,7 +18,7 @@ module IF (
     typedef enum {IDLE, READ_ADDR, READ_DATA, STALL} state_t;
     state_t state, next_state;
     parameter [1:0] DELAY_CYCLES = 1;//处理周期
-    reg [1:0] delay;
+    reg [1:0] delay_counter;
     reg       ren;
     reg [31:0] get_instr;
     wire [1:0] rresp;
@@ -77,13 +77,16 @@ module IF (
     always @(posedge clk or posedge reset) begin
         if (reset) begin
             pc <= 32'h8000_0000;
+            sram_araddr <= 32'h8000_0000;
+
             if_valid <= 1'b0;
             if_ready <= 1'b1;
             state = READ_ADDR;
             next_state = READ_ADDR;
-            delay <= 2'b10;
+            delay_counter <= 2'b10;
             sram_arvalid <= 1'b1;
-            sram_rready <= 1'b0;
+
+            sram_rready <= 1'b1;
             sram_araddr <= 32'h0;
             if_access_fault <= 1'b0;
             if_fault_addr <= 32'h0;
@@ -94,7 +97,7 @@ module IF (
                 IDLE: begin
                     if_ready <= 1'b1;
                     if_valid <= 1'b0;
-                    delay <= 2'b10;
+                    delay_counter <= 2'b10;
                     sram_arvalid <= 1'b0;
                     sram_rready <= 1'b0;
                     if(wb_valid) begin
@@ -113,7 +116,7 @@ module IF (
                 //     ren = 1'b1;//ifu_sram读使能
                 //     // instr = pmem_read(pc, 4); //读取指令
                 //     instr = get_instr;
-                //     if(delay > 0) delay = delay - 1;
+                //     if(delay_counter > 0) delay_counter = delay_counter - 1;
                 //     else if(instr != 32'h0) begin
                 //         if(rresp != `OKAY) begin
                 //             if_access_fault <= 1'b1;
@@ -129,8 +132,8 @@ module IF (
                 READ_ADDR: begin
                     if_ready <= 1'b0;
                     if_valid <= 1'b0;
-                    if(delay > 0) begin
-                        delay <= delay - 1;
+                    if(delay_counter > 0) begin
+                        delay_counter <= delay_counter - 1;
                         next_state = READ_ADDR;
                     end
                     else if(sram_arready && sram_arvalid) begin
@@ -169,7 +172,13 @@ module IF (
                     if_valid <= 1'b1;
                     sram_arvalid <= 1'b0;
                     sram_rready <= 1'b0;
-                    next_state = id_ready ? IDLE : STALL;
+                    // next_state = id_ready ? IDLE : STALL;
+                    if(id_ready) begin
+                        next_state = IDLE;
+                    end
+                    else begin
+                        next_state = STALL;
+                    end
                 end
                 default: begin
                     if_ready <= 1'b0;

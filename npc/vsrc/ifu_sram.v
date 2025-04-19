@@ -87,11 +87,6 @@ module ifu_sram #(
             araddr_reg <= 32'h0;
             rdata_reg <= 32'h0;
             rresp <= `OKAY;
-            //写通道无效
-            // awready <= 1'b0;
-            // wready <= 1'b0;
-            // bresp <= `OKAY;
-            // bvalid <= 1'b0;
         end
         else begin
             sram_state = next_sram_state;
@@ -116,7 +111,7 @@ module ifu_sram #(
                     end
                     else begin
                         if(addr_valid) begin
-                            arready <= 1'b0;//?
+                            // arready <= 1'b0;//?
                             rdata_reg <= pmem_read(araddr_reg, 4);
                             rresp <= `OKAY;
                         end
@@ -128,8 +123,9 @@ module ifu_sram #(
                     end
                 end
                 READ_DATA:begin
-                    if(rready) begin
-                        rvalid <= 1'b1;
+                    rvalid <= 1'b1;
+                    arready <= 1'b0;
+                    if(rready && rvalid) begin
                         rdata <= rdata_reg;
                         rresp <= `OKAY; //OKAY
                         next_sram_state = IDLE;
@@ -141,6 +137,8 @@ module ifu_sram #(
                 default: begin
                     arready <= 1'b1;
                     rvalid <= 1'b0;
+                    araddr_reg <= 32'h0;
+                    rdata_reg <= 32'h0;
                     next_sram_state = IDLE;
                 end
             endcase
@@ -152,6 +150,7 @@ module ifu_sram #(
     always @(posedge clk) begin
         $display("[ifu_sram] state=%d, arvalid=%b, arready=%b, rvalid=%b, rready=%b, araddr=0x%h, rdata=0x%h, rresp=0x%b",
                  sram_state, arvalid, arready, rvalid, rready, araddr_reg, rdata, rresp);
+        $display("[ifu_sram] rdata_reg=0x%h, rdata=0x%h",rdata_reg,rdata);
     end
 
     // 协议断言
