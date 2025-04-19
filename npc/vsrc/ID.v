@@ -5,7 +5,7 @@ module ID (
     input             reset,
     input      [31:0] instr,
 
-    input             reg_ready,//来自REG就绪
+    input             ex_ready,//来自EX就绪
     input             if_valid,//IF有效
     output reg        id_ready,//ID就绪
     output reg        id_valid,//ID输出是否有效
@@ -101,14 +101,14 @@ module ID (
                             `INST_TYPE_LUI: begin
                                 imm = immU;
                                 RegWrite = 1'b1;
-                                $display("\033[32m[ID]: LUI \033[0m");
+                                // $display("\033[32m[ID]: LUI \033[0m");
                             end
                             // AUIPC
                             `INST_TYPE_AUIPC: begin
                                 imm = immU;
                                 RegWrite = 1'b1;
                                 alu_op=`ALU_ADD;//PC+imm
-                                $display("\033[32m[ID]: AUIPC \033[0m");
+                                // $display("\033[32m[ID]: AUIPC \033[0m");
                             end
                             // JAL
                             `INST_TYPE_JAL: begin
@@ -136,7 +136,7 @@ module ID (
                                         $display("\033[32m[ID] : Unknown S instruction with func3 = %b\033[0m",func3);
                                     end
                                 endcase
-                                $display("\033[32m[ID]: S Instr\033[0m");
+                                // $display("\033[32m[ID]: S Instr\033[0m");
                             end
 
                             `INST_TYPE_L: begin
@@ -155,7 +155,7 @@ module ID (
                                     alu_op = `ALU_ADD;
 
                                     MemLen = `Mem_Bit;//单字节读取
-                                    $display("\033[32m[ID]: LBU\033[0m");
+                                    // $display("\033[32m[ID]: LBU\033[0m");
                                 end
                                 else if(func3 == `F3_LH) begin
                                     imm=immI;
@@ -264,7 +264,7 @@ module ID (
                 STALL: begin
                     id_ready = 1'b0;
                     id_valid = 1'b1;
-                    next_state = reg_ready ? IDLE : STALL;
+                    next_state = ex_ready ? IDLE : STALL;
                 end
                 default: begin
                     id_valid = 1'b0;
@@ -275,7 +275,4 @@ module ID (
         end
     end
 
-    // always @(*) begin
-    //     $display("\033[32m[ID]: state = %d | id_ready=%b | id_valid=%b\033[0m", state, id_ready, id_valid);
-    // end
 endmodule

@@ -1,3 +1,28 @@
+/*********************************************************************/
+//                    _ooOoo_
+//                   o8888888o
+//                   88" . "88
+//                   (| -_- |)
+//                   O\  =  /O
+//                ____/`---'\____
+//              .'  \\|     |//  `.
+//             /  \\|||  :  |||//  \
+//            /  _||||| -:- |||||-  \
+//            |   | \\\  -  /// |   |
+//            | \_|  ''\---/''  |   |
+//            \  .-\__  `-`  ___/-. /
+//          ___`. .'  /--.--\  `. . __
+//       ."" '<  `.___\_<|>_/___.'  >'"".
+//      | | :  `- \`.;`\ _ /`;.`/ - ` : | |
+//      \  \ `-.   \_ __\ /__ _/   .-` /  /
+// ======`-.____`-.___\_____/___.-`____.-'======
+//                    `=---='
+// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//             佛祖保佑        永无BUG
+//           南无阿弥陀佛   就算报错也让我看懂
+//                    佛祖保佑
+/*********************************************************************/
+
 `include "/home/furina/ysyx-workbench/npc/vsrc/defines.v"
 module rv32e (
     input         clk,
@@ -10,7 +35,9 @@ module rv32e (
     wire         wb_valid;
     wire         if_valid;
     wire         id_ready;
-
+    wire         if_access_fault;
+    wire [31:0]  if_fault_addr;
+    wire [31:0]  trap_pc;
     //===== ID =====//
     wire [6:0]   opcode;
     wire [4:0]   rs1, rs2, rd;
@@ -41,7 +68,9 @@ module rv32e (
     wire [31:0]  data_out;
     wire         mem_valid;
     wire         wb_ready;
-
+    wire         load_access_fault;
+    wire         store_access_fault;
+    wire [31:0]  mem_fault_addr;
     //===== WB =====//
     wire [31:0]  wb_data;
     wire [31:0]  jal_target;
@@ -68,7 +97,9 @@ module rv32e (
         .if_ready(if_ready),
         .wb_valid(wb_valid),
         .if_valid(if_valid),
-        .id_ready(id_ready)
+        .id_ready(id_ready),
+        .if_access_fault(if_access_fault),
+        .if_fault_addr(if_fault_addr)
     );
 
     // 译码模块
@@ -80,7 +111,7 @@ module rv32e (
         .if_valid(if_valid),
         .id_ready(id_ready),
         .id_valid(id_valid),
-        .reg_ready(reg_ready),
+        .ex_ready(ex_ready),
         .opcode(opcode),
         .rs1(rs1),
         .rs2(rs2),
@@ -94,28 +125,11 @@ module rv32e (
         .alu_op(alu_op),
         .MemLen(MemLen)
     );
-
-    // 寄存器文件
-    RegFile regfile (
-        .clk(clk),
-        .reset(reset),
-        .id_valid(id_valid),
-        .ex_ready(ex_ready),
-        .reg_ready(reg_ready),
-        .reg_valid(reg_valid),
-        .rs1(rs1),
-        .rs2(rs2),
-        .rd(rd_wb),
-        .we(RegWrite_wb),
-        .wd(wb_data),
-        .rs1_val(rs1_val),
-        .rs2_val(rs2_val)
-    );
     
     EX ex_stage(
         .clk(clk), 
         .reset(reset),
-        .reg_valid(reg_valid),
+        .id_valid(id_valid),
         .ex_ready(ex_ready),
         .opcode(opcode), 
         .rs1_val(rs1_val),
@@ -136,12 +150,15 @@ module rv32e (
         .mem_ready(mem_ready),
         .wb_ready(wb_ready),
         .mem_valid(mem_valid),
-        .MemRead(wb_MemRead),
-        .MemWrite(wb_MemWrite),
-        .MemLen(wb_MemLen),
-        .addr(wb_addr),
-        .data_in(wb_data_in),
-        .data_out(data_out)
+        .MemRead(MemRead),
+        .MemWrite(MemWrite),
+        .MemLen(MemLen),
+        .addr(rs1_val + imm),
+        .data_in(rs2_val),
+        .data_out(data_out),
+        .load_access_fault(load_access_fault),
+        .store_access_fault(store_access_fault),
+        .mem_fault_addr(mem_fault_addr)
     );
 
     // 写回模块
@@ -157,16 +174,21 @@ module rv32e (
 
         .id_rd(rd),
         .id_RegWrite(RegWrite),
-        .id_MemRead(MemRead),
-        .id_MemWrite(MemWrite),
-        .id_MemLen(MemLen),
-        .id_addr(alu_result),
-        // .id_addr(rs1_val + imm), 
-        .id_data_in(rs2_val),
+        // .id_MemRead(MemRead),
+        // .id_MemWrite(MemWrite),
+        // .id_MemLen(MemLen),
+        // .id_addr(alu_result),
+        // // .id_addr(rs1_val + imm), 
+        // .id_data_in(rs2_val),
+
+        .rs1(rs1),
+        .rs2(rs2),
+        .rs1_val(rs1_val),
+        .rs2_val(rs2_val),
 
         .pc(pc),
         .imm(imm),
-        .rs1_val(rs1_val),
+        // .rs1_val(rs1_val),
         .alu_less(alu_less),
         .alu_zero(alu_zero),
         .alu_result(alu_result),
@@ -176,15 +198,27 @@ module rv32e (
         .take_branch(take_branch),
         .jal_target(jal_target),
         .jalr_target(jalr_target),
-        .wb_data(wb_data),
+        .wb_data(wb_data)
 
-        .rd_wb(rd_wb),
-        .RegWrite_wb(RegWrite_wb),
-        .wb_MemRead(wb_MemRead),
-        .wb_MemWrite(wb_MemWrite),
-        .wb_MemLen(wb_MemLen),
-        .wb_addr(wb_addr),
-        .wb_data_in(wb_data_in)
+        // .rd_wb(rd_wb),
+        // .RegWrite_wb(RegWrite_wb),
+        // .wb_MemRead(wb_MemRead),
+        // .wb_MemWrite(wb_MemWrite),
+        // .wb_MemLen(wb_MemLen),
+        // .wb_addr(wb_addr),
+        // .wb_data_in(wb_data_in)
     );
     assign branch_target = is_jalr ? jalr_target : jal_target;
+
+    always @(*) begin
+        if(if_access_fault) begin
+            $display("[IF]:IF access fault at address: %h", if_fault_addr);
+        end
+        if(load_access_fault) begin
+            $display("[MEM]:Load access fault at address: %h", mem_fault_addr);
+        end
+        if(store_access_fault) begin
+            $display("[MEM]:Store access fault at address: %h", mem_fault_addr);
+        end
+    end 
 endmodule

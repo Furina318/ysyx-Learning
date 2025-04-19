@@ -2,7 +2,7 @@
 module EX (
     input             clk,
     input             reset,
-    input             reg_valid,//reg模块的输出是否有效
+    input             id_valid,//reg模块的输出是否有效
     output reg        ex_ready,//ex就绪状态
     input      [6:0]  opcode,
     input      [31:0] rs1_val,
@@ -37,7 +37,7 @@ module EX (
                     ex_ready = 1'b1;
                     ex_valid = 1'b0;
                     delay = DELAY_CYCLES;
-                    next_state = reg_valid ? BUSY : IDLE;
+                    next_state = id_valid ? BUSY : IDLE;
                 end
                 BUSY: begin
                     ex_ready = 1'b0;
@@ -61,8 +61,6 @@ module EX (
                         delay = delay - 1;
                     end
                     next_state = (delay == 0) ? STALL : BUSY;
-                    $display("\033[33m[EX]: alu_result = %h | alu_zero=%b | alu_less=%b\033[0m", alu_result, alu_zero, alu_less);
-                    $display("\033[33m[EX]: imm=%h | rs1_val=%h | rs2_val=%h\033[0m", imm, rs1_val, rs2_val);
                 end
                 STALL: begin
                     ex_ready = 1'b0;
@@ -77,7 +75,4 @@ module EX (
             endcase
         end
     end
-    // always @(*) begin
-    //     $display("\033[33m[EX]: state = %d | ex_ready=%b | ex_valid=%b\033[0m", state, ex_ready, ex_valid);
-    // end
 endmodule

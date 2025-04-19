@@ -1,3 +1,4 @@
+`include "/home/furina/ysyx-workbench/npc/vsrc/defines.v"
 // ====== SRAM接口定义 ======
 module mem_sram #(
     parameter ADDR_WIDTH = 32,
@@ -6,33 +7,48 @@ module mem_sram #(
     input  wire                   clk,
     input  wire                   reset,
 
-    //读地址通道
+    //AXI4-Lite 读地址通道
     input  wire [ADDR_WIDTH-1:0]  araddr,
     input  wire                   arvalid,
     output reg                    arready,
-    //读数据通道
+    //AXI4-Lite读数据通道
     output reg   [DATA_WIDTH-1:0] rdata,
     output reg                    rvalid,
     input  wire                   rready,
-    
-    //写端口
-    input  wire [ADDR_WIDTH-1:0]  waddr,
+    output reg   [1:0]            rresp,//读响应信号
+    //AXI4-Lite写地址通道
+    input  wire [ADDR_WIDTH-1:0]  awaddr,
+    input  wire                   awvalid,
+    output reg                    awready,
+    //AXI4-Lite写数据通道
     input  wire [DATA_WIDTH-1:0]  wdata,
-    input  wire [3:0]             wmask,
+    input  wire [3:0]             wstrb,
     input  wire                   wvalid,
-    output reg                    wready
+    output reg                    wready,
+    //写响应通道
+    output reg   [1:0]            bresp,//写回复信号
+    output reg                    bvalid,
+    input  wire                   bready
 );
     import "DPI-C" function int unsigned pmem_read(input int unsigned raddr, input int len);
     import "DPI-C" function void pmem_write(input int unsigned waddr, input int unsigned wdata, input int len);
 
     //状态机定义
-    typedef enum {IDLE, READ_ADDR, READ_DATA, WRITE} state_t;
+    typedef enum {IDLE, READ_ADDR, READ_DATA, WRITE_ADDR, WRITE_DATA, WRITE_RESP} state_t;
     state_t sram_state, next_sram_state;
     reg [1:0] delay_counter;//模拟读延迟计数器
     parameter [1:0] DELAY_CYCLES = 2;//处理周期
     
-    reg [ADDR_WIDTH-1:0] araddr_reg;
-    reg [DATA_WIDTH-1:0] rdata_reg;
+    reg [ADDR_WIDTH-1:0] araddr_reg,awaddr_reg;
+    reg [DATA_WIDTH-1:0] rdata_reg,wdata_reg;
+    reg [3:0] wstrb_reg;
+    reg addr_valid;
+
+    //检查地址是否有效
+    always @(*) begin
+        addr_valid = (araddr >= 32'h8000_0000 && araddr <= 32'h8fff_ffff) ||
+                    (awaddr >= 32'h8000_0000 && awaddr <= 32'h8fff_ffff); 
+    end
     
     always @(posedge clk or posedge reset) begin
         if(reset) begin
@@ -44,14 +60,21 @@ module mem_sram #(
             delay_counter <= 2'b10;
             araddr_reg <= 32'h0;
             rdata_reg <= 32'h0;
+            rresp <= `OKAY;
+            bresp <= `OKAY;
+            bvalid <= 1'b0;
+            awaddr_reg <= 32'h0;
+            wstrb_reg <= 4'b0000;
+            wdata_reg <= 32'h0;
         end
         else begin
             sram_state <= next_sram_state;
             case(sram_state)
                 IDLE:begin
                     arready <= 1'b1;//初始化时准备好接受读地址
-                    wready  <= 1'b1;//初始化时准备好接受写地址
+                    awready  <= 1'b1;//初始化时准备好接受写地址
                     rvalid  <= 1'b0;
+                    bvalid  <= 1'b0;
                     delay_counter <= 2'b10;
                     if(arvalid && arready) begin//读握手
                         araddr_reg <= araddr;
@@ -59,15 +82,12 @@ module mem_sram #(
                         // delay_counter <= DELAY_CYCLES;
                         next_sram_state <= READ_ADDR;
                     end
-                    else if(wvalid && wready) begin//写握手
-                        wready <= 1'b0;//接收地址后不再准备
-                        case(wmask)
-                            4'b0001: pmem_write(waddr,wdata,1);//sb
-                            4'b0011: pmem_write(waddr,wdata,2);//sh
-                            4'b1111: pmem_write(waddr,wdata,4);//sw
-                            default: pmem_write(waddr,wdata,4);
-                        endcase
-                        next_sram_state <= WRITE;
+                    else if(awvalid && awready) begin//写地址握手
+                        wdata_reg <= wdata;
+                        wstrb_reg <= wstrb;
+                        awaddr_reg <= awaddr;
+                        awready <= 1'b0;
+                        next_sram_state <= WRITE_ADDR;
                     end
                     else begin
                         next_sram_state <= IDLE;
@@ -80,9 +100,14 @@ module mem_sram #(
                         next_sram_state <= READ_ADDR;
                     end
                     else begin
-                        $display("\nRead form MEM SRAM");
-                        rdata_reg <= pmem_read(araddr_reg,4);
-                        // rvalid <= 1'b1;//读取数据有效
+                        if(addr_valid) begin
+                            rdata_reg <= pmem_read(araddr_reg, 4);
+                            rresp <= `OKAY;
+                        end
+                        else begin
+                            rdata_reg <= 32'h0;
+                            rresp <= `SLVERR;
+                        end
                         next_sram_state <= READ_DATA;
                     end
                 end
@@ -96,13 +121,47 @@ module mem_sram #(
                     end
                     else next_sram_state <= READ_DATA;
                 end
-                WRITE: begin
+                WRITE_ADDR: begin
                     if(delay_counter > 0) begin
                         delay_counter <= delay_counter - 1;
+                        next_sram_state <= WRITE_ADDR;
                     end
                     else begin
                         wready <= 1'b1;
+                        next_sram_state <= WRITE_DATA;
+                    end
+                end
+                WRITE_DATA: begin
+                    if(wvalid && wready) begin//写握手
+                        // wready <= 1'b0;//接收地址后不再准备
+                        if(addr_valid) begin
+                            case(wstrb_reg)
+                                4'b0001: pmem_write(awaddr_reg,wdata_reg,1);//sb
+                                4'b0011: pmem_write(awaddr_reg,wdata_reg,2);//sh
+                                4'b1111: pmem_write(awaddr_reg,wdata_reg,4);//sw
+                                default: pmem_write(awaddr_reg,wdata_reg,4);
+                            endcase
+                            bresp <= `OKAY;
+                        end
+                        else begin
+                            bresp <= `SLVERR;
+                        end
+                        bvalid <= 1'b1;
+                        next_sram_state <= WRITE_RESP;
+                    end
+                    else begin
+                        next_sram_state <= WRITE_DATA;
+                    end
+                end
+                WRITE_RESP: begin
+                    if(bvalid && bready) begin
+                        // wready <= 1'b1;
+                        awready <= 1'b1;
+                        bvalid <= 1'b0;
                         next_sram_state <= IDLE;
+                    end
+                    else begin
+                        next_sram_state <= WRITE_RESP;
                     end
                 end
                 default: begin
@@ -112,57 +171,18 @@ module mem_sram #(
         end
     end
 
-    // always @(*) begin
-    //     case(sram_state)
-    //         IDLE: begin
-    //             if(arvalid && arready) begin
-    //                 next_sram_state = READ_ADDR;
-    //             end
-    //             else if(wvalid && wready) begin
-    //                 next_sram_state = WRITE;
-    //             end
-    //             else begin
-    //                 next_sram_state = IDLE;
-    //             end
-    //         end
-
-    //         READ_ADDR: begin
-    //             if(delay_counter > 0) begin
-    //                 next_sram_state = READ_ADDR;
-    //             end
-    //             else begin
-    //                 next_sram_state = READ_DATA;
-    //             end
-    //         end
-
-    //         READ_DATA: begin
-    //             if(rready) begin
-    //                 next_sram_state = IDLE;
-    //             end
-    //             else begin
-    //                 next_sram_state = READ_DATA;
-    //             end
-    //         end
-
-    //         WRITE: begin
-    //             if(delay_counter > 0) begin
-    //                 next_sram_state = WRITE;
-    //             end
-    //             else begin
-    //                 next_sram_state = IDLE;
-    //             end
-    //         end
-
-    //         default: begin
-    //             next_sram_state = IDLE;
-    //         end
-    //     endcase
+    // // 调试日志
+    // always @(posedge clk) begin
+    //     $display("[mem_sram] state=%d, arvalid=%b, arready=%b, rvalid=%b, rready=%b, awvalid=%b, awready=%b, wvalid=%b, wready=%b, bvalid=%b, bready=%b, raddr=0x%h, waddr=0x%h, wstrb=%b,wdata=0x%h",
+    //              sram_state, arvalid, arready, rvalid, rready, awvalid, awready, wvalid, wready, bvalid, bready, araddr_reg, awaddr_reg, wstrb_reg,  wdata_reg);
     // end
-    //调试输出
-    always @(*) begin
-        $display("\033[1m[mem_sram]: state=%d | araddr=%h | araddr_reg=%h | arvalid=%b | arready=%b | rready=%b | rvalid=%b | rdata=%h\033[0m",
-            sram_state, araddr, araddr_reg, arvalid, arready, rready, rvalid,rdata);
-        $display("\033[1m[mem_sram]: waddr=%h | wdata=%h | wmask=%b | wvalid=%b | wready=%b\033[0m",
-            waddr, wdata, wmask, wvalid, wready);
+
+    // 协议断言
+    always @(posedge clk) begin
+        assert(!(arvalid && arready && sram_state != IDLE)) else $error("[mem_sram] AR channel handshake in wrong state");
+        assert(!(rvalid && rready && sram_state != READ_DATA)) else $error("[mem_sram] R channel handshake in wrong state");
+        assert(!(awvalid && awready && sram_state != IDLE)) else $error("[mem_sram] AW channel handshake in wrong state");
+        assert(!(wvalid && wready && sram_state != WRITE_DATA)) else $error("[mem_sram] W channel handshake in wrong state");
+        assert(!(bvalid && bready && sram_state != WRITE_RESP)) else $error("[mem_sram] B channel handshake in wrong state");
     end
 endmodule
