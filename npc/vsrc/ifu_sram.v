@@ -96,6 +96,7 @@ module ifu_sram #(
                     rvalid  <= 1'b0;
                     delay_counter <= 2'b10;
                     if(arvalid && arready) begin//读握手
+                        // rvalid <= 1'b0;
                         araddr_reg <= araddr;
                         // arready <= 1'b0;//接收地址后不再准备
                         next_sram_state = READ_ADDR;
@@ -111,7 +112,7 @@ module ifu_sram #(
                     end
                     else begin
                         if(addr_valid) begin
-                            // arready <= 1'b0;//?
+                            arready <= 1'b0;
                             rdata_reg <= pmem_read(araddr_reg, 4);
                             rresp <= `OKAY;
                         end
@@ -125,8 +126,9 @@ module ifu_sram #(
                 READ_DATA:begin
                     rvalid <= 1'b1;
                     arready <= 1'b0;
+                    rdata <= rdata_reg;
                     if(rready && rvalid) begin
-                        rdata <= rdata_reg;
+                        // rdata <= rdata_reg;
                         rresp <= `OKAY; //OKAY
                         next_sram_state = IDLE;
                     end
@@ -136,7 +138,7 @@ module ifu_sram #(
                 end
                 default: begin
                     arready <= 1'b1;
-                    rvalid <= 1'b0;
+                    // rvalid <= 1'b0;
                     araddr_reg <= 32'h0;
                     rdata_reg <= 32'h0;
                     next_sram_state = IDLE;
@@ -146,12 +148,12 @@ module ifu_sram #(
     end
     
 
-    // 调试日志
-    always @(posedge clk) begin
-        $display("[ifu_sram] state=%d, arvalid=%b, arready=%b, rvalid=%b, rready=%b, araddr=0x%h, rdata=0x%h, rresp=0x%b",
-                 sram_state, arvalid, arready, rvalid, rready, araddr_reg, rdata, rresp);
-        $display("[ifu_sram] rdata_reg=0x%h, rdata=0x%h",rdata_reg,rdata);
-    end
+    // // 调试日志
+    // always @(posedge clk) begin
+    //     $display("[ifu_sram] state=%d, arvalid=%b, arready=%b, rvalid=%b, rready=%b, araddr=0x%h, rdata=0x%h, rresp=0x%b",
+    //              sram_state, arvalid, arready, rvalid, rready, araddr_reg, rdata, rresp);
+    //     $display("[ifu_sram] rdata_reg=0x%h, rdata=0x%h",rdata_reg,rdata);
+    // end
 
     // 协议断言
     always @(posedge clk) begin

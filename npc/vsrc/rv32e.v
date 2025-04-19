@@ -212,13 +212,13 @@ module rv32e (
 
     always @(*) begin
         if(if_access_fault) begin
-            $display("[IF]:IF access fault at address: %h", if_fault_addr);
+            $display("\033[31m[IF]:IF access fault at address: %h\033[0m", if_fault_addr);
         end
         if(load_access_fault) begin
-            $display("[MEM]:Load access fault at address: %h", mem_fault_addr);
+            $display("\033[31m[MEM]:Load access fault at address: %h\033[0m", mem_fault_addr);
         end
         if(store_access_fault) begin
-            $display("[MEM]:Store access fault at address: %h", mem_fault_addr);
+            $display("\033[31m[MEM]:Store access fault at address: %h\033[0m", mem_fault_addr);
         end
     end 
 endmodule

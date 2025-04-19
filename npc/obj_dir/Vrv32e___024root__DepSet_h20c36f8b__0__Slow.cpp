@@ -133,15 +133,15 @@ VL_ATTR_COLD void Vrv32e___024root___stl_sequent__TOP__0(Vrv32e___024root* vlSel
            | ((0x80000000U <= vlSelf->rv32e__DOT__mem_stage__DOT__sram_awaddr) 
               & (0x8fffffffU >= vlSelf->rv32e__DOT__mem_stage__DOT__sram_awaddr)));
     if (VL_UNLIKELY(vlSelf->rv32e__DOT__if_access_fault)) {
-        VL_WRITEF("[IF]:IF access fault at address: %x\n",
+        VL_WRITEF("\033[31m[IF]:IF access fault at address: %x\033[0m\n",
                   32,vlSelf->rv32e__DOT__if_fault_addr);
     }
     if (VL_UNLIKELY(vlSelf->rv32e__DOT__load_access_fault)) {
-        VL_WRITEF("[MEM]:Load access fault at address: %x\n",
+        VL_WRITEF("\033[31m[MEM]:Load access fault at address: %x\033[0m\n",
                   32,vlSelf->rv32e__DOT__mem_fault_addr);
     }
     if (VL_UNLIKELY(vlSelf->rv32e__DOT__store_access_fault)) {
-        VL_WRITEF("[MEM]:Store access fault at address: %x\n",
+        VL_WRITEF("\033[31m[MEM]:Store access fault at address: %x\033[0m\n",
                   32,vlSelf->rv32e__DOT__mem_fault_addr);
     }
     vlSelf->rv32e__DOT__branch_target = ((IData)(vlSelf->rv32e__DOT__is_jalr)
@@ -164,7 +164,6 @@ VL_ATTR_COLD void Vrv32e___024root___eval_stl(Vrv32e___024root* vlSelf) {
     // Body
     if (vlSelf->__VstlTriggered.at(0U)) {
         Vrv32e___024root___stl_sequent__TOP__0(vlSelf);
-        vlSelf->__Vm_traceActivity[2U] = 1U;
         vlSelf->__Vm_traceActivity[1U] = 1U;
         vlSelf->__Vm_traceActivity[0U] = 1U;
     }
@@ -182,9 +181,6 @@ VL_ATTR_COLD void Vrv32e___024root___dump_triggers__act(Vrv32e___024root* vlSelf
     if (vlSelf->__VactTriggered.at(0U)) {
         VL_DBG_MSGF("         'act' region trigger index 0 is active: @(posedge clk or posedge reset)\n");
     }
-    if (vlSelf->__VactTriggered.at(1U)) {
-        VL_DBG_MSGF("         'act' region trigger index 1 is active: @(posedge clk)\n");
-    }
 }
 #endif  // VL_DEBUG
 
@@ -199,9 +195,6 @@ VL_ATTR_COLD void Vrv32e___024root___dump_triggers__nba(Vrv32e___024root* vlSelf
     }
     if (vlSelf->__VnbaTriggered.at(0U)) {
         VL_DBG_MSGF("         'nba' region trigger index 0 is active: @(posedge clk or posedge reset)\n");
-    }
-    if (vlSelf->__VnbaTriggered.at(1U)) {
-        VL_DBG_MSGF("         'nba' region trigger index 1 is active: @(posedge clk)\n");
     }
 }
 #endif  // VL_DEBUG
@@ -343,19 +336,9 @@ VL_ATTR_COLD void Vrv32e___024root___ctor_var_reset(Vrv32e___024root* vlSelf) {
         vlSelf->rv32e__DOT__wb_stage__DOT__regs[__Vi0] = VL_RAND_RESET_I(32);
     }
     vlSelf->rv32e__DOT__wb_stage__DOT__unnamedblk1__DOT__i = VL_RAND_RESET_I(32);
-    vlSelf->__Vdly__rv32e__DOT__pc = VL_RAND_RESET_I(32);
-    vlSelf->__Vdly__rv32e__DOT__if_stage__DOT__sram_araddr = VL_RAND_RESET_I(32);
-    vlSelf->__Vdly__rv32e__DOT__if_stage__DOT__delay_counter = VL_RAND_RESET_I(2);
-    vlSelf->__Vdly__rv32e__DOT__if_stage__DOT__sram_arvalid = VL_RAND_RESET_I(1);
-    vlSelf->__Vdly__rv32e__DOT__if_stage__DOT__sram_rready = VL_RAND_RESET_I(1);
-    vlSelf->__Vdly__rv32e__DOT__if_stage__DOT__sram_arready = VL_RAND_RESET_I(1);
-    vlSelf->__Vdly__rv32e__DOT__if_stage__DOT__sram_rvalid = VL_RAND_RESET_I(1);
-    vlSelf->__Vdly__rv32e__DOT__if_stage__DOT__ifu_sram_inst__DOT__delay_counter = VL_RAND_RESET_I(2);
-    vlSelf->__Vdly__rv32e__DOT__if_stage__DOT__ifu_sram_inst__DOT__araddr_reg = VL_RAND_RESET_I(32);
-    vlSelf->__Vdly__rv32e__DOT__if_stage__DOT__ifu_sram_inst__DOT__rdata_reg = VL_RAND_RESET_I(32);
     vlSelf->__Vtrigrprev__TOP__clk = VL_RAND_RESET_I(1);
     vlSelf->__Vtrigrprev__TOP__reset = VL_RAND_RESET_I(1);
-    for (int __Vi0 = 0; __Vi0 < 3; ++__Vi0) {
+    for (int __Vi0 = 0; __Vi0 < 2; ++__Vi0) {
         vlSelf->__Vm_traceActivity[__Vi0] = 0;
     }
 }

@@ -87,7 +87,6 @@ module IF (
             sram_arvalid <= 1'b1;
 
             sram_rready <= 1'b1;
-            sram_araddr <= 32'h0;
             if_access_fault <= 1'b0;
             if_fault_addr <= 32'h0;
         end 
@@ -171,7 +170,7 @@ module IF (
                     if_ready <= 1'b0;
                     if_valid <= 1'b1;
                     sram_arvalid <= 1'b0;
-                    sram_rready <= 1'b0;
+                    // sram_rready <= 1'b0;
                     // next_state = id_ready ? IDLE : STALL;
                     if(id_ready) begin
                         next_state = IDLE;
@@ -191,11 +190,12 @@ module IF (
         end
     end
     
-    // 调试日志
-    always @(posedge clk) begin
-        $display("[IF] state=%d, pc=0x%h, instr=0x%h, arvalid=%b, arready=%b, rvalid=%b, rready=%b, if_valid=%b, if_ready=%b, wb_valid=%b, id_ready=%b",
-                 state, pc, instr, sram_arvalid, sram_arready, sram_rvalid, sram_rready, if_valid, if_ready, wb_valid, id_ready);
-    end
+    // // 调试日志
+    // always @(posedge clk) begin
+    //     $display("\033[31m[IF] PC=0x%h\033[0m",pc);
+    //     $display("[IF] state=%d, pc=0x%h, instr=0x%h, arvalid=%b, arready=%b, rvalid=%b, rready=%b, if_valid=%b, if_ready=%b, wb_valid=%b, id_ready=%b",
+    //              state, pc, instr, sram_arvalid, sram_arready, sram_rvalid, sram_rready, if_valid, if_ready, wb_valid, id_ready);
+    // end
 
     // 协议断言
     always @(posedge clk) begin

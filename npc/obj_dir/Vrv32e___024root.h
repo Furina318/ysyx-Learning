@@ -93,12 +93,6 @@ class Vrv32e___024root final : public VerilatedModule {
         CData/*0:0*/ rv32e__DOT__wb_stage__DOT__RegWrite_wb;
         CData/*4:0*/ rv32e__DOT__wb_stage__DOT__rd_wb;
         CData/*4:0*/ rv32e__DOT__wb_stage__DOT__rd_wb_pre;
-        CData/*1:0*/ __Vdly__rv32e__DOT__if_stage__DOT__delay_counter;
-        CData/*0:0*/ __Vdly__rv32e__DOT__if_stage__DOT__sram_arvalid;
-        CData/*0:0*/ __Vdly__rv32e__DOT__if_stage__DOT__sram_rready;
-        CData/*0:0*/ __Vdly__rv32e__DOT__if_stage__DOT__sram_arready;
-        CData/*0:0*/ __Vdly__rv32e__DOT__if_stage__DOT__sram_rvalid;
-        CData/*1:0*/ __Vdly__rv32e__DOT__if_stage__DOT__ifu_sram_inst__DOT__delay_counter;
         CData/*0:0*/ __Vtrigrprev__TOP__clk;
         CData/*0:0*/ __Vtrigrprev__TOP__reset;
         CData/*0:0*/ __VactContinue;
@@ -145,30 +139,26 @@ class Vrv32e___024root final : public VerilatedModule {
         IData/*31:0*/ rv32e__DOT__mem_stage__DOT__sram_araddr;
         IData/*31:0*/ rv32e__DOT__mem_stage__DOT__sram_rdata;
         IData/*31:0*/ rv32e__DOT__mem_stage__DOT__sram_awaddr;
-    };
-    struct {
         IData/*31:0*/ rv32e__DOT__mem_stage__DOT__sram_wdata;
         IData/*31:0*/ rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__sram_state;
         IData/*31:0*/ rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__next_sram_state;
         IData/*31:0*/ rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__araddr_reg;
         IData/*31:0*/ rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__awaddr_reg;
         IData/*31:0*/ rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__rdata_reg;
+    };
+    struct {
         IData/*31:0*/ rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__wdata_reg;
         IData/*31:0*/ rv32e__DOT__wb_stage__DOT__state;
         IData/*31:0*/ rv32e__DOT__wb_stage__DOT__next_state;
         IData/*31:0*/ rv32e__DOT__wb_stage__DOT__unnamedblk1__DOT__i;
-        IData/*31:0*/ __Vdly__rv32e__DOT__pc;
-        IData/*31:0*/ __Vdly__rv32e__DOT__if_stage__DOT__sram_araddr;
-        IData/*31:0*/ __Vdly__rv32e__DOT__if_stage__DOT__ifu_sram_inst__DOT__araddr_reg;
-        IData/*31:0*/ __Vdly__rv32e__DOT__if_stage__DOT__ifu_sram_inst__DOT__rdata_reg;
         IData/*31:0*/ __VstlIterCount;
         IData/*31:0*/ __VactIterCount;
         VlUnpacked<IData/*31:0*/, 32> rv32e__DOT__wb_stage__DOT__regs;
-        VlUnpacked<CData/*0:0*/, 3> __Vm_traceActivity;
+        VlUnpacked<CData/*0:0*/, 2> __Vm_traceActivity;
     };
     VlTriggerVec<1> __VstlTriggered;
-    VlTriggerVec<2> __VactTriggered;
-    VlTriggerVec<2> __VnbaTriggered;
+    VlTriggerVec<1> __VactTriggered;
+    VlTriggerVec<1> __VnbaTriggered;
 
     // INTERNAL VARIABLES
     Vrv32e__Syms* const vlSymsp;
