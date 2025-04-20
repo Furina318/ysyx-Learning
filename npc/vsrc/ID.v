@@ -248,7 +248,7 @@ module ID (
                             `INST_TYPE_E: begin
                                 if(instr_reg==`INST_EBREAK) begin
                                     ebreak(`HIT_TRAP,instr_reg);
-                                    $display("ebreak instruction");
+                                    // $display("ebreak instruction");
                                 end
                             end
 

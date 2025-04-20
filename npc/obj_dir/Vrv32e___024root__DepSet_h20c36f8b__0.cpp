@@ -478,11 +478,8 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__0(Vrv32e___024root* vlSe
                                 Vrv32e___024root____Vdpiimwrap_rv32e__DOT__id_stage__DOT__ebreak_TOP(2U, vlSelf->rv32e__DOT__id_stage__DOT__instr_reg);
                                 VL_WRITEF("\033[32m[ID] : Unknow instruction with inst = %x\033[0m\n",
                                           32,vlSelf->rv32e__DOT__id_stage__DOT__instr_reg);
-                            } else if (VL_UNLIKELY(
-                                                   (0x100073U 
-                                                    == vlSelf->rv32e__DOT__id_stage__DOT__instr_reg))) {
+                            } else if ((0x100073U == vlSelf->rv32e__DOT__id_stage__DOT__instr_reg)) {
                                 Vrv32e___024root____Vdpiimwrap_rv32e__DOT__id_stage__DOT__ebreak_TOP(1U, vlSelf->rv32e__DOT__id_stage__DOT__instr_reg);
-                                VL_WRITEF("ebreak instruction\n");
                             }
                         } else if ((2U & (IData)(vlSelf->rv32e__DOT__id_stage__DOT__get_opcode))) {
                             if (VL_LIKELY((1U & (IData)(vlSelf->rv32e__DOT__id_stage__DOT__get_opcode)))) {
