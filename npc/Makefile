@@ -36,6 +36,7 @@ NPC_EXEC = $(BINARY) $(ARGS) $(IMG)
 
 ifdef mainargs
 ASFLAGS += -DBIN_PATH=\"$(mainargs)\"
+@echo "$(mainargs)"
 endif
 # 伪目标：运行 GTKWave 查看波形
 .PHONY: gtkw
