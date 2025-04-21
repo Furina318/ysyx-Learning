@@ -164,8 +164,6 @@ VL_ATTR_COLD void Vrv32e___024root___eval_stl(Vrv32e___024root* vlSelf) {
     // Body
     if (vlSelf->__VstlTriggered.at(0U)) {
         Vrv32e___024root___stl_sequent__TOP__0(vlSelf);
-        vlSelf->__Vm_traceActivity[1U] = 1U;
-        vlSelf->__Vm_traceActivity[0U] = 1U;
     }
 }
 
@@ -214,7 +212,6 @@ VL_ATTR_COLD void Vrv32e___024root___ctor_var_reset(Vrv32e___024root* vlSelf) {
     vlSelf->rv32e__DOT__id_ready = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__if_access_fault = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__if_fault_addr = VL_RAND_RESET_I(32);
-    vlSelf->rv32e__DOT__trap_pc = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__opcode = VL_RAND_RESET_I(7);
     vlSelf->rv32e__DOT__rs1 = VL_RAND_RESET_I(5);
     vlSelf->rv32e__DOT__rs2 = VL_RAND_RESET_I(5);
@@ -229,8 +226,6 @@ VL_ATTR_COLD void Vrv32e___024root___ctor_var_reset(Vrv32e___024root* vlSelf) {
     vlSelf->rv32e__DOT__MemLen = VL_RAND_RESET_I(2);
     vlSelf->rv32e__DOT__id_valid = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__ex_ready = VL_RAND_RESET_I(1);
-    vlSelf->rv32e__DOT__reg_valid = VL_RAND_RESET_I(1);
-    vlSelf->rv32e__DOT__reg_ready = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__rs1_val = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__rs2_val = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__alu_result = VL_RAND_RESET_I(32);
@@ -251,21 +246,11 @@ VL_ATTR_COLD void Vrv32e___024root___ctor_var_reset(Vrv32e___024root* vlSelf) {
     vlSelf->rv32e__DOT__is_jalr = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__take_branch = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__branch_target = VL_RAND_RESET_I(32);
-    vlSelf->rv32e__DOT__rd_wb = VL_RAND_RESET_I(5);
-    vlSelf->rv32e__DOT__RegWrite_wb = VL_RAND_RESET_I(1);
-    vlSelf->rv32e__DOT__wb_MemRead = VL_RAND_RESET_I(1);
-    vlSelf->rv32e__DOT__wb_MemWrite = VL_RAND_RESET_I(1);
-    vlSelf->rv32e__DOT__wb_MemLen = VL_RAND_RESET_I(2);
-    vlSelf->rv32e__DOT__wb_addr = VL_RAND_RESET_I(32);
-    vlSelf->rv32e__DOT__wb_data_in = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT____Vcellinp__if_stage__pc_src = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT____Vcellinp__mem_stage__addr = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__if_stage__DOT__state = 0;
     vlSelf->rv32e__DOT__if_stage__DOT__next_state = 0;
     vlSelf->rv32e__DOT__if_stage__DOT__delay_counter = VL_RAND_RESET_I(2);
-    vlSelf->rv32e__DOT__if_stage__DOT__ren = VL_RAND_RESET_I(1);
-    vlSelf->rv32e__DOT__if_stage__DOT__get_instr = VL_RAND_RESET_I(32);
-    vlSelf->rv32e__DOT__if_stage__DOT__rresp = VL_RAND_RESET_I(2);
     vlSelf->rv32e__DOT__if_stage__DOT__sram_araddr = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__if_stage__DOT__sram_arvalid = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__if_stage__DOT__sram_arready = VL_RAND_RESET_I(1);
@@ -273,12 +258,6 @@ VL_ATTR_COLD void Vrv32e___024root___ctor_var_reset(Vrv32e___024root* vlSelf) {
     vlSelf->rv32e__DOT__if_stage__DOT__sram_rvalid = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__if_stage__DOT__sram_rready = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__if_stage__DOT__sram_rresp = VL_RAND_RESET_I(2);
-    vlSelf->rv32e__DOT__if_stage__DOT__sram_awaddr = VL_RAND_RESET_I(32);
-    vlSelf->rv32e__DOT__if_stage__DOT__sram_awvalid = VL_RAND_RESET_I(1);
-    vlSelf->rv32e__DOT__if_stage__DOT__sram_wdata = VL_RAND_RESET_I(32);
-    vlSelf->rv32e__DOT__if_stage__DOT__sram_wstrb = VL_RAND_RESET_I(4);
-    vlSelf->rv32e__DOT__if_stage__DOT__sram_wvalid = VL_RAND_RESET_I(1);
-    vlSelf->rv32e__DOT__if_stage__DOT__sram_bready = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__if_stage__DOT__ifu_sram_inst__DOT__sram_state = 0;
     vlSelf->rv32e__DOT__if_stage__DOT__ifu_sram_inst__DOT__next_sram_state = 0;
     vlSelf->rv32e__DOT__if_stage__DOT__ifu_sram_inst__DOT__araddr_reg = VL_RAND_RESET_I(32);
@@ -299,7 +278,6 @@ VL_ATTR_COLD void Vrv32e___024root___ctor_var_reset(Vrv32e___024root* vlSelf) {
     vlSelf->rv32e__DOT__ex_stage__DOT__delay = VL_RAND_RESET_I(2);
     vlSelf->rv32e__DOT__mem_stage__DOT__state = 0;
     vlSelf->rv32e__DOT__mem_stage__DOT__next_state = 0;
-    vlSelf->rv32e__DOT__mem_stage__DOT__delay = VL_RAND_RESET_I(2);
     vlSelf->rv32e__DOT__mem_stage__DOT__sram_araddr = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__mem_stage__DOT__sram_arvalid = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__mem_stage__DOT__sram_arready = VL_RAND_RESET_I(1);
@@ -335,10 +313,6 @@ VL_ATTR_COLD void Vrv32e___024root___ctor_var_reset(Vrv32e___024root* vlSelf) {
     for (int __Vi0 = 0; __Vi0 < 32; ++__Vi0) {
         vlSelf->rv32e__DOT__wb_stage__DOT__regs[__Vi0] = VL_RAND_RESET_I(32);
     }
-    vlSelf->rv32e__DOT__wb_stage__DOT__unnamedblk1__DOT__i = VL_RAND_RESET_I(32);
     vlSelf->__Vtrigrprev__TOP__clk = VL_RAND_RESET_I(1);
     vlSelf->__Vtrigrprev__TOP__reset = VL_RAND_RESET_I(1);
-    for (int __Vi0 = 0; __Vi0 < 2; ++__Vi0) {
-        vlSelf->__Vm_traceActivity[__Vi0] = 0;
-    }
 }

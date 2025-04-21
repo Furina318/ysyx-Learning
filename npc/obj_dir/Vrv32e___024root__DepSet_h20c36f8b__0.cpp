@@ -164,7 +164,6 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__0(Vrv32e___024root* vlSe
     __Vdlyvset__rv32e__DOT__wb_stage__DOT__regs__v0 = 0U;
     __Vdlyvset__rv32e__DOT__wb_stage__DOT__regs__v32 = 0U;
     if (vlSelf->reset) {
-        vlSelf->rv32e__DOT__wb_stage__DOT__unnamedblk1__DOT__i = 0x20U;
         vlSelf->rv32e__DOT__ex_stage__DOT__state = 0U;
         vlSelf->rv32e__DOT__ex_stage__DOT__delay = 1U;
         vlSelf->rv32e__DOT__ex_ready = 1U;
@@ -879,7 +878,6 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__0(Vrv32e___024root* vlSe
                                     ? 0U : vlSelf->rv32e__DOT__wb_stage__DOT__regs
                                    [vlSelf->rv32e__DOT__rs1]);
     if (vlSelf->reset) {
-        vlSelf->rv32e__DOT__mem_stage__DOT__delay = 3U;
         vlSelf->rv32e__DOT__if_stage__DOT__state = 1U;
         vlSelf->rv32e__DOT__if_stage__DOT__next_state = 1U;
         __Vdly__rv32e__DOT__pc = 0x80000000U;
@@ -1399,7 +1397,6 @@ void Vrv32e___024root___eval_nba(Vrv32e___024root* vlSelf) {
     // Body
     if (vlSelf->__VnbaTriggered.at(0U)) {
         Vrv32e___024root___nba_sequent__TOP__0(vlSelf);
-        vlSelf->__Vm_traceActivity[1U] = 1U;
     }
 }
 
