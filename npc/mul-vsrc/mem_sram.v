@@ -46,8 +46,17 @@ module mem_sram #(
 
     //检查地址是否有效
     always @(*) begin
-        addr_valid = (araddr >= 32'h8000_0000 && araddr <= 32'h8fff_ffff) ||
-                    (awaddr >= 32'h8000_0000 && awaddr <= 32'h8fff_ffff); 
+        if(`DEVICE) begin
+            addr_valid = (araddr >= 32'h8000_0000 && araddr <= 32'h8fff_ffff) ||
+                    (awaddr >= 32'h8000_0000 && awaddr <= 32'h8fff_ffff) ||
+                    (araddr >= 32'h1000_0000 && araddr <= 32'h1000_0007) ||
+                    (awaddr >= 32'h1000_0000 && awaddr <= 32'h1000_0007) ||
+                    (awaddr >= 32'h1000_2000 && awaddr <= 32'h1000_2007);
+        end
+        else begin
+            addr_valid = (araddr >= 32'h8000_0000 && araddr <= 32'h8fff_ffff) ||
+                    (awaddr >= 32'h8000_0000 && awaddr <= 32'h8fff_ffff);
+        end
     end
     
     always @(posedge clk or posedge reset) begin

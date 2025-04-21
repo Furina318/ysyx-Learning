@@ -67,6 +67,3 @@
 `define Mem_Half   2'b01
 `define Mem_UHalf  2'b11
 `define Mem_Bit    2'b00
-
-`define OKAY    2'b00
-`define SLVERR  2'b10

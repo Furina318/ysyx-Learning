@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "Vrv32e.h"
+// #include "verilated_vcd_c.h"
 #include "../obj_dir/Vrv32e___024root.h"
 #include "Vrv32e__Dpi.h"
 #include "svdpi.h"
@@ -25,6 +26,7 @@ extern word_t pmem_r(paddr_t addr, int len);
 extern void pmem_w(paddr_t addr, int len, word_t data);
 
 /* **************** */
+// VerilatedVcdC *tfp = new VerilatedVcdC(); // 导出vcd波形
 Vrv32e *top = new Vrv32e("top");
 vluint64_t main_time = 0; // 仿真时间
 
@@ -33,7 +35,7 @@ extern "C" void ebreak(int station, int inst) {
         if (Verilated::gotFinish())
             return;
 
-        npc_state.halt_ret = top->rootp->rv32e__DOT__wb_stage__DOT__regs[10]; // a0
+        npc_state.halt_ret = top->rootp->rv32e__DOT__regfile__DOT__regs[10]; // a0
         npc_state.halt_pc = top->rootp->rv32e__DOT__pc;
 
         switch (station) {
@@ -78,6 +80,7 @@ void single_cycle(void) {
         }
 
         top->eval(); // 执行仿真
+        // tfp->dump(main_time); // 记录波形
         main_time++; // 推进仿真时间
     }
 }
@@ -90,11 +93,17 @@ void reset(void) {
 }
 
 void init_verilator(void) {
+    // Verilated::traceEverOn(true); // 启用波形跟踪
+
+    // top->trace(tfp, 0);
+    // tfp->open("wave.vcd"); // 打开波形文件
+
     reset(); // 执行复位
 }
 
 void die(){
     top->final();
+    // tfp->close();
     delete top;
     Verilated::gotFinish(true);
 }
@@ -111,6 +120,7 @@ int main(int argc, char *argv[]) {
 
     /* End the simulation */
     top->final();
+    // tfp->close();
     delete top;
 
     return is_exit_status_bad();

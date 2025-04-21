@@ -19,14 +19,14 @@ BINARY = ./obj_dir/V$(MODULE)
 
 # DIFFTEST 配置（如果启用）
 # CONFIG_DIFFTEST = 1
-ifdef CONFIG_DIFFTEST
+# ifdef CONFIG_DIFFTEST
 DIFF_REF_PATH = /home/furina/ysyx-workbench/nemu/build
 DIFF_REF_SO = $(DIFF_REF_PATH)/riscv32-nemu-interpreter-so
 ARGS_DIFF = --diff=$(DIFF_REF_SO)
 
 $(DIFF_REF_SO):
 	$(MAKE) -s -C $(DIFF_REF_PATH)
-endif
+# endif
 
 # 参数设置
 IMG ?=  # 可由 AM Makefile (npc.mk) 设置
@@ -38,6 +38,34 @@ ifdef mainargs
 ASFLAGS += -DBIN_PATH=\"$(mainargs)\"
 # @echo "### Get mainargs ###"
 endif
+
+
+# # 伪目标：运行 GTKWave 查看波形
+# .PHONY: gtkw
+# gtkw: uae.gtkw
+# 	@echo
+# 	@echo "### WAVES ###"
+# 	gtkwave uae.gtkw
+
+# # 伪目标：仿真
+# .PHONY: sim
+# sim: wave.vcd
+
+# # 伪目标：查看波形
+# .PHONY: waves
+# waves: wave.vcd
+# 	@echo
+# 	@echo "### WAVES ###"
+# 	gtkwave wave.vcd
+
+# #生成波形文件
+# .PHONY: wave.vcd
+# wave.vcd: $(BINARY)
+# 	@echo
+# 	@echo "### SIMULATING ###"
+# 	@$(BINARY) #+verilator+rand+reset+2
+
+
 
 # 伪目标：运行环境准备
 .PHONY: run-env
@@ -71,6 +99,7 @@ verilate: .stamp.verilate
 .stamp.verilate: $(VSRCS) $(CSRCS)
 	@echo
 	@echo "### VERILATING ###"
+#	verilator -Wno-STMTDLY -Wno-MODDUP --trace --top-module $(MODULE) -cc $(VSRCS) --exe $(CSRCS) -I$(INC_PATH) $(CFLAGS)
 	verilator -Wno-STMTDLY -Wno-MODDUP --top-module $(MODULE) -cc $(VSRCS) --exe $(CSRCS) -I$(INC_PATH) $(CFLAGS)
 	@echo "LIBS += $(LIBS)" >> ./obj_dir/V$(MODULE).mk    # 添加链接库
 	@echo "CXXFLAGS += -I$(INC_PATH)" >> ./obj_dir/V$(MODULE).mk  # 添加包含路径
@@ -86,4 +115,9 @@ lint: $(MODULE).v
 clean:
 	rm -rf .stamp.*
 	rm -rf ./obj_dir
+#	rm -rf wave.vcd
 	rm -rf ./log/*
+
+# .PHONY: wave
+# wave:
+# 	gtkwave wave.vcd
