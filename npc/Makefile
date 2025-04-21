@@ -56,7 +56,7 @@ waves: wave.vcd
 	@echo "### WAVES ###"
 	gtkwave wave.vcd
 
-# 生成波形文件
+#生成波形文件
 .PHONY: wave.vcd
 wave.vcd: $(BINARY)
 	@echo
