@@ -20,12 +20,12 @@ BINARY = ./obj_dir/V$(MODULE)
 # DIFFTEST 配置（如果启用）
 # CONFIG_DIFFTEST = 1
 # ifdef CONFIG_DIFFTEST
-DIFF_REF_PATH = /home/furina/ysyx-workbench/nemu/build
-DIFF_REF_SO = $(DIFF_REF_PATH)/riscv32-nemu-interpreter-so
-ARGS_DIFF = --diff=$(DIFF_REF_SO)
+# DIFF_REF_PATH = /home/furina/ysyx-workbench/nemu/build
+# DIFF_REF_SO = $(DIFF_REF_PATH)/riscv32-nemu-interpreter-so
+# ARGS_DIFF = --diff=$(DIFF_REF_SO)
 
-$(DIFF_REF_SO):
-	$(MAKE) -s -C $(DIFF_REF_PATH)
+# $(DIFF_REF_SO):
+# 	$(MAKE) -s -C $(DIFF_REF_PATH)
 # endif
 
 # 参数设置

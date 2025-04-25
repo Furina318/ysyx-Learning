@@ -9,6 +9,7 @@
 #include "../obj_dir/Vrv32e___024root.h"
 #include "svdpi.h"
 #include "verilated_vcd_c.h"
+// #include "../include/reg.h"
 
 /********extern functions or variables********/
 
@@ -195,7 +196,7 @@ static void execute_once() {
 
     PCSet.next_pc = top->rootp->rv32e__DOT__pc;
     PCSet.ninst = top->rootp->rv32e__DOT__instr;
-    // printf("next-pc=0x%08x | next-inst=0x%08x\n",PCSet.next_pc,PCSet.ninst);
+    // printf("next_pc=0x%08x | next_inst=0x%08x\n\n",PCSet.next_pc,PCSet.ninst);
 
 #ifdef CONFIG_ITRACE
     char *p = logbuf;
@@ -213,8 +214,15 @@ static void trace_and_difftest(){
   if(g_print_step){
     IFDEF(CONFIG_ITRACE,puts(logbuf));
   }
-  //difftest
-  IFDEF(CONFIG_DIFFTEST,difftest_step(PCSet.pc,PCSet.next_pc));
+  #ifdef CONFIG_DIFFTEST
+  if(top->rootp->rv32e__DOT__wb_valid){
+    // printf("pc=0x%08x | inst=0x%08x\n",PCSet.pc,PCSet.inst);
+    // printf("next_pc=0x%08x | next_inst=0x%08x\n\n",PCSet.next_pc,PCSet.ninst);
+    difftest_step(PCSet.pc,PCSet.next_pc);
+  }
+  // IFDEF(CONFIG_DIFFTEST,difftest_step(PCSet.pc,PCSet.next_pc));
+  #endif
+  
 }
 
 static void execute(uint64_t n) {
@@ -260,6 +268,7 @@ void cpu_exec(uint64_t n) {
                 (npc_state.halt_ret == 0 ? ANSI_FMT("HIT GOOD TRAP", ANSI_FG_GREEN) :
                                            ANSI_FMT("HIT BAD TRAP", ANSI_FG_RED))),
                 npc_state.halt_pc);
+                // regs_display();
                 // die();
         case NPC_QUIT:
             statistic();

@@ -44,6 +44,7 @@
 `define F3_LW    3'b010
 `define F3_LH    3'b001
 `define F3_LBU   3'b100
+`define F3_LB    3'b000
 `define F3_SW    3'b010
 `define F3_SH    3'b001
 `define F3_SB    3'b000
@@ -63,7 +64,14 @@
 `define ALU_SRL    4'b1001//srl,srli
 
 //Mem字节选取
-`define Mem_Word   2'b10
-`define Mem_Half   2'b01
-`define Mem_UHalf  2'b11
-`define Mem_Bit    2'b00
+`define Mem_Word   3'b010
+`define Mem_Half   3'b001
+`define Mem_UHalf  3'b011
+`define Mem_UBit   3'b000
+`define Mem_Bit    3'b100
+
+`define OKAY    2'b00
+`define SLVERR  2'b10
+
+//Device
+`define DEVICE 1'b1

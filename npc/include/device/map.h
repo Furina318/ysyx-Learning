@@ -2,6 +2,7 @@
 #define __DEVICE_MAP_H__
 
 #include "../common.h"
+#include "../difftest.h"
 
 typedef void(*io_callback_t)(uint32_t, int, bool);
 uint8_t* new_space(int size);
@@ -23,7 +24,8 @@ static inline int find_mapid_by_addr(IOMap *maps, int size, paddr_t addr) {
   int i;
   for (i = 0; i < size; i ++) {
     if (map_inside(maps + i, addr)) {
-      //difftest_skip_ref();
+      // difftest_skip_ref();
+      IFDEF(CONFIG_DIFFTEST,difftest_skip_ref());
       return i;
     }
   }

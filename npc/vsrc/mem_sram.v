@@ -66,7 +66,7 @@ module mem_sram #(
             rvalid <= 1'b0;
             wready <= 1'b0;
             rdata <= 32'h0;
-            delay_counter <= 2'b10;
+            delay_counter <= 2'b00;
             araddr_reg <= 32'h0;
             rdata_reg <= 32'h0;
             rresp <= `OKAY;

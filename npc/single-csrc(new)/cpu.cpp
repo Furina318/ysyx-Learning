@@ -184,6 +184,7 @@ static void statistic() {
 static void execute_once() {
     PCSet.pc = top->rootp->rv32e__DOT__pc;
     PCSet.inst = top->rootp->rv32e__DOT__instr;
+    // printf("pc=0x%08x | inst=0x%08x\n",PCSet.pc,PCSet.inst);
 
     single_cycle();
     single_cycle(); // 执行一个时钟周期
@@ -194,6 +195,7 @@ static void execute_once() {
 
     PCSet.next_pc = top->rootp->rv32e__DOT__pc;
     PCSet.ninst = top->rootp->rv32e__DOT__instr;
+    // printf("next-pc=0x%08x | next-inst=0x%08x\n",PCSet.next_pc,PCSet.ninst);
 
 #ifdef CONFIG_ITRACE
     char *p = logbuf;
@@ -213,12 +215,6 @@ static void trace_and_difftest(){
   }
   //difftest
   IFDEF(CONFIG_DIFFTEST,difftest_step(PCSet.pc,PCSet.next_pc));
-  #ifdef CONFIG_DIFFTEST
-    if(main_time>=start_time && !once){
-      ref_difftest_regcpy(&cpu, DIFFTEST_TO_REF);
-      once = ture;
-    }
-  #endif
 }
 
 static void execute(uint64_t n) {

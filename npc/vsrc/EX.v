@@ -15,16 +15,12 @@ module EX (
     output reg        alu_zero,
     output reg        alu_less
 );
-    typedef enum { IDLE, BUSY, STALL } state_t;
+    typedef enum { IDLE, STALL } state_t;
     state_t state, next_state;
-    parameter DELAY_CYCLES = 1;//处理周期
-    reg [1:0] delay;
-    //状态机定义(IDLE等待上游valid信号, BUSY处理, STALL等待下游ready信号)
 
     always @(posedge clk or posedge reset) begin
         if (reset) begin
             state = IDLE;
-            delay = DELAY_CYCLES;
             ex_ready = 1'b1;
             ex_valid = 1'b0;
             alu_result = 32'b0;
@@ -36,15 +32,11 @@ module EX (
                 IDLE: begin
                     ex_ready = 1'b1;
                     ex_valid = 1'b0;
-                    delay = DELAY_CYCLES;
-                    next_state = id_valid ? BUSY : IDLE;
-                end
-                BUSY: begin
-                    ex_ready = 1'b0;
-                    ex_valid = 1'b0;
-                    if (delay > 0) begin//处于工作状态
+                    if(id_valid) begin
+                        ex_ready = 1'b0;
+                        ex_valid = 1'b0;
                         case (alu_op)
-                            `ALU_ADD:  alu_result = rs1_val + ((opcode[6:2] == `INST_TYPE_R || opcode[6:2] == `INST_TYPE_B) ? rs2_val : imm);
+                             `ALU_ADD:  alu_result = rs1_val + ((opcode[6:2] == `INST_TYPE_R || opcode[6:2] == `INST_TYPE_B) ? rs2_val : imm);
                             `ALU_SUB:  alu_result = rs1_val - ((opcode[6:2] == `INST_TYPE_R || opcode[6:2] == `INST_TYPE_B) ? rs2_val : imm);
                             `ALU_AND:  alu_result = rs1_val & ((opcode[6:2] == `INST_TYPE_R || opcode[6:2] == `INST_TYPE_B) ? rs2_val : imm);
                             `ALU_OR:   alu_result = rs1_val | ((opcode[6:2] == `INST_TYPE_R || opcode[6:2] == `INST_TYPE_B) ? rs2_val : imm);
@@ -57,10 +49,16 @@ module EX (
                             default:   alu_result = 32'b0;
                         endcase
                         alu_zero = (alu_result == 32'b0);
-                        alu_less = ($signed(rs1_val) < $signed((opcode[6:2] == `INST_TYPE_R || opcode[6:2] == `INST_TYPE_B) ? rs2_val : imm));
-                        delay = delay - 1;
+                        case(alu_op)
+                            `ALU_SLT:  alu_less = ($signed(rs1_val) < $signed((opcode[6:2] == `INST_TYPE_R || opcode[6:2] == `INST_TYPE_B) ? rs2_val : imm));
+                             `ALU_SLTU: alu_less = (rs1_val < rs2_val);
+                            default:   alu_less = ($signed(rs1_val) < $signed((opcode[6:2] == `INST_TYPE_R || opcode[6:2] == `INST_TYPE_B) ? rs2_val : imm));
+                        endcase
+                        next_state = mem_ready ? STALL : IDLE;
                     end
-                    next_state = (delay == 0) ? STALL : BUSY;
+                    else begin
+                        next_state = IDLE;
+                    end
                 end
                 STALL: begin
                     ex_ready = 1'b0;
@@ -75,4 +73,5 @@ module EX (
             endcase
         end
     end
+    
 endmodule

@@ -8,7 +8,7 @@ extern Vrv32e *top;
 /*********************************************/
 
 
-#define gpr top->rootp->rv32e__DOT__wb_stage__DOT__regs
+#define gpr top->rootp->rv32e__DOT__regfile__DOT__regs
 
 static const char *regs[] = {
     "$0", "ra", "sp", "gp", "tp", "t0", "t1", "t2",
@@ -19,6 +19,7 @@ static const char *regs[] = {
 
 void regs_display() 
 {
+    printf("[npc]:\n");
     _Log(ANSI_FG_RED "RegName  Hex_Value       Dec_Value\n" ANSI_NONE);
     for(int i = 0; i < 32; i++)
     {
