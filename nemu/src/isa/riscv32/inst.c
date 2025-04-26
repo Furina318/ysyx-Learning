@@ -56,7 +56,7 @@ static void decode_operand(Decode *s, int *rd, word_t *src1, word_t *src2, word_
   }
 }
 
-#define ECALL(dnpc) {IFDEF(CONFIG_E_TRACE,printf("\033[32m[ecall]: dnpc = 0x%08x\n\033[0m",isa_raise_intr(isa_reg_str2val("a7"),s->pc))); dnpc = (isa_raise_intr(isa_reg_str2val("a7"),s->pc));}
+#define ECALL(dnpc) {IFDEF(CONFIG_E_TRACE,printf("\033[32m[ecall]: dnpc = 0x%08x\033[0m\n",isa_raise_intr(isa_reg_str2val("a7"),s->pc))); dnpc = (isa_raise_intr(isa_reg_str2val("a7"),s->pc));}
 
 static int decode_exec(Decode *s) {
   s->dnpc = s->snpc;
@@ -73,7 +73,7 @@ static int decode_exec(Decode *s) {
   INSTPAT("??????? ????? ????? 001 ????? 11100 11", csrrw  , I, R(rd)=C(imm);C(imm)=src1);
   INSTPAT("??????? ????? ????? 010 ????? 11100 11", csrrs  , I, R(rd)=C(imm);C(imm)|=src1);
   INSTPAT("0000000 00000 00000 000 00000 11100 11", ecall  , I, ECALL(s->dnpc));
-  INSTPAT("0011000 00010 00000 000 00000 11100 11", mret   , R, IFDEF(CONFIG_E_TRACE, printf("[mret]: dnpc = 0x%08x\n", s->dnpc)); s->dnpc = C(MEPC));
+  INSTPAT("0011000 00010 00000 000 00000 11100 11", mret   , R, IFDEF(CONFIG_E_TRACE, printf("\033[32m[mret]: dnpc = 0x%08x\033[0m\n", s->dnpc)); s->dnpc = C(MEPC));
 
   INSTPAT("??????? ????? ????? ??? ????? 11011 11", jal    , J, R(rd)=s->pc+4;s->dnpc=s->pc+imm);//jal指令中是当前pc值加上符号位拓展的offset，而dnpc已经指向下一条指令，所以需要减去4。
 
