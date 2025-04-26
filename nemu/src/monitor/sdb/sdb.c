@@ -81,6 +81,8 @@ static int cmd_info(char *args){
     }
     if(strcmp(arg,"r")==0){
       isa_reg_display();//打印寄存器，文件在isa/risv32/reg.c中
+    }else if(strcmp(arg,"c")==0){
+      isa_csr_display();
     }else if(strcmp(arg,"w")==0){
       char *wp_state="turn off";
 #ifdef CONFIG_WATCHPOINTS
@@ -294,7 +296,7 @@ static struct {
 
   /* TODO: Add more commands */
   { "si", "Let the program excute N instuctions and then suspend the excution(while the N is not given,the default value is 1)", cmd_si},
-  { "info", "Print register status with\"r\",or print the monitor status with \"w\" ",cmd_info},
+  { "info", "Print register/csr status with\"r or c\",or print the monitor status with \"w\" ",cmd_info},
   { "x", "Scan N pieces of memory base on 'EXPR' ",cmd_x},
   { "p", "Find the value of the expression 'EXPR' ",cmd_p},
   { "w", "Set watchpoint on 'EXPR',the programme will stop when it change",cmd_w},
