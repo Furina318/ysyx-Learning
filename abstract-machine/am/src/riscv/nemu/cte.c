@@ -46,7 +46,12 @@ void yield() {
   asm volatile("li a7, -1; ecall");
 #endif
 }
-
+// 整个 yield 操作的流程如下：​
+// 应用程序调用 yield()，触发 ecall 指令。
+// NEMU 模拟器识别 ecall，保存上下文，并跳转到异常处理程序。
+// AM 层的异常处理程序构造事件，并调用用户注册的事件处理器。
+// 事件处理器根据事件类型执行相应操作，如任务切换。
+// 恢复上下文，执行 mret 指令，返回用户程序
 bool ienabled() {
   return false;
 }
