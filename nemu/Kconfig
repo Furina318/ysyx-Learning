@@ -149,7 +149,7 @@ config MEMORY_TRACE
   default n
 
 config E_TRACE
-  depends on TRACE
+  # depends on TRACE
   bool "Enable exception trace"
   default n
 
