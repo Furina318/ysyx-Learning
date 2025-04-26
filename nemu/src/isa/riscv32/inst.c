@@ -60,8 +60,10 @@ static void decode_operand(Decode *s, int *rd, word_t *src1, word_t *src2, word_
 
 static int decode_exec(Decode *s) {
   s->dnpc = s->snpc;
+
   int zimm = BITS(s->isa.inst, 19, 15);
 	uint32_t csri = BITS(s->isa.inst, 31, 20);
+  
 #define INSTPAT_INST(s) ((s)->isa.inst)
 #define INSTPAT_MATCH(s, name, type, ... /* execute body */ ) { \
   int rd = 0; \
