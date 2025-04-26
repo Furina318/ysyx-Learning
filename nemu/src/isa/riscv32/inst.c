@@ -67,7 +67,7 @@ static vaddr_t *csr_register(word_t imm){
 }
 
 #define CSR(i) *csr_register(i)
-#define ECALL(dnpc) {dnpc=(isa_raise_intr(isa_reg_str2val("a7"),s->pc));}
+#define ECALL(dnpc) {printf("ECALL: dnpc=0x%08x\n",isa_raise_intr(isa_reg_str2val("a7"),s->pc));dnpc=(isa_raise_intr(isa_reg_str2val("a7"),s->pc));}
 
 static int decode_exec(Decode *s) {
   s->dnpc = s->snpc;
