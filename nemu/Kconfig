@@ -148,6 +148,11 @@ config MEMORY_TRACE
   bool "Enable memory trace"
   default n
 
+config E_TRACE
+  depends on TRACE
+  bool "Enable exception trace"
+  default n
+
 config DEVICE_TRACE
   depends on TRACE
   bool "Enable device trace(depend on TRACE)"
