@@ -68,7 +68,7 @@ static vaddr_t *csr_register(word_t imm){
 }
 
 #define CSR(i) *csr_register(i)
-#define ECALL(dnpc) {dnpc=(isa_raise_intr(isa_reg_str2val("a7"),s->pc));}
+#define ECALL(dnpc) {printf("ECALL: dnpc=0x%08x\n",isa_raise_intr(isa_reg_str2val("a7"),s->pc));dnpc=(isa_raise_intr(isa_reg_str2val("a7"),s->pc));}
 
 static int decode_exec(Decode *s) {
   s->dnpc = s->snpc;
@@ -85,7 +85,7 @@ static int decode_exec(Decode *s) {
   INSTPAT("??????? ????? ????? 001 ????? 11100 11", csrrw  , I, R(rd)=CSR(imm);CSR(imm)=src1);
   INSTPAT("??????? ????? ????? 010 ????? 11100 11", csrrs  , I, R(rd)=CSR(imm);CSR(imm)|=src1);
   INSTPAT("0000000 00000 00000 000 00000 11100 11", ecall  , I, ECALL(s->dnpc));
-  INSTPAT("0011000 00010 00000 000 00000 11100 11", mret   , R, s->dnpc = CSR(MEPC));
+  INSTPAT("0011000 00010 00000 000 00000 11100 11", mret   , R, printf("MRET: dnpc = 0x%08x\n", s->dnpc); s->dnpc = CSR(MEPC));
 
   INSTPAT("??????? ????? ????? 000 ????? 00100 11", li     , I, R(rd)=src1+imm);
   INSTPAT("??????? ????? ????? 000 ????? 00100 11", addi   , I, R(rd)=src1+SEXT(imm,12));//mv拓展为addi rd, rs1, 0 
