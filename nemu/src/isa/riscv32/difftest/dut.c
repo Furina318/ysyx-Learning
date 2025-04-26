@@ -23,6 +23,9 @@ const char *regs_sorted[] = {
   "a6", "a7", "s2", "s3", "s4", "s5", "s6", "s7",
   "s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6"
 };
+const char *csrs_sorted[] = {
+  "mcause", "mepc", "mstatus", "mtvec" 
+};
 bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc) {
   if (cpu.pc != ref_r->pc) {
     printf("PC mismatch: NEMU = 0x%x, REF = 0x%x\n", cpu.pc, ref_r->pc);
@@ -36,6 +39,27 @@ bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc) {
       nemu_state.state = NEMU_ABORT;
       return false;
     }
+  }
+  //检查CSR
+  if(cpu.csr.mcause != ref_r->csr.mcause){
+    printf("%s mismatch: NEMU = 0x%x, REF = 0x%x\n", csrs_sorted[0], cpu.csr.mcause, ref_r->csr.mcause);
+    nemu_state.state = NEMU_ABORT;
+    return false;
+  }
+  if(cpu.csr.mepc != ref_r->csr.mepc){
+    printf("%s mismatch: NEMU = 0x%x, REF = 0x%x\n", csrs_sorted[1], cpu.csr.mepc, ref_r->csr.mepc);
+    nemu_state.state = NEMU_ABORT;
+    return false;
+  }
+  if(cpu.csr.mstatus != ref_r->csr.mstatus){
+    printf("%s mismatch: NEMU = 0x%x, REF = 0x%x\n", csrs_sorted[2], cpu.csr.mstatus, ref_r->csr.mstatus);
+    nemu_state.state = NEMU_ABORT;
+    return false;
+  }
+  if(cpu.csr.mtvec != ref_r->csr.mtvec){
+    printf("%s mismatch: NEMU = 0x%x, REF = 0x%x\n", csrs_sorted[3], cpu.csr.mtvec, ref_r->csr.mtvec);
+    nemu_state.state = NEMU_ABORT;
+    return false;
   }
   return true;
 }
