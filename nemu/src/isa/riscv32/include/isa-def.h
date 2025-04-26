@@ -25,16 +25,17 @@ typedef struct{
   word_t mtvec;//存放异常向量表地址
 }riscv32_CSRs;
 
-typedef struct{
-  word_t gpr[32];
+// typedef struct{
+//   word_t gpr[32];
+//   vaddr_t pc;
+//   riscv32_CSRs csr;
+// }riscv32_CPU_state;
+
+typedef struct {
+  word_t gpr[MUXDEF(CONFIG_RVE, 16, 32)];
   vaddr_t pc;
   riscv32_CSRs csr;
-}riscv32_CPU_state;
-
-// typedef struct {
-//   word_t gpr[MUXDEF(CONFIG_RVE, 16, 32)];
-//   vaddr_t pc;
-// } MUXDEF(CONFIG_RV64, riscv64_CPU_state, riscv32_CPU_state);
+} MUXDEF(CONFIG_RV64, riscv64_CPU_state, riscv32_CPU_state);
 
 // decode
 typedef struct {
