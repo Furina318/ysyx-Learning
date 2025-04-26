@@ -9,7 +9,7 @@ Context* __am_irq_handle(Context *c) {
     Event ev = {0};
     // printf("%d\n",c->mcause);
     switch (c->mcause) {
-      case -1:  ev.event = EVENT_YIELD; c->mepc += 4;break;
+      case -1:  ev.event = EVENT_YIELD; break;
       default: ev.event = EVENT_ERROR; break;
     }
     //user_handler是一个函数指针，指向一个函数，该函数接受一个Event类型的参数和一个Context类型的参数，并返回一个Context类型的指针.
