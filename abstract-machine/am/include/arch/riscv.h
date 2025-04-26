@@ -16,7 +16,6 @@ struct Context {
   uintptr_t gpr[NR_REGS]; // general purpose registers
   uintptr_t mcause,mstatus,mepc;
   void *pdir; // page directory
-  // uintptr_t np;
 };
 
 #ifdef __riscv_e
