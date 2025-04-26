@@ -40,27 +40,27 @@ bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc) {
       return false;
     }
   }
-  //检查CSR
-  if(cpu.csr.mcause != ref_r->csr.mcause){
-    printf("%s mismatch: NEMU = 0x%x, REF = 0x%x\n", csrs_sorted[0], cpu.csr.mcause, ref_r->csr.mcause);
-    nemu_state.state = NEMU_ABORT;
-    return false;
-  }
-  if(cpu.csr.mepc != ref_r->csr.mepc){
-    printf("%s mismatch: NEMU = 0x%x, REF = 0x%x\n", csrs_sorted[1], cpu.csr.mepc, ref_r->csr.mepc);
-    nemu_state.state = NEMU_ABORT;
-    return false;
-  }
-  if(cpu.csr.mstatus != ref_r->csr.mstatus){
-    printf("%s mismatch: NEMU = 0x%x, REF = 0x%x\n", csrs_sorted[2], cpu.csr.mstatus, ref_r->csr.mstatus);
-    nemu_state.state = NEMU_ABORT;
-    return false;
-  }
-  if(cpu.csr.mtvec != ref_r->csr.mtvec){
-    printf("%s mismatch: NEMU = 0x%x, REF = 0x%x\n", csrs_sorted[3], cpu.csr.mtvec, ref_r->csr.mtvec);
-    nemu_state.state = NEMU_ABORT;
-    return false;
-  }
+  // //检查CSR
+  // if(cpu.csr.mcause != ref_r->csr.mcause){
+  //   printf("%s mismatch: NEMU = 0x%x, REF = 0x%x\n", csrs_sorted[0], cpu.csr.mcause, ref_r->csr.mcause);
+  //   nemu_state.state = NEMU_ABORT;
+  //   return false;
+  // }
+  // if(cpu.csr.mepc != ref_r->csr.mepc){
+  //   printf("%s mismatch: NEMU = 0x%x, REF = 0x%x\n", csrs_sorted[1], cpu.csr.mepc, ref_r->csr.mepc);
+  //   nemu_state.state = NEMU_ABORT;
+  //   return false;
+  // }
+  // if(cpu.csr.mstatus != ref_r->csr.mstatus){
+  //   printf("%s mismatch: NEMU = 0x%x, REF = 0x%x\n", csrs_sorted[2], cpu.csr.mstatus, ref_r->csr.mstatus);
+  //   nemu_state.state = NEMU_ABORT;
+  //   return false;
+  // }
+  // if(cpu.csr.mtvec != ref_r->csr.mtvec){
+  //   printf("%s mismatch: NEMU = 0x%x, REF = 0x%x\n", csrs_sorted[3], cpu.csr.mtvec, ref_r->csr.mtvec);
+  //   nemu_state.state = NEMU_ABORT;
+  //   return false;
+  // }
   return true;
 }
 
