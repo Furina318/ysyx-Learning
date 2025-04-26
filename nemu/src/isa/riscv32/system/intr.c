@@ -19,7 +19,7 @@ word_t isa_raise_intr(word_t NO, vaddr_t epc) {
   /* TODO: Trigger an interrupt/exception with ``NO''.
    * Then return the address of the interrupt/exception vector.
    */
-  // if(NO == -1) epc += 4;//NO代表异常原因，0表示自陷。epc代表触发异常的指令地址，最后返回异常入口地址
+  if(NO == -1) epc += 4;//NO代表异常原因，0表示自陷。epc代表触发异常的指令地址，最后返回异常入口地址
 
   cpu.csr.mcause = NO;
   cpu.csr.mepc = epc;
