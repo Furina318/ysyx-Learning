@@ -416,6 +416,8 @@ static void statistic() {
 
 void assert_fail_msg() {
   isa_reg_display();
+  puts("");
+  isa_csr_display();
   statistic();
 }
 
