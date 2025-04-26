@@ -38,11 +38,6 @@ void isa_reg_display() {
   }
 
   _Log(ANSI_FG_YELLOW "$%s\t " ANSI_NONE "0x%08x\t %010u\n","pc",cpu.pc,cpu.pc);
-  
-  for(i=0; i<sizeof(csrs)/sizeof(csrs[0]); i++){
-    _Log(ANSI_FG_YELLOW "$%s\t " ANSI_NONE, regs[i]);
-    _Log("0x%08x\t %010u\n", cpu.gpr[i], cpu.gpr[i]);
-  }
 }
 
 word_t isa_reg_str2val(const char *s) {
@@ -53,4 +48,20 @@ word_t isa_reg_str2val(const char *s) {
     }
   }
   return 0;
+}
+
+void isa_csr_display() {
+  _Log(ANSI_FG_RED "CsrName  Hex_Value       Dec_Value\n" ANSI_NONE);
+
+  _Log(ANSI_FG_YELLOW "$%s\t " ANSI_NONE, csrs[0]);
+  _Log("0x%08x\t %010u\n", cpu.csr.mcause, cpu.csr.mcause);
+
+  _Log(ANSI_FG_YELLOW "$%s\t " ANSI_NONE, csrs[1]);
+  _Log("0x%08x\t %010u\n", cpu.csr.mepc, cpu.csr.mepc);
+
+  _Log(ANSI_FG_YELLOW "$%s\t " ANSI_NONE, csrs[2]);
+  _Log("0x%08x\t %010u\n", cpu.csr.mstatus, cpu.csr.mstatus);
+
+  _Log(ANSI_FG_YELLOW "$%s\t " ANSI_NONE, csrs[3]);
+  _Log("0x%08x\t %010u\n", cpu.csr.mtvec, cpu.csr.mtvec);
 }
