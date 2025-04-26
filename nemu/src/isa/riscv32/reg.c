@@ -47,11 +47,11 @@ void isa_reg_display() {
   _Log(ANSI_FG_YELLOW "$%s\t " ANSI_NONE, csrs[1]);
   _Log("0x%08x\t %010u\n", cpu.csr.mepc, cpu.csr.mepc);
 
-  _Log(ANSI_FG_YELLOW "$%s\t " ANSI_NONE, csrs[2]);
-  _Log("0x%08x\t %010u\n", cpu.csr.mstatus, cpu.csr.mstatus);
-
   _Log(ANSI_FG_YELLOW "$%s\t " ANSI_NONE, csrs[3]);
   _Log("0x%08x\t %010u\n", cpu.csr.mtvec, cpu.csr.mtvec);
+
+  _Log(ANSI_FG_YELLOW "$%s\t " ANSI_NONE, csrs[2]);
+  _Log("0x%08x\t %010u\n", cpu.csr.mstatus, cpu.csr.mstatus);
 }
 
 word_t isa_reg_str2val(const char *s) {
