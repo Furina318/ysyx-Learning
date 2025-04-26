@@ -24,14 +24,25 @@ const char *regs[] = {
   "s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6"
 };
 
+const char *csrs[] = {
+  "mcause", "mepc", "mstatus", "mtvec" 
+};
+
 void isa_reg_display() {
   static int i;
   _Log(ANSI_FG_RED "RegName  Hex_Value       Dec_Value\n" ANSI_NONE);
-  for(i=0;i<sizeof(regs)/sizeof(regs[0]);i++){
+
+  for(i=0; i<sizeof(regs)/sizeof(regs[0]); i++){
     _Log(ANSI_FG_YELLOW "$%s\t " ANSI_NONE, regs[i]);
     _Log("0x%08x\t %010u\n", cpu.gpr[i], cpu.gpr[i]);
   }
+
   _Log(ANSI_FG_YELLOW "$%s\t " ANSI_NONE "0x%08x\t %010u\n","pc",cpu.pc,cpu.pc);
+  
+  for(i=0; i<sizeof(regs)/sizeof(regs[0]); i++){
+    _Log(ANSI_FG_YELLOW "$%s\t " ANSI_NONE, regs[i]);
+    _Log("0x%08x\t %010u\n", cpu.gpr[i], cpu.gpr[i]);
+  }
 }
 
 word_t isa_reg_str2val(const char *s) {
