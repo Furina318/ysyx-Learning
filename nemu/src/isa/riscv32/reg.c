@@ -39,7 +39,7 @@ void isa_reg_display() {
 
   _Log(ANSI_FG_YELLOW "$%s\t " ANSI_NONE "0x%08x\t %010u\n","pc",cpu.pc,cpu.pc);
   
-  for(i=0; i<sizeof(regs)/sizeof(regs[0]); i++){
+  for(i=0; i<sizeof(csrs)/sizeof(csrs[0]); i++){
     _Log(ANSI_FG_YELLOW "$%s\t " ANSI_NONE, regs[i]);
     _Log("0x%08x\t %010u\n", cpu.gpr[i], cpu.gpr[i]);
   }
