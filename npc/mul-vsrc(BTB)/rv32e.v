@@ -38,6 +38,11 @@ module rv32e (
     wire         if_access_fault;
     wire [31:0]  if_fault_addr;
     wire [31:0]  trap_pc;
+    wire         predict_taken;
+    wire [31:0]  predict_target;
+    wire         flush;
+    wire [31:0]  actual_target;
+    wire [1:0]   ghr;
     //===== ID =====//
     wire [6:0]   opcode;
     wire [4:0]   rs1, rs2, rd;
@@ -78,6 +83,22 @@ module rv32e (
     wire         is_jal, is_jalr;
     wire         take_branch;
     wire [31:0]  branch_target;
+
+    // 分支预测统计
+    wire [31:0]  branch_total;   // 总分支次数
+    wire [31:0]  branch_correct; // 预测正确次数
+    wire [1:0]   ghr_update;
+
+    reg [1:0] ghr_reg;
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            ghr_reg <= 2'b00;
+        end
+        else if(wb_valid) begin
+            ghr_reg <= ghr_update;
+        end
+    end
+    assign ghr = ghr_reg;
     // assign branch_target=is_jalr ? jalr_target : jal_target;
     
     wire [4:0]   rd_wb;
@@ -100,7 +121,12 @@ module rv32e (
         .if_valid(if_valid),
         .id_ready(id_ready),
         .if_access_fault(if_access_fault),
-        .if_fault_addr(if_fault_addr)
+        .if_fault_addr(if_fault_addr),
+        .flush(flush),
+        .actual_target(actual_target),
+        .predict_taken(predict_taken),
+        .predict_target(predict_target),
+        .ghr(ghr)
     );
 
     // 译码模块
@@ -124,7 +150,9 @@ module rv32e (
         .MemWrite(MemWrite),
         .MemRead(MemRead),
         .alu_op(alu_op),
-        .MemLen(MemLen)
+        .MemLen(MemLen),
+        .branch_total(branch_total),
+        .branch_correct(branch_correct)
     );
     
     EX ex_stage(
@@ -193,7 +221,15 @@ module rv32e (
         .take_branch(take_branch),
         .jal_target(jal_target),
         .jalr_target(jalr_target),
-        .wb_data(wb_data)
+        .wb_data(wb_data),
+
+        .predict_taken(predict_taken),
+        .flush(flush),
+        .actual_target(actual_target),
+        .branch_total(branch_total),
+        .branch_correct(branch_correct),
+        .ghr(ghr),
+        .ghr_update(ghr_update)
     );
     assign branch_target = is_jalr ? jalr_target : jal_target;
 

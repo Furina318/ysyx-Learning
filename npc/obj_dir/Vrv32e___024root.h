@@ -22,8 +22,6 @@ class Vrv32e___024root final : public VerilatedModule {
         CData/*0:0*/ rv32e__DOT__if_valid;
         CData/*0:0*/ rv32e__DOT__id_ready;
         CData/*0:0*/ rv32e__DOT__if_access_fault;
-        CData/*0:0*/ rv32e__DOT__predict_taken;
-        CData/*0:0*/ rv32e__DOT__flush;
         CData/*6:0*/ rv32e__DOT__opcode;
         CData/*4:0*/ rv32e__DOT__rs1;
         CData/*4:0*/ rv32e__DOT__rs2;
@@ -48,8 +46,6 @@ class Vrv32e___024root final : public VerilatedModule {
         CData/*0:0*/ rv32e__DOT__is_jal;
         CData/*0:0*/ rv32e__DOT__is_jalr;
         CData/*0:0*/ rv32e__DOT__take_branch;
-        CData/*1:0*/ rv32e__DOT__ghr_update;
-        CData/*1:0*/ rv32e__DOT__ghr_reg;
         CData/*0:0*/ rv32e__DOT____Vcellinp__if_stage__pc_src;
         CData/*0:0*/ rv32e__DOT__if_stage__DOT__sram_arvalid;
         CData/*0:0*/ rv32e__DOT__if_stage__DOT__sram_arready;
@@ -79,14 +75,12 @@ class Vrv32e___024root final : public VerilatedModule {
         CData/*4:0*/ rv32e__DOT__wb_stage__DOT__rd_wb_pre;
         CData/*0:0*/ __Vtrigrprev__TOP__clk;
         CData/*0:0*/ __Vtrigrprev__TOP__reset;
-    };
-    struct {
         CData/*0:0*/ __VactContinue;
         IData/*31:0*/ rv32e__DOT__pc;
         IData/*31:0*/ rv32e__DOT__instr;
         IData/*31:0*/ rv32e__DOT__if_fault_addr;
-        IData/*31:0*/ rv32e__DOT__predict_target;
-        IData/*31:0*/ rv32e__DOT__actual_target;
+    };
+    struct {
         IData/*31:0*/ rv32e__DOT__imm;
         IData/*31:0*/ rv32e__DOT__rs1_val;
         IData/*31:0*/ rv32e__DOT__rs2_val;
@@ -97,8 +91,6 @@ class Vrv32e___024root final : public VerilatedModule {
         IData/*31:0*/ rv32e__DOT__jal_target;
         IData/*31:0*/ rv32e__DOT__jalr_target;
         IData/*31:0*/ rv32e__DOT__branch_target;
-        IData/*31:0*/ rv32e__DOT__branch_total;
-        IData/*31:0*/ rv32e__DOT__branch_correct;
         IData/*31:0*/ rv32e__DOT____Vcellinp__mem_stage__addr;
         IData/*31:0*/ rv32e__DOT__if_stage__DOT__state;
         IData/*31:0*/ rv32e__DOT__if_stage__DOT__next_state;
@@ -129,13 +121,7 @@ class Vrv32e___024root final : public VerilatedModule {
         IData/*31:0*/ rv32e__DOT__wb_stage__DOT__next_state;
         IData/*31:0*/ __VstlIterCount;
         IData/*31:0*/ __VactIterCount;
-        QData/*63:0*/ rv32e__DOT__if_stage__DOT__btb_valid;
-        VlUnpacked<IData/*31:0*/, 64> rv32e__DOT__if_stage__DOT__btb_pc;
-        VlUnpacked<IData/*31:0*/, 64> rv32e__DOT__if_stage__DOT__btb_target;
-        VlUnpacked<VlUnpacked<CData/*1:0*/, 4>, 64> rv32e__DOT__if_stage__DOT__pht_counters;
         VlUnpacked<IData/*31:0*/, 32> rv32e__DOT__wb_stage__DOT__regs;
-        VlUnpacked<CData/*1:0*/, 64> rv32e__DOT__wb_stage__DOT__btb_state;
-        VlUnpacked<VlUnpacked<CData/*1:0*/, 4>, 64> rv32e__DOT__wb_stage__DOT__pht_counters;
     };
     VlTriggerVec<1> __VstlTriggered;
     VlTriggerVec<1> __VactTriggered;
