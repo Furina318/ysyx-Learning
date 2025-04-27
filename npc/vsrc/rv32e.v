@@ -129,7 +129,7 @@ module rv32e (
             forwardB = 2'b00; // Use register value
     end
 
-    // Select forwarded values for EX stage
+    // Select forwarded values for EX stage 结构冒险信号
     wire [31:0] ex_rs1_val, ex_rs2_val;
     assign ex_rs1_val = (forwardA == 2'b10) ? ex_mem_alu_result :
                         (forwardA == 2'b01) ? wb_data :
