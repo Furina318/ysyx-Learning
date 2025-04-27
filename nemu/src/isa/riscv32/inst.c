@@ -58,7 +58,6 @@ static void decode_operand(Decode *s, int *rd, word_t *src1, word_t *src2, word_
 
 #define ECALL(dnpc) {IFDEF(CONFIG_E_TRACE,printf("\033[32m[ecall]: dnpc = 0x%08x\033[0m\n",isa_raise_intr(isa_reg_str2val("a7"),s->pc)));\
    dnpc = (isa_raise_intr(11,s->pc));\
-  cpu.csr.mstatus=0x1800;\
 }
 
 static int decode_exec(Decode *s) {
