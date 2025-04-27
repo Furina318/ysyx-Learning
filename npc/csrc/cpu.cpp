@@ -183,8 +183,8 @@ static void statistic() {
 }
 
 static void execute_once() {
-    PCSet.pc = top->rootp->rv32e__DOT__pc;
-    PCSet.inst = top->rootp->rv32e__DOT__instr;
+    PCSet.pc = top->rootp->rv32e__DOT__if_pc;
+    PCSet.inst = top->rootp->rv32e__DOT__if_instr;
     // printf("pc=0x%08x | inst=0x%08x\n",PCSet.pc,PCSet.inst);
 
     single_cycle();
@@ -194,8 +194,8 @@ static void execute_once() {
   ftrace_handle();
 #endif 
 
-    PCSet.next_pc = top->rootp->rv32e__DOT__pc;
-    PCSet.ninst = top->rootp->rv32e__DOT__instr;
+    PCSet.next_pc = top->rootp->rv32e__DOT__if_pc;
+    PCSet.ninst = top->rootp->rv32e__DOT__if_instr;
     // printf("next_pc=0x%08x | next_inst=0x%08x\n\n",PCSet.next_pc,PCSet.ninst);
 
 #ifdef CONFIG_ITRACE

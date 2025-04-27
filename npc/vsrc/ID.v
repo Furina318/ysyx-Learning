@@ -280,4 +280,8 @@ module ID (
             endcase
         end
     end
+
+    always @(posedge clk) begin
+        $display("\033[31m[ID]: state=%d | id_ready=%b | id_valid=%b\033[0m", state, id_ready, id_valid);
+    end
 endmodule

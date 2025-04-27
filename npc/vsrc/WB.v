@@ -110,5 +110,7 @@ module WB (
             endcase
         end
     end
-
+    always @(*) begin
+        $display("\033[34m[WB]: state = %d | wb_ready=%b | wb_valid=%b\033[0m", state, wb_ready, wb_valid);
+    end
 endmodule

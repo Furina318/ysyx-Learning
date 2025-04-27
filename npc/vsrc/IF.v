@@ -158,6 +158,12 @@ module IF (
     end
 
     always @(posedge clk) begin
+        $display("\033[35m[IF] PC=0x%h\033[0m", pc);
+        $display("\033[35m[IF] state=%d | pc=0x%h | instr=0x%h | if_valid=%b | if_ready=%b\033[0m",
+                 state, pc, instr, if_valid, if_ready);
+    end
+
+    always @(posedge clk) begin
         assert(!(sram_arvalid && sram_arready && state != READ_ADDR)) else $error("[IF] AR channel handshake in wrong state");
         assert(!(sram_rvalid && sram_rready && state != READ_DATA)) else $error("[IF] R channel handshake in wrong state");
     end

@@ -61,6 +61,8 @@ void Vrv32e___024root___eval_triggers__act(Vrv32e___024root* vlSelf) {
                                        & (~ (IData)(vlSelf->__Vtrigrprev__TOP__clk))) 
                                       | ((IData)(vlSelf->reset) 
                                          & (~ (IData)(vlSelf->__Vtrigrprev__TOP__reset))));
+    vlSelf->__VactTriggered.at(1U) = ((IData)(vlSelf->clk) 
+                                      & (~ (IData)(vlSelf->__Vtrigrprev__TOP__clk)));
     vlSelf->__Vtrigrprev__TOP__clk = vlSelf->clk;
     vlSelf->__Vtrigrprev__TOP__reset = vlSelf->reset;
 #ifdef VL_DEBUG

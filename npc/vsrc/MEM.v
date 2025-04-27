@@ -261,11 +261,11 @@ module MEM (
         end
     end
 
-    // // 调试日志
-    // always @(posedge clk) begin
-    //     $display("[MEM] state=%d, arvalid=%b, arready=%b, rvalid=%b, rready=%b, awvalid=%b, awready=%b, wvalid=%b, wready=%b, bvalid=%b, bready=%b, mem_valid=%b, wb_ready=%b, ex_valid=%b, addr=0x%h",
-    //              state, sram_arvalid, sram_arready, sram_rvalid, sram_rready, sram_awvalid, sram_awready, sram_wvalid, sram_wready, sram_bvalid, sram_bready, mem_valid, wb_ready, ex_valid, sram_araddr);
-    // end
+    // 调试日志
+    always @(posedge clk) begin
+        $display("\033[33m[MEM] state=%d | addr=0x%h | sram_addr=0x%h | mem_ready=%b | mem_valid=%b\033[0m",
+                 state, addr, sram_araddr, mem_ready, mem_valid);
+    end
 
     // 协议断言
     always @(posedge clk) begin
