@@ -7,24 +7,13 @@ static Context* (*user_handler)(Event, Context*) = NULL;
 Context* __am_irq_handle(Context *c) {
   if (user_handler) {
     Event ev = {0};
-
-		/*
+    // printf("%d\n",c->mcause);
     switch (c->mcause) {
+      case 11:  ev.event = EVENT_YIELD; c->mepc += 4;break;
       default: ev.event = EVENT_ERROR; break;
     }
-		*/
-		if(c->mcause == 11) {
-			if(c->GPR1 == -1) {
-				ev.event = EVENT_YIELD;
-				c->mepc += 4;
-			} else if(c->GPR1 >= 0 && c->GPR1 <= 19) {
-				ev.event = EVENT_SYSCALL;
-				c->mepc += 4;
-			} else {
-				ev.event = EVENT_ERROR;
-				}
-		}
-
+    //user_handler是一个函数指针，指向一个函数，该函数接受一个Event类型的参数和一个Context类型的参数，并返回一个Context类型的指针.
+    //是cte_init函数中注册的异常处理函数
     c = user_handler(ev, c);
     assert(c != NULL);
   }
@@ -49,6 +38,8 @@ bool cte_init(Context*(*handler)(Event, Context*)) {
 Context *kcontext(Area kstack, void (*entry)(void *), void *arg) {
   Context *cp = (Context *)(kstack.end - sizeof(Context *));
   cp->mepc = (uintptr_t)entry;
+	cp->gpr[10] = (uintptr_t)(arg);
+	
   return cp;
 }
 
