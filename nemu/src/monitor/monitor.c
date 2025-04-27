@@ -214,6 +214,8 @@ void init_monitor(int argc, char *argv[]) {
   IFDEF(CONFIG_ITRACE, init_disasm());
   IFDEF(CONFIG_MEMORY_TRACE,init_mtrace());
   IFDEF(CONFIG_DEVICE_TRACE,init_dtrace());
+  IFDEF(CONFIG_BRANCH_Predictor,predictor_init());
+  IFDEF(CONFIG_ITRACE,iringbuf_init());
   /* Display welcome message. */
   welcome();
 }
