@@ -670,6 +670,11 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSe
                     vlSelf->rv32e__DOT__id_MemRead = 1U;
                     vlSelf->rv32e__DOT__id_alu_op = 0U;
                     vlSelf->rv32e__DOT__id_MemLen = 4U;
+                } else if ((0U == vlSelf->rv32e__DOT__if_id_instr)) {
+                    vlSelf->rv32e__DOT__id_imm = 0U;
+                    vlSelf->rv32e__DOT__id_RegWrite = 0U;
+                    vlSelf->rv32e__DOT__id_MemWrite = 0U;
+                    vlSelf->rv32e__DOT__id_MemRead = 0U;
                 }
             } else {
                 vlSelf->rv32e__DOT__id_stage__DOT__next_state = 0U;
@@ -1152,26 +1157,20 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSe
         }
         vlSelf->rv32e__DOT__if_stage__DOT__state = vlSelf->rv32e__DOT__if_stage__DOT__next_state;
         if ((0U == vlSelf->rv32e__DOT__if_stage__DOT__state)) {
+            if (vlSelf->rv32e__DOT____Vcellinp__if_stage__pc_src) {
+                __Vdly__rv32e__DOT__if_pc = vlSelf->rv32e__DOT__branch_target;
+                __Vdly__rv32e__DOT__if_stage__DOT__sram_araddr 
+                    = vlSelf->rv32e__DOT__branch_target;
+            } else {
+                __Vdly__rv32e__DOT__if_pc = ((IData)(4U) 
+                                             + vlSelf->rv32e__DOT__if_pc);
+                __Vdly__rv32e__DOT__if_stage__DOT__sram_araddr 
+                    = ((IData)(4U) + vlSelf->rv32e__DOT__if_pc);
+            }
+            vlSelf->rv32e__DOT__if_stage__DOT__next_state = 1U;
             vlSelf->rv32e__DOT__if_ready = 1U;
             vlSelf->rv32e__DOT__if_valid = 0U;
-            __Vdly__rv32e__DOT__if_stage__DOT__sram_arvalid = 0U;
-            __Vdly__rv32e__DOT__if_stage__DOT__sram_rready = 0U;
-            if (vlSelf->rv32e__DOT__wb_valid) {
-                if (vlSelf->rv32e__DOT____Vcellinp__if_stage__pc_src) {
-                    __Vdly__rv32e__DOT__if_pc = vlSelf->rv32e__DOT__branch_target;
-                    __Vdly__rv32e__DOT__if_stage__DOT__sram_araddr 
-                        = vlSelf->rv32e__DOT__branch_target;
-                } else {
-                    __Vdly__rv32e__DOT__if_pc = ((IData)(4U) 
-                                                 + vlSelf->rv32e__DOT__if_pc);
-                    __Vdly__rv32e__DOT__if_stage__DOT__sram_araddr 
-                        = ((IData)(4U) + vlSelf->rv32e__DOT__if_pc);
-                }
-                vlSelf->rv32e__DOT__if_stage__DOT__next_state = 1U;
-                __Vdly__rv32e__DOT__if_stage__DOT__sram_arvalid = 1U;
-            } else {
-                vlSelf->rv32e__DOT__if_stage__DOT__next_state = 0U;
-            }
+            __Vdly__rv32e__DOT__if_stage__DOT__sram_arvalid = 1U;
         } else if ((1U == vlSelf->rv32e__DOT__if_stage__DOT__state)) {
             vlSelf->rv32e__DOT__if_ready = 0U;
             vlSelf->rv32e__DOT__if_valid = 0U;

@@ -178,6 +178,12 @@ module ID (
 
                                     MemLen = `Mem_Bit;
                                 end
+                                else if(instr == 32'h0000_0000) begin
+                                    imm = 32'h0;
+                                    RegWrite = 1'b0;
+                                    MemWrite = 1'b0;
+                                    MemRead = 1'b0;
+                                end
                             end
 
                             `INST_TYPE_R: begin

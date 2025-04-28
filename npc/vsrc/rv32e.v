@@ -69,6 +69,7 @@ module rv32e (
     reg [31:0] mem_wb_pc;
     reg [31:0] mem_wb_imm;
     reg        mem_wb_valid;
+    
 
     // === Wires for Stage Outputs ===
     // IF 
@@ -141,10 +142,10 @@ module rv32e (
     // === Stall Unit (Load-Use Hazard) === 数据冒险判断
     assign stall = id_ex_MemRead && id_ex_valid &&
                    (id_ex_rd == id_rs1 || id_ex_rd == id_rs2) &&
-                   id_ex_rd != 5'b0;
+                   id_ex_rd != 5'b0;//触发数据冒险后一个周期置0
 
     // === Flush Unit (Control Hazard) === 控制冒险判断
-    assign flush = (wb_is_jal || wb_is_jalr || wb_take_branch) && wb_valid;
+    assign flush = (wb_is_jal || wb_is_jalr || wb_take_branch) && wb_valid;//冲刷信号
 
     // === Module Instantiations ===
     IF if_stage (
@@ -297,13 +298,15 @@ module rv32e (
             mem_wb_pc <= 32'h0;
             mem_wb_imm <= 32'h0;
             mem_wb_valid <= 1'b0;
-        end else begin
+        end 
+        else begin
             // IF/ID 
             if (flush) begin
                 if_id_pc <= 32'h0;
                 if_id_instr <= 32'h0;
                 if_id_valid <= 1'b0;
-            end else if (!stall && if_valid && id_ready) begin
+            end 
+            else if (!stall && if_valid && id_ready) begin//不处于数据冒险+握手
                 if_id_pc <= if_pc;
                 if_id_instr <= if_instr;
                 if_id_valid <= if_valid;
@@ -326,7 +329,8 @@ module rv32e (
                 id_ex_rs1_val <= 32'h0;
                 id_ex_rs2_val <= 32'h0;
                 id_ex_valid <= 1'b0;
-            end else if (id_valid && ex_ready) begin
+            end 
+            else if (id_valid && ex_ready) begin
                 id_ex_opcode <= id_opcode;
                 id_ex_rs1 <= id_rs1;
                 id_ex_rs2 <= id_rs2;

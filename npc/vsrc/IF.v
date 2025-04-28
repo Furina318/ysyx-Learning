@@ -91,18 +91,17 @@ module IF (
                 IDLE: begin
                     if_ready <= 1'b1;
                     if_valid <= 1'b0;
-                    // delay_counter <= 2'b10;
-                    sram_arvalid <= 1'b0;
-                    sram_rready <= 1'b0;
-                    if(wb_valid) begin
+                    // sram_arvalid <= 1'b0;
+                    // sram_rready <= 1'b0;
+                    // if(wb_valid) begin
                         pc <= pc_src ? branch_target : pc + 4; //更新pc
                         sram_araddr <= pc_src ? branch_target : pc + 4;
                         sram_arvalid <= 1'b1;
                         next_state = READ_ADDR;
-                    end
-                    else begin
-                        next_state = IDLE;
-                    end
+                    // end
+                    // else begin
+                    //     next_state = IDLE;
+                    // end
                 end
                 READ_ADDR: begin
                     if_ready <= 1'b0;
