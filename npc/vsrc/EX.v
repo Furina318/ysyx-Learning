@@ -9,6 +9,13 @@ module EX (
     input      [31:0] rs2_val,
     input      [31:0] imm,
     input      [3:0]  alu_op,
+    input      [2:0]  func3,
+    input      [31:0] pc,
+    output reg [31:0] jal_target,
+    output reg [31:0] jalr_target,
+    output reg        is_jal,
+    output reg        is_jalr,
+    output reg        take_branch,
     input             mem_ready,//下游mem是否就绪
     output reg        ex_valid,//ex输出是否有效
     output reg [31:0] alu_result,
@@ -36,7 +43,7 @@ module EX (
                         // ex_ready = 1'b0;
                         // ex_valid = 1'b0;
                         case (alu_op)
-                             `ALU_ADD:  alu_result = rs1_val + ((opcode[6:2] == `INST_TYPE_R || opcode[6:2] == `INST_TYPE_B) ? rs2_val : imm);
+                            `ALU_ADD:  alu_result = rs1_val + ((opcode[6:2] == `INST_TYPE_R || opcode[6:2] == `INST_TYPE_B) ? rs2_val : imm);
                             `ALU_SUB:  alu_result = rs1_val - ((opcode[6:2] == `INST_TYPE_R || opcode[6:2] == `INST_TYPE_B) ? rs2_val : imm);
                             `ALU_AND:  alu_result = rs1_val & ((opcode[6:2] == `INST_TYPE_R || opcode[6:2] == `INST_TYPE_B) ? rs2_val : imm);
                             `ALU_OR:   alu_result = rs1_val | ((opcode[6:2] == `INST_TYPE_R || opcode[6:2] == `INST_TYPE_B) ? rs2_val : imm);
@@ -54,6 +61,19 @@ module EX (
                              `ALU_SLTU: alu_less = (rs1_val < rs2_val);
                             default:   alu_less = ($signed(rs1_val) < $signed((opcode[6:2] == `INST_TYPE_R || opcode[6:2] == `INST_TYPE_B) ? rs2_val : imm));
                         endcase
+
+                        jal_target = pc + imm;
+                        jalr_target = (rs1_val + imm) & ~32'h1;
+                        is_jal = (opcode == `INST_JAL);
+                        is_jalr = (opcode == `INST_JALR) & (func3 == 3'b000);
+                        take_branch = (opcode == `INST_B) && (
+                            (func3 == `F3_BNE && !alu_zero) || // bne
+                            (func3 == `F3_BEQ && alu_zero) ||  // beq
+                            (func3 == `F3_BLT && alu_less) ||  // blt
+                            (func3 == `F3_BGE && !alu_less) || // bge
+                            (func3 == `F3_BLTU && alu_less) || // bltu
+                            (func3 == `F3_BGEU && !alu_less)   // bgeu
+                        );
                         // next_state = mem_ready ? STALL : IDLE;
                         next_state = STALL;
                     end

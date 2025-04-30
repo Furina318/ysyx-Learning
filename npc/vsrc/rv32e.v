@@ -103,6 +103,7 @@ module rv32e (
     wire [2:0]  id_MemLen;
     wire        id_valid, ex_ready;
     wire [31:0] id_rs1_val, id_rs2_val;
+    wire [31:0] rs1_val, rs2_val;
 
     // EX 
     wire [31:0] ex_alu_result;
@@ -132,11 +133,16 @@ module rv32e (
         .rd(mem_wb_rd),          // WB 阶段写口
         .we(mem_wb_RegWrite),    // WB 阶段写使能
         .wd(wb_data),            // WB 阶段写数据
-        .rs1_val(id_rs1_val),    // ID 阶段读出的值
-        .rs2_val(id_rs2_val)     // ID 阶段读出的值
+        .rs1_val(rs1_val),    // ID 阶段读出的值
+        .rs2_val(rs2_val)     // ID 阶段读出的值
     );
+    wire forwordA, forwordB;
+    assign forwordA = (id_rs1 == mem_wb_rd) ? 1'b1 : 1'b0;
+    assign forwordB = (id_rs2 == mem_wb_rd) ? 1'b1 : 1'b0;
+    assign id_rs1_val = forwordA ? wb_data : rs1_val;
+    assign id_rs2_val = forwordB ? wb_data : rs2_val;
 
-    // === Stall Unit (Load-Use Hazard) === 数据冒险判断
+    // = == Stall Unit (Load-Use Hazard) === 数据冒险判断
     assign stall = id_ex_MemRead && id_ex_valid &&
                    (id_ex_rd == id_rs1 || id_ex_rd == id_rs2) &&
                    id_ex_rd != 5'b0;
@@ -192,6 +198,13 @@ module rv32e (
         .rs2_val(id_ex_rs2_val), // Directly use register value
         .imm(id_ex_imm),
         .alu_op(id_ex_alu_op),
+        .func3(id_ex_func3),
+        .pc(id_ex_pc),
+        .jal_target(wb_jal_target),
+        .jalr_target(wb_jalr_target),
+        .is_jal(wb_is_jal),
+        .is_jalr(wb_is_jalr),
+        .take_branch(wb_take_branch),
         .mem_ready(mem_ready),
         .ex_valid(ex_valid),
         .alu_result(ex_alu_result),
@@ -238,11 +251,11 @@ module rv32e (
         // .rs2(mem_wb_rs2),
         .rs1_val(mem_wb_rs1_val),
         .rs2_val(mem_wb_rs2_val),
-        .jal_target(wb_jal_target),
-        .jalr_target(wb_jalr_target),
-        .is_jal(wb_is_jal),
-        .is_jalr(wb_is_jalr),
-        .take_branch(wb_take_branch),
+        // .jal_target(wb_jal_target),
+        // .jalr_target(wb_jalr_target),
+        // .is_jal(wb_is_jal),
+        // .is_jalr(wb_is_jalr),
+        // .take_branch(wb_take_branch),
         .wb_data(wb_data)
     );
 

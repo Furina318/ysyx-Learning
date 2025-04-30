@@ -20,11 +20,11 @@ module WB (
     input       [31:0] rs2_val,
     output reg         wb_ready,
     output reg         wb_valid,
-    output reg [31:0]  jal_target,
-    output reg [31:0]  jalr_target,
-    output reg         is_jal,
-    output reg         is_jalr,
-    output reg         take_branch,
+    // output reg [31:0]  jal_target,
+    // output reg [31:0]  jalr_target,
+    // output reg         is_jal,
+    // output reg         is_jalr,
+    // output reg         take_branch,
     output reg [31:0]  wb_data
 );
     typedef enum {IDLE, STALL} state_t;
@@ -42,11 +42,11 @@ module WB (
             state = STALL;
             wb_ready = 1'b1;
             wb_valid = 1'b1;
-            jal_target = 32'h0;
-            jalr_target = 32'h0;
-            is_jal = 1'b0;
-            is_jalr = 1'b0;
-            take_branch = 1'b0;
+            // jal_target = 32'h0;
+            // jalr_target = 32'h0;
+            // is_jal = 1'b0;
+            // is_jalr = 1'b0;
+            // take_branch = 1'b0;
             wb_data = 32'h0;
 
             // for(integer i = 0; i < 32; i = i + 1) begin
@@ -64,18 +64,18 @@ module WB (
                         // wb_ready = 1'b0;
                         // wb_valid = 1'b0;
                         // 跳转目标计算
-                        jal_target = pc + imm;
-                        jalr_target = (rs1_val + imm) & ~32'h1;
-                        is_jal = (opcode == `INST_JAL);
-                        is_jalr = (opcode == `INST_JALR) & (func3 == 3'b000);
-                        take_branch = (opcode == `INST_B) && (
-                            (func3 == `F3_BNE && !alu_zero) || // bne
-                            (func3 == `F3_BEQ && alu_zero) ||  // beq
-                            (func3 == `F3_BLT && alu_less) ||  // blt
-                            (func3 == `F3_BGE && !alu_less) || // bge
-                            (func3 == `F3_BLTU && alu_less) || // bltu
-                            (func3 == `F3_BGEU && !alu_less)   // bgeu
-                        );
+                        // jal_target = pc + imm;
+                        // jalr_target = (rs1_val + imm) & ~32'h1;
+                        // is_jal = (opcode == `INST_JAL);
+                        // is_jalr = (opcode == `INST_JALR) & (func3 == 3'b000);
+                        // take_branch = (opcode == `INST_B) && (
+                        //     (func3 == `F3_BNE && !alu_zero) || // bne
+                        //     (func3 == `F3_BEQ && alu_zero) ||  // beq
+                        //     (func3 == `F3_BLT && alu_less) ||  // blt
+                        //     (func3 == `F3_BGE && !alu_less) || // bge
+                        //     (func3 == `F3_BLTU && alu_less) || // bltu
+                        //     (func3 == `F3_BGEU && !alu_less)   // bgeu
+                        // );
 
                         // 写回数据选择
                         wb_data = (opcode == `INST_LUI) ? imm :                   // LUI
