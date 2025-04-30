@@ -91,8 +91,8 @@ module IF (
                 IDLE: begin
                     if_ready <= 1'b1;
                     if_valid <= 1'b0;
-                    // sram_arvalid <= 1'b0;
-                    // sram_rready <= 1'b0;
+                    sram_arvalid <= 1'b0;
+                    sram_rready <= 1'b0;
                     // if(wb_valid) begin
                         pc <= pc_src ? branch_target : pc + 4; //更新pc
                         sram_araddr <= pc_src ? branch_target : pc + 4;
@@ -157,9 +157,9 @@ module IF (
     end
 
     always @(posedge clk) begin
-        $display("\033[35m[IF] PC=0x%h\033[0m", pc);
-        $display("\033[35m[IF] state=%d | pc=0x%h | instr=0x%h | if_valid=%b | if_ready=%b\033[0m",
-                 state, pc, instr, if_valid, if_ready);
+        $display("\033[36m[IF] PC = 0x%h | instr = 0x%h\033[0m", pc, instr);
+    //     $display("\033[35m[IF] state=%d | pc=0x%h | instr=0x%h | if_valid=%b | if_ready=%b\033[0m",
+    //              state, pc, instr, if_valid, if_ready);
     end
 
     always @(posedge clk) begin

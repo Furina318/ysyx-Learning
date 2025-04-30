@@ -1,3 +1,4 @@
+`include "/home/furina/ysyx-workbench/npc/vsrc/defines.v"
 /*********************************************************************/
 //                    _ooOoo_
 //                   o8888888o
@@ -23,7 +24,6 @@
 //                    佛祖保佑
 /*********************************************************************/
 
-`include "/home/furina/ysyx-workbench/npc/vsrc/defines.v"
 module rv32e (
     input         clk,
     input         reset
@@ -46,6 +46,7 @@ module rv32e (
     reg [2:0]  id_ex_MemLen;
     reg [31:0] id_ex_rs1_val, id_ex_rs2_val;
     reg        id_ex_valid;
+    reg [31:0] id_ex_pc;
 
     // === EX/MEM 流水线寄存器 ===
     reg [31:0] ex_mem_alu_result;
@@ -56,20 +57,32 @@ module rv32e (
     reg        ex_mem_MemRead;
     reg [2:0]  ex_mem_MemLen;
     reg [4:0]  ex_mem_rd;
+    reg [4:0]  ex_mem_rs1;
+    reg [4:0]  ex_mem_rs2;
+    reg [31:0] ex_mem_rs1_val;
     reg [31:0] ex_mem_rs2_val;
     reg        ex_mem_valid;
+    reg [6:0]  ex_mem_opcode;
+    reg [2:0]  ex_mem_func3;
+    reg [31:0] ex_mem_imm;
+    reg [31:0] ex_mem_pc;
 
     // === MEM/WB 流水线寄存器 ===
+    reg        mem_wb_alu_zero;
+    reg        mem_wb_alu_less;
     reg [31:0] mem_wb_data_out;
     reg [31:0] mem_wb_alu_result;
     reg [6:0]  mem_wb_opcode;
     reg [2:0]  mem_wb_func3;
     reg        mem_wb_RegWrite;
     reg [4:0]  mem_wb_rd;
+    reg [4:0]  mem_wb_rs1;
+    reg [4:0]  mem_wb_rs2;
+    reg [31:0] mem_wb_rs1_val;
+    reg [31:0] mem_wb_rs2_val;
     reg [31:0] mem_wb_pc;
     reg [31:0] mem_wb_imm;
     reg        mem_wb_valid;
-    
 
     // === Wires for Stage Outputs ===
     // IF 
@@ -106,46 +119,30 @@ module rv32e (
     wire [31:0] wb_data, wb_jal_target, wb_jalr_target;
     wire        wb_is_jal, wb_is_jalr, wb_take_branch;
 
-    // =====  冒险信号处理  =====
+    // ===== 冒险信号处理 =====
     wire        stall;          // 数据冒险信号
     wire        flush;          // 控制冒险信号
-    reg [1:0]   forwardA, forwardB; // rs1，rs2结构冒险信号
 
-    // === Forwarding Unit ===
-    always @(*) begin
-        // Forward rs1
-        if (ex_mem_RegWrite && ex_mem_rd != 5'b0 && ex_mem_rd == id_ex_rs1)
-            forwardA = 2'b10; // Forward from EX/MEM (alu_result)
-        else if (mem_wb_RegWrite && mem_wb_rd != 5'b0 && mem_wb_rd == id_ex_rs1)
-            forwardA = 2'b01; // Forward from MEM/WB (wb_data)
-        else
-            forwardA = 2'b00; // Use register value
-
-        // Forward rs2
-        if (ex_mem_RegWrite && ex_mem_rd != 5'b0 && ex_mem_rd == id_ex_rs2)
-            forwardB = 2'b10; // Forward from EX/MEM (alu_result)
-        else if (mem_wb_RegWrite && mem_wb_rd != 5'b0 && mem_wb_rd == id_ex_rs2)
-            forwardB = 2'b01; // Forward from MEM/WB (wb_data)
-        else
-            forwardB = 2'b00; // Use register value
-    end
-
-    // Select forwarded values for EX stage 结构冒险信号
-    wire [31:0] ex_rs1_val, ex_rs2_val;
-    assign ex_rs1_val = (forwardA == 2'b10) ? ex_mem_alu_result :
-                        (forwardA == 2'b01) ? wb_data :
-                        id_ex_rs1_val;
-    assign ex_rs2_val = (forwardB == 2'b10) ? ex_mem_alu_result :
-                        (forwardB == 2'b01) ? wb_data :
-                        id_ex_rs2_val;
+    // === RegFile Instance ===
+    RegFile reg_file (
+        .clk(clk),
+        .reset(reset),
+        .rs1(id_rs1),            // ID 阶段读口
+        .rs2(id_rs2),            // ID 阶段读口
+        .rd(mem_wb_rd),          // WB 阶段写口
+        .we(mem_wb_RegWrite),    // WB 阶段写使能
+        .wd(wb_data),            // WB 阶段写数据
+        .rs1_val(id_rs1_val),    // ID 阶段读出的值
+        .rs2_val(id_rs2_val)     // ID 阶段读出的值
+    );
 
     // === Stall Unit (Load-Use Hazard) === 数据冒险判断
     assign stall = id_ex_MemRead && id_ex_valid &&
                    (id_ex_rd == id_rs1 || id_ex_rd == id_rs2) &&
-                   id_ex_rd != 5'b0;//触发数据冒险后一个周期置0
+                   id_ex_rd != 5'b0;
 
     // === Flush Unit (Control Hazard) === 控制冒险判断
-    assign flush = (wb_is_jal || wb_is_jalr || wb_take_branch) && wb_valid;//冲刷信号
+    assign flush = (wb_is_jal || wb_is_jalr || wb_take_branch) && wb_valid;
 
     // === Module Instantiations ===
     IF if_stage (
@@ -167,7 +164,7 @@ module rv32e (
         .clk(clk),
         .reset(reset),
         .instr(if_id_instr),
-        .if_valid(if_id_valid),
+        .if_valid(if_valid),
         .id_ready(id_ready),
         .id_valid(id_valid),
         .ex_ready(ex_ready && !stall), // Stall ID if needed
@@ -188,11 +185,11 @@ module rv32e (
     EX ex_stage (
         .clk(clk),
         .reset(reset),
-        .id_valid(id_ex_valid),
+        .id_valid(id_valid),
         .ex_ready(ex_ready),
         .opcode(id_ex_opcode),
-        .rs1_val(ex_rs1_val), // Use forwarded value
-        .rs2_val(ex_rs2_val), // Use forwarded value
+        .rs1_val(id_ex_rs1_val), // Directly use register value
+        .rs2_val(id_ex_rs2_val), // Directly use register value
         .imm(id_ex_imm),
         .alu_op(id_ex_alu_op),
         .mem_ready(mem_ready),
@@ -205,7 +202,7 @@ module rv32e (
     MEM mem_stage (
         .clk(clk),
         .reset(reset),
-        .ex_valid(ex_mem_valid),
+        .ex_valid(ex_valid),
         .mem_ready(mem_ready),
         .wb_ready(wb_ready),
         .mem_valid(mem_valid),
@@ -223,24 +220,24 @@ module rv32e (
     WB wb_stage (
         .clk(clk),
         .reset(reset),
-        .mem_valid(mem_wb_valid),
+        .mem_valid(mem_valid),
         .wb_ready(wb_ready),
         .if_ready(if_ready),
         .wb_valid(wb_valid),
         .opcode(mem_wb_opcode),
         .func3(mem_wb_func3),
-        .id_rd(mem_wb_rd),
-        .id_RegWrite(mem_wb_RegWrite),
+        // .rd(mem_wb_rd),
+        // .RegWrite(mem_wb_RegWrite),
         .alu_result(mem_wb_alu_result),
         .data_out(mem_wb_data_out),
-        .alu_zero(ex_mem_alu_zero),
-        .alu_less(ex_mem_alu_less),
+        .alu_zero(mem_wb_alu_zero),
+        .alu_less(mem_wb_alu_less),
         .pc(mem_wb_pc),
         .imm(mem_wb_imm),
-        .rs1(id_rs1),
-        .rs2(id_rs2),
-        .rs1_val(id_rs1_val),
-        .rs2_val(id_rs2_val),
+        // .rs1(mem_wb_rs1),
+        // .rs2(mem_wb_rs2),
+        .rs1_val(mem_wb_rs1_val),
+        .rs2_val(mem_wb_rs2_val),
         .jal_target(wb_jal_target),
         .jalr_target(wb_jalr_target),
         .is_jal(wb_is_jal),
@@ -257,14 +254,14 @@ module rv32e (
             // Reset IF/ID
             if_id_pc <= 32'h8000_0000;
             if_id_instr <= 32'h0;
-            if_id_valid <= 1'b0;
+            // if_id_valid <= 1'b0;
 
             // Reset ID/EX
             id_ex_opcode <= 7'b0;
             id_ex_rs1 <= 5'b0;
             id_ex_rs2 <= 5'b0;
             id_ex_rd <= 5'b0;
-            id_ex_imm <= 32'b0;
+            id_ex_imm <= 32'h0;
             id_ex_func3 <= 3'b0;
             id_ex_func7 <= 7'b0;
             id_ex_RegWrite <= 1'b0;
@@ -274,7 +271,8 @@ module rv32e (
             id_ex_MemLen <= 3'b0;
             id_ex_rs1_val <= 32'b0;
             id_ex_rs2_val <= 32'b0;
-            id_ex_valid <= 1'b0;
+            // id_ex_valid <= 1'b0;
+            id_ex_pc <= 32'h0;
 
             // Reset EX/MEM
             ex_mem_alu_result <= 32'b0;
@@ -285,31 +283,41 @@ module rv32e (
             ex_mem_MemRead <= 1'b0;
             ex_mem_MemLen <= 3'b0;
             ex_mem_rd <= 5'b0;
+            ex_mem_rs1 <= 5'b0;
+            ex_mem_rs2 <= 5'b0;
             ex_mem_rs2_val <= 32'b0;
-            ex_mem_valid <= 1'b0;
+            // ex_mem_valid <= 1'b0;
+            ex_mem_opcode <= 7'b0;
+            ex_mem_func3 <= 3'b0;
+            ex_mem_imm <= 32'b0;
+            ex_mem_pc <= 32'h0;
 
             // Reset MEM/WB
+            mem_wb_alu_zero <= 1'b0;
+            mem_wb_alu_less <= 1'b0;
             mem_wb_data_out <= 32'h0;
             mem_wb_alu_result <= 32'h0;
             mem_wb_opcode <= 7'b0;
             mem_wb_func3 <= 3'b0;
             mem_wb_RegWrite <= 1'b0;
             mem_wb_rd <= 5'b0;
+            mem_wb_rs1 <= 5'b0;
+            mem_wb_rs2 <= 5'b0;
             mem_wb_pc <= 32'h0;
             mem_wb_imm <= 32'h0;
-            mem_wb_valid <= 1'b0;
+            // mem_wb_valid <= 1'b0;
         end 
         else begin
             // IF/ID 
             if (flush) begin
                 if_id_pc <= 32'h0;
                 if_id_instr <= 32'h0;
-                if_id_valid <= 1'b0;
+                // if_id_valid <= 1'b0;
             end 
             else if (!stall && if_valid && id_ready) begin//不处于数据冒险+握手
                 if_id_pc <= if_pc;
                 if_id_instr <= if_instr;
-                if_id_valid <= if_valid;
+                // if_id_valid <= if_valid;
             end
 
             // ID/EX   数据冒险处理(ID向下游EX模块发送空指令)
@@ -328,7 +336,8 @@ module rv32e (
                 id_ex_MemLen <= 3'b0;
                 id_ex_rs1_val <= 32'h0;
                 id_ex_rs2_val <= 32'h0;
-                id_ex_valid <= 1'b0;
+                // id_ex_valid <= 1'b0;
+                id_ex_pc <= 32'h0;
             end 
             else if (id_valid && ex_ready) begin
                 id_ex_opcode <= id_opcode;
@@ -345,11 +354,30 @@ module rv32e (
                 id_ex_MemLen <= id_MemLen;
                 id_ex_rs1_val <= id_rs1_val;
                 id_ex_rs2_val <= id_rs2_val;
-                id_ex_valid <= id_valid;
+                // id_ex_valid <= id_valid;
+                id_ex_pc <= if_id_pc;
             end
 
             // EX/MEM 
-            if (ex_valid && mem_ready) begin
+            if (flush) begin
+                ex_mem_alu_result <= 32'b0;
+                ex_mem_alu_zero <= 1'b0;
+                ex_mem_alu_less <= 1'b0;
+                ex_mem_RegWrite <= 1'b0;
+                ex_mem_MemWrite <= 1'b0;
+                ex_mem_MemRead <= 1'b0;
+                ex_mem_MemLen <= 3'b0;
+                ex_mem_rd <= 5'b0;
+                ex_mem_rs1 <= 5'b0;
+                ex_mem_rs2 <= 5'b0;
+                ex_mem_rs1_val <= 32'b0;
+                ex_mem_rs2_val <= 32'b0;
+                ex_mem_imm <= 32'b0;
+                ex_mem_opcode <= 7'b0;
+                ex_mem_func3 <= 3'b0;
+                ex_mem_pc <= 32'h0;
+            end
+            else if (ex_valid && mem_ready) begin
                 ex_mem_alu_result <= ex_alu_result;
                 ex_mem_alu_zero <= ex_alu_zero;
                 ex_mem_alu_less <= ex_alu_less;
@@ -358,21 +386,50 @@ module rv32e (
                 ex_mem_MemRead <= id_ex_MemRead;
                 ex_mem_MemLen <= id_ex_MemLen;
                 ex_mem_rd <= id_ex_rd;
-                ex_mem_rs2_val <= ex_rs2_val; // Use forwarded value
-                ex_mem_valid <= ex_valid;
+                ex_mem_rs1 <= id_ex_rs1;
+                ex_mem_rs2 <= id_ex_rs2;
+                ex_mem_rs1_val <= id_ex_rs1_val; // Directly use register value
+                ex_mem_rs2_val <= id_ex_rs2_val; // Directly use register value
+                // ex_mem_valid <= ex_valid;
+                ex_mem_opcode <= id_ex_opcode;
+                ex_mem_func3 <= id_ex_func3;
+                ex_mem_imm <= id_ex_imm;
+                ex_mem_pc <= id_ex_pc;
             end
 
-            // MEM/WB 
-            if (mem_valid && wb_ready) begin
+            // MEM/WB
+            if (flush) begin
+                mem_wb_alu_zero <= 1'b0;
+                mem_wb_alu_less <= 1'b0;
+                mem_wb_data_out <= 32'b0;
+                mem_wb_alu_result <= 32'b0;
+                mem_wb_opcode <= 7'b0;
+                mem_wb_func3 <= 3'b0;
+                mem_wb_RegWrite <= 1'b0;
+                mem_wb_rd <= 5'b0;
+                mem_wb_rs1 <= 5'b0;
+                mem_wb_rs2 <= 5'b0;
+                mem_wb_rs1_val <= 32'b0;
+                mem_wb_rs2_val <= 32'b0;
+                mem_wb_pc <= 32'h0;
+                mem_wb_imm <= 32'b0;
+            end 
+            else if (mem_valid && wb_ready) begin
+                mem_wb_alu_zero <= ex_mem_alu_zero;
+                mem_wb_alu_less <= ex_mem_alu_less;
                 mem_wb_data_out <= mem_data_out;
                 mem_wb_alu_result <= ex_mem_alu_result;
-                mem_wb_opcode <= id_ex_opcode;
-                mem_wb_func3 <= id_ex_func3;
+                mem_wb_opcode <= ex_mem_opcode;
+                mem_wb_func3 <= ex_mem_func3;
                 mem_wb_RegWrite <= ex_mem_RegWrite;
                 mem_wb_rd <= ex_mem_rd;
-                mem_wb_pc <= if_id_pc;
-                mem_wb_imm <= id_ex_imm;
-                mem_wb_valid <= mem_valid;
+                mem_wb_rs1 <= ex_mem_rs1;
+                mem_wb_rs2 <= ex_mem_rs2;
+                mem_wb_rs1_val <= ex_mem_rs1_val; // Directly use register value
+                mem_wb_rs2_val <= ex_mem_rs2_val; // Directly use register value
+                mem_wb_pc <= ex_mem_pc;
+                mem_wb_imm <= ex_mem_imm;
+                // mem_wb_valid <= mem_valid;
             end
         end
     end
@@ -388,16 +445,13 @@ module rv32e (
         if (store_access_fault) begin
             $display("\033[31m[MEM]: Store access fault at address: %h\033[0m", mem_fault_addr);
         end
-
+    end
+    always @(posedge clk) begin    
         if(flush) begin
-            $display("");
-            $display("\033[32m[FLUSH]控制冒险触发!!!\033[0m");
-            $display("");
+            $display("\033[32m         [FLUSH]控制冒险触发! branch_target = 0x%h\033[0m", branch_target);
         end
         if(stall) begin
-            $display("");
-            $display("\033[32m[STALL]数据冒险触发!!!\033[0m");
-            $display("");
+            $display("\033[32m         [STALL]数据冒险触发!!!\033[0m");
         end
     end
 endmodule

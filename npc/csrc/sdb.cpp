@@ -98,7 +98,8 @@ static int cmd_info(char *args){
 //           wp->NO, wp->expr ? wp->expr : "N/A", wp->old_val);
 //         wp=wp->next;
 //      }
-//    }else printf("Invalid operation,please specify 'r' or 'w'.\n");
+//    }
+    else printf("Invalid operation, please specify 'r'.\n");
   }else printf("No argument provided. Please specify 'r'.\n");
   return 0;
 }

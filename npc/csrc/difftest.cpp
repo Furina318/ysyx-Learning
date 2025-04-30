@@ -39,7 +39,7 @@ const char *ref_regs[] = {
 
 static void update_cpu_state(CPU_state *cpu)
 {
-    cpu->pc = top->rootp->rv32e__DOT__pc;
+    cpu->pc = top->rootp->rv32e__DOT__if_pc;
     for(int i = 0; i < 32; i++)
         cpu->gpr[i] = top_regs[i];
 }

@@ -33,8 +33,8 @@ module EX (
                     ex_ready = 1'b1;
                     ex_valid = 1'b0;
                     if(id_valid) begin
-                        ex_ready = 1'b0;
-                        ex_valid = 1'b0;
+                        // ex_ready = 1'b0;
+                        // ex_valid = 1'b0;
                         case (alu_op)
                              `ALU_ADD:  alu_result = rs1_val + ((opcode[6:2] == `INST_TYPE_R || opcode[6:2] == `INST_TYPE_B) ? rs2_val : imm);
                             `ALU_SUB:  alu_result = rs1_val - ((opcode[6:2] == `INST_TYPE_R || opcode[6:2] == `INST_TYPE_B) ? rs2_val : imm);
@@ -54,7 +54,8 @@ module EX (
                              `ALU_SLTU: alu_less = (rs1_val < rs2_val);
                             default:   alu_less = ($signed(rs1_val) < $signed((opcode[6:2] == `INST_TYPE_R || opcode[6:2] == `INST_TYPE_B) ? rs2_val : imm));
                         endcase
-                        next_state = mem_ready ? STALL : IDLE;
+                        // next_state = mem_ready ? STALL : IDLE;
+                        next_state = STALL;
                     end
                     else begin
                         next_state = IDLE;
@@ -73,7 +74,7 @@ module EX (
             endcase
         end
     end
-    always @(*) begin
-        $display("\033[32m[EX]: state = %d | ex_ready=%b | ex_valid=%b\033[0m", state, ex_ready, ex_valid);
-    end
+    // always @(*) begin
+    //     $display("\033[32m[EX]: state = %d | ex_ready=%b | ex_valid=%b\033[0m", state, ex_ready, ex_valid);
+    // end
 endmodule

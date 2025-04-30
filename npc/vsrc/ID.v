@@ -73,9 +73,8 @@ module ID (
                     id_valid = 1'b0;
                     // delay = DELAY_CYCLES;
                     if(if_valid) begin
-                        // instr = instr; 
-                        id_ready = 1'b0;    //译码时不接收新指令
-                        id_valid = 1'b0;    //译码期间不驱动输出
+                        // id_ready = 1'b0;    //译码时不接收新指令
+                        // id_valid = 1'b0;    //译码期间不驱动输出
 
                         opcode = instr[6:0];
                         rs1    = instr[19:15];
@@ -267,7 +266,8 @@ module ID (
                                 $display("\033[32m[ID] : Unknow instruction with inst = %h\033[0m", instr);
                             end
                         endcase
-                        next_state = ex_ready ? STALL : IDLE;
+                        // next_state = ex_ready ? STALL : IDLE;
+                        next_state = STALL;
                     end
                     else begin
                         next_state = IDLE;
@@ -287,7 +287,8 @@ module ID (
         end
     end
 
-    always @(posedge clk) begin
-        $display("\033[31m[ID]: state=%d | id_ready=%b | id_valid=%b\033[0m", state, id_ready, id_valid);
-    end
+    // always @(posedge clk) begin
+    //     $display("\033[31m[ID]: state=%d | id_ready=%b | id_valid=%b\033[0m", state, id_ready, id_valid);
+    // end
+
 endmodule

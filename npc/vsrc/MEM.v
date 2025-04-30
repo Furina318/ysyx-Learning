@@ -105,6 +105,7 @@ module MEM (
                 IDLE: begin
                     mem_ready <= 1'b1;
                     mem_valid <= 1'b0;
+
                     sram_arvalid <= 1'b0;
                     sram_rready <= 1'b0;
                     sram_awvalid <= 1'b0;
@@ -261,11 +262,11 @@ module MEM (
         end
     end
 
-    // 调试日志
-    always @(posedge clk) begin
-        $display("\033[33m[MEM] state=%d | addr=0x%h | sram_addr=0x%h | mem_ready=%b | mem_valid=%b\033[0m",
-                 state, addr, sram_araddr, mem_ready, mem_valid);
-    end
+    // // 调试日志
+    // always @(posedge clk) begin
+    //     $display("\033[33m[MEM] state=%d | addr=0x%h | sram_addr=0x%h | mem_ready=%b | mem_valid=%b\033[0m",
+    //              state, addr, sram_araddr, mem_ready, mem_valid);
+    // end
 
     // 协议断言
     always @(posedge clk) begin

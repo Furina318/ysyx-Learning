@@ -35,7 +35,7 @@ extern "C" void ebreak(int station, int inst) {
         if (Verilated::gotFinish())
             return;
 
-        npc_state.halt_ret = top->rootp->rv32e__DOT__wb_stage__DOT__regs[10]; // a0
+        npc_state.halt_ret = top->rootp->rv32e__DOT__reg_file__DOT__regs[10]; // a0
         npc_state.halt_pc = top->rootp->rv32e__DOT__if_pc;
 
         switch (station) {
