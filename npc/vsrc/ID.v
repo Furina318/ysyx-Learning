@@ -21,7 +21,8 @@ module ID (
     output reg        MemWrite,
     output reg        MemRead,
     output reg [3:0]  alu_op,
-    output reg [2:0]  MemLen
+    output reg [2:0]  MemLen,
+    output reg        is_ebreak
 );
     import "DPI-C" function void ebreak(input int station, input int inst);
 
@@ -64,6 +65,7 @@ module ID (
             MemRead   = 1'b0;
             alu_op    = `ALU_ADD;
             MemLen    = `Mem_Word;
+            is_ebreak = 1'b0;
         end
         else begin
             state = next_state;
@@ -72,6 +74,7 @@ module ID (
                     id_ready = 1'b1;  //空闲时准备接收指令
                     id_valid = 1'b0;
                     // delay = DELAY_CYCLES;
+                    is_ebreak = 1'b0;
                     if(if_valid) begin
                         // id_ready = 1'b0;    //译码时不接收新指令
                         // id_valid = 1'b0;    //译码期间不驱动输出
@@ -257,7 +260,8 @@ module ID (
 
                             `INST_TYPE_E: begin
                                 if (instr == `INST_EBREAK) begin
-                                    ebreak(`HIT_TRAP, instr);
+                                    // ebreak(`HIT_TRAP, instr);
+                                    is_ebreak = 1'b1;
                                 end
                             end
 

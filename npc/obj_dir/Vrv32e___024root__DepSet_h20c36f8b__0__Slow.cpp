@@ -191,6 +191,7 @@ VL_ATTR_COLD void Vrv32e___024root___ctor_var_reset(Vrv32e___024root* vlSelf) {
     vlSelf->rv32e__DOT__id_ex_rs2 = VL_RAND_RESET_I(5);
     vlSelf->rv32e__DOT__id_ex_rd = VL_RAND_RESET_I(5);
     vlSelf->rv32e__DOT__id_ex_imm = VL_RAND_RESET_I(32);
+    vlSelf->rv32e__DOT__id_ex_instr = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__id_ex_func3 = VL_RAND_RESET_I(3);
     vlSelf->rv32e__DOT__id_ex_func7 = VL_RAND_RESET_I(7);
     vlSelf->rv32e__DOT__id_ex_RegWrite = VL_RAND_RESET_I(1);
@@ -202,6 +203,7 @@ VL_ATTR_COLD void Vrv32e___024root___ctor_var_reset(Vrv32e___024root* vlSelf) {
     vlSelf->rv32e__DOT__id_ex_rs2_val = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__id_ex_valid = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__id_ex_pc = VL_RAND_RESET_I(32);
+    vlSelf->rv32e__DOT__id_ex_is_ebreak = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__ex_mem_alu_result = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__ex_mem_alu_zero = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__ex_mem_alu_less = VL_RAND_RESET_I(1);
@@ -257,6 +259,7 @@ VL_ATTR_COLD void Vrv32e___024root___ctor_var_reset(Vrv32e___024root* vlSelf) {
     vlSelf->rv32e__DOT__id_MemLen = VL_RAND_RESET_I(3);
     vlSelf->rv32e__DOT__id_valid = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__ex_ready = VL_RAND_RESET_I(1);
+    vlSelf->rv32e__DOT__is_ebreak = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__ex_alu_result = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__ex_alu_zero = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__ex_alu_less = VL_RAND_RESET_I(1);

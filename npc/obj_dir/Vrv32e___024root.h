@@ -30,6 +30,7 @@ class Vrv32e___024root final : public VerilatedModule {
         CData/*3:0*/ rv32e__DOT__id_ex_alu_op;
         CData/*2:0*/ rv32e__DOT__id_ex_MemLen;
         CData/*0:0*/ rv32e__DOT__id_ex_valid;
+        CData/*0:0*/ rv32e__DOT__id_ex_is_ebreak;
         CData/*0:0*/ rv32e__DOT__ex_mem_alu_zero;
         CData/*0:0*/ rv32e__DOT__ex_mem_alu_less;
         CData/*0:0*/ rv32e__DOT__ex_mem_RegWrite;
@@ -69,6 +70,7 @@ class Vrv32e___024root final : public VerilatedModule {
         CData/*2:0*/ rv32e__DOT__id_MemLen;
         CData/*0:0*/ rv32e__DOT__id_valid;
         CData/*0:0*/ rv32e__DOT__ex_ready;
+        CData/*0:0*/ rv32e__DOT__is_ebreak;
         CData/*0:0*/ rv32e__DOT__ex_alu_zero;
         CData/*0:0*/ rv32e__DOT__ex_alu_less;
         CData/*0:0*/ rv32e__DOT__ex_valid;
@@ -77,10 +79,10 @@ class Vrv32e___024root final : public VerilatedModule {
         CData/*0:0*/ rv32e__DOT__wb_ready;
         CData/*0:0*/ rv32e__DOT__load_access_fault;
         CData/*0:0*/ rv32e__DOT__store_access_fault;
-        CData/*0:0*/ rv32e__DOT__wb_is_jal;
-        CData/*0:0*/ rv32e__DOT__wb_is_jalr;
     };
     struct {
+        CData/*0:0*/ rv32e__DOT__wb_is_jal;
+        CData/*0:0*/ rv32e__DOT__wb_is_jalr;
         CData/*0:0*/ rv32e__DOT__wb_take_branch;
         CData/*0:0*/ rv32e__DOT__stall;
         CData/*0:0*/ rv32e__DOT__flush;
@@ -123,6 +125,7 @@ class Vrv32e___024root final : public VerilatedModule {
         IData/*31:0*/ rv32e__DOT__if_id_pc;
         IData/*31:0*/ rv32e__DOT__if_id_instr;
         IData/*31:0*/ rv32e__DOT__id_ex_imm;
+        IData/*31:0*/ rv32e__DOT__id_ex_instr;
         IData/*31:0*/ rv32e__DOT__id_ex_rs1_val;
         IData/*31:0*/ rv32e__DOT__id_ex_rs2_val;
         IData/*31:0*/ rv32e__DOT__id_ex_pc;
@@ -142,11 +145,11 @@ class Vrv32e___024root final : public VerilatedModule {
         IData/*31:0*/ rv32e__DOT__if_fault_addr;
         IData/*31:0*/ rv32e__DOT__branch_target;
         IData/*31:0*/ rv32e__DOT__id_imm;
+    };
+    struct {
         IData/*31:0*/ rv32e__DOT__ex_alu_result;
         IData/*31:0*/ rv32e__DOT__mem_data_out;
         IData/*31:0*/ rv32e__DOT__mem_fault_addr;
-    };
-    struct {
         IData/*31:0*/ rv32e__DOT__wb_data;
         IData/*31:0*/ rv32e__DOT__wb_jal_target;
         IData/*31:0*/ rv32e__DOT__wb_jalr_target;

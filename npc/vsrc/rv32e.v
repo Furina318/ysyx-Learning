@@ -37,6 +37,7 @@ module rv32e (
     reg [6:0]  id_ex_opcode;
     reg [4:0]  id_ex_rs1, id_ex_rs2, id_ex_rd;
     reg [31:0] id_ex_imm;
+    reg [31:0] id_ex_instr;
     reg [2:0]  id_ex_func3;
     reg [6:0]  id_ex_func7;
     reg        id_ex_RegWrite;
@@ -47,6 +48,7 @@ module rv32e (
     reg [31:0] id_ex_rs1_val, id_ex_rs2_val;
     reg        id_ex_valid;
     reg [31:0] id_ex_pc;
+    reg        id_ex_is_ebreak;
 
     // === EX/MEM 流水线寄存器 ===
     reg [31:0] ex_mem_alu_result;
@@ -104,6 +106,7 @@ module rv32e (
     wire        id_valid, ex_ready;
     wire [31:0] id_rs1_val, id_rs2_val;
     wire [31:0] rs1_val, rs2_val;
+    wire        is_ebreak;
 
     // EX 
     wire [31:0] ex_alu_result;
@@ -185,12 +188,15 @@ module rv32e (
         .MemWrite(id_MemWrite),
         .MemRead(id_MemRead),
         .alu_op(id_alu_op),
-        .MemLen(id_MemLen)
+        .MemLen(id_MemLen),
+        .is_ebreak(is_ebreak)
     );
 
     EX ex_stage (
         .clk(clk),
         .reset(reset),
+        .is_ebreak(id_ex_is_ebreak),
+        .instr(id_ex_instr),
         .id_valid(id_valid),
         .ex_ready(ex_ready),
         .opcode(id_ex_opcode),
@@ -351,6 +357,8 @@ module rv32e (
                 id_ex_rs2_val <= 32'h0;
                 // id_ex_valid <= 1'b0;
                 id_ex_pc <= 32'h0;
+                id_ex_instr <= 32'h0;
+                id_ex_is_ebreak <= 1'b0;
             end 
             else if (id_valid && ex_ready) begin
                 id_ex_opcode <= id_opcode;
@@ -369,6 +377,8 @@ module rv32e (
                 id_ex_rs2_val <= id_rs2_val;
                 // id_ex_valid <= id_valid;
                 id_ex_pc <= if_id_pc;
+                id_ex_instr <= if_id_instr;
+                id_ex_is_ebreak <= is_ebreak;
             end
 
             // EX/MEM 

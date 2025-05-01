@@ -2,6 +2,8 @@
 module EX (
     input             clk,
     input             reset,
+    input             is_ebreak,
+    input      [31:0] instr,
     input             id_valid,//reg模块的输出是否有效
     output reg        ex_ready,//ex就绪状态
     input      [6:0]  opcode,
@@ -22,6 +24,9 @@ module EX (
     output reg        alu_zero,
     output reg        alu_less
 );
+
+    import "DPI-C" function void ebreak(input int station, input int inst);
+
     typedef enum { IDLE, STALL } state_t;
     state_t state, next_state;
 
@@ -75,6 +80,9 @@ module EX (
                             (func3 == `F3_BGEU && !alu_less)   // bgeu
                         );
                         // next_state = mem_ready ? STALL : IDLE;
+                        if(is_ebreak) begin
+                            ebreak(`HIT_TRAP, instr);
+                        end
                         next_state = STALL;
                     end
                     else begin

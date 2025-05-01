@@ -194,11 +194,13 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSe
         vlSelf->rv32e__DOT__id_MemRead = 0U;
         vlSelf->rv32e__DOT__id_alu_op = 0U;
         vlSelf->rv32e__DOT__id_MemLen = 2U;
+        vlSelf->rv32e__DOT__is_ebreak = 0U;
     } else {
         vlSelf->rv32e__DOT__id_stage__DOT__state = vlSelf->rv32e__DOT__id_stage__DOT__next_state;
         if ((0U == vlSelf->rv32e__DOT__id_stage__DOT__state)) {
             vlSelf->rv32e__DOT__id_ready = 1U;
             vlSelf->rv32e__DOT__id_valid = 0U;
+            vlSelf->rv32e__DOT__is_ebreak = 0U;
             if (vlSelf->rv32e__DOT__if_valid) {
                 vlSelf->rv32e__DOT__id_opcode = (0x7fU 
                                                  & vlSelf->rv32e__DOT__if_id_instr);
@@ -240,7 +242,7 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSe
                                 VL_WRITEF("\033[32m[ID] : Unknow instruction with inst = %x\033[0m\n",
                                           32,vlSelf->rv32e__DOT__if_id_instr);
                             } else if ((0x100073U == vlSelf->rv32e__DOT__if_id_instr)) {
-                                Vrv32e___024root____Vdpiimwrap_rv32e__DOT__id_stage__DOT__ebreak_TOP(1U, vlSelf->rv32e__DOT__if_id_instr);
+                                vlSelf->rv32e__DOT__is_ebreak = 1U;
                             }
                         } else if ((2U & (IData)(vlSelf->rv32e__DOT__id_stage__DOT__get_opcode))) {
                             if (VL_LIKELY((1U & (IData)(vlSelf->rv32e__DOT__id_stage__DOT__get_opcode)))) {
@@ -489,10 +491,6 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSe
         vlSelf->rv32e__DOT__ex_alu_result = 0U;
         vlSelf->rv32e__DOT__ex_alu_zero = 0U;
         vlSelf->rv32e__DOT__ex_alu_less = 0U;
-        vlSelf->rv32e__DOT__wb_stage__DOT__state = 1U;
-        vlSelf->rv32e__DOT__wb_ready = 1U;
-        vlSelf->rv32e__DOT__wb_valid = 1U;
-        vlSelf->rv32e__DOT__wb_data = 0U;
     } else {
         vlSelf->rv32e__DOT__ex_stage__DOT__state = vlSelf->rv32e__DOT__ex_stage__DOT__next_state;
         if ((0U == vlSelf->rv32e__DOT__ex_stage__DOT__state)) {
@@ -648,6 +646,9 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSe
                                                    == (IData)(vlSelf->rv32e__DOT__id_ex_opcode)) 
                                                   & (0U 
                                                      == (IData)(vlSelf->rv32e__DOT__id_ex_func3)));
+                if (vlSelf->rv32e__DOT__id_ex_is_ebreak) {
+                    Vrv32e___024root____Vdpiimwrap_rv32e__DOT__id_stage__DOT__ebreak_TOP(1U, vlSelf->rv32e__DOT__id_ex_instr);
+                }
                 vlSelf->rv32e__DOT__ex_stage__DOT__next_state = 1U;
                 vlSelf->rv32e__DOT__ex_alu_less = (
                                                    (7U 
@@ -714,6 +715,13 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSe
             vlSelf->rv32e__DOT__ex_valid = 0U;
             vlSelf->rv32e__DOT__ex_stage__DOT__next_state = 0U;
         }
+    }
+    if (vlSelf->reset) {
+        vlSelf->rv32e__DOT__wb_stage__DOT__state = 1U;
+        vlSelf->rv32e__DOT__wb_ready = 1U;
+        vlSelf->rv32e__DOT__wb_valid = 1U;
+        vlSelf->rv32e__DOT__wb_data = 0U;
+    } else {
         vlSelf->rv32e__DOT__wb_stage__DOT__state = vlSelf->rv32e__DOT__wb_stage__DOT__next_state;
         if ((0U == vlSelf->rv32e__DOT__wb_stage__DOT__state)) {
             vlSelf->rv32e__DOT__wb_ready = 1U;
@@ -782,6 +790,14 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSe
                     = vlSelf->rv32e__DOT__id_ex_rs1_val;
             }
         }
+        if (((IData)(vlSelf->rv32e__DOT__flush) | (IData)(vlSelf->rv32e__DOT__stall))) {
+            vlSelf->rv32e__DOT__id_ex_is_ebreak = 0U;
+            vlSelf->rv32e__DOT__id_ex_instr = 0U;
+        } else if (((IData)(vlSelf->rv32e__DOT__id_valid) 
+                    & (IData)(vlSelf->rv32e__DOT__ex_ready))) {
+            vlSelf->rv32e__DOT__id_ex_is_ebreak = vlSelf->rv32e__DOT__is_ebreak;
+            vlSelf->rv32e__DOT__id_ex_instr = vlSelf->rv32e__DOT__if_id_instr;
+        }
     }
     if (vlSelf->reset) {
         __Vdlyvset__rv32e__DOT__reg_file__DOT__regs__v0 = 1U;
@@ -792,6 +808,18 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSe
         vlSelf->rv32e__DOT__mem_wb_rs2 = 0U;
         vlSelf->rv32e__DOT__mem_wb_rs1 = 0U;
         vlSelf->rv32e__DOT__mem_wb_func3 = 0U;
+        vlSelf->rv32e__DOT__id_ex_alu_op = 0U;
+        vlSelf->rv32e__DOT__mem_wb_alu_result = 0U;
+        vlSelf->rv32e__DOT__mem_wb_imm = 0U;
+        vlSelf->rv32e__DOT__mem_wb_opcode = 0U;
+        vlSelf->rv32e__DOT__mem_wb_pc = 0U;
+        vlSelf->rv32e__DOT__mem_wb_data_out = 0U;
+        vlSelf->rv32e__DOT__mem_wb_RegWrite = 0U;
+        vlSelf->rv32e__DOT__ex_mem_alu_less = 0U;
+        vlSelf->rv32e__DOT__ex_mem_alu_zero = 0U;
+        vlSelf->rv32e__DOT__ex_mem_rs2 = 0U;
+        vlSelf->rv32e__DOT__ex_mem_rs1 = 0U;
+        vlSelf->rv32e__DOT__ex_mem_func3 = 0U;
         vlSelf->rv32e__DOT__if_id_instr = 0U;
     } else {
         if (((IData)(vlSelf->rv32e__DOT__mem_wb_RegWrite) 
@@ -804,9 +832,11 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSe
         }
         if (((IData)(vlSelf->rv32e__DOT__flush) | (IData)(vlSelf->rv32e__DOT__stall))) {
             vlSelf->rv32e__DOT__id_ex_func7 = 0U;
+            vlSelf->rv32e__DOT__id_ex_alu_op = 0U;
         } else if (((IData)(vlSelf->rv32e__DOT__id_valid) 
                     & (IData)(vlSelf->rv32e__DOT__ex_ready))) {
             vlSelf->rv32e__DOT__id_ex_func7 = vlSelf->rv32e__DOT__id_func7;
+            vlSelf->rv32e__DOT__id_ex_alu_op = vlSelf->rv32e__DOT__id_alu_op;
         }
         if (vlSelf->rv32e__DOT__flush) {
             vlSelf->rv32e__DOT__mem_wb_alu_less = 0U;
@@ -814,6 +844,17 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSe
             vlSelf->rv32e__DOT__mem_wb_rs2 = 0U;
             vlSelf->rv32e__DOT__mem_wb_rs1 = 0U;
             vlSelf->rv32e__DOT__mem_wb_func3 = 0U;
+            vlSelf->rv32e__DOT__mem_wb_alu_result = 0U;
+            vlSelf->rv32e__DOT__mem_wb_imm = 0U;
+            vlSelf->rv32e__DOT__mem_wb_opcode = 0U;
+            vlSelf->rv32e__DOT__mem_wb_pc = 0U;
+            vlSelf->rv32e__DOT__mem_wb_data_out = 0U;
+            vlSelf->rv32e__DOT__mem_wb_RegWrite = 0U;
+            vlSelf->rv32e__DOT__ex_mem_alu_less = 0U;
+            vlSelf->rv32e__DOT__ex_mem_alu_zero = 0U;
+            vlSelf->rv32e__DOT__ex_mem_rs2 = 0U;
+            vlSelf->rv32e__DOT__ex_mem_rs1 = 0U;
+            vlSelf->rv32e__DOT__ex_mem_func3 = 0U;
             vlSelf->rv32e__DOT__if_id_instr = 0U;
         } else {
             if (((IData)(vlSelf->rv32e__DOT__mem_valid) 
@@ -825,6 +866,25 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSe
                 vlSelf->rv32e__DOT__mem_wb_rs2 = vlSelf->rv32e__DOT__ex_mem_rs2;
                 vlSelf->rv32e__DOT__mem_wb_rs1 = vlSelf->rv32e__DOT__ex_mem_rs1;
                 vlSelf->rv32e__DOT__mem_wb_func3 = vlSelf->rv32e__DOT__ex_mem_func3;
+                vlSelf->rv32e__DOT__mem_wb_alu_result 
+                    = vlSelf->rv32e__DOT__ex_mem_alu_result;
+                vlSelf->rv32e__DOT__mem_wb_imm = vlSelf->rv32e__DOT__ex_mem_imm;
+                vlSelf->rv32e__DOT__mem_wb_opcode = vlSelf->rv32e__DOT__ex_mem_opcode;
+                vlSelf->rv32e__DOT__mem_wb_pc = vlSelf->rv32e__DOT__ex_mem_pc;
+                vlSelf->rv32e__DOT__mem_wb_data_out 
+                    = vlSelf->rv32e__DOT__mem_data_out;
+                vlSelf->rv32e__DOT__mem_wb_RegWrite 
+                    = vlSelf->rv32e__DOT__ex_mem_RegWrite;
+            }
+            if (((IData)(vlSelf->rv32e__DOT__ex_valid) 
+                 & (IData)(vlSelf->rv32e__DOT__mem_ready))) {
+                vlSelf->rv32e__DOT__ex_mem_alu_less 
+                    = vlSelf->rv32e__DOT__ex_alu_less;
+                vlSelf->rv32e__DOT__ex_mem_alu_zero 
+                    = vlSelf->rv32e__DOT__ex_alu_zero;
+                vlSelf->rv32e__DOT__ex_mem_rs2 = vlSelf->rv32e__DOT__id_ex_rs2;
+                vlSelf->rv32e__DOT__ex_mem_rs1 = vlSelf->rv32e__DOT__id_ex_rs1;
+                vlSelf->rv32e__DOT__ex_mem_func3 = vlSelf->rv32e__DOT__id_ex_func3;
             }
             if ((((~ (IData)(vlSelf->rv32e__DOT__stall)) 
                   & (IData)(vlSelf->rv32e__DOT__if_valid)) 
@@ -840,18 +900,6 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSe
                                                | (vlSelf->rv32e__DOT__if_id_instr 
                                                   >> 0x14U));
     if (vlSelf->reset) {
-        vlSelf->rv32e__DOT__id_ex_alu_op = 0U;
-        vlSelf->rv32e__DOT__mem_wb_alu_result = 0U;
-        vlSelf->rv32e__DOT__mem_wb_imm = 0U;
-        vlSelf->rv32e__DOT__mem_wb_opcode = 0U;
-        vlSelf->rv32e__DOT__mem_wb_pc = 0U;
-        vlSelf->rv32e__DOT__mem_wb_data_out = 0U;
-        vlSelf->rv32e__DOT__mem_wb_RegWrite = 0U;
-        vlSelf->rv32e__DOT__ex_mem_alu_less = 0U;
-        vlSelf->rv32e__DOT__ex_mem_alu_zero = 0U;
-        vlSelf->rv32e__DOT__ex_mem_rs2 = 0U;
-        vlSelf->rv32e__DOT__ex_mem_rs1 = 0U;
-        vlSelf->rv32e__DOT__ex_mem_func3 = 0U;
         vlSelf->rv32e__DOT__ex_mem_imm = 0U;
         vlSelf->rv32e__DOT__ex_mem_opcode = 0U;
         vlSelf->rv32e__DOT__ex_mem_pc = 0U;
@@ -882,121 +930,6 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSe
         vlSelf->rv32e__DOT__id_ex_pc = 0U;
         vlSelf->rv32e__DOT__ex_mem_alu_result = 0U;
     } else {
-        if (((IData)(vlSelf->rv32e__DOT__flush) | (IData)(vlSelf->rv32e__DOT__stall))) {
-            vlSelf->rv32e__DOT__id_ex_alu_op = 0U;
-        } else if (((IData)(vlSelf->rv32e__DOT__id_valid) 
-                    & (IData)(vlSelf->rv32e__DOT__ex_ready))) {
-            vlSelf->rv32e__DOT__id_ex_alu_op = vlSelf->rv32e__DOT__id_alu_op;
-        }
-        if (vlSelf->rv32e__DOT__flush) {
-            vlSelf->rv32e__DOT__mem_wb_alu_result = 0U;
-            vlSelf->rv32e__DOT__mem_wb_imm = 0U;
-            vlSelf->rv32e__DOT__mem_wb_opcode = 0U;
-            vlSelf->rv32e__DOT__mem_wb_pc = 0U;
-            vlSelf->rv32e__DOT__mem_wb_data_out = 0U;
-            vlSelf->rv32e__DOT__mem_wb_RegWrite = 0U;
-            vlSelf->rv32e__DOT__ex_mem_alu_less = 0U;
-            vlSelf->rv32e__DOT__ex_mem_alu_zero = 0U;
-            vlSelf->rv32e__DOT__ex_mem_rs2 = 0U;
-        } else {
-            if (((IData)(vlSelf->rv32e__DOT__mem_valid) 
-                 & (IData)(vlSelf->rv32e__DOT__wb_ready))) {
-                vlSelf->rv32e__DOT__mem_wb_alu_result 
-                    = vlSelf->rv32e__DOT__ex_mem_alu_result;
-                vlSelf->rv32e__DOT__mem_wb_imm = vlSelf->rv32e__DOT__ex_mem_imm;
-                vlSelf->rv32e__DOT__mem_wb_opcode = vlSelf->rv32e__DOT__ex_mem_opcode;
-                vlSelf->rv32e__DOT__mem_wb_pc = vlSelf->rv32e__DOT__ex_mem_pc;
-                vlSelf->rv32e__DOT__mem_wb_data_out 
-                    = vlSelf->rv32e__DOT__mem_data_out;
-                vlSelf->rv32e__DOT__mem_wb_RegWrite 
-                    = vlSelf->rv32e__DOT__ex_mem_RegWrite;
-            }
-            if (((IData)(vlSelf->rv32e__DOT__ex_valid) 
-                 & (IData)(vlSelf->rv32e__DOT__mem_ready))) {
-                vlSelf->rv32e__DOT__ex_mem_alu_less 
-                    = vlSelf->rv32e__DOT__ex_alu_less;
-                vlSelf->rv32e__DOT__ex_mem_alu_zero 
-                    = vlSelf->rv32e__DOT__ex_alu_zero;
-                vlSelf->rv32e__DOT__ex_mem_rs2 = vlSelf->rv32e__DOT__id_ex_rs2;
-            }
-        }
-        if (((IData)(vlSelf->rv32e__DOT__flush) | (IData)(vlSelf->rv32e__DOT__stall))) {
-            vlSelf->rv32e__DOT__id_ex_rs2 = 0U;
-        } else if (((IData)(vlSelf->rv32e__DOT__id_valid) 
-                    & (IData)(vlSelf->rv32e__DOT__ex_ready))) {
-            vlSelf->rv32e__DOT__id_ex_rs2 = vlSelf->rv32e__DOT__id_rs2;
-        }
-        if (vlSelf->rv32e__DOT__flush) {
-            vlSelf->rv32e__DOT__ex_mem_rs1 = 0U;
-        } else if (((IData)(vlSelf->rv32e__DOT__ex_valid) 
-                    & (IData)(vlSelf->rv32e__DOT__mem_ready))) {
-            vlSelf->rv32e__DOT__ex_mem_rs1 = vlSelf->rv32e__DOT__id_ex_rs1;
-        }
-        if (((IData)(vlSelf->rv32e__DOT__flush) | (IData)(vlSelf->rv32e__DOT__stall))) {
-            vlSelf->rv32e__DOT__id_ex_rs1 = 0U;
-        } else if (((IData)(vlSelf->rv32e__DOT__id_valid) 
-                    & (IData)(vlSelf->rv32e__DOT__ex_ready))) {
-            vlSelf->rv32e__DOT__id_ex_rs1 = vlSelf->rv32e__DOT__id_rs1;
-        }
-        if (vlSelf->rv32e__DOT__flush) {
-            vlSelf->rv32e__DOT__ex_mem_func3 = 0U;
-        } else if (((IData)(vlSelf->rv32e__DOT__ex_valid) 
-                    & (IData)(vlSelf->rv32e__DOT__mem_ready))) {
-            vlSelf->rv32e__DOT__ex_mem_func3 = vlSelf->rv32e__DOT__id_ex_func3;
-        }
-        if (((IData)(vlSelf->rv32e__DOT__flush) | (IData)(vlSelf->rv32e__DOT__stall))) {
-            vlSelf->rv32e__DOT__id_ex_func3 = 0U;
-            vlSelf->rv32e__DOT__id_ex_rs1_val = 0U;
-        } else if (((IData)(vlSelf->rv32e__DOT__id_valid) 
-                    & (IData)(vlSelf->rv32e__DOT__ex_ready))) {
-            vlSelf->rv32e__DOT__id_ex_func3 = vlSelf->rv32e__DOT__id_func3;
-            vlSelf->rv32e__DOT__id_ex_rs1_val = (((IData)(vlSelf->rv32e__DOT__id_rs1) 
-                                                  == (IData)(vlSelf->rv32e__DOT__mem_wb_rd))
-                                                  ? vlSelf->rv32e__DOT__wb_data
-                                                  : 
-                                                 ((0U 
-                                                   == (IData)(vlSelf->rv32e__DOT__id_rs1))
-                                                   ? 0U
-                                                   : 
-                                                  vlSelf->rv32e__DOT__reg_file__DOT__regs
-                                                  [vlSelf->rv32e__DOT__id_rs1]));
-        }
-        if (vlSelf->rv32e__DOT__flush) {
-            vlSelf->rv32e__DOT__ex_mem_imm = 0U;
-        } else if (((IData)(vlSelf->rv32e__DOT__ex_valid) 
-                    & (IData)(vlSelf->rv32e__DOT__mem_ready))) {
-            vlSelf->rv32e__DOT__ex_mem_imm = vlSelf->rv32e__DOT__id_ex_imm;
-        }
-        if (((IData)(vlSelf->rv32e__DOT__flush) | (IData)(vlSelf->rv32e__DOT__stall))) {
-            vlSelf->rv32e__DOT__id_ex_imm = 0U;
-        } else if (((IData)(vlSelf->rv32e__DOT__id_valid) 
-                    & (IData)(vlSelf->rv32e__DOT__ex_ready))) {
-            vlSelf->rv32e__DOT__id_ex_imm = vlSelf->rv32e__DOT__id_imm;
-        }
-        if (vlSelf->rv32e__DOT__flush) {
-            vlSelf->rv32e__DOT__ex_mem_opcode = 0U;
-        } else if (((IData)(vlSelf->rv32e__DOT__ex_valid) 
-                    & (IData)(vlSelf->rv32e__DOT__mem_ready))) {
-            vlSelf->rv32e__DOT__ex_mem_opcode = vlSelf->rv32e__DOT__id_ex_opcode;
-        }
-        if (((IData)(vlSelf->rv32e__DOT__flush) | (IData)(vlSelf->rv32e__DOT__stall))) {
-            vlSelf->rv32e__DOT__id_ex_opcode = 0U;
-        } else if (((IData)(vlSelf->rv32e__DOT__id_valid) 
-                    & (IData)(vlSelf->rv32e__DOT__ex_ready))) {
-            vlSelf->rv32e__DOT__id_ex_opcode = vlSelf->rv32e__DOT__id_opcode;
-        }
-        if (vlSelf->rv32e__DOT__flush) {
-            vlSelf->rv32e__DOT__ex_mem_pc = 0U;
-        } else if (((IData)(vlSelf->rv32e__DOT__ex_valid) 
-                    & (IData)(vlSelf->rv32e__DOT__mem_ready))) {
-            vlSelf->rv32e__DOT__ex_mem_pc = vlSelf->rv32e__DOT__id_ex_pc;
-        }
-        if (((IData)(vlSelf->rv32e__DOT__flush) | (IData)(vlSelf->rv32e__DOT__stall))) {
-            vlSelf->rv32e__DOT__id_ex_pc = 0U;
-        } else if (((IData)(vlSelf->rv32e__DOT__id_valid) 
-                    & (IData)(vlSelf->rv32e__DOT__ex_ready))) {
-            vlSelf->rv32e__DOT__id_ex_pc = vlSelf->rv32e__DOT__if_id_pc;
-        }
         vlSelf->rv32e__DOT__mem_stage__DOT__state = vlSelf->rv32e__DOT__mem_stage__DOT__next_state;
         if ((0U == vlSelf->rv32e__DOT__mem_stage__DOT__state)) {
             __Vdly__rv32e__DOT__mem_valid = 0U;
@@ -1134,12 +1067,45 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSe
             __Vdly__rv32e__DOT__mem_valid = 0U;
         }
         if (vlSelf->rv32e__DOT__flush) {
+            vlSelf->rv32e__DOT__ex_mem_imm = 0U;
+            vlSelf->rv32e__DOT__ex_mem_opcode = 0U;
+            vlSelf->rv32e__DOT__ex_mem_pc = 0U;
             vlSelf->rv32e__DOT__ex_mem_RegWrite = 0U;
             vlSelf->rv32e__DOT__ex_mem_alu_result = 0U;
         } else if (((IData)(vlSelf->rv32e__DOT__ex_valid) 
                     & (IData)(vlSelf->rv32e__DOT__mem_ready))) {
+            vlSelf->rv32e__DOT__ex_mem_imm = vlSelf->rv32e__DOT__id_ex_imm;
+            vlSelf->rv32e__DOT__ex_mem_opcode = vlSelf->rv32e__DOT__id_ex_opcode;
+            vlSelf->rv32e__DOT__ex_mem_pc = vlSelf->rv32e__DOT__id_ex_pc;
             vlSelf->rv32e__DOT__ex_mem_RegWrite = vlSelf->rv32e__DOT__id_ex_RegWrite;
             vlSelf->rv32e__DOT__ex_mem_alu_result = vlSelf->rv32e__DOT__ex_alu_result;
+        }
+        if (((IData)(vlSelf->rv32e__DOT__flush) | (IData)(vlSelf->rv32e__DOT__stall))) {
+            vlSelf->rv32e__DOT__id_ex_rs2 = 0U;
+            vlSelf->rv32e__DOT__id_ex_rs1 = 0U;
+            vlSelf->rv32e__DOT__id_ex_func3 = 0U;
+            vlSelf->rv32e__DOT__id_ex_rs1_val = 0U;
+            vlSelf->rv32e__DOT__id_ex_imm = 0U;
+            vlSelf->rv32e__DOT__id_ex_opcode = 0U;
+            vlSelf->rv32e__DOT__id_ex_pc = 0U;
+        } else if (((IData)(vlSelf->rv32e__DOT__id_valid) 
+                    & (IData)(vlSelf->rv32e__DOT__ex_ready))) {
+            vlSelf->rv32e__DOT__id_ex_rs2 = vlSelf->rv32e__DOT__id_rs2;
+            vlSelf->rv32e__DOT__id_ex_rs1 = vlSelf->rv32e__DOT__id_rs1;
+            vlSelf->rv32e__DOT__id_ex_func3 = vlSelf->rv32e__DOT__id_func3;
+            vlSelf->rv32e__DOT__id_ex_rs1_val = (((IData)(vlSelf->rv32e__DOT__id_rs1) 
+                                                  == (IData)(vlSelf->rv32e__DOT__mem_wb_rd))
+                                                  ? vlSelf->rv32e__DOT__wb_data
+                                                  : 
+                                                 ((0U 
+                                                   == (IData)(vlSelf->rv32e__DOT__id_rs1))
+                                                   ? 0U
+                                                   : 
+                                                  vlSelf->rv32e__DOT__reg_file__DOT__regs
+                                                  [vlSelf->rv32e__DOT__id_rs1]));
+            vlSelf->rv32e__DOT__id_ex_imm = vlSelf->rv32e__DOT__id_imm;
+            vlSelf->rv32e__DOT__id_ex_opcode = vlSelf->rv32e__DOT__id_opcode;
+            vlSelf->rv32e__DOT__id_ex_pc = vlSelf->rv32e__DOT__if_id_pc;
         }
     }
     if (vlSelf->reset) {
