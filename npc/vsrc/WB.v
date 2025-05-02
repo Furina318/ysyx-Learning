@@ -6,8 +6,8 @@ module WB (
     input              if_ready,
     input       [6:0]  opcode,
     input       [2:0]  func3,
-    // input       [4:0]  rd,
-    // input              RegWrite,
+    input       [4:0]  rd,
+    input              RegWrite,
     // input       [4:0]  rs1,
     // input       [4:0]  rs2,
     input       [31:0] pc,
@@ -25,15 +25,17 @@ module WB (
     // output reg         is_jal,
     // output reg         is_jalr,
     // output reg         take_branch,
+    output reg [4:0]   rd_wb,
+    output reg         RegWrite_wb,
     output reg [31:0]  wb_data
 );
     typedef enum {IDLE, STALL} state_t;
     state_t state, next_state;
 
-    reg        RegWrite_wb;
-    reg [4:0]  rd_wb;
-    reg [4:0]  rd_wb_pre;
-    reg [31:0] regs [0:31]; // 32个寄存器
+    // reg        RegWrite_wb;
+    // reg [4:0]  rd_wb;
+    // reg [4:0]  rd_wb_pre;
+    // reg [31:0] regs [0:31]; // 32个寄存器
     // assign rs1_val = (rs1 != 0) ? regs[rs1] : 0;
     // assign rs2_val = (rs2 != 0) ? regs[rs2] : 0;
 
@@ -79,14 +81,14 @@ module WB (
 
                         // 写回数据选择
                         wb_data = (opcode == `INST_LUI) ? imm :                   // LUI
-                                        (opcode == `INST_AUIPC) ? (pc + imm) :          // AUIPC
-                                        (opcode == `INST_JAL || opcode == `INST_JALR) ? (pc + 4) : // JAL, JALR
+                                        (opcode == `INST_AUIPC) ? (pc - 4 + imm) :          // AUIPC
+                                        (opcode == `INST_JAL || opcode == `INST_JALR) ? (pc - 4 + 4) : // JAL, JALR
                                         (opcode == `INST_LW) ? data_out :              // LW
                                         (opcode == `INST_R || opcode == `INST_I) ? alu_result : 32'b0; // R-type, I-type
                         //=====写回数据=====
-                        // rd_wb = rd;
+                        rd_wb = rd;
                         // rd_wb_pre = rd_wb;
-                        // RegWrite_wb = RegWrite;
+                        RegWrite_wb = RegWrite;
                         // if(RegWrite_wb && rd_wb_pre != 0) begin
                         //     regs[rd_wb_pre] <= wb_data;
                         //     // $display("\033[35m[WB/REG]: regs[%d] = %h\033[0m", rd_wb_pre, wb_data);

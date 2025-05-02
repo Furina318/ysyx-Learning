@@ -84,6 +84,8 @@ class Vrv32e___024root final : public VerilatedModule {
         CData/*0:0*/ rv32e__DOT__wb_is_jal;
         CData/*0:0*/ rv32e__DOT__wb_is_jalr;
         CData/*0:0*/ rv32e__DOT__wb_take_branch;
+        CData/*4:0*/ rv32e__DOT__rd_wb;
+        CData/*0:0*/ rv32e__DOT__RegWrite_wb;
         CData/*0:0*/ rv32e__DOT__stall;
         CData/*0:0*/ rv32e__DOT__flush;
         CData/*0:0*/ rv32e__DOT____Vcellinp__if_stage__pc_src;
@@ -116,9 +118,6 @@ class Vrv32e___024root final : public VerilatedModule {
         CData/*1:0*/ rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__delay_counter;
         CData/*3:0*/ rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__wstrb_reg;
         CData/*0:0*/ rv32e__DOT__mem_stage__DOT__mem_sram_inst__DOT__addr_valid;
-        CData/*0:0*/ rv32e__DOT__wb_stage__DOT__RegWrite_wb;
-        CData/*4:0*/ rv32e__DOT__wb_stage__DOT__rd_wb;
-        CData/*4:0*/ rv32e__DOT__wb_stage__DOT__rd_wb_pre;
         CData/*0:0*/ __Vtrigrprev__TOP__clk;
         CData/*0:0*/ __Vtrigrprev__TOP__reset;
         CData/*0:0*/ __VactContinue;
@@ -145,9 +144,9 @@ class Vrv32e___024root final : public VerilatedModule {
         IData/*31:0*/ rv32e__DOT__if_fault_addr;
         IData/*31:0*/ rv32e__DOT__branch_target;
         IData/*31:0*/ rv32e__DOT__id_imm;
+        IData/*31:0*/ rv32e__DOT__ex_alu_result;
     };
     struct {
-        IData/*31:0*/ rv32e__DOT__ex_alu_result;
         IData/*31:0*/ rv32e__DOT__mem_data_out;
         IData/*31:0*/ rv32e__DOT__mem_fault_addr;
         IData/*31:0*/ rv32e__DOT__wb_data;
@@ -186,7 +185,6 @@ class Vrv32e___024root final : public VerilatedModule {
         IData/*31:0*/ __VstlIterCount;
         IData/*31:0*/ __VactIterCount;
         VlUnpacked<IData/*31:0*/, 32> rv32e__DOT__reg_file__DOT__regs;
-        VlUnpacked<IData/*31:0*/, 32> rv32e__DOT__wb_stage__DOT__regs;
         VlUnpacked<CData/*0:0*/, 2> __Vm_traceActivity;
     };
     VlTriggerVec<1> __VstlTriggered;

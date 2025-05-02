@@ -122,7 +122,8 @@ module rv32e (
     // WB 
     wire [31:0] wb_data, wb_jal_target, wb_jalr_target;
     wire        wb_is_jal, wb_is_jalr, wb_take_branch;
-
+    wire [4:0]  rd_wb;
+    wire        RegWrite_wb;
     // ===== 冒险信号处理 =====
     wire        stall;          // 数据冒险信号
     wire        flush;          // 控制冒险信号
@@ -133,8 +134,8 @@ module rv32e (
         .reset(reset),
         .rs1(id_rs1),            // ID 阶段读口
         .rs2(id_rs2),            // ID 阶段读口
-        .rd(mem_wb_rd),          // WB 阶段写口
-        .we(mem_wb_RegWrite),    // WB 阶段写使能
+        .rd(rd_wb),          // WB 阶段写口
+        .we(RegWrite_wb),    // WB 阶段写使能
         .wd(wb_data),            // WB 阶段写数据
         .rs1_val(rs1_val),    // ID 阶段读出的值
         .rs2_val(rs2_val)     // ID 阶段读出的值
@@ -245,8 +246,8 @@ module rv32e (
         .wb_valid(wb_valid),
         .opcode(mem_wb_opcode),
         .func3(mem_wb_func3),
-        // .rd(mem_wb_rd),
-        // .RegWrite(mem_wb_RegWrite),
+        .rd(mem_wb_rd),
+        .RegWrite(mem_wb_RegWrite),
         .alu_result(mem_wb_alu_result),
         .data_out(mem_wb_data_out),
         .alu_zero(mem_wb_alu_zero),
@@ -262,6 +263,8 @@ module rv32e (
         // .is_jal(wb_is_jal),
         // .is_jalr(wb_is_jalr),
         // .take_branch(wb_take_branch),
+        .rd_wb(rd_wb),
+        .RegWrite_wb(RegWrite_wb),
         .wb_data(wb_data)
     );
 

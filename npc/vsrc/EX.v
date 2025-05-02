@@ -67,7 +67,7 @@ module EX (
                             default:   alu_less = ($signed(rs1_val) < $signed((opcode[6:2] == `INST_TYPE_R || opcode[6:2] == `INST_TYPE_B) ? rs2_val : imm));
                         endcase
 
-                        jal_target = pc + imm;
+                        jal_target = (pc - 4) + imm;
                         jalr_target = (rs1_val + imm) & ~32'h1;
                         is_jal = (opcode == `INST_JAL);
                         is_jalr = (opcode == `INST_JALR) & (func3 == 3'b000);
