@@ -68,8 +68,4 @@ __EXPORT void difftest_init(int port) {
   init_isa();
   cpu.gpr[0]=0;
   cpu.pc=RESET_VECTOR;
-  cpu.csr.mcause  = 0x0;
-  cpu.csr.mepc    = 0x0;
-  cpu.csr.mtvec   = 0x0;
-  cpu.csr.mstatus = 0x1800;
 }
