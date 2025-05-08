@@ -34,10 +34,6 @@ static void restart() {
   cpu.gpr[0] = 0;
 
   cpu.csr.mstatus = 0x1800;
-  printf("mcause:0x%08x\n",cpu.csr.mcause);
-  printf("mepc:0x%08x\n",cpu.csr.mepc);
-  printf("mtvec:0x%08x\n",cpu.csr.mtvec);
-  printf("mstatus:0x%08x\n",cpu.csr.mstatus);
 }
 
 void init_isa() {

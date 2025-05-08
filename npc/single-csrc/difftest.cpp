@@ -46,6 +46,11 @@ static void update_cpu_state(CPU_state *cpu)
     cpu->pc = top->rootp->rv32e__DOT__pc;
     for(int i = 0; i < 32; i++)
         cpu->gpr[i] = top_regs[i];
+    
+    cpu->csr.mcause  = MCAUSE;
+    cpu->csr.mepc    = MEPC;
+    cpu->csr.mtvec   = MTVEC;
+    cpu->csr.mstatus = MSTATUS;
 }
 
 
@@ -149,7 +154,7 @@ static void checkregs(CPU_state *ref, vaddr_t pc, vaddr_t npc)
 void difftest_step(vaddr_t pc, vaddr_t npc) 
 {
     CPU_state ref_r;
-    update_cpu_state(&cpu);
+    update_cpu_state(&ref_r);
     if(rst_flag == true){
         rst_flag = false;
     }else{
@@ -165,7 +170,7 @@ void difftest_step(vaddr_t pc, vaddr_t npc)
         //     }
         // }
         if(skip_flag){
-            ref_difftest_regcpy(&cpu, DIFFTEST_TO_REF);
+            ref_difftest_regcpy(&ref_r, DIFFTEST_TO_REF);
             skip_flag = false;
             return;
         }
