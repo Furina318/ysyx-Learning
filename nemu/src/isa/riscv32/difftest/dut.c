@@ -44,10 +44,10 @@ bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc) {
       return false;
     }
   }
-  // CHECKDIFF_CSR(mstatus);
-  // CHECKDIFF_CSR(mcause);
-  // CHECKDIFF_CSR(mepc);
-  // CHECKDIFF_CSR(mtvec);
+  CHECKDIFF_CSR(mstatus);
+  CHECKDIFF_CSR(mcause);
+  CHECKDIFF_CSR(mepc);
+  CHECKDIFF_CSR(mtvec);
   return true;
 }
 

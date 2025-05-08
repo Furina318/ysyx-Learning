@@ -36,17 +36,17 @@ static debug_module_config_t difftest_dm_config = {
   .support_impebreak = true
 };
 
-// typedef struct{
-//   word_t mcause;//存放异常原因
-//   vaddr_t mepc;//存放触发异常的地址PC
-//   word_t mstatus;//存放当前状态
-//   word_t mtvec;//存放异常向量表地址
-// }riscv32_CSRs;
+typedef struct{
+  word_t mcause;//存放异常原因
+  vaddr_t mepc;//存放触发异常的地址PC
+  word_t mstatus;//存放当前状态
+  word_t mtvec;//存放异常向量表地址
+}riscv32_CSRs;
 
 struct diff_context_t {
   word_t gpr[MUXDEF(CONFIG_RVE, 16, 32)];
   word_t pc;
-  // riscv32_CSRs csr;
+  riscv32_CSRs csr;
 };
 
 static sim_t* s = NULL;
