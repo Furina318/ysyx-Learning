@@ -1,4 +1,4 @@
-`include "/home/furina/ysyx-workbench/npc/vsrc/defines.v"
+`include "/home/furina/ysyx-workbench/npc/single-vsrc/defines.v"
 // ALU模块
 module ALU (
     input      [3:0]   alu_op,

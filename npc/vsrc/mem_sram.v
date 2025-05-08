@@ -111,6 +111,7 @@ module mem_sram #(
                     else begin
                         if(addr_valid) begin
                             rdata_reg <= pmem_read(araddr_reg, 4);
+                            $display("\033[37m[MEM][READ]:  form 0x%h read 0x%h\033[0m", araddr_reg, rdata_reg);
                             rresp <= `OKAY;
                         end
                         else begin
@@ -150,6 +151,7 @@ module mem_sram #(
                                 4'b1111: pmem_write(awaddr_reg,wdata_reg,4);//sw
                                 default: pmem_write(awaddr_reg,wdata_reg,4);
                             endcase
+                            $display("\033[37m[MEM][WRITE]: write 0x%h(wstrb=%b) at 0x%h\033[0m", wdata_reg, wstrb_reg, awaddr_reg);
                             bresp <= `OKAY;
                         end
                         else begin

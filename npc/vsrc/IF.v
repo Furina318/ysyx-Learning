@@ -2,6 +2,7 @@
 module IF (
     input         clk,
     input         reset,
+    input         struct_hazard,
     input  [31:0] branch_target,
     input         pc_src,
     input         id_ready,  // 来自 ID 的 ready
@@ -85,7 +86,14 @@ module IF (
             sram_rready <= 1'b1;
             if_access_fault <= 1'b0;
             if_fault_addr <= 32'h0;
-        end else begin
+        end
+        // else if (struct_hazard) begin
+        //     // 结构冒险时暂停，保持当前状态
+        //     if_valid <= 1'b0;
+        //     sram_arvalid <= 1'b0;
+        //     sram_rready <= 1'b0;
+        // end
+        else begin
             state = next_state;
             case (state)
                 IDLE: begin
@@ -93,15 +101,15 @@ module IF (
                     if_valid <= 1'b0;
                     sram_arvalid <= 1'b0;
                     sram_rready <= 1'b0;
-                    // if(wb_valid) begin
+                    if(!struct_hazard) begin
                         pc <= pc_src ? branch_target : pc + 4; //更新pc
                         sram_araddr <= pc_src ? branch_target : pc + 4;
                         sram_arvalid <= 1'b1;
                         next_state = READ_ADDR;
-                    // end
-                    // else begin
-                    //     next_state = IDLE;
-                    // end
+                    end
+                    else begin
+                        next_state = IDLE;
+                    end
                 end
                 READ_ADDR: begin
                     if_ready <= 1'b0;

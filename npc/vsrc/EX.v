@@ -67,7 +67,7 @@ module EX (
                             default:   alu_less = ($signed(rs1_val) < $signed((opcode[6:2] == `INST_TYPE_R || opcode[6:2] == `INST_TYPE_B) ? rs2_val : imm));
                         endcase
 
-                        jal_target = (pc - 4) + imm;
+                        jal_target = pc + imm;
                         jalr_target = (rs1_val + imm) & ~32'h1;
                         is_jal = (opcode == `INST_JAL);
                         is_jalr = (opcode == `INST_JALR) & (func3 == 3'b000);
@@ -102,7 +102,7 @@ module EX (
             endcase
         end
     end
-    // always @(*) begin
-    //     $display("\033[32m[EX]: state = %d | ex_ready=%b | ex_valid=%b\033[0m", state, ex_ready, ex_valid);
-    // end
+    always @(*) begin
+        $display("\033[32m[EX]: state = %d | rs1_val=0x%h | imm=0x%h | alu_result=0x%h\033[0m", state, rs1_val, imm, alu_result);
+    end
 endmodule

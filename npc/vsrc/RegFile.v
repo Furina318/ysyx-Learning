@@ -2,7 +2,7 @@
 // 寄存器文件
 module RegFile (
     input         clk,
-    input         reset,
+    // input         reset,
     input  [4:0]  rs1,
     input  [4:0]  rs2,
     input  [4:0]  rd,
@@ -19,21 +19,16 @@ module RegFile (
     assign rs1_val = (rs1 != 0) ? regs[rs1] : 0;
     assign rs2_val = (rs2 != 0) ? regs[rs2] : 0;
 
-    always @(posedge clk or posedge reset) begin
-        if(reset) begin
-            for(integer i = 0; i < 32; i = i + 1) begin
-                regs[i] <= 32'h0;//初始化寄存器
-            end
-        end
-        else begin
-            if(we && rd != 0) begin
-                regs[rd] <= wd;
-            end
+    always @(posedge clk) begin
+        if(we && rd != 0) begin
+            regs[rd] <= wd;
+            $display("\033[35m[REG][WRITE]: regs[%d] = 0x%h\033[0m", rd, wd);
         end
     end
-    // always @(*) begin
-    //     rs1_val = (rs1 != 0) ? regs[rs1] : 32'h0;
-    //     rs2_val = (rs2 != 0) ? regs[rs2] : 32'h0;
-    //     $display("\033[35m[REG]: rd=%h | rs1_val=%h | rs2_val=%h\033[0m",rd, rs1_val, rs2_val);
-    // end
+
+    always @(posedge clk) begin
+        // rs1_val = (rs1 != 0) ? regs[rs1] : 32'h0;
+        // rs2_val = (rs2 != 0) ? regs[rs2] : 32'h0;
+        $display("\033[35m[REG][READ]: rs1=%d rs1_val=0x%h | rs2=%d rs2_val=0x%h\033[0m", rs1, rs1_val, rs2, rs2_val);
+    end
 endmodule

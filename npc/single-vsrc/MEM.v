@@ -1,4 +1,4 @@
-`include "/home/furina/ysyx-workbench/npc/vsrc/defines.v"
+`include "/home/furina/ysyx-workbench/npc/single-vsrc/defines.v"
 // 内存模块
 module MEM (
     input         clk,
@@ -41,6 +41,7 @@ module MEM (
                 `Mem_Word:  data_out = pmem_read(addr,4);//lw
                 default: data_out = 32'b0;
             endcase
+            // $display("MEM read");
         end
         else if(MemWrite) begin
             case(MemLen)
@@ -49,6 +50,7 @@ module MEM (
                 `Mem_Word: pmem_write(addr,data_in,4);//sw
                 default: pmem_write(addr,data_in,4);
             endcase
+            // $display("MEM write");
         end
         else data_out=32'b0;
     end

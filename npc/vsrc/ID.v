@@ -125,7 +125,7 @@ module ID (
                             `INST_TYPE_S: begin
                                 imm=immS;
                                 MemWrite=1'b1;
-                                alu_op=`ALU_ADD;//显性设置ALU为加法
+                                // alu_op=`ALU_ADD;//显性设置ALU为加法
                                 case(func3)
                                     `F3_SW: MemLen=`Mem_Word;
                                     `F3_SH: MemLen=`Mem_Half;

@@ -1,4 +1,4 @@
-`include "/home/furina/ysyx-workbench/npc/vsrc/defines.v"
+`include "/home/furina/ysyx-workbench/npc/single-vsrc/defines.v"
 // 取指模块
 module IF (
     input         clk,
@@ -30,7 +30,7 @@ module IF (
 
     always @(*) begin
         instr=pmem_read(pc,4); // 同步读取指令
-        //$display("PC=0x%08x | instr=0x%08x",pc,instr);
+        // $display("PC=0x%08x | instr=0x%08x",pc,instr);
     end
 
 endmodule

@@ -9,17 +9,21 @@
 `define INST_TYPE_L       5'b00000
 `define INST_TYPE_I       5'b00100
 `define INST_TYPE_E       5'b11100
+`define INST_TYPE_CSR     5'b10011
 
 `define INST_LUI       7'b01101_11
 `define INST_AUIPC     7'b00101_11
 `define INST_JAL       7'b11011_11
 `define INST_JALR      7'b11001_11
 `define INST_LW        7'b00000_11
+`define INST_CSR       7'b11100_11
 
 `define INST_B         7'b11000_11
 `define INST_R         7'b01100_11
 `define INST_I         7'b00100_11
 
+`define INST_ECALL        32'h00000073 
+`define INST_MRET         32'h30200073
 //ebreak
 `define INST_EBREAK       32'h00100073
 `define HIT_TRAP          1
@@ -51,6 +55,14 @@
 `define F3_LHU   3'b101
 `define F3_BGEU  3'b111
 
+`define F3_CSRRW  3'b001
+`define F3_CSRRS  3'b010
+`define F3_CSRRC  3'b011
+`define F3_CSRRWI 3'b101
+`define F3_CSRRSI 3'b110
+`define F3_CSRRCI 3'b111
+`define F3_ECALL  3'b000
+
 // ALU 操作码
 `define ALU_ADD    4'b0000
 `define ALU_SUB    4'b0001
@@ -73,3 +85,9 @@
 // `define Mem_Half   2'b01
 // `define Mem_UHalf  2'b11
 // `define Mem_Bit    2'b00
+
+//CSR操作码
+`define CSR_CSRRW 2'b01
+`define CSR_CSRRS 2'b10
+`define CSR_CSRRC 2'b11
+`define CSR_NONE  2'b00

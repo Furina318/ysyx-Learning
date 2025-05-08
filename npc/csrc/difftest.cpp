@@ -14,7 +14,7 @@ extern uint8_t* guest_to_host(paddr_t paddr);
 
 #ifdef CONFIG_DIFFTEST
 
-#define top_regs top->rootp->rv32e__DOT__wb_stage__DOT__regs
+#define top_regs top->rootp->rv32e__DOT__reg_file__DOT__regs
 CPU_state cpu;
 static int skip_cnt_ref = 0;   // the amount to skip the ref
 static bool skip_flag = false; // the flag   to skip the ref 

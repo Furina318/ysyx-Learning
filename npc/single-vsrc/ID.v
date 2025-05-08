@@ -1,7 +1,7 @@
-`include "/home/furina/ysyx-workbench/npc/vsrc/defines.v"
+`include "/home/furina/ysyx-workbench/npc/single-vsrc/defines.v"
 // 译码模块
 module ID (
-    input  [31:0] instr,
+    input      [31:0] instr,
     output reg [6:0]  opcode,
     output reg [4:0]  rs1,
     output reg [4:0]  rs2,
@@ -13,7 +13,11 @@ module ID (
     output reg        MemWrite,
     output reg        MemRead,
     output reg [3:0]  alu_op,
-    output reg [2:0]  MemLen
+    output reg [2:0]  MemLen,
+    output reg        csrWrite,
+    output reg        is_ecall,
+    output reg        is_mret,
+    output reg [1:0]  csr_op
 );
     import "DPI-C" function void ebreak(input int station, input int inst);
 
@@ -23,6 +27,7 @@ module ID (
     reg [31:0] immB;
     reg [31:0] immJ;
     reg [31:0] immR;
+    reg [31:0] immCSR;
     reg [4:0] get_opcode;
     
     assign immI = {{20{instr[31]}}, instr[31:20]};
@@ -31,6 +36,7 @@ module ID (
     assign immB = {{20{instr[31]}}, instr[7], instr[30:25], instr[11:8], 1'b0};
     assign immJ = {{12{instr[31]}}, instr[19:12], instr[20], instr[30:21], 1'b0};
     assign immR = 32'b0;
+    assign immCSR = {27'b0, instr[19:15]};
 
     always @(*) begin
         opcode = instr[6:0];
@@ -46,6 +52,11 @@ module ID (
         MemRead  = 1'b0;
         alu_op   = `ALU_ADD;
         MemLen   = `Mem_Word;
+
+        csr_op = `CSR_NONE;
+        is_ecall = 1'b0;
+        is_mret = 1'b0;
+        csrWrite = 1'b0;
  
         assign get_opcode = opcode[6:2];
 
@@ -75,21 +86,12 @@ module ID (
             end
     
             `INST_TYPE_S: begin
-                // if (func3 == 3'b010) begin
-                //     imm=immS;
-                //     MemWrite=1'b1;
-                // end
-                // else if(func3 == 3'b001) begin
-                //     imm=immS;
-                //     MemWrite=1'b1;
-                //     MemLen=`Mem_Half;
-                // end
-                imm=immS;
-                MemWrite=1'b1;
+                imm = immS;
+                MemWrite = 1'b1;
                 case(func3)
-                    `F3_SW: MemLen=`Mem_Word;
-                    `F3_SH: MemLen=`Mem_Half;
-                    `F3_SB: MemLen=`Mem_Bit;
+                    `F3_SW: MemLen = `Mem_Word;
+                    `F3_SH: MemLen = `Mem_Half;
+                    `F3_SB: MemLen = `Mem_Bit;
                     default: begin
                         ebreak(`ABORT,instr);
                         $display("ID : Uknown S instruction with func3 = %b",func3);
@@ -98,56 +100,42 @@ module ID (
             end
 
             `INST_TYPE_L: begin
-                // imm = immI;
-                // RegWrite = 1'b1;
-                // MemRead = 1'b1;
-                // alu_op = `ALU_ADD;
-                // case(func3)
-                //     `F3_LW:  MemLen = `Mem_Word;
-                //     `F3_LBU: MemLen = `Mem_UBit;
-                //     `F3_LH:  MemLen = `Mem_Half;
-                //     `F3_LHU: MemLen = `Mem_UHalf;
-                //     default: begin
-                //         ebreak(`ABORT,instr);
-                //         $display("ID : Uknown L instruction with func3 = %b",func3);
-                //     end
-                // endcase
                 if(func3 == `F3_LW) begin
-                    imm=immI;
-                    RegWrite=1'b1;
-                    MemRead=1'b1;
+                    imm = immI;
+                    RegWrite = 1'b1;
+                    MemRead = 1'b1;
                     alu_op = `ALU_ADD;
 
                     MemLen = `Mem_Word;
                 end
                 else if(func3 == `F3_LBU) begin
-                    imm=immI;
-                    RegWrite=1'b1;
-                    MemRead=1'b1;
+                    imm  =immI;
+                    RegWrite = 1'b1;
+                    MemRead = 1'b1;
                     alu_op = `ALU_ADD;
 
                     MemLen = `Mem_UBit;//单字节读取
                 end
                 else if(func3 == `F3_LH) begin
-                    imm=immI;
-                    RegWrite=1'b1;
-                    MemRead=1'b1;
+                    imm = immI;
+                    RegWrite = 1'b1;
+                    MemRead = 1'b1;
                     alu_op = `ALU_ADD;
 
                     MemLen = `Mem_Half;
                 end
                 else if(func3 == `F3_LHU) begin
-                    imm=immI;
-                    RegWrite=1'b1;
-                    MemRead=1'b1;
+                    imm = immI;
+                    RegWrite = 1'b1;
+                    MemRead = 1'b1;
                     alu_op = `ALU_ADD;
 
                     MemLen = `Mem_UHalf;
                 end
                 else if(func3 == `F3_LB && opcode == 7'b00000_11) begin
-                    imm=immI;
-                    RegWrite=1'b1;
-                    MemRead=1'b1;
+                    imm = immI;
+                    RegWrite = 1'b1;
+                    MemRead = 1'b1;
                     alu_op = `ALU_ADD;
 
                     MemLen = `Mem_Bit;
@@ -165,7 +153,7 @@ module ID (
                     3'b000:   alu_op = (func7[5]) ? `ALU_SUB : `ALU_ADD; // add, sub
                     `F3_ANDI: alu_op = `ALU_AND; // and
                     `F3_ORI:  alu_op = `ALU_OR; // or
-                    `F3_XORI:   alu_op = `ALU_XOR;// xor
+                    `F3_XORI: alu_op = `ALU_XOR;// xor
                     `F3_SLTU: begin
                         if(func7==7'b0000000) alu_op=`ALU_SLTU;
                         else if(func7==7'b0000000) alu_op=`ALU_SRL;
@@ -188,8 +176,8 @@ module ID (
             end
 
             `INST_TYPE_I: begin
-                imm=immI;
-                RegWrite=1'b1;
+                imm = immI;
+                RegWrite = 1'b1;
                 case(func3)
                     `F3_ADDI: alu_op = `ALU_ADD;
                     `F3_ANDI: alu_op = `ALU_AND;
@@ -231,7 +219,60 @@ module ID (
             `INST_TYPE_E: begin
                 if(instr==`INST_EBREAK) begin
                     ebreak(`HIT_TRAP,instr);
-                    $display("ebreak instruction");
+                    // $display("ebreak instruction");
+                end
+
+                if(opcode == `INST_CSR) begin
+                    case(func3)
+                        `F3_CSRRW: begin
+                            csrWrite = 1'b1;
+                            RegWrite = 1'b1;
+                            csr_op = `CSR_CSRRW;
+                        end
+                        `F3_CSRRS: begin
+                            csrWrite = 1'b1;
+                            RegWrite = 1'b1;
+                            csr_op = `CSR_CSRRS;
+                        end
+                        `F3_CSRRC: begin
+                            csrWrite = 1'b1;
+                            RegWrite = 1'b1;
+                            csr_op = `CSR_CSRRC;
+                        end
+                        `F3_CSRRWI: begin
+                            csrWrite = 1'b1;
+                            RegWrite = 1'b1;
+                            csr_op = `CSR_CSRRW;
+                            imm = immCSR;
+                        end
+                        `F3_CSRRSI: begin
+                            csrWrite = 1'b1;
+                            RegWrite = 1'b1;
+                            csr_op = `CSR_CSRRS;
+                            imm = immCSR;
+                        end
+                        `F3_CSRRCI: begin
+                            csrWrite = 1'b1;
+                            RegWrite = 1'b1;
+                            csr_op = `CSR_CSRRC;
+                            imm = immCSR;
+                        end
+                        `F3_ECALL: begin
+                            if (instr == `INST_ECALL) begin
+                                is_ecall = 1'b1;
+                            end
+                            else if(instr == `INST_MRET) begin
+                                is_mret = 1'b1;
+                            end
+                            // else begin
+                            //     $display("Undefined behaviour CSR instruction");
+                            // end
+                        end
+                        default: begin
+                            ebreak(`ABORT,instr);
+                        $display("ID : Unknown CSR instruction with func3 = %b",func3);
+                        end
+                    endcase
                 end
             end
 

@@ -15,6 +15,10 @@ extern uint8_t* guest_to_host(paddr_t paddr);
 #ifdef CONFIG_DIFFTEST
 
 #define top_regs top->rootp->rv32e__DOT__regfile__DOT__regs
+#define MSTATUS  top->rootp->rv32e__DOT__csr__DOT__mstatus
+#define MEPC     top->rootp->rv32e__DOT__csr__DOT__mepc
+#define MTVEC    top->rootp->rv32e__DOT__csr__DOT__mtvec
+#define MCAUSE   top->rootp->rv32e__DOT__csr__DOT__mcause
 CPU_state cpu;
 static int skip_cnt_ref = 0;   // the amount to skip the ref
 static bool skip_flag = false; // the flag   to skip the ref 
@@ -83,6 +87,25 @@ void init_difftest(char *ref_so_file, long img_size, int port)
     // ref_difftest_regcpy(&cpu, DIFFTEST_TO_REF);
 }
 
+#define CHECKDIFF_MCAUSE() if(ref_r->csr.mcause != MCAUSE){\
+    printf( "mcause mismatch: NPC = 0x%x, REF = 0x%x\n", MCAUSE, ref_r->csr.mcause); \
+    return false; \
+  }
+
+#define CHECKDIFF_MEPC() if(ref_r->csr.mepc != MEPC){\
+    printf( "mepc mismatch: NPC = 0x%x, REF = 0x%x\n", MEPC, ref_r->csr.mepc); \
+    return false; \
+  }
+
+#define CHECKDIFF_MSTATUS() if(ref_r->csr.mstatus != MSTATUS){\
+    printf( "mstatus mismatch: NPC = 0x%x, REF = 0x%x\n", MSTATUS, ref_r->csr.mstatus); \
+    return false; \
+  }
+
+#define CHECKDIFF_MTVEC() if(ref_r->csr.mtvec != MTVEC){\
+    printf( "mtvec mismatch: NPC = 0x%x, REF = 0x%x\n", MTVEC, ref_r->csr.mtvec); \
+    return false; \
+  }
 
 bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc) 
 {
@@ -105,6 +128,10 @@ bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc)
             success = false;
         }
         
+    CHECKDIFF_MCAUSE();
+    CHECKDIFF_MTVEC();
+    CHECKDIFF_MEPC();
+    CHECKDIFF_MSTATUS();
     return success;
 }
 
