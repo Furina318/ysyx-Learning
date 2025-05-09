@@ -1,5 +1,6 @@
 #include "../../include/device/map.h"
 #include "../../include/utils.h"
+#include "../../include/conf.h"
 
 #define KEYDOWN_MASK 0x8000
 
