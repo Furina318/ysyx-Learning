@@ -124,8 +124,8 @@ module rv32e (
     wire [31:0] mem_fault_addr;
 
     // WB 
-    wire [31:0] wb_data, wb_jal_target, wb_jalr_target;
-    wire        wb_is_jal, wb_is_jalr, wb_take_branch;
+    wire [31:0] wb_data, ex_jal_target, ex_jalr_target;
+    wire        ex_is_jal, ex_is_jalr, ex_take_branch;
     wire [4:0]  rd_wb;
     wire        RegWrite_wb;
 
@@ -159,7 +159,7 @@ module rv32e (
                    id_ex_rd != 5'b0) && ex_ready;
 
     // === Flush Unit (Control Hazard) === 控制冒险判断
-    assign flush = (wb_is_jal || wb_is_jalr || wb_take_branch) && wb_valid;
+    assign flush = (ex_is_jal || ex_is_jalr || ex_take_branch) && wb_valid;
 
     // === Module Instantiations ===
     IF if_stage (
@@ -167,7 +167,7 @@ module rv32e (
         .reset(reset),
         .struct_hazard(struct_hazard),
         .branch_target(branch_target),
-        .pc_src(wb_is_jal | wb_is_jalr | wb_take_branch),
+        .pc_src(ex_is_jal | ex_is_jalr | ex_take_branch),
         .pc(if_pc),
         .instr(if_instr),
         .if_ready(if_ready),
@@ -228,11 +228,11 @@ module rv32e (
         .alu_op(id_ex_alu_op),
         .func3(id_ex_func3),
         .pc(id_ex_pc - 4),
-        .jal_target(wb_jal_target),
-        .jalr_target(wb_jalr_target),
-        .is_jal(wb_is_jal),
-        .is_jalr(wb_is_jalr),
-        .take_branch(wb_take_branch),
+        .jal_target(ex_jal_target),
+        .jalr_target(ex_jalr_target),
+        .is_jal(ex_is_jal),
+        .is_jalr(ex_is_jalr),
+        .take_branch(ex_take_branch),
         .mem_ready(mem_ready),
         .ex_valid(ex_valid),
         .alu_result(ex_alu_result),
@@ -291,7 +291,7 @@ module rv32e (
         .wb_data(wb_data)
     );
 
-    assign branch_target = wb_is_jalr ? wb_jalr_target : wb_jal_target;
+    assign branch_target = ex_is_jalr ? ex_jalr_target : ex_jal_target;
 
     // === 流水线寄存器更新 ===
     always @(posedge clk or posedge reset) begin
@@ -408,27 +408,28 @@ module rv32e (
             end
 
             // EX/MEM 
-            if (flush) begin
-                // ex_mem_alu_result = 32'b0;
-                ex_mem_alu_zero = 1'b0;
-                ex_mem_alu_less = 1'b0;
-                ex_mem_RegWrite = 1'b0;
-                ex_mem_MemWrite = 1'b0;
-                ex_mem_MemRead = 1'b0;
-                ex_mem_MemLen = 3'b0;
-                ex_mem_rd = 5'b0;
-                ex_mem_rs1 = 5'b0;
-                ex_mem_rs2 = 5'b0;
-                ex_mem_rs1_val = 32'b0;
-                ex_mem_rs2_val = 32'b0;
-                ex_mem_imm = 32'b0;
-                ex_mem_opcode = 7'b0;
-                ex_mem_func3 = 3'b0;
-                ex_mem_pc = 32'h0;
-                ex_mem_is_ebreak = 1'b0;
-                ex_mem_instr = 32'h0;
-            end
-            else if (ex_valid && mem_ready) begin
+            // if (flush) begin
+            //     // ex_mem_alu_result = 32'b0;
+            //     ex_mem_alu_zero = 1'b0;
+            //     ex_mem_alu_less = 1'b0;
+            //     ex_mem_RegWrite = 1'b0;
+            //     ex_mem_MemWrite = 1'b0;
+            //     ex_mem_MemRead = 1'b0;
+            //     ex_mem_MemLen = 3'b0;
+            //     ex_mem_rd = 5'b0;
+            //     ex_mem_rs1 = 5'b0;
+            //     ex_mem_rs2 = 5'b0;
+            //     ex_mem_rs1_val = 32'b0;
+            //     ex_mem_rs2_val = 32'b0;
+            //     ex_mem_imm = 32'b0;
+            //     ex_mem_opcode = 7'b0;
+            //     ex_mem_func3 = 3'b0;
+            //     ex_mem_pc = 32'h0;
+            //     ex_mem_is_ebreak = 1'b0;
+            //     ex_mem_instr = 32'h0;
+            // end
+            // else 
+            if (ex_valid && mem_ready) begin
                 ex_mem_alu_result = ex_alu_result;
                 ex_mem_alu_zero = ex_alu_zero;
                 ex_mem_alu_less = ex_alu_less;
@@ -451,25 +452,26 @@ module rv32e (
             end
 
             // MEM/WB
-            if (flush) begin
-                mem_wb_alu_zero = 1'b0;
-                mem_wb_alu_less = 1'b0;
-                mem_wb_data_out = 32'b0;
-                // mem_wb_alu_result = 32'b0;
-                mem_wb_opcode = 7'b0;
-                mem_wb_func3 = 3'b0;
-                mem_wb_RegWrite = 1'b0;
-                mem_wb_rd = 5'b0;
-                mem_wb_rs1 = 5'b0;
-                mem_wb_rs2 = 5'b0;
-                mem_wb_rs1_val = 32'b0;
-                mem_wb_rs2_val = 32'b0;
-                mem_wb_pc = 32'h0;
-                mem_wb_imm = 32'b0;
-                mem_wb_is_ebreak = 1'b0;
-                mem_wb_instr = 32'h0;
-            end 
-            else if (mem_valid && wb_ready) begin
+            // if (flush) begin
+            //     mem_wb_alu_zero = 1'b0;
+            //     mem_wb_alu_less = 1'b0;
+            //     mem_wb_data_out = 32'b0;
+            //     // mem_wb_alu_result = 32'b0;
+            //     mem_wb_opcode = 7'b0;
+            //     mem_wb_func3 = 3'b0;
+            //     mem_wb_RegWrite = 1'b0;
+            //     mem_wb_rd = 5'b0;
+            //     mem_wb_rs1 = 5'b0;
+            //     mem_wb_rs2 = 5'b0;
+            //     mem_wb_rs1_val = 32'b0;
+            //     mem_wb_rs2_val = 32'b0;
+            //     mem_wb_pc = 32'h0;
+            //     mem_wb_imm = 32'b0;
+            //     mem_wb_is_ebreak = 1'b0;
+            //     mem_wb_instr = 32'h0;
+            // end 
+            // else 
+            if (mem_valid && wb_ready) begin
                 mem_wb_alu_zero = ex_mem_alu_zero;
                 mem_wb_alu_less = ex_mem_alu_less;
                 mem_wb_data_out = mem_data_out;
@@ -482,7 +484,7 @@ module rv32e (
                 mem_wb_rs2 = ex_mem_rs2;
                 mem_wb_rs1_val = ex_mem_rs1_val; // Directly use register value
                 mem_wb_rs2_val = ex_mem_rs2_val; // Directly use register value
-                mem_wb_pc = ex_mem_pc;
+                mem_wb_pc = flush ? ex_mem_pc - 4 : ex_mem_pc;
                 mem_wb_imm = ex_mem_imm;
                 mem_wb_valid = mem_valid;
                 mem_wb_is_ebreak = ex_mem_is_ebreak;

@@ -3,8 +3,8 @@ MODULE = rv32e
 
 # 源文件路径和定义
 NPC_HOME = /home/furina/ysyx-workbench/npc
-CSRCS = $(shell find $(abspath ./single-csrc) -name "*.cpp")  # 查找 csrc 目录下所有 .cpp 文件
-VSRCS = $(shell find $(abspath ./single-vsrc) -name "*.v")     # 查找 vsrc 目录下所有 .v 文件
+CSRCS = $(shell find $(abspath ./csrc) -name "*.cpp")  # 查找 csrc 目录下所有 .cpp 文件
+VSRCS = $(shell find $(abspath ./vsrc) -name "*.v")     # 查找 vsrc 目录下所有 .v 文件
 
 INC_PATH = $(NPC_HOME)/include/
 CFLAGS += -I$(INC_PATH)  # 包含路径，确保头文件被找到
@@ -20,12 +20,12 @@ BINARY = ./obj_dir/V$(MODULE)
 # DIFFTEST 配置（如果启用）
 # CONFIG_DIFFTEST = 1
 # ifdef CONFIG_DIFFTEST
-DIFF_REF_PATH = /home/furina/ysyx-workbench/nemu/build
-DIFF_REF_SO = $(DIFF_REF_PATH)/riscv32-nemu-interpreter-so
-ARGS_DIFF = --diff=$(DIFF_REF_SO)
+# DIFF_REF_PATH = /home/furina/ysyx-workbench/nemu/build
+# DIFF_REF_SO = $(DIFF_REF_PATH)/riscv32-nemu-interpreter-so
+# ARGS_DIFF = --diff=$(DIFF_REF_SO)
 
-$(DIFF_REF_SO):
-	$(MAKE) -s -C $(DIFF_REF_PATH)
+# $(DIFF_REF_SO):
+# 	$(MAKE) -s -C $(DIFF_REF_PATH)
 # endif
 
 # 参数设置
@@ -41,29 +41,29 @@ endif
 
 
 # 伪目标：运行 GTKWave 查看波形
-# .PHONY: gtkw
-# gtkw: uae.gtkw
-# 	@echo
-# 	@echo "### WAVES ###"
-# 	gtkwave uae.gtkw
+.PHONY: gtkw
+gtkw: uae.gtkw
+	@echo
+	@echo "### WAVES ###"
+	gtkwave uae.gtkw
 
-# # 伪目标：仿真
-# .PHONY: sim
-# sim: wave.vcd
+# 伪目标：仿真
+.PHONY: sim
+sim: wave.vcd
 
-# # 伪目标：查看波形
-# .PHONY: waves
-# waves: wave.vcd
-# 	@echo
-# 	@echo "### WAVES ###"
-# 	gtkwave wave.vcd
+# 伪目标：查看波形
+.PHONY: waves
+waves: wave.vcd
+	@echo
+	@echo "### WAVES ###"
+	gtkwave wave.vcd
 
-# #生成波形文件
-# .PHONY: wave.vcd
-# wave.vcd: $(BINARY)
-# 	@echo
-# 	@echo "### SIMULATING ###"
-# 	@$(BINARY) #+verilator+rand+reset+2
+#生成波形文件
+.PHONY: wave.vcd
+wave.vcd: $(BINARY)
+	@echo
+	@echo "### SIMULATING ###"
+	@$(BINARY) #+verilator+rand+reset+2
 
 
 
@@ -99,8 +99,8 @@ verilate: .stamp.verilate
 .stamp.verilate: $(VSRCS) $(CSRCS)
 	@echo
 	@echo "### VERILATING ###"
-	# verilator -Wno-STMTDLY -Wno-MODDUP --trace --top-module $(MODULE) -cc $(VSRCS) --exe $(CSRCS) -I$(INC_PATH) $(CFLAGS)
-	verilator -Wno-STMTDLY -Wno-MODDUP --top-module $(MODULE) -cc $(VSRCS) --exe $(CSRCS) -I$(INC_PATH) $(CFLAGS)
+	verilator -Wno-STMTDLY -Wno-MODDUP --trace --top-module $(MODULE) -cc $(VSRCS) --exe $(CSRCS) -I$(INC_PATH) $(CFLAGS)
+#	verilator -Wno-STMTDLY -Wno-MODDUP --top-module $(MODULE) -cc $(VSRCS) --exe $(CSRCS) -I$(INC_PATH) $(CFLAGS)
 	@echo "LIBS += $(LIBS)" >> ./obj_dir/V$(MODULE).mk    # 添加链接库
 	@echo "CXXFLAGS += -I$(INC_PATH)" >> ./obj_dir/V$(MODULE).mk  # 添加包含路径
 	@touch .stamp.verilate
@@ -115,9 +115,9 @@ lint: $(MODULE).v
 clean:
 	rm -rf .stamp.*
 	rm -rf ./obj_dir
-#	rm -rf wave.vcd
+	rm -rf wave.vcd
 	rm -rf ./log/*
 
-# .PHONY: wave
-# wave:
-# 	gtkwave wave.vcd
+.PHONY: wave
+wave:
+	gtkwave wave.vcd
