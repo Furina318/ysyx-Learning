@@ -151,7 +151,7 @@ static inline bool in_pmem(paddr_t addr) {
 static inline void out_of_bound(paddr_t addr) {
   regs_display();
   printf("[npc]address = 0x%08x is out of bound of pmem [0x%08x, 0x%08x] at pc = 0x%08x  time = %ld\n", 
-         addr, PMEM_LEFT, PMEM_RIGHT, top->rootp->rv32e__DOT__if_pc, main_time);
+         addr, PMEM_LEFT, PMEM_RIGHT, top->rootp->rv32e__DOT__IF_ID_pc, main_time);
   npc_state.state=NPC_ABORT;
   // die();
   // _Log(ANSI_FG_RED "address = 0x%08x is out of bound of pmem [0x%08x, 0x%08x] at pc = 0x%08x  time = %ld", 

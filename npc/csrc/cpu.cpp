@@ -4,12 +4,12 @@
 #include "../include/macro.h"
 #include "../include/conf.h"
 #include "../include/paddr.h"
+#include "../include/difftest.h"
 #include "Vrv32e.h"
 #include "Vrv32e__Dpi.h"
 #include "../obj_dir/Vrv32e___024root.h"
 #include "svdpi.h"
 #include "verilated_vcd_c.h"
-// #include "../include/reg.h"
 
 /********extern functions or variables********/
 
@@ -34,6 +34,9 @@ extern vluint64_t main_time;
 #define start_time 10
 bool once = false;
 /*********************************************/
+
+word_t diff_pc[2] = {0};
+word_t last_pc;
 
 /*********** FUNC_TRACE ***********/
 #define MAX_FTRACE_SIZE 1000
@@ -183,8 +186,8 @@ static void statistic() {
 }
 
 static void execute_once() {
-    PCSet.pc = top->rootp->rv32e__DOT__if_pc;
-    PCSet.inst = top->rootp->rv32e__DOT__if_instr;
+    PCSet.pc = top->rootp->rv32e__DOT__IF_ID_pc;
+    PCSet.inst = top->rootp->rv32e__DOT__IF_ID_inst;
     // printf("pc=0x%08x | inst=0x%08x\n",PCSet.pc,PCSet.inst);
 
     single_cycle();
@@ -194,8 +197,8 @@ static void execute_once() {
   ftrace_handle();
 #endif 
 
-    PCSet.next_pc = top->rootp->rv32e__DOT__if_pc;
-    PCSet.ninst = top->rootp->rv32e__DOT__if_instr;
+    PCSet.next_pc = top->rootp->rv32e__DOT__IF_ID_pc;
+    PCSet.ninst = top->rootp->rv32e__DOT__IF_ID_inst;
     // printf("next_pc=0x%08x | next_inst=0x%08x\n\n",PCSet.next_pc,PCSet.ninst);
 
 #ifdef CONFIG_ITRACE
@@ -214,15 +217,28 @@ static void trace_and_difftest(){
   if(g_print_step){
     IFDEF(CONFIG_ITRACE,puts(logbuf));
   }
+  //difftest
   #ifdef CONFIG_DIFFTEST
   if(top->rootp->rv32e__DOT__wb_valid){
     // printf("pc=0x%08x | inst=0x%08x\n",PCSet.pc,PCSet.inst);
     // printf("next_pc=0x%08x | next_inst=0x%08x\n\n",PCSet.next_pc,PCSet.ninst);
+    
     difftest_step(PCSet.pc,PCSet.next_pc);
   }
-  // IFDEF(CONFIG_DIFFTEST,difftest_step(PCSet.pc,PCSet.next_pc));
   #endif
-  
+
+  // #ifdef CONFIG_DIFFTEST
+  // if(PCSet.pc!= last_pc && main_time >= start_time){
+  //   diff_pc[1] = diff_pc[0];
+  //   diff_pc[0] = last_pc;
+  //   last_pc = PCSet.pc;
+  //   difftest_step(diff_pc[1],PCSet.next_pc);
+  // }
+  // else{
+  //   diff_pc[1] = diff_pc[0];
+  //   diff_pc[0] = last_pc;
+  // }
+  // #endif
 }
 
 static void execute(uint64_t n) {
@@ -268,7 +284,6 @@ void cpu_exec(uint64_t n) {
                 (npc_state.halt_ret == 0 ? ANSI_FMT("HIT GOOD TRAP", ANSI_FG_GREEN) :
                                            ANSI_FMT("HIT BAD TRAP", ANSI_FG_RED))),
                 npc_state.halt_pc);
-                // regs_display();
                 // die();
         case NPC_QUIT:
             statistic();

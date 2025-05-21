@@ -35,8 +35,8 @@ extern "C" void ebreak(int station, int inst) {
         if (Verilated::gotFinish())
             return;
 
-        npc_state.halt_ret = top->rootp->rv32e__DOT__reg_file__DOT__regs[10]; // a0
-        npc_state.halt_pc = top->rootp->rv32e__DOT__if_pc;
+        npc_state.halt_ret = top->rootp->rv32e__DOT__wbu__DOT__regs[10]; // a0
+        npc_state.halt_pc = top->rootp->rv32e__DOT__IF_ID_pc;
 
         switch (station) {
             case HIT_TRAP:
@@ -46,7 +46,7 @@ extern "C" void ebreak(int station, int inst) {
 
             case ABORT:
             default:
-                Log("maintime = %ld, pc = 0x%08x, inst = 0x%08x", main_time, top->rootp->rv32e__DOT__if_pc, top->rootp->rv32e__DOT__if_instr);
+                Log("maintime = %ld, pc = 0x%08x, inst = 0x%08x", main_time, top->rootp->rv32e__DOT__IF_ID_pc, top->rootp->rv32e__DOT__IF_ID_inst);
                 npc_state.state = NPC_ABORT;
                 // _Log(ANSI_FG_RED "HIT BAD TRAP\n" ANSI_NONE);
                 break;
