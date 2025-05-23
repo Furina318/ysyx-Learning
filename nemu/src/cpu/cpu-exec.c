@@ -248,17 +248,17 @@ static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
   }
 #endif
 }
-int cnt =0;
+// int cnt =0;
 static void exec_once(Decode *s, vaddr_t pc) {
   s->pc = pc;
   s->snpc = pc;
   isa_exec_once(s);
 
-  if(cnt <= 10) cnt++;
-  else{
-    printf("pc: 0x%08x\n",s->pc);
-    cnt = 0;
-  }
+  // if(cnt <= 10) cnt++;
+  // else{
+  //   printf("pc: 0x%08x\n",s->pc);
+  //   cnt = 0;
+  // }
 
   uint32_t opcode = s->isa.inst & 0x7f;
   if(opcode == 0x0000006f || opcode == 0x00000067) {}
