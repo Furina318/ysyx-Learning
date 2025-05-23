@@ -20,3 +20,11 @@ void __am_timer_rtc(AM_TIMER_RTC_T *rtc) {
   rtc->month  = 0;
   rtc->year   = 1900;
 }
+
+//先更新高32位，再更新低32位原因：
+// if (!is_write && offset == 4) {
+//     uint64_t us = get_time();
+//     rtc_port_base[0] = (uint32_t)us;
+//     rtc_port_base[1] = us >> 32;
+//   }
+//在nemu的rtc中对时钟的调用如上。。。
