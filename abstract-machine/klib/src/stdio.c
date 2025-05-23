@@ -5,25 +5,24 @@
 
 #if !defined(__ISA_NATIVE__) || defined(__NATIVE_USE_KLIB__)
 
-void int_to_str(int num, char *buffer, int *index) {
+void int_to_str(int num, char *buffer, int *index, int *is_negative) {
+    *is_negative = 0;
     if (num == 0) {
         buffer[(*index)++] = '0';
         return;
     }
+    
     char temp[32];
     int temp_index = 0;
-    int is_negative = num < 0;
-    if (is_negative) {
-        num = -num;
+    *is_negative = (num < 0);
+    unsigned int n = (unsigned int)(*is_negative ? -num : num);
+    
+    while (n > 0) {
+        temp[temp_index++] = (char)((n % 10) + '0');
+        n /= 10;
     }
-    while (num > 0) {
-        temp[temp_index++] = (char)((num % 10) + '0');
-        num /= 10;
-    }
-    if (is_negative) {
-        buffer[(*index)++] = '-';
-    }
-    // 反向复制到缓冲区
+    
+    // 反向复制数字部分
     for (int i = temp_index - 1; i >= 0; i--) {
         buffer[(*index)++] = temp[i];
     }
@@ -45,27 +44,6 @@ void int_to_base_str(unsigned int num, char *buffer, int *index, int base) {
         buffer[(*index)++] = temp[i];
     }
 }
-
-// void float_to_str(double num, char *buffer, int *index, int precision) {
-//     if (num < 0) {
-//         buffer[(*index)++] = '-';
-//         num = -num;
-//     }
-//     int int_part = (int)num;
-//     double frac_part = num - int_part;
-//     int_to_str(int_part, buffer, index);
-//     buffer[(*index)++] = '.';
-//     for (int i = 0; i < precision; i++) {
-//         frac_part *= 10;
-//         int digit = (int)frac_part;
-//         buffer[(*index)++] = '0' + digit;
-//         frac_part -= digit;
-//     }
-//     // 去掉末尾的多余零
-//     while (buffer[*index - 1] == '0' && buffer[*index - 2] != '.') {
-//         (*index)--;
-//     }
-// }
 
 void long_to_str(long long num, char *buffer, int *index) {
     if (num == 0) {
@@ -101,7 +79,7 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
     int d;
     long ld;
     long long lld;
-    short hd;
+    // short hd;
     char c;
     char buffer[1024] = {0};  // 初始化为零
     int index = 0;
@@ -124,8 +102,21 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
             out[index++] = *fmt;
             continue;
         }
-        fmt++;
+        fmt++;//跳过“%”
         
+        int width = 0;
+        int zero_pad = 0;
+        //解析标志
+        if(*fmt == '0'){
+            zero_pad = 1;
+            fmt++;
+        }
+        //解析宽度
+        while(*fmt >= '0' && *fmt <= '9') {
+            width = width * 10 + (*fmt - '0');
+            fmt++;
+        }
+
         // 处理精度
         if (*fmt == '.') {
             fmt++;
@@ -146,9 +137,25 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
                 break;
             case 'd':
                 d = va_arg(ap, int);
-                int_to_str(d, buffer, &buffer_index);
-                for (int i = 0; i < buffer_index; i++) {
-                    out[index++] = buffer[i];
+                char num_buffer[32];  // 临时缓冲区
+                int num_index = 0;
+                int is_negative = 0;
+                int_to_str(d, num_buffer, &num_index, &is_negative);
+                int total_length = num_index + (is_negative ? 1 : 0);
+                int pad = width - total_length;
+                if (pad < 0) pad = 0;
+                if (zero_pad) {
+                    if(is_negative) out[index++] = '-';
+                    //添加前导零
+                    for (int i = 0; i < pad; i++) out[index++] = '0';
+                    //添加数字
+                    for (int i = 0; i < num_index; i++) out[index++] = num_buffer[i];
+                }else{
+                    //添加空格
+                    for (int i = 0; i < pad; i++) out[index++] = ' ';
+                    if(is_negative) out[index++] = '-';
+                    //添加数字
+                    for (int i = 0; i < num_index; i++) out[index++] = num_buffer[i];
                 }
                 break;
             case 'x':
@@ -202,54 +209,21 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
                     }
                 }
                 break;
-            case 'h':
-                fmt++;
-                if (*fmt == 'd') {
-                    hd = (short)va_arg(ap, int);
-                    buffer_index = 0;
-                    int_to_str(hd, buffer, &buffer_index);
-                    for (int i = 0; i < buffer_index; i++) {
-                        out[index++] = buffer[i];
-                    }
-                }
-                break;
-            case '0':
-                fmt++;
-                if (*fmt == 'd') {
-                    d = va_arg(ap, int);
-                    buffer_index = 0;
-                    int_to_str(d, buffer, &buffer_index);
-                    for (int i = 0; i < precision - buffer_index; i++) {
-                        out[index++] = '0';
-                    }
-                    for (int i = 0; i < buffer_index; i++) {
-                        out[index++] = buffer[i];
-                    }
-                } else {
-                    fmt++;
-                    out[index++] = '0';
-                }
-                break;
+            // case 'h':
+            //     fmt++;
+            //     if (*fmt == 'd') {
+            //         hd = (short)va_arg(ap, int);
+            //         buffer_index = 0;
+            //         int_to_str(hd, buffer, &buffer_index);
+            //         for (int i = 0; i < buffer_index; i++) {
+            //             out[index++] = buffer[i];
+            //         }
+            //     }
+            //     break;
             default:
-                fmt++;
-                if (*fmt == 'd') {
-                    d = va_arg(ap, int);
-                    buffer_index = 0;
-                    int_to_str(d, buffer, &buffer_index);
-                    for (int i = 0; i < precision - buffer_index; i++) {
-                        out[index++] = ' ';
-                    }
-                    for (int i = 0; i < buffer_index; i++) {
-                        out[index++] = buffer[i];
-                    }
-                } else {
-                    fmt++;
-                    out[index++] = ' ';
-                }
+                out[index++] = '%';
+                out[index++] = *fmt;
                 break;
-                // out[index++] = '%';
-                // out[index++] = *fmt;
-                // break;
         }
     }
     out[index] = '\0';
