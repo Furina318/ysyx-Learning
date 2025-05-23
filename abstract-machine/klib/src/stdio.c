@@ -213,6 +213,20 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
                     }
                 }
                 break;
+            case '0':
+                fmt++;
+                if (*fmt == 'd') {
+                    d = va_arg(ap, int);
+                    buffer_index = 0;
+                    int_to_str(d, buffer, &buffer_index);
+                    for (int i = 0; i < precision - buffer_index; i++) {
+                        out[index++] = '0';
+                    }
+                    for (int i = 0; i < buffer_index; i++) {
+                        out[index++] = buffer[i];
+                    }
+                }
+                break;
             default:
                 out[index++] = '%';
                 out[index++] = *fmt;
