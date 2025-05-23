@@ -225,6 +225,9 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
                     for (int i = 0; i < buffer_index; i++) {
                         out[index++] = buffer[i];
                     }
+                } else {
+                    fmt++;
+                    out[index++] = '0';
                 }
                 break;
             default:
