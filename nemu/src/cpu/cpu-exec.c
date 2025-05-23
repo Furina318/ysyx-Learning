@@ -254,7 +254,7 @@ static void exec_once(Decode *s, vaddr_t pc) {
   s->snpc = pc;
   isa_exec_once(s);
 
-  if(cnt <= 1000) cnt++;
+  if(cnt <= 100) cnt++;
   else{
     printf("pc: 0x%08x\n",s->pc);
     cnt = 0;
