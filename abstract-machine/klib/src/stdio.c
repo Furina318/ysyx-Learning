@@ -231,9 +231,25 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
                 }
                 break;
             default:
-                out[index++] = '%';
-                out[index++] = *fmt;
+                fmt++;
+                if (*fmt == 'd') {
+                    d = va_arg(ap, int);
+                    buffer_index = 0;
+                    int_to_str(d, buffer, &buffer_index);
+                    for (int i = 0; i < precision - buffer_index; i++) {
+                        out[index++] = ' ';
+                    }
+                    for (int i = 0; i < buffer_index; i++) {
+                        out[index++] = buffer[i];
+                    }
+                } else {
+                    fmt++;
+                    out[index++] = ' ';
+                }
                 break;
+                // out[index++] = '%';
+                // out[index++] = *fmt;
+                // break;
         }
     }
     out[index] = '\0';
