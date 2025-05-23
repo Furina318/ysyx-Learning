@@ -254,10 +254,10 @@ static void exec_once(Decode *s, vaddr_t pc) {
   s->snpc = pc;
   isa_exec_once(s);
 
-  uint32_t opcode = s->isa.inst & 0x7f;
+  // uint32_t opcode = s->isa.inst & 0x7f;
 #ifdef CONFIG_BRANCH_Predictor
   // 分支预测器逻辑
-  // uint32_t opcode = s->isa.inst & 0x7f;
+  uint32_t opcode = s->isa.inst & 0x7f;
   bool is_branch = (opcode == 0x63);  //条件分支 (beq,bne等)
   bool is_jal = (opcode == 0x6f);     //无条件跳转(jal)
   bool is_jalr = (opcode == 0x67);    //间接跳转(jalr)
@@ -312,7 +312,7 @@ static void exec_once(Decode *s, vaddr_t pc) {
 #endif
 
 #ifdef CONFIG_FUNC_TRACE
-  // uint32_t opcode = s->isa.inst & 0x7f;
+  uint32_t opcode = s->isa.inst & 0x7f;
   vaddr_t target=s->dnpc;
   if(opcode==0x6f){ //JAL指令（函数调用）11011 11//JALR指令11001 11
     vaddr_t ret_addr=pc+4;
