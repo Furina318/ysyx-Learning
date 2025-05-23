@@ -254,21 +254,20 @@ int sprintf(char *out, const char *fmt, ...) {
     return val;
 }
 
-
-int snprintf(char *out, size_t n, const char *fmt, ...) {
-    va_list args;
-    va_start(args, fmt);
-    int len = vsnprintf(out, n, fmt, args);
-    va_end(args);
-    return len;
-}
-
 int vsnprintf(char *out, size_t n, const char *fmt, va_list ap) {
     char buffer[1024]; // 临时缓冲区
     int len = vsprintf(buffer, fmt, ap); // 先格式化到临时缓冲区
     if (len >= n) len = n - 1; // 截断超出部分
     memcpy(out, buffer, len); // 复制到输出缓冲区
     out[len] = '\0'; // 确保字符串以\0结尾
+    return len;
+}
+
+int snprintf(char *out, size_t n, const char *fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+    int len = vsnprintf(out, n, fmt, args);
+    va_end(args);
     return len;
 }
 
