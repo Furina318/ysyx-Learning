@@ -92,8 +92,21 @@ void *memcpy(void *out, const void *in, size_t n) {
   if (out == NULL || in == NULL) return NULL;
   char *dst=(char *)out;
   const char *src=(const char *)in;
-  while(n--) *dst++ = *src++;
-  return out; 
+  // while(n--) *dst++ = *src++;
+  if (src < dst && dst < src + n) {
+        // 从后往前复制防止覆盖
+        dst += n - 1;
+        src += n - 1;
+        while (n--) {
+            *dst-- = *src--;
+        }
+    } else {
+        // 正常从前向后复制
+        while (n--) {
+            *dst++ = *src++;
+        }
+    }
+    return out;
 }
 
 int memcmp(const void *s1, const void *s2, size_t n) {
