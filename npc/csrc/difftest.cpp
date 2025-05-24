@@ -18,7 +18,7 @@ extern uint8_t* guest_to_host(paddr_t paddr);
 CPU_state cpu;
 static int skip_cnt_ref = 0;   // the amount to skip the ref
 static bool skip_flag = false; // the flag   to skip the ref 
-static bool rst_flag = false;
+static bool rst_flag = true;
 
 void (*ref_difftest_memcpy)(paddr_t addr, void *buf, size_t n, bool direction) = NULL;
 void (*ref_difftest_regcpy)(void *dut, bool direction) = NULL;
@@ -47,7 +47,7 @@ static void update_cpu_state(CPU_state *cpu)
 
 void init_difftest(char *ref_so_file, long img_size, int port) 
 {
-    // update_cpu_state(&cpu);
+    update_cpu_state(&cpu);
     // printf("%s\n",ref_so_file);
     assert(ref_so_file != NULL);
     // printf("%s\n",ref_so_file);
@@ -121,20 +121,20 @@ static void checkregs(CPU_state *ref, vaddr_t pc, vaddr_t npc)
 
 void difftest_step(vaddr_t pc, vaddr_t npc) 
 {
-    CPU_state ref_r;
-    update_cpu_state(&ref_r);
+    // CPU_state ref_r;
+    update_cpu_state(&cpu);
     if(rst_flag == true){
         rst_flag = false;
     }else{
         if(skip_flag){
-            ref_difftest_regcpy(&ref_r, DIFFTEST_TO_REF);
+            ref_difftest_regcpy(&cpu, DIFFTEST_TO_REF);
             skip_flag = false;
             return;
         }
         ref_difftest_exec(1);
-        ref_difftest_regcpy(&ref_r, DIFFTEST_TO_DUT);
+        ref_difftest_regcpy(&cpu, DIFFTEST_TO_DUT);
 
-        checkregs(&ref_r, pc, npc);
+        checkregs(&cpu, pc, npc);
     }
     printf("pc:0x%08x npc:0x%08x\n",pc,npc);
 }

@@ -223,7 +223,7 @@ static void trace_and_difftest(){
   if(!top->rootp->rv32e__DOT__ex_flush){
     diff_pc[2] = diff_pc[1];
     diff_pc[1] = diff_pc[0];
-    diff_pc[0] = top->rootp->rv32e__DOT__IF_ID_pc;
+    diff_pc[0] = PCSet.pc;
     if(PCSet.pc!= diff_pc[1] && run_time >= start_time){
       difftest_step(diff_pc[2],diff_pc[1]);
     }
