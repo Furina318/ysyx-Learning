@@ -136,6 +136,7 @@ void difftest_step(vaddr_t pc, vaddr_t npc)
 
         checkregs(&ref_r, pc, npc);
     }
+    printf("pc:0x%08x npc:0x%08x\n",pc,npc);
 }
 
 

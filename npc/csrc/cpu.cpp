@@ -17,7 +17,7 @@ extern void single_cycle(void);
 // extern NPCState npc_state;
 extern Vrv32e *top;
 extern VerilatedVcdC *tfp;
-extern vluint64_t main_time;
+// extern vluint64_t main_time;
 extern void die();
 
 #ifdef CONFIG_ITRACE 
@@ -30,13 +30,11 @@ extern void difftest_step(vaddr_t pc, vaddr_t npc);
 extern void (*ref_difftest_regcpy)(void *dut, bool direction);
 #endif
 
-extern vluint64_t main_time;
+// extern vluint64_t main_time;
+int run_time = 0;
 #define start_time 10
 bool once = false;
 /*********************************************/
-
-word_t diff_pc[2] = {0};
-word_t last_pc;
 
 /*********** FUNC_TRACE ***********/
 #define MAX_FTRACE_SIZE 1000
@@ -193,6 +191,8 @@ static void execute_once() {
     single_cycle();
     single_cycle(); // 执行一个时钟周期
 
+    if(run_time <= start_time) run_time++;
+
 #ifdef CONFIG_FTRACE
   ftrace_handle();
 #endif 
@@ -210,6 +210,7 @@ static void execute_once() {
 
 }
 
+word_t diff_pc[10];
 static void trace_and_difftest(){
   #ifdef CONFIG_ITRACE
     log_write("%s\n",logbuf);
@@ -219,26 +220,25 @@ static void trace_and_difftest(){
   }
   //difftest
   #ifdef CONFIG_DIFFTEST
-  if(top->rootp->rv32e__DOT__wb_valid){
-    // printf("pc=0x%08x | inst=0x%08x\n",PCSet.pc,PCSet.inst);
-    // printf("next_pc=0x%08x | next_inst=0x%08x\n\n",PCSet.next_pc,PCSet.ninst);
-    
-    difftest_step(PCSet.pc,PCSet.next_pc);
+  if(!top->rootp->rv32e__DOT__ex_flush){
+    diff_pc[2] = diff_pc[1];
+    diff_pc[1] = diff_pc[0];
+    diff_pc[0] = top->rootp->rv32e__DOT__IF_ID_pc;
+    if(PCSet.pc!= diff_pc[1] && run_time >= start_time){
+      difftest_step(diff_pc[2],diff_pc[1]);
+    }
+  }else{
+    diff_pc[2] = diff_pc[1];
+    diff_pc[1] = diff_pc[0];
+    diff_pc[0] = top->rootp->rv32e__DOT__ex_flush_pc;
   }
+  // if(top->rootp->rv32e__DOT__wb_valid){
+  //   // printf("pc=0x%08x | inst=0x%08x\n",PCSet.pc,PCSet.inst);
+  //   // printf("next_pc=0x%08x | next_inst=0x%08x\n\n",PCSet.next_pc,PCSet.ninst);
+    
+  //   difftest_step(PCSet.pc,PCSet.next_pc);
+  // }
   #endif
-
-  // #ifdef CONFIG_DIFFTEST
-  // if(PCSet.pc!= last_pc && main_time >= start_time){
-  //   diff_pc[1] = diff_pc[0];
-  //   diff_pc[0] = last_pc;
-  //   last_pc = PCSet.pc;
-  //   difftest_step(diff_pc[1],PCSet.next_pc);
-  // }
-  // else{
-  //   diff_pc[1] = diff_pc[0];
-  //   diff_pc[0] = last_pc;
-  // }
-  // #endif
 }
 
 static void execute(uint64_t n) {

@@ -4,7 +4,7 @@
 module EX (
     input             clk,
     input             reset,
-    input             id_ready,        // ID -> IF
+    input             id_ready,      
     input             id_valid,
     output reg        ex_ready,
     input             mem_ready,
@@ -186,8 +186,8 @@ module EX (
     reg        ex_flush_condition;
 
     always @(*) begin
-        jal_target  = id_ex_pc + id_ex_imm;
-        jalr_target = (src1 + id_ex_imm) & ~32'h1;
+        jal_target  = process_result;
+        jalr_target = process_result & ~32'h1;
         take_branch = (id_ex_opcode == `INST_B) && (
                     (id_ex_func3 == `F3_BNE && !alu_zero) || // bne
                     (id_ex_func3 == `F3_BEQ && alu_zero) ||  // beq
