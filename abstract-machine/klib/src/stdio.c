@@ -147,11 +147,11 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
                 if (zero_pad) {
                     if(is_negative) out[index++] = '-';
                     // //添加前导零
-                    // for (int i = 0; i < pad; i++) out[index++] = '0';
+                    for (int i = 0; i < pad; i++) out[index++] = '0';
                     // //添加数字
                     // for (int i = 0; i < num_index; i++) out[index++] = num_buffer[i];
-                    int zero_need = (width > num_index) ? (width - num_index) : 0;
-                    for(int i = 0; i < zero_need; i++) out[index++] = '0';
+                    // int zero_need = (width > num_index) ? (width - num_index) : 0;
+                    // for(int i = 0; i < zero_need; i++) out[index++] = '0';
                     int copy_len = (width < num_index) ? width : num_index;
                     for(int i = 0; i < copy_len; i++) out[index++] = num_buffer[i];
                 }else{
