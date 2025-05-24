@@ -196,18 +196,35 @@ module MEM (
         end
     end
 
-    wire [31:0] rd_data;
-    assign rd_data = (ex_mem_forward_las) ? data_in :
-                     (l_opcode == `INST_LW) ? wr_rd_data :
-                    //  (ex_mem_opcode == `INST_LW) ? wr_rd_data :
-                     (ex_mem_opcode == `INST_LUI) ? ex_mem_imm :
-                    //  (ex_mem_opcode == `INST_AUIPC) ? ex_mem_process_result:
-                     (ex_mem_opcode == `INST_AUIPC) ? ex_mem_pc + ex_mem_imm :
-                     (ex_mem_opcode == `INST_JAL) ? ex_mem_pc + 4 :
-                     (ex_mem_opcode == `INST_JALR) ? ex_mem_pc + 4 :
-                     (ex_mem_opcode == `INST_CSR) ? ex_mem_csr_rdata :
-                     (ex_mem_opcode == `INST_R) ? ex_mem_process_result :
-                     (ex_mem_opcode == `INST_I) ? ex_mem_process_result : 32'b0;
+    reg [31:0] rd_data;
+    always @(*) begin
+        if(l_load) begin
+            rd_data = wr_rd_data;
+        end
+        else if(ex_mem_forward_las) begin
+            rd_data = data_in;
+        end
+        else if(ex_mem_MemWrite) begin
+            rd_data = 32'h0;
+        end
+        else if(ex_mem_csr & !ex_mem_csr_ecall & !ex_mem_csr_mret) begin
+            rd_data = ex_mem_csr_rdata;
+        end
+        else begin
+            rd_data = ex_mem_process_result;
+        end
+    end
+    // assign rd_data = (ex_mem_forward_las) ? data_in :
+    //                  (ex_mem_opcode == `INST_LW) ? wr_rd_data :
+    //                 //  (ex_mem_opcode == `INST_LW) ? wr_rd_data :
+    //                  (ex_mem_opcode == `INST_LUI) ? ex_mem_imm :
+    //                 //  (ex_mem_opcode == `INST_AUIPC) ? ex_mem_process_result:
+    //                  (ex_mem_opcode == `INST_AUIPC) ? ex_mem_pc + ex_mem_imm :
+    //                  (ex_mem_opcode == `INST_JAL) ? ex_mem_pc + 4 :
+    //                  (ex_mem_opcode == `INST_JALR) ? ex_mem_pc + 4 :
+    //                  (ex_mem_opcode == `INST_CSR) ? ex_mem_csr_rdata :
+    //                  (ex_mem_opcode == `INST_R) ? ex_mem_process_result :
+    //                  (ex_mem_opcode == `INST_I) ? ex_mem_process_result : 32'b0;
 
     // 流水线握手逻辑
     always @(posedge clk) begin
