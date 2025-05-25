@@ -43,10 +43,11 @@ __EXPORT void difftest_regcpy(void *dut, bool direction) {
   // } else {
   //   *dut_r = cpu;
   // }
+  CPU_state *diff_dut = (CPU_state *)dut;
   if(direction == DIFFTEST_TO_REF){
-    memcpy(&cpu, dut, DIFFTEST_REG_SIZE);
+    memcpy(&cpu, diff_dut, DIFFTEST_REG_SIZE);
   }else if(direction == DIFFTEST_TO_DUT){
-    memcpy(dut, &cpu, DIFFTEST_REG_SIZE);
+    memcpy(diff_dut, &cpu, DIFFTEST_REG_SIZE);
   }else{
     printf("Invaild direction in difftest_regcpy\n");
     assert(0);

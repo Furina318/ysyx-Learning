@@ -47,7 +47,7 @@ static void update_cpu_state(CPU_state *cpu)
 
 void init_difftest(char *ref_so_file, long img_size, int port) 
 {
-    update_cpu_state(&cpu);
+    // update_cpu_state(&cpu);
     // printf("%s\n",ref_so_file);
     assert(ref_so_file != NULL);
     // printf("%s\n",ref_so_file);
@@ -115,28 +115,32 @@ static void checkregs(CPU_state *ref, vaddr_t pc, vaddr_t npc)
         npc_state.state = NPC_ABORT;
         npc_state.halt_pc = pc;
         Log("Differential test %s at pc = 0x%08x." , (ANSI_FMT("fails", ANSI_FG_RED)), npc_state.halt_pc);
+        for(int i = 0; i < 32; i++)
+        {
+            printf("%s:\t0x%08x\n", ref_regs[i], ref->gpr[i]);
+        }
     }
 }
 
 
 void difftest_step(vaddr_t pc, vaddr_t npc) 
 {
-    // CPU_state ref_r;
-    update_cpu_state(&cpu);
+    CPU_state ref_r;
+    update_cpu_state(&ref_r);
     if(rst_flag == true){
         rst_flag = false;
     }else{
         if(skip_flag){
-            ref_difftest_regcpy(&cpu, DIFFTEST_TO_REF);
+            ref_difftest_regcpy(&ref_r, DIFFTEST_TO_REF);
             skip_flag = false;
             return;
         }
         ref_difftest_exec(1);
-        ref_difftest_regcpy(&cpu, DIFFTEST_TO_DUT);
+        ref_difftest_regcpy(&ref_r, DIFFTEST_TO_DUT);
 
-        checkregs(&cpu, pc, npc);
+        checkregs(&ref_r, pc, npc);
     }
-    printf("pc:0x%08x npc:0x%08x\n",pc,npc);
+    printf("nemu-pc: %08x\n",ref_r.pc);
 }
 
 

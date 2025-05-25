@@ -211,6 +211,8 @@ static void execute_once() {
 }
 
 word_t diff_pc[10];
+bool is_flush = false;
+int count = 0;
 static void trace_and_difftest(){
   #ifdef CONFIG_ITRACE
     log_write("%s\n",logbuf);
@@ -220,17 +222,24 @@ static void trace_and_difftest(){
   }
   //difftest
   #ifdef CONFIG_DIFFTEST
-  if(!top->rootp->rv32e__DOT__ex_flush){
+  if(!top->rootp->rv32e__DOT__wbu__DOT__flush){
     diff_pc[2] = diff_pc[1];
     diff_pc[1] = diff_pc[0];
     diff_pc[0] = PCSet.pc;
-    if(PCSet.pc!= diff_pc[1] && run_time >= start_time){
+    if(run_time >= start_time - 6 && !is_flush){
+      printf("pc: %08x | npc: %08x\n",diff_pc[2],diff_pc[1]);
       difftest_step(diff_pc[2],diff_pc[1]);
+    }else{
+      is_flush = false;
     }
   }else{
     diff_pc[2] = diff_pc[1];
-    diff_pc[1] = diff_pc[0];
-    diff_pc[0] = top->rootp->rv32e__DOT__ex_flush_pc;
+    diff_pc[1] = top->rootp->rv32e__DOT__IF_ID_pc;
+    if(run_time >= start_time - 6 ){
+      printf("flush: pc: %08x | npc: %08x\n",diff_pc[1],diff_pc[0]);
+      difftest_step(diff_pc[1],diff_pc[0]);
+      is_flush = true;
+    }
   }
   // if(top->rootp->rv32e__DOT__wb_valid){
   //   // printf("pc=0x%08x | inst=0x%08x\n",PCSet.pc,PCSet.inst);
