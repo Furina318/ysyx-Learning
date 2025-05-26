@@ -62,6 +62,6 @@ void isa_csr_display() {
   _Log(ANSI_FG_YELLOW "$%s\t " ANSI_NONE, csrs[3]);
   _Log("0x%08x\t %010u\n", cpu.csr.mtvec, cpu.csr.mtvec);
   
-  _Log(ANSI_FG_YELLOW "$%s\t " ANSI_NONE, csrs[2]);
+  _Log(ANSI_FG_YELLOW "$%s " ANSI_NONE, csrs[2]);
   _Log("0x%08x\t %010u\n", cpu.csr.mstatus, cpu.csr.mstatus);
 }
