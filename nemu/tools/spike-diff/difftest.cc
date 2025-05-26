@@ -46,7 +46,11 @@ typedef struct{
 struct diff_context_t {
   word_t gpr[MUXDEF(CONFIG_RVE, 16, 32)];
   word_t pc;
-  riscv32_CSRs csr;
+  // riscv32_CSRs csr;
+  word_t mcause;
+  word_t mepc;
+  word_t mstatus;
+  word_t mtvec;
 };
 
 static sim_t* s = NULL;
