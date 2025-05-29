@@ -10,24 +10,24 @@
 // va_arg用于从可变参数列表中提取参数。需要指定参数的类型。
 // va_end清理 va_list，结束可变参数的使用
 
-// int printf(const char *fmt, ...){
-//     char buf[2048];
-//     va_list args;
-//     va_start(args,fmt);
-//     int val = vsnprintf(buf, sizeof(buf), fmt, args);
-//     va_end(args);
-//     putstr(buf);
-//     return val;
-// }
-int printf(const char *fmt, ...) {
-	va_list args;
-	va_start(args, fmt);
-	char buffer[256];
-	int ret = vsnprintf(buffer, sizeof(buffer), fmt, args);
-	va_end(args);
-	putstr(buffer);
-	return ret;
+int printf(const char *fmt, ...){
+    char buf[200];
+    va_list args;
+    va_start(args,fmt);
+    int val = vsnprintf(buf, sizeof(buf), fmt, args);
+    va_end(args);
+    putstr(buf);
+    return val;
 }
+// int printf(const char *fmt, ...) {
+// 	va_list args;
+// 	va_start(args, fmt);
+// 	char buffer[256];
+// 	int ret = vsnprintf(buffer, sizeof(buffer), fmt, args);
+// 	va_end(args);
+// 	putstr(buffer);
+// 	return ret;
+// }
 
 int vsprintf(char *out, const char *fmt, va_list ap) {
 	return vsnprintf(out, (size_t)-1, fmt, ap);
