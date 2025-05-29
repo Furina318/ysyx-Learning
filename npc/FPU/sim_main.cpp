@@ -358,6 +358,7 @@ int main(int argc, char **argv) {
                 std::cout << "x" << std::setw(2) << std::setfill('0') << i 
                           << ": 0x" << std::hex << iregs[i] << std::dec << std::endl;
             }
+            std::cout << std::endl;
             std::cout << "Float Registers:" << std::endl;
             for (int i = 0; i < 32; i++) {
                 tb->freg_rs1 = i;

@@ -6,6 +6,21 @@
 
 #include "Vfpu___024root.h"
 
+VL_INLINE_OPT void Vfpu___024root___ico_sequent__TOP__1(Vfpu___024root* vlSelf) {
+    if (false && vlSelf) {}  // Prevent unused
+    Vfpu__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
+    VL_DEBUG_IF(VL_DBG_MSGF("+    Vfpu___024root___ico_sequent__TOP__1\n"); );
+    // Body
+    vlSelf->fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__switch_outputs[0x43U] 
+        = ((0x17fffU & vlSelf->fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__switch_outputs
+            [0x43U]) | (0x8000U & (vlSelf->fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__partial_products
+                                   [0xfU][2U] << 0xcU)));
+    vlSelf->fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__switch_outputs[0x43U] 
+        = ((0xffffU & vlSelf->fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__switch_outputs
+            [0x43U]) | (0x10000U & (vlSelf->fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__partial_products
+                                    [0x10U][2U] << 0xdU)));
+}
+
 void Vfpu___024root___eval_act(Vfpu___024root* vlSelf) {
     if (false && vlSelf) {}  // Prevent unused
     Vfpu__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
@@ -822,24 +837,28 @@ VL_INLINE_OPT void Vfpu___024root___nba_sequent__TOP__1(Vfpu___024root* vlSelf) 
                                              - (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__true_exp2)));
                             if ((0x1cU < (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__shift_amt))) {
                                 vlSelf->fpu_tb__DOT__fpu_inst__DOT__shift_amt = 0x1cU;
+                                vlSelf->fpu_tb__DOT__fpu_inst__DOT__sticky 
+                                    = (0U != vlSelf->fpu_tb__DOT__fpu_inst__DOT__norm_mant2);
+                            } else {
+                                vlSelf->fpu_tb__DOT__fpu_inst__DOT__shifted_mant2 
+                                    = ((0x1bU >= (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__shift_amt))
+                                        ? (0xfffffffU 
+                                           & ((vlSelf->fpu_tb__DOT__fpu_inst__DOT__norm_mant2 
+                                               << 4U) 
+                                              >> (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__shift_amt)))
+                                        : 0U);
+                                vlSelf->fpu_tb__DOT__fpu_inst__DOT__sticky 
+                                    = (0U != ((0x1bU 
+                                               >= ((IData)(0x1cU) 
+                                                   - (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__shift_amt)))
+                                               ? (0xfffffffU 
+                                                  & ((vlSelf->fpu_tb__DOT__fpu_inst__DOT__norm_mant2 
+                                                      << 4U) 
+                                                     << 
+                                                     ((IData)(0x1cU) 
+                                                      - (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__shift_amt))))
+                                               : 0U));
                             }
-                            vlSelf->fpu_tb__DOT__fpu_inst__DOT__shifted_mant2 
-                                = ((0x1bU >= (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__shift_amt))
-                                    ? (0xfffffffU & 
-                                       ((vlSelf->fpu_tb__DOT__fpu_inst__DOT__norm_mant2 
-                                         << 4U) >> (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__shift_amt)))
-                                    : 0U);
-                            vlSelf->fpu_tb__DOT__fpu_inst__DOT__sticky 
-                                = (0U != ((0x1bU >= 
-                                           ((IData)(0x1cU) 
-                                            - (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__shift_amt)))
-                                           ? (0xfffffffU 
-                                              & ((vlSelf->fpu_tb__DOT__fpu_inst__DOT__norm_mant2 
-                                                  << 4U) 
-                                                 << 
-                                                 ((IData)(0x1cU) 
-                                                  - (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__shift_amt))))
-                                           : 0U));
                         } else {
                             vlSelf->fpu_tb__DOT__fpu_inst__DOT__max_exp 
                                 = vlSelf->fpu_tb__DOT__fpu_inst__DOT__true_exp2;
@@ -851,24 +870,28 @@ VL_INLINE_OPT void Vfpu___024root___nba_sequent__TOP__1(Vfpu___024root* vlSelf) 
                                              - (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__true_exp1)));
                             if ((0x1cU < (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__shift_amt))) {
                                 vlSelf->fpu_tb__DOT__fpu_inst__DOT__shift_amt = 0x1cU;
+                                vlSelf->fpu_tb__DOT__fpu_inst__DOT__sticky 
+                                    = (0U != vlSelf->fpu_tb__DOT__fpu_inst__DOT__norm_mant1);
+                            } else {
+                                vlSelf->fpu_tb__DOT__fpu_inst__DOT__shifted_mant1 
+                                    = ((0x1bU >= (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__shift_amt))
+                                        ? (0xfffffffU 
+                                           & ((vlSelf->fpu_tb__DOT__fpu_inst__DOT__norm_mant1 
+                                               << 4U) 
+                                              >> (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__shift_amt)))
+                                        : 0U);
+                                vlSelf->fpu_tb__DOT__fpu_inst__DOT__sticky 
+                                    = (0U != ((0x1bU 
+                                               >= ((IData)(0x1cU) 
+                                                   - (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__shift_amt)))
+                                               ? (0xfffffffU 
+                                                  & ((vlSelf->fpu_tb__DOT__fpu_inst__DOT__norm_mant1 
+                                                      << 4U) 
+                                                     << 
+                                                     ((IData)(0x1cU) 
+                                                      - (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__shift_amt))))
+                                               : 0U));
                             }
-                            vlSelf->fpu_tb__DOT__fpu_inst__DOT__shifted_mant1 
-                                = ((0x1bU >= (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__shift_amt))
-                                    ? (0xfffffffU & 
-                                       ((vlSelf->fpu_tb__DOT__fpu_inst__DOT__norm_mant1 
-                                         << 4U) >> (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__shift_amt)))
-                                    : 0U);
-                            vlSelf->fpu_tb__DOT__fpu_inst__DOT__sticky 
-                                = (0U != ((0x1bU >= 
-                                           ((IData)(0x1cU) 
-                                            - (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__shift_amt)))
-                                           ? (0xfffffffU 
-                                              & ((vlSelf->fpu_tb__DOT__fpu_inst__DOT__norm_mant1 
-                                                  << 4U) 
-                                                 << 
-                                                 ((IData)(0x1cU) 
-                                                  - (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__shift_amt))))
-                                           : 0U));
                         }
                         if (((vlSelf->operand1_fp >> 0x1fU) 
                              == (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__sign2_eff))) {
@@ -1279,22 +1302,27 @@ VL_INLINE_OPT void Vfpu___024root___nba_sequent__TOP__1(Vfpu___024root* vlSelf) 
                                          - (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__true_exp2)));
                         if ((0x1cU < (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__shift_amt))) {
                             vlSelf->fpu_tb__DOT__fpu_inst__DOT__shift_amt = 0x1cU;
-                        }
-                        vlSelf->fpu_tb__DOT__fpu_inst__DOT__shifted_mant2 
-                            = ((0x1bU >= (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__shift_amt))
-                                ? (0xfffffffU & ((vlSelf->fpu_tb__DOT__fpu_inst__DOT__norm_mant2 
+                            vlSelf->fpu_tb__DOT__fpu_inst__DOT__sticky 
+                                = (0U != vlSelf->fpu_tb__DOT__fpu_inst__DOT__norm_mant2);
+                        } else {
+                            vlSelf->fpu_tb__DOT__fpu_inst__DOT__shifted_mant2 
+                                = ((0x1bU >= (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__shift_amt))
+                                    ? (0xfffffffU & 
+                                       ((vlSelf->fpu_tb__DOT__fpu_inst__DOT__norm_mant2 
+                                         << 4U) >> (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__shift_amt)))
+                                    : 0U);
+                            vlSelf->fpu_tb__DOT__fpu_inst__DOT__sticky 
+                                = (0U != ((0x1bU >= 
+                                           ((IData)(0x1cU) 
+                                            - (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__shift_amt)))
+                                           ? (0xfffffffU 
+                                              & ((vlSelf->fpu_tb__DOT__fpu_inst__DOT__norm_mant2 
                                                   << 4U) 
-                                                 >> (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__shift_amt)))
-                                : 0U);
-                        vlSelf->fpu_tb__DOT__fpu_inst__DOT__sticky 
-                            = (0U != ((0x1bU >= ((IData)(0x1cU) 
-                                                 - (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__shift_amt)))
-                                       ? (0xfffffffU 
-                                          & ((vlSelf->fpu_tb__DOT__fpu_inst__DOT__norm_mant2 
-                                              << 4U) 
-                                             << ((IData)(0x1cU) 
-                                                 - (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__shift_amt))))
-                                       : 0U));
+                                                 << 
+                                                 ((IData)(0x1cU) 
+                                                  - (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__shift_amt))))
+                                           : 0U));
+                        }
                     } else {
                         vlSelf->fpu_tb__DOT__fpu_inst__DOT__max_exp 
                             = vlSelf->fpu_tb__DOT__fpu_inst__DOT__true_exp2;
@@ -1306,22 +1334,27 @@ VL_INLINE_OPT void Vfpu___024root___nba_sequent__TOP__1(Vfpu___024root* vlSelf) 
                                          - (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__true_exp1)));
                         if ((0x1cU < (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__shift_amt))) {
                             vlSelf->fpu_tb__DOT__fpu_inst__DOT__shift_amt = 0x1cU;
-                        }
-                        vlSelf->fpu_tb__DOT__fpu_inst__DOT__shifted_mant1 
-                            = ((0x1bU >= (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__shift_amt))
-                                ? (0xfffffffU & ((vlSelf->fpu_tb__DOT__fpu_inst__DOT__norm_mant1 
+                            vlSelf->fpu_tb__DOT__fpu_inst__DOT__sticky 
+                                = (0U != vlSelf->fpu_tb__DOT__fpu_inst__DOT__norm_mant1);
+                        } else {
+                            vlSelf->fpu_tb__DOT__fpu_inst__DOT__shifted_mant1 
+                                = ((0x1bU >= (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__shift_amt))
+                                    ? (0xfffffffU & 
+                                       ((vlSelf->fpu_tb__DOT__fpu_inst__DOT__norm_mant1 
+                                         << 4U) >> (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__shift_amt)))
+                                    : 0U);
+                            vlSelf->fpu_tb__DOT__fpu_inst__DOT__sticky 
+                                = (0U != ((0x1bU >= 
+                                           ((IData)(0x1cU) 
+                                            - (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__shift_amt)))
+                                           ? (0xfffffffU 
+                                              & ((vlSelf->fpu_tb__DOT__fpu_inst__DOT__norm_mant1 
                                                   << 4U) 
-                                                 >> (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__shift_amt)))
-                                : 0U);
-                        vlSelf->fpu_tb__DOT__fpu_inst__DOT__sticky 
-                            = (0U != ((0x1bU >= ((IData)(0x1cU) 
-                                                 - (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__shift_amt)))
-                                       ? (0xfffffffU 
-                                          & ((vlSelf->fpu_tb__DOT__fpu_inst__DOT__norm_mant1 
-                                              << 4U) 
-                                             << ((IData)(0x1cU) 
-                                                 - (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__shift_amt))))
-                                       : 0U));
+                                                 << 
+                                                 ((IData)(0x1cU) 
+                                                  - (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__shift_amt))))
+                                           : 0U));
+                        }
                     }
                     if (((vlSelf->operand1_fp >> 0x1fU) 
                          == (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__sign2_eff))) {
@@ -1876,15 +1909,15 @@ VL_INLINE_OPT void Vfpu___024root___nba_sequent__TOP__1(Vfpu___024root* vlSelf) 
                 vlSelf->fpu_tb__DOT__fpu_inst__DOT__comb_exception 
                     = vlSelf->__Vfunc_fpu_tb__DOT__fpu_inst__DOT__detect_exceptions__9__Vfuncout;
             }
-        }
-        if (VL_UNLIKELY(((0xbU == (IData)(vlSelf->fpu_op_type)) 
-                         & (3U == (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__state))))) {
-            VL_WRITEF("FMUL_S: prod_mant=%x, result_exp=%3#, stored_true_exp1=%3#, stored_true_exp2=%3#, multiplier_product=%x\n",
-                      48,vlSelf->fpu_tb__DOT__fpu_inst__DOT__prod_mant,
-                      9,(IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__result_exp),
-                      9,vlSelf->fpu_tb__DOT__fpu_inst__DOT__stored_true_exp1,
-                      9,(IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__stored_true_exp2),
-                      64,vlSelf->fpu_tb__DOT__fpu_inst__DOT__multiplier_product);
+            if (VL_UNLIKELY(((0xbU == (IData)(vlSelf->fpu_op_type)) 
+                             & (3U == (IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__state))))) {
+                VL_WRITEF("FMUL_S: prod_mant=%x, result_exp=%3#, stored_true_exp1=%3#, stored_true_exp2=%3#, multiplier_product=%x\n",
+                          48,vlSelf->fpu_tb__DOT__fpu_inst__DOT__prod_mant,
+                          9,(IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__result_exp),
+                          9,vlSelf->fpu_tb__DOT__fpu_inst__DOT__stored_true_exp1,
+                          9,(IData)(vlSelf->fpu_tb__DOT__fpu_inst__DOT__stored_true_exp2),
+                          64,vlSelf->fpu_tb__DOT__fpu_inst__DOT__multiplier_product);
+            }
         }
     }
     vlSelf->fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__multiplicand_ext[0U] 

@@ -25,6 +25,7 @@ VL_ATTR_COLD void Vfpu___024root___eval_triggers__stl(Vfpu___024root* vlSelf) {
 }
 
 void Vfpu___024root___ico_sequent__TOP__0(Vfpu___024root* vlSelf);
+void Vfpu___024root___ico_sequent__TOP__1(Vfpu___024root* vlSelf);
 void Vfpu_walloc_17bits___ico_sequent__TOP__fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__gen_wallace__BRA__67__KET____DOT__uut__0(Vfpu_walloc_17bits* vlSelf);
 void Vfpu_walloc_17bits___ico_sequent__TOP__fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__gen_wallace__BRA__66__KET____DOT__uut__0(Vfpu_walloc_17bits* vlSelf);
 void Vfpu_walloc_17bits___ico_sequent__TOP__fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__gen_wallace__BRA__65__KET____DOT__uut__0(Vfpu_walloc_17bits* vlSelf);
@@ -160,7 +161,7 @@ void Vfpu_walloc_17bits___ico_sequent__TOP__fpu_tb__DOT__fpu_inst__DOT__mul_inst
 void Vfpu_walloc_17bits___ico_sequent__TOP__fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__gen_wallace__BRA__65__KET____DOT__uut__1(Vfpu_walloc_17bits* vlSelf);
 void Vfpu_walloc_17bits___ico_sequent__TOP__fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__gen_wallace__BRA__66__KET____DOT__uut__1(Vfpu_walloc_17bits* vlSelf);
 void Vfpu_walloc_17bits___ico_sequent__TOP__fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__gen_wallace__BRA__67__KET____DOT__uut__1(Vfpu_walloc_17bits* vlSelf);
-void Vfpu___024root___ico_sequent__TOP__1(Vfpu___024root* vlSelf);
+void Vfpu___024root___ico_sequent__TOP__2(Vfpu___024root* vlSelf);
 
 VL_ATTR_COLD void Vfpu___024root___eval_stl(Vfpu___024root* vlSelf) {
     if (false && vlSelf) {}  // Prevent unused
@@ -172,6 +173,7 @@ VL_ATTR_COLD void Vfpu___024root___eval_stl(Vfpu___024root* vlSelf) {
         vlSelf->__Vm_traceActivity[2U] = 1U;
         vlSelf->__Vm_traceActivity[1U] = 1U;
         vlSelf->__Vm_traceActivity[0U] = 1U;
+        Vfpu___024root___ico_sequent__TOP__1(vlSelf);
         Vfpu_walloc_17bits___ico_sequent__TOP__fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__gen_wallace__BRA__67__KET____DOT__uut__0((&vlSymsp->TOP__fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__gen_wallace__BRA__67__KET____DOT__uut));
         Vfpu_walloc_17bits___ico_sequent__TOP__fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__gen_wallace__BRA__66__KET____DOT__uut__0((&vlSymsp->TOP__fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__gen_wallace__BRA__66__KET____DOT__uut));
         Vfpu_walloc_17bits___ico_sequent__TOP__fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__gen_wallace__BRA__65__KET____DOT__uut__0((&vlSymsp->TOP__fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__gen_wallace__BRA__65__KET____DOT__uut));
@@ -307,6 +309,6 @@ VL_ATTR_COLD void Vfpu___024root___eval_stl(Vfpu___024root* vlSelf) {
         Vfpu_walloc_17bits___ico_sequent__TOP__fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__gen_wallace__BRA__65__KET____DOT__uut__1((&vlSymsp->TOP__fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__gen_wallace__BRA__65__KET____DOT__uut));
         Vfpu_walloc_17bits___ico_sequent__TOP__fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__gen_wallace__BRA__66__KET____DOT__uut__1((&vlSymsp->TOP__fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__gen_wallace__BRA__66__KET____DOT__uut));
         Vfpu_walloc_17bits___ico_sequent__TOP__fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__gen_wallace__BRA__67__KET____DOT__uut__1((&vlSymsp->TOP__fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__gen_wallace__BRA__67__KET____DOT__uut));
-        Vfpu___024root___ico_sequent__TOP__1(vlSelf);
+        Vfpu___024root___ico_sequent__TOP__2(vlSelf);
     }
 }

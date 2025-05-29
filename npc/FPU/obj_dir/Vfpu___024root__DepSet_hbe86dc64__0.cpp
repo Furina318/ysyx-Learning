@@ -24,10 +24,10 @@ void Vfpu___024root___eval_triggers__ico(Vfpu___024root* vlSelf) {
 #endif
 }
 
-VL_INLINE_OPT void Vfpu___024root___ico_sequent__TOP__1(Vfpu___024root* vlSelf) {
+VL_INLINE_OPT void Vfpu___024root___ico_sequent__TOP__2(Vfpu___024root* vlSelf) {
     if (false && vlSelf) {}  // Prevent unused
     Vfpu__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
-    VL_DEBUG_IF(VL_DBG_MSGF("+    Vfpu___024root___ico_sequent__TOP__1\n"); );
+    VL_DEBUG_IF(VL_DBG_MSGF("+    Vfpu___024root___ico_sequent__TOP__2\n"); );
     // Init
     VlWide<3>/*95:0*/ __Vtemp_hd252095e__0;
     VlWide<3>/*95:0*/ __Vtemp_h61c4b67e__0;
@@ -1284,6 +1284,7 @@ VL_INLINE_OPT void Vfpu___024root___ico_sequent__TOP__1(Vfpu___024root* vlSelf) 
 }
 
 void Vfpu___024root___ico_sequent__TOP__0(Vfpu___024root* vlSelf);
+void Vfpu___024root___ico_sequent__TOP__1(Vfpu___024root* vlSelf);
 void Vfpu_walloc_17bits___ico_sequent__TOP__fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__gen_wallace__BRA__67__KET____DOT__uut__0(Vfpu_walloc_17bits* vlSelf);
 void Vfpu_walloc_17bits___ico_sequent__TOP__fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__gen_wallace__BRA__66__KET____DOT__uut__0(Vfpu_walloc_17bits* vlSelf);
 void Vfpu_walloc_17bits___ico_sequent__TOP__fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__gen_wallace__BRA__65__KET____DOT__uut__0(Vfpu_walloc_17bits* vlSelf);
@@ -1428,6 +1429,7 @@ void Vfpu___024root___eval_ico(Vfpu___024root* vlSelf) {
     if (vlSelf->__VicoTriggered.at(0U)) {
         Vfpu___024root___ico_sequent__TOP__0(vlSelf);
         vlSelf->__Vm_traceActivity[1U] = 1U;
+        Vfpu___024root___ico_sequent__TOP__1(vlSelf);
         Vfpu_walloc_17bits___ico_sequent__TOP__fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__gen_wallace__BRA__67__KET____DOT__uut__0((&vlSymsp->TOP__fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__gen_wallace__BRA__67__KET____DOT__uut));
         Vfpu_walloc_17bits___ico_sequent__TOP__fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__gen_wallace__BRA__66__KET____DOT__uut__0((&vlSymsp->TOP__fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__gen_wallace__BRA__66__KET____DOT__uut));
         Vfpu_walloc_17bits___ico_sequent__TOP__fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__gen_wallace__BRA__65__KET____DOT__uut__0((&vlSymsp->TOP__fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__gen_wallace__BRA__65__KET____DOT__uut));
@@ -1563,7 +1565,7 @@ void Vfpu___024root___eval_ico(Vfpu___024root* vlSelf) {
         Vfpu_walloc_17bits___ico_sequent__TOP__fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__gen_wallace__BRA__65__KET____DOT__uut__1((&vlSymsp->TOP__fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__gen_wallace__BRA__65__KET____DOT__uut));
         Vfpu_walloc_17bits___ico_sequent__TOP__fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__gen_wallace__BRA__66__KET____DOT__uut__1((&vlSymsp->TOP__fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__gen_wallace__BRA__66__KET____DOT__uut));
         Vfpu_walloc_17bits___ico_sequent__TOP__fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__gen_wallace__BRA__67__KET____DOT__uut__1((&vlSymsp->TOP__fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__gen_wallace__BRA__67__KET____DOT__uut));
-        Vfpu___024root___ico_sequent__TOP__1(vlSelf);
+        Vfpu___024root___ico_sequent__TOP__2(vlSelf);
     }
 }
 
@@ -1736,6 +1738,6 @@ void Vfpu___024root___eval_nba(Vfpu___024root* vlSelf) {
         Vfpu_walloc_17bits___ico_sequent__TOP__fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__gen_wallace__BRA__65__KET____DOT__uut__1((&vlSymsp->TOP__fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__gen_wallace__BRA__65__KET____DOT__uut));
         Vfpu_walloc_17bits___ico_sequent__TOP__fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__gen_wallace__BRA__66__KET____DOT__uut__1((&vlSymsp->TOP__fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__gen_wallace__BRA__66__KET____DOT__uut));
         Vfpu_walloc_17bits___ico_sequent__TOP__fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__gen_wallace__BRA__67__KET____DOT__uut__1((&vlSymsp->TOP__fpu_tb__DOT__fpu_inst__DOT__mul_inst__DOT__gen_wallace__BRA__67__KET____DOT__uut));
-        Vfpu___024root___ico_sequent__TOP__1(vlSelf);
+        Vfpu___024root___ico_sequent__TOP__2(vlSelf);
     }
 }
