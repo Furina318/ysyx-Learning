@@ -9,7 +9,7 @@ int printf(const char *fmt, ...){
     char buf[2048];
     va_list args;
     va_start(args,fmt);
-    int val = vsprintf(buf,fmt,args);
+    int val = vsnprintf(buf, sizeof(buf), fmt, args);
     putstr(buf);
     va_end(args);
     return val;
