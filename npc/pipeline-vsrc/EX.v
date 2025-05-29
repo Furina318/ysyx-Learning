@@ -150,6 +150,10 @@ module EX (
         //     else begin
         //         ex_num2 = {27'b0, id_ex_zimm};
         // end
+        else if(id_ex_alu_op == `ALU_SLL || id_ex_alu_op == `ALU_SRL || id_ex_alu_op == `ALU_SRA) begin
+            ex_num1 = src1;
+            ex_num2 = {27'b0, src2[4:0]}; //位移指令只取src2低5位
+        end
         else begin
             ex_num1 = src1;
             ex_num2 = (id_ex_opcode[6:2] == `INST_TYPE_R || id_ex_opcode[6:2] == `INST_TYPE_B) ? src2 : id_ex_imm;
@@ -198,23 +202,23 @@ module EX (
         );
 
         if (id_ex_jal) begin
-            ex_flush = 1'b1 & ex_flush_condition;
+            ex_flush = 1'b1 & ex_flush_condition & (~(|load_use_flag));//添加加载使用冒险检测
             ex_flush_pc = jal_target;
         end
         else if (id_ex_jalr) begin
-            ex_flush = 1'b1 & ex_flush_condition;
+            ex_flush = 1'b1 & ex_flush_condition & (~(|load_use_flag));
             ex_flush_pc = jalr_target;
         end
         else if (take_branch) begin
-            ex_flush = 1'b1 & ex_flush_condition;
+            ex_flush = 1'b1 & ex_flush_condition & (~(|load_use_flag));
             ex_flush_pc = id_ex_pc + id_ex_imm;
         end
         else if (id_ex_csr_ecall) begin
-            ex_flush = 1'b1 & ex_flush_condition;
+            ex_flush = 1'b1 & ex_flush_condition & (~(|load_use_flag));
             ex_flush_pc = wb_ex_csr_num1;
         end
         else if (id_ex_csr_mret) begin
-            ex_flush = 1'b1 & ex_flush_condition;
+            ex_flush = 1'b1 & ex_flush_condition & (~(|load_use_flag));
             ex_flush_pc = wb_ex_csr_num2;
         end
         else begin
