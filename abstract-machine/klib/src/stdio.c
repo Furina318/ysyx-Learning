@@ -5,6 +5,12 @@
 
 #if !defined(__ISA_NATIVE__) || defined(__NATIVE_USE_KLIB__)
 
+// va_list 是一个类型，用于存储可变参数列表。
+// va_start初始化 va_list,使其指向可变参数的起始位置。
+// va_arg用于从可变参数列表中提取参数。需要指定参数的类型。
+// va_end清理 va_list，结束可变参数的使用
+// buf数组不要太大！！！！！！！！！不然内容会全存在数组而没有打印出来
+
 void int_to_str(int num, char *buffer, int *index, int *is_negative) {
     *is_negative = 0;
     if (num == 0) {
@@ -64,11 +70,6 @@ void long_to_str(long long num, char *buffer, int *index) {
         buffer[(*index)++] = temp[i];
     }
 }
-  
-  // va_list 是一个类型，用于存储可变参数列表。
-  // va_start初始化 va_list,使其指向可变参数的起始位置。
-  // va_arg用于从可变参数列表中提取参数。需要指定参数的类型。
-  // va_end清理 va_list，结束可变参数的使用
 
 // int printf(const char *fmt, ...) {
 //   panic("Not implemented");
