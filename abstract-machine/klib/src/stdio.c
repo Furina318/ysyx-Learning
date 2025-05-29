@@ -5,26 +5,27 @@
 
 #if !defined(__ISA_NATIVE__) || defined(__NATIVE_USE_KLIB__)
 
+// va_list 是一个类型，用于存储可变参数列表。
+// va_start初始化 va_list,使其指向可变参数的起始位置。
+// va_arg用于从可变参数列表中提取参数。需要指定参数的类型。
+// va_end清理 va_list，结束可变参数的使用
+
 int printf(const char *fmt, ...){
     char buf[2048];
     va_list args;
     va_start(args,fmt);
     int val = vsnprintf(buf, sizeof(buf), fmt, args);
-    putstr(buf);
     va_end(args);
+    putstr(buf);
     return val;
 }
 // int printf(const char *fmt, ...) {
 // 	va_list args;
 // 	va_start(args, fmt);
-
 // 	char buffer[256];
 // 	int ret = vsnprintf(buffer, sizeof(buffer), fmt, args);
-
 // 	va_end(args);
-
 // 	putstr(buffer);
-
 // 	return ret;
 // }
 
