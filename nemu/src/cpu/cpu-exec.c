@@ -58,21 +58,22 @@ void iringbuf_init(){
 }
 
 void iringbuf_push(vaddr_t pc,uint32_t inst,char *logbuf){
-  iringbuf.entries[iringbuf.w_ptr].pc=pc;
-  iringbuf.entries[iringbuf.w_ptr].inst=inst;
-  strncpy(iringbuf.entries[iringbuf.w_ptr].logbuf,logbuf,sizeof(iringbuf.entries[iringbuf.w_ptr].logbuf)-1);
-  iringbuf.entries[iringbuf.w_ptr].logbuf[sizeof(iringbuf.entries[iringbuf.w_ptr].logbuf)-1]='\0';
-  iringbuf.w_ptr=(iringbuf.w_ptr+1)%IRINGBUF_SIZE;//更新写指针
-  if(iringbuf.full) iringbuf.r_ptr=(iringbuf.r_ptr+1)%IRINGBUF_SIZE;//如果满，则更新读指针
-  iringbuf.full=(iringbuf.r_ptr==iringbuf.w_ptr);
+  iringbuf.entries[iringbuf.w_ptr].pc = pc;
+  iringbuf.entries[iringbuf.w_ptr].inst = inst;
+  strncpy(iringbuf.entries[iringbuf.w_ptr].logbuf, logbuf, sizeof(iringbuf.entries[iringbuf.w_ptr].logbuf) - 1);
+  iringbuf.entries[iringbuf.w_ptr].logbuf[sizeof(iringbuf.entries[iringbuf.w_ptr].logbuf) - 1] = '\0';
+
+  iringbuf.w_ptr = (iringbuf.w_ptr + 1) % IRINGBUF_SIZE;//更新写指针
+  if(iringbuf.full) iringbuf.r_ptr = (iringbuf.r_ptr + 1) % IRINGBUF_SIZE;//如果满，则更新读指针
+  iringbuf.full = (iringbuf.r_ptr == iringbuf.w_ptr);//更新溢出状态
 }
 
 void iringbuf_dummy(vaddr_t error_pc){
-  printf("Recent inst\n");
-  int count=iringbuf.full ? IRINGBUF_SIZE : iringbuf.w_ptr;
-  for(int i=0;i<count;i++){
-    int index=(iringbuf.r_ptr+i)%IRINGBUF_SIZE;
-    if(iringbuf.entries[index].pc==error_pc) printf(" --> ");
+  // printf("Recent inst\n");
+  int count = iringbuf.full ? IRINGBUF_SIZE : iringbuf.w_ptr;//如果满，则输出IRINGBUF_SIZE条，否则输出w_ptr条
+  for(int i = 0; i < count; i++){
+    int index = (iringbuf.r_ptr + i) % IRINGBUF_SIZE;//计算当前索引
+    if(iringbuf.entries[index].pc == error_pc) printf(" --> ");//检测到出错的pc并指出
     else printf("     ");
     printf("%-20s %02x %02x %02x %02x\n",
               // iringbuf.entries[index].pc,
@@ -261,9 +262,9 @@ static void exec_once(Decode *s, vaddr_t pc) {
   // }
 
   uint32_t opcode = s->isa.inst & 0x7f;
-  if(opcode == 0x0000006f || opcode == 0x00000067) {}
+  if(opcode == 0x0000006f || opcode == 0x00000067) {}//空转，不做任何事情
 #ifdef CONFIG_BRANCH_Predictor
-  // 分支预测器逻辑
+  // =================分支预测器逻辑===============
   // uint32_t opcode = s->isa.inst & 0x7f;
   bool is_branch = (opcode == 0x63);  //条件分支 (beq,bne等)
   bool is_jal = (opcode == 0x6f);     //无条件跳转(jal)
@@ -319,6 +320,7 @@ static void exec_once(Decode *s, vaddr_t pc) {
 #endif
 
 #ifdef CONFIG_FUNC_TRACE
+  // ===============函数调用跟踪逻辑===============
   // uint32_t opcode = s->isa.inst & 0x7f;
   vaddr_t target=s->dnpc;
   if(opcode==0x6f){ //JAL指令（函数调用）11011 11//JALR指令11001 11
@@ -339,6 +341,7 @@ static void exec_once(Decode *s, vaddr_t pc) {
 #endif
   cpu.pc = s->dnpc;
 #ifdef CONFIG_ITRACE
+  // ===============指令跟踪逻辑===============
   char *p = s->logbuf;
   p += snprintf(p, sizeof(s->logbuf), FMT_WORD ":", s->pc);
   int ilen = s->snpc - s->pc;

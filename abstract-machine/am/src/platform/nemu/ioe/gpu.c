@@ -6,6 +6,7 @@
 //分辨率的值保存在nemu的vga文件中：vgactl_port_base[0] = (screen_width() << 16) | screen_height();
 // #define SCREEN_W (MUXDEF(CONFIG_VGA_SIZE_800x600, 800, 400))
 // #define SCREEN_H (MUXDEF(CONFIG_VGA_SIZE_800x600, 600, 300))
+//vgactl_port_base[0] = (screen_width() << 16) | screen_height();
 void __am_gpu_init() {
   // int i;
   // int w=400;
@@ -30,7 +31,7 @@ void __am_gpu_fbdraw(AM_GPU_FBDRAW_T *ctl) {
   int x=ctl->x, y=ctl->y, w=ctl->w, h=ctl->h; // 获取绘图区域的起始坐标(x,y)和尺寸(w,h)
   if(!ctl->sync && (w==0 || h==0)) return;//如果 sync 为 false 且 w 和 h 都为 0，则直接返回，不进行绘图操作
 
-  // 图像像素按行优先方式存储在pixels，其对应索引index=(row*w+col)
+  //图像像素按行优先方式存储在pixels，其对应索引index=(row*w+col)
   //先存储第一行的所有像素，再存储第二行的所有像素，依此类推
   uint32_t *pixels=ctl->pixels;//跟fb同类型才可以进行赋值
   uint32_t *fb=(uint32_t *)(uintptr_t)FB_ADDR;//将帧缓冲区地址转换为uint32_t指针类型
