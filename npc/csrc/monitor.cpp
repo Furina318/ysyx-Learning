@@ -66,9 +66,13 @@ static void welcome() {
   Log("Build time: %s, %s", __TIME__, __DATE__);
   printf("Welcome to %s-NPC!\n", ANSI_FMT("RISCV32e", ANSI_FG_YELLOW ANSI_BG_RED));
   printf("For help, type \"help\"\n");
-  printf("\n\33[31m%s\33[0m\n", npc_logo);
-//   Log("Exercise: Please remove me in the source code and compile NEMU again.");
-  //assert(0);
+  // printf("\n\33[31m%s\33[0m\n", npc_logo);
+  printf(ANSI_FG_CYAN"██████╗ ██╗██████╗ ██╗     ██╗███╗   ██╗███████╗    ███╗   ██╗██████╗  ██████╗\n"
+                    "██╔══██╗██║██╔══██╗██║     ██║████╗  ██║██╔════╝    ████╗  ██║██╔══██╗██╔════╝\n"
+                    "██████╔╝██║██████╔╝██║     ██║██╔██╗ ██║█████╗█████╗██╔██╗ ██║██████╔╝██║     \n"
+                    "██╔═══╝ ██║██╔═══╝ ██║     ██║██║╚██╗██║██╔══╝╚════╝██║╚██╗██║██╔═══╝ ██║     \n"
+                    "██║     ██║██║     ███████╗██║██║ ╚████║███████╗    ██║ ╚████║██║     ╚██████╗\n"
+                    "╚═╝     ╚═╝╚═╝     ╚══════╝╚═╝╚═╝  ╚═══╝╚══════╝    ╚═╝  ╚═══╝╚═╝      ╚═════╝\n"ANSI_NONE);
 }
 
 // #ifndef CONFIG_TARGET_AM
@@ -116,59 +120,73 @@ int func_count = 0;             // 符号数量
 #define CODE_BASE_ADDR 0x80000000;  // 根据 ELF 的 Program Header 动态获取
 
 void load_func_table(const char *elf_file) {
+  // 打开ELF文件
   FILE* fp = fopen(elf_file, "rb");
   Assert(fp, "Can not open '%s'", elf_file);
+  
+  // 获取文件大小
   fseek(fp, 0, SEEK_END);
   long size = ftell(fp);
   Log("The ELF file is %s, size = %ld", elf_file, size);
   printf("[ftrace log] : The ELF file is %s, size = %ld\n", elf_file, size);
 
-  // Read ELF header
-  fseek(fp, 0, SEEK_SET);
-  Elf32_Ehdr elf_header;
-  assert(fread(&elf_header, sizeof(Elf32_Ehdr), 1, fp)==1);
+  /*=== 读取ELF头 ===*/
+  fseek(fp, 0, SEEK_SET);  // 回到文件起始位置
+  Elf32_Ehdr elf_header;   // ELF文件头结构
+  assert(fread(&elf_header, sizeof(Elf32_Ehdr), 1, fp)==1);  // 读取文件头
 
-  // Locate and read section headers
-  // Elf32_Shdr shdr;
-  fseek(fp, elf_header.e_shoff, SEEK_SET);
-  Elf32_Shdr sh_table[elf_header.e_shnum];
+  /*=== 读取节头表(section header table) ===*/
+  fseek(fp, elf_header.e_shoff, SEEK_SET);  // 定位到节头表起始位置
+  Elf32_Shdr sh_table[elf_header.e_shnum];  // 创建节头表数组
+  // 读取所有节头表条目
   assert(fread(sh_table, sizeof(Elf32_Shdr), elf_header.e_shnum, fp)==elf_header.e_shnum);
 
-  // Locate symbol table and string table
-  Elf32_Shdr *symtab = NULL;
-  Elf32_Shdr *strtab = NULL;
+  /*=== 定位关键节 ===*/
+  Elf32_Shdr *symtab = NULL;  // 符号表指针
+  Elf32_Shdr *strtab = NULL;  // 字符串表指针
   for (int i = 0; i < elf_header.e_shnum; i++) {
+    // 查找符号表(SHT_SYMTAB类型)
     if (sh_table[i].sh_type == SHT_SYMTAB) {
       symtab = &sh_table[i];
     }
+    // 查找字符串表(排除节名字符串表)
     if (sh_table[i].sh_type == SHT_STRTAB && i != elf_header.e_shstrndx) {
       strtab = &sh_table[i];
     }
   }
+  // 验证是否找到两个关键表
   Assert(symtab && strtab, "Failed to locate symbol table or string table");
 
-  // Read symbol table
+  /*=== 读取符号表数据 ===*/
+  // 计算符号数量并创建缓冲区
   Elf32_Sym symbols[symtab->sh_size / sizeof(Elf32_Sym)];
-  fseek(fp, symtab->sh_offset, SEEK_SET);
-  assert(fread(symbols, symtab->sh_size, 1, fp)==1);
+  fseek(fp, symtab->sh_offset, SEEK_SET);  // 定位符号表数据起始位置
+  assert(fread(symbols, symtab->sh_size, 1, fp)==1);  // 读取整个符号表
 
-  // Read string table
-  char strtab_data[strtab->sh_size];
-  fseek(fp, strtab->sh_offset, SEEK_SET);
-  assert(fread(strtab_data, strtab->sh_size, 1, fp)==1);
+  /*=== 读取字符串表数据 ===*/
+  char strtab_data[strtab->sh_size];  // 创建字符串表缓冲区
+  fseek(fp, strtab->sh_offset, SEEK_SET);  // 定位字符串表起始位置
+  assert(fread(strtab_data, strtab->sh_size, 1, fp)==1);  // 读取整个字符串表
 
-  // Parse symbols and store function symbols in func_table
-  func_count = 0;
+  /*=== 解析函数符号 ===*/
+  func_count = 0;  // 重置符号计数器
   for (int i = 0; i < symtab->sh_size / sizeof(Elf32_Sym); i++) {
+    // 只处理函数类型符号(STT_FUNC)
     if (ELF32_ST_TYPE(symbols[i].st_info) == STT_FUNC) {
-      func_table[func_count].addr = symbols[i].st_value;
-      func_table[func_count].size = symbols[i].st_size;
-      strncpy(func_table[func_count].name, &strtab_data[symbols[i].st_name], sizeof(func_table[func_count].name) - 1);
+      // 填充符号表条目
+      func_table[func_count].addr = symbols[i].st_value;  // 函数地址
+      func_table[func_count].size = symbols[i].st_size;   // 函数大小
+      
+      // 从字符串表复制函数名称
+      strncpy(func_table[func_count].name, 
+             &strtab_data[symbols[i].st_name], 
+             sizeof(func_table[func_count].name) - 1);
+      
+      // 确保字符串终止
       func_table[func_count].name[sizeof(func_table[func_count].name) - 1] = '\0';
-      func_count++;
+      func_count++;  // 递增有效符号计数
     }
   }
-
   fclose(fp);
   Log("Loaded %d function symbols from ELF file", func_count);
 }
