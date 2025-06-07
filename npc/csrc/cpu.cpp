@@ -149,7 +149,7 @@ static void ftrace_handle() {
         }
         
         // 处理ret指令（JALR x0, x1, 0）
-        if ((instr & 0xFFFFF07F) == 0x00008067) {
+        if ((instr & 0xFFFFF07F) == 0x00008067) {//通过掩码提取指令的x1（rs1）和x0(rd)，0(imm)
             if (ftrace_size > 0) {
                 ftrace_ret(pc, ftrace[ftrace_size-1].name);
             }

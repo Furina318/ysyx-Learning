@@ -4,7 +4,7 @@
 
 static Context* (*user_handler)(Event, Context*) = NULL;
 
-Context* __am_irq_handle(Context *c) {
+Context* __am_irq_handle(Context *c) {//a0寄存器传入
   if (user_handler) {
     Event ev = {0};
     // printf("%d\n",c->mcause);
@@ -18,7 +18,7 @@ Context* __am_irq_handle(Context *c) {
     assert(c != NULL);
   }
 
-  return c;
+  return c;//a0寄存器存储
 }
 
 extern void __am_asm_trap(void);
@@ -38,7 +38,7 @@ bool cte_init(Context*(*handler)(Event, Context*)) {
 Context *kcontext(Area kstack, void (*entry)(void *), void *arg) {
   Context *cp = (Context *)(kstack.end - sizeof(Context));
   cp->mepc = (uintptr_t)entry;
-  cp->mstatus = 0x1800;
+  cp->mstatus = 0x1800;//防止切换进程的时候初始化不正确，每次调用时初始化一次
 	cp->gpr[10] = (uintptr_t)(arg);//a0寄存器
 	
   return cp;
@@ -48,7 +48,7 @@ void yield() {
 #ifdef __riscv_e
   asm volatile("li a5, -1; ecall");
 #else
-  asm volatile("li a7, -1; ecall");
+  asm volatile("li a7, -1; ecall");//a7 = -1 通常表示 程序终止请求
 #endif
 }
 // 整个 yield 操作的流程如下：​
