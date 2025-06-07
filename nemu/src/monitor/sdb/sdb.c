@@ -25,6 +25,7 @@
 
 static int is_batch_mode = false;//批处理模式（省略c的键入）
 extern void print_dtrace_file();
+extern void iringbuf_dummy(vaddr_t error_pc); 
 void init_regex();
 void init_wp_pool();
 WP *new_wp();
@@ -242,6 +243,11 @@ static int cmd_ext(){
   return 0;
 }
 
+static int cmd_itrace(char *args){
+  iringbuf_dummy(cpu.pc);//打印最近的指令
+  return 0;
+}
+
 static int cmd_mtrace(char *args){
 #ifdef CONFIG_MEMORY_TRACE
   typedef uint32_t paddr_t;
@@ -302,6 +308,8 @@ static struct {
   { "w", "Set watchpoint on 'EXPR',the programme will stop when it change",cmd_w},
   { "d", "Delete a watchpoint NO.n you set",cmd_d},
   { "ext", "Open random-expressions-file to check expr() whether correct",cmd_ext},
+  { "itrace", "Print the recent instructions executed",cmd_itrace},
+  { "mtrace", "Open memory trace file to check memory behavior",cmd_mtrace},
   { "mtrace", "(Use when nemu stop)Open mtrace log file to check memory behavior",cmd_mtrace},
   { "dtrace", "Output the trace of device access",cmd_dtrace},
 };
