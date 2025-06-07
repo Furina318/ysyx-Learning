@@ -245,6 +245,7 @@ static int cmd_ext(){
 
 static int cmd_itrace(char *args){
   iringbuf_dummy(cpu.pc);//打印最近的指令
+  IFNDEF(CONFIG_ITRACE, puts("Instruction trace is disabled. Enable it in menuconfig.") );
   return 0;
 }
 
