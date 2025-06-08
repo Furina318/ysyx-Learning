@@ -152,7 +152,17 @@ module EX (
         // end
         else if(id_ex_alu_op == `ALU_SLL || id_ex_alu_op == `ALU_SRL || id_ex_alu_op == `ALU_SRA) begin
             ex_num1 = src1;
-            ex_num2 = {27'b0, src2[4:0]}; //位移指令只取src2低5位
+            // ex_num2 = {27'b0, src2[4:0]}; //位移指令只取src2低5位
+            // ex_num2 = {27'b0, id_ex_imm[4:0]}; 
+            if(id_ex_opcode[6:2] == `INST_TYPE_I) begin
+                ex_num2 = {27'b0, id_ex_imm[4:0]};
+            end
+            else if(id_ex_opcode[6:2] == `INST_TYPE_R) begin
+                ex_num2 = {27'b0, src2[4:0]};
+            end
+            else begin
+                ex_num2 = 32'b0; // 如果不是位移指令，ex_num2为0
+            end
         end
         else begin
             ex_num1 = src1;

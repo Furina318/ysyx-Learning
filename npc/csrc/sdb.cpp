@@ -22,6 +22,7 @@ extern word_t   reg_str2val(const char *s, bool *success);
 extern uint8_t* guest_to_host(paddr_t paddr);
 extern word_t   host_read(void *addr, int len);
 extern word_t   expr(char *e);
+extern void     display_iringbuf();
 extern "C" void     pmem_write(paddr_t waddr,word_t wdata,int len);
 extern "C" word_t   pmem_read(paddr_t raddr,int len);
 extern void die();
@@ -209,6 +210,11 @@ static int cmd_mtrace(char *args){
   return 0;
 }
 
+static int cmd_itrace(char *args) {
+  IFDEF(CONFIG_ITRACE, display_iringbuf());
+  IFNDEF(CONFIG_ITRACE, printf("Instruction trace not enabled.\n"));
+  return 0;
+}
 static int cmd_help(char *args);
 
 static struct {
@@ -228,6 +234,7 @@ static struct {
 //   { "w", "Set watchpoint on 'EXPR',the programme will stop when it change",cmd_w},
 //   { "d", "Delete a watchpoint NO.n you set",cmd_d},
   { "mtrace", "使用格式:筛选起始地址 结束地址 是否筛选数据 需要筛选的数据。若不填则默认全打印",cmd_mtrace},
+  { "itrace", "Display instruction trace", cmd_itrace },
 };
 
 #define NR_CMD ARRLEN(cmd_table)
