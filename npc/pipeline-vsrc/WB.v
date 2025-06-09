@@ -6,8 +6,8 @@ module WBU #(
   input 		  clk,
   input 		  rst,
   input			  wen,
-  input           mem_wb_valid,
-  output          wb_mem_ready,
+  input           lsu_wb_valid,
+  output          wb_lsu_ready,
 
   input  [DATA_WIDTH-1:0] wdata,
   input  [ADDR_WIDTH-1:0] waddr,
@@ -17,7 +17,7 @@ module WBU #(
   output [DATA_WIDTH-1:0] src2,     
   
   output reg              wb_valid,
-  input                   mem_wb_flush,
+  input                   lsu_wb_flush,
 
   input  [11:0]           raddr_csr1,   
   input  [11:0]           raddr_csr2,   
@@ -34,7 +34,7 @@ reg [31:0] CSR[2**12-1:0];
 
 reg [DATA_WIDTH-1:0] regs [2**ADDR_WIDTH-1:0];
 
-assign wb_mem_ready = 1;
+assign wb_lsu_ready = 1;
 reg    flush;
 integer i;
 always @(posedge clk) begin
@@ -43,7 +43,7 @@ always @(posedge clk) begin
             regs[i] <= 32'b0;
         end
     end
-    else if (mem_wb_valid && wen && (waddr != 5'b0)) begin
+    else if (lsu_wb_valid && wen && (waddr != 5'b0)) begin
         if (regs[waddr] != wdata) begin
             $display("[WBU] Reg x%d changed to 0x%h",  waddr, wdata);
         end
@@ -55,13 +55,13 @@ always @(posedge clk) begin
     if (rst) begin
         wb_valid <= 1'b0;
     end
-    else if (mem_wb_valid && !flush) begin
+    else if (lsu_wb_valid && !flush) begin
         wb_valid <= 1'b1;
-        flush <= mem_wb_flush;
+        flush <= lsu_wb_flush;
     end
     else begin
         wb_valid <= 1'b0;
-        flush <= mem_wb_flush;
+        flush <= lsu_wb_flush;
     end
 end
 
@@ -84,7 +84,7 @@ always @(posedge clk) begin
     if (rst) begin
         CSR[32'h300] <= 32'h1800;
     end
-    else if (mem_wb_valid && (wen_csr1 | wen_csr2)) begin
+    else if (lsu_wb_valid && (wen_csr1 | wen_csr2)) begin
         if (wen_csr2) begin
             CSR[waddr_csr1] <= wdata_csr1;
             CSR[waddr_csr2] <= wdata_csr2;

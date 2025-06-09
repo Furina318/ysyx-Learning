@@ -4,7 +4,7 @@
 
 /***************************** ITRACE *****************************/
 #ifdef CONFIG_ITRACE
-#define MAX_iringbuf_size 20
+#define MAX_iringbuf_size 40
 struct IRINGBUF
 {
     char inst_buf[MAX_iringbuf_size][64];

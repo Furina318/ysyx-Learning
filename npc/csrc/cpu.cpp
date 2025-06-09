@@ -127,13 +127,13 @@ const char *get_func_name(vaddr_t addr){
 #ifdef CONFIG_FTRACE
 static void ftrace_handle() {
     // 获取当前流水线级信号
-    uint32_t pc = top->rootp->rv32e__DOT__pc;
-    uint32_t instr = top->rootp->rv32e__DOT__instr;
+    uint32_t pc = top->rootp->rv32e__DOT__IF_ID_pc;
+    uint32_t instr = top->rootp->rv32e__DOT__IF_ID_inst;
     uint32_t opcode = instr & 0x7F;
     
     // 获取译码阶段信号
-    uint32_t imm = top->rootp->rv32e__DOT__imm;
-    uint32_t rs1_val = top->rootp->rv32e__DOT__rs1_val;
+    uint32_t imm = top->rootp->rv32e__DOT__id_ex_imm;
+    uint32_t rs1_val = top->rootp->rv32e__DOT__exu__DOT__src1;
 
     // 计算真实跳转目标
     if (opcode == 0x6F) { // JAL

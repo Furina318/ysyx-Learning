@@ -47,46 +47,46 @@ module rv32e (
     wire [11:0] id_wb_csr_addr1;  // ID 到 WB：CSR 读地址 1
     wire [11:0] id_wb_csr_addr2;  // ID 到 WB：CSR 读地址 2
 
-    wire [31:0] ex_mem_pc;        // EX 到 MEM：程序计数器
-    wire [31:0] ex_mem_inst;      // EX 到 MEM：指令
-    wire        ex_mem_valid;     // EX 到 MEM：有效信号
-    wire        mem_ex_ready;     // MEM 到 EX：就绪信号
-    wire [31:0] ex_mem_src2;      // EX 到 MEM：源操作数 2
-    wire        ex_mem_RegWrite;  // EX 到 MEM：寄存器写使能
-    wire [4:0]  ex_mem_rd;        // EX 到 MEM：目标寄存器
-    wire        ex_mem_MemRead;   // EX 到 MEM：内存读使能
-    wire        ex_mem_MemWrite;  // EX 到 MEM：内存写使能
-    wire [2:0]  ex_mem_MemLen;    // EX 到 MEM：内存访问长度
-    wire [31:0] ex_mem_process_result; // EX 到 MEM：ALU/内存地址结果
+    wire [31:0] ex_lsu_pc;        // EX 到 MEM：程序计数器
+    wire [31:0] ex_lsu_inst;      // EX 到 MEM：指令
+    wire        ex_lsu_valid;     // EX 到 MEM：有效信号
+    wire        lsu_ex_ready;     // MEM 到 EX：就绪信号
+    wire [31:0] ex_lsu_src2;      // EX 到 MEM：源操作数 2
+    wire        ex_lsu_RegWrite;  // EX 到 MEM：寄存器写使能
+    wire [4:0]  ex_lsu_rd;        // EX 到 MEM：目标寄存器
+    wire        ex_lsu_MemRead;   // EX 到 MEM：内存读使能
+    wire        ex_lsu_MemWrite;  // EX 到 MEM：内存写使能
+    wire [2:0]  ex_lsu_MemLen;    // EX 到 MEM：内存访问长度
+    wire [31:0] ex_lsu_process_result; // EX 到 MEM：ALU/内存地址结果
     wire        ex_flush;         // EX 到 IF：冲刷信号
     wire [31:0] ex_flush_pc;      // EX 到 IF：冲刷目标 PC
-    wire        ex_mem_csr;       // EX 到 MEM：CSR 指令信号
-    wire        ex_mem_csr_wen1;  // EX 到 MEM：CSR 写使能 1
-    wire        ex_mem_csr_wen2;  // EX 到 MEM：CSR 写使能 2
-    wire [11:0] ex_mem_csr_wr_addr1; // EX 到 MEM：CSR 写地址 1
-    wire [11:0] ex_mem_csr_wr_addr2; // EX 到 MEM：CSR 写地址 2
-    wire [31:0] ex_mem_csr_wr_data1; // EX 到 MEM：CSR 写数据 1
-    wire [31:0] ex_mem_csr_wr_data2; // EX 到 MEM：CSR 写数据 2
-    wire [31:0] ex_mem_csr_rdata; // EX 到 MEM：CSR 读数据
-    wire        ex_mem_csr_ecall; // EX 到 MEM：ECALL 信号
-    wire        ex_mem_csr_mret;  // EX 到 MEM：MRET 信号
-    wire [31:0] ex_mem_imm;     // EX 到 MEM：立即数
-    wire [6:0]  ex_mem_opcode; // EX 到 MEM：操作码
+    wire        ex_lsu_csr;       // EX 到 MEM：CSR 指令信号
+    wire        ex_lsu_csr_wen1;  // EX 到 MEM：CSR 写使能 1
+    wire        ex_lsu_csr_wen2;  // EX 到 MEM：CSR 写使能 2
+    wire [11:0] ex_lsu_csr_wr_addr1; // EX 到 MEM：CSR 写地址 1
+    wire [11:0] ex_lsu_csr_wr_addr2; // EX 到 MEM：CSR 写地址 2
+    wire [31:0] ex_lsu_csr_wr_data1; // EX 到 MEM：CSR 写数据 1
+    wire [31:0] ex_lsu_csr_wr_data2; // EX 到 MEM：CSR 写数据 2
+    wire [31:0] ex_lsu_csr_rdata; // EX 到 MEM：CSR 读数据
+    wire        ex_lsu_csr_ecall; // EX 到 MEM：ECALL 信号
+    wire        ex_lsu_csr_mret;  // EX 到 MEM：MRET 信号
+    wire [31:0] ex_lsu_imm;     // EX 到 MEM：立即数
+    wire [6:0]  ex_lsu_opcode; // EX 到 MEM：操作码
 
-    wire [31:0] mem_wb_pc;        // MEM 到 WB：程序计数器
-    wire [31:0] mem_wb_inst;      // MEM 到 WB：指令
-    wire        mem_wb_valid;     // MEM 到 WB：有效信号
-    wire        wb_mem_ready;     // WB 到 MEM：就绪信号
-    wire        mem_wb_RegWrite;  // MEM 到 WB：寄存器写使能
-    wire [4:0]  mem_wb_rd;        // MEM 到 WB：目标寄存器
-    wire [31:0] mem_wb_write_rd_data; // MEM 到 WB：写回数据
-    wire [31:0] mem_wb_csr_wr_data1;  // MEM 到 WB：CSR 写数据 1
-    wire [31:0] mem_wb_csr_wr_data2;  // MEM 到 WB：CSR 写数据 2
-    wire [11:0] mem_wb_csr_wr_addr1;  // MEM 到 WB：CSR 写地址 1
-    wire [11:0] mem_wb_csr_wr_addr2;  // MEM 到 WB：CSR 写地址 2
-    wire        mem_wb_csr_wen1;      // MEM 到 WB：CSR 写使能 1
-    wire        mem_wb_csr_wen2;      // MEM 到 WB：CSR 写使能 2
-    wire        mem_wb_flush;
+    wire [31:0] lsu_wb_pc;        // MEM 到 WB：程序计数器
+    wire [31:0] lsu_wb_inst;      // MEM 到 WB：指令
+    wire        lsu_wb_valid;     // MEM 到 WB：有效信号
+    wire        wb_lsu_ready;     // WB 到 MEM：就绪信号
+    wire        lsu_wb_RegWrite;  // MEM 到 WB：寄存器写使能
+    wire [4:0]  lsu_wb_rd;        // MEM 到 WB：目标寄存器
+    wire [31:0] lsu_wb_write_rd_data; // MEM 到 WB：写回数据
+    wire [31:0] lsu_wb_csr_wr_data1;  // MEM 到 WB：CSR 写数据 1
+    wire [31:0] lsu_wb_csr_wr_data2;  // MEM 到 WB：CSR 写数据 2
+    wire [11:0] lsu_wb_csr_wr_addr1;  // MEM 到 WB：CSR 写地址 1
+    wire [11:0] lsu_wb_csr_wr_addr2;  // MEM 到 WB：CSR 写地址 2
+    wire        lsu_wb_csr_wen1;      // MEM 到 WB：CSR 写使能 1
+    wire        lsu_wb_csr_wen2;      // MEM 到 WB：CSR 写使能 2
+    wire        lsu_wb_flush;
     wire        wb_valid;         
 
     wire [31:0] wb_ex_src1;       // WB 到 EX：源操作数 1（前递）
@@ -95,10 +95,10 @@ module rv32e (
     wire [31:0] wb_ex_csr_num2;   // WB 到 EX：CSR 读数据 2
 
     // 前递信号
-    wire [4:0]  mem_ex_forward_rd;        // MEM 到 EX：前递的目标寄存器
-    wire        mem_ex_forward_RegWrite;  // MEM 到 EX：前递写使能
-    wire        mem_ex_forward_MemRead;   // MEM 到 EX：前递读使能
-    wire        ex_mem_forward_las;       // EX 到 MEM：加载后存储前递标志
+    wire [4:0]  lsu_ex_forward_rd;        // MEM 到 EX：前递的目标寄存器
+    wire        lsu_ex_forward_RegWrite;  // MEM 到 EX：前递写使能
+    wire        lsu_ex_forward_MemRead;   // MEM 到 EX：前递读使能
+    wire        ex_lsu_forward_las;       // EX 到 MEM：加载后存储前递标志
 
     // 内存访问信号（暴露在顶层，需外部连接）
     wire [31:0] addr;             // 内存地址
@@ -171,18 +171,18 @@ module rv32e (
         .id_ready(id_ready),
         .id_valid(id_valid),
         .ex_ready(ex_ready),
-        .mem_ready(mem_ex_ready),
-        .ex_mem_valid(ex_mem_valid),
+        .lsu_ready(lsu_ex_ready),
+        .ex_lsu_valid(ex_lsu_valid),
         .id_wb_rs1(id_wb_rs1),
         .id_wb_rs2(id_wb_rs2),
-        .mem_ex_forward_rd(mem_ex_forward_rd),
-        .mem_ex_forward_RegWrite(mem_ex_forward_RegWrite),
-        .mem_ex_forward_MemRead(mem_ex_forward_MemRead),
-        .mem_wb_wdata(mem_wb_write_rd_data),
-        .mem_wb_rd(mem_wb_rd),
-        .mem_wb_RegWrite(mem_wb_RegWrite),
-        .mem_wb_valid(mem_wb_valid),
-        .ex_mem_forward_las(ex_mem_forward_las),
+        .lsu_ex_forward_rd(lsu_ex_forward_rd),
+        .lsu_ex_forward_RegWrite(lsu_ex_forward_RegWrite),
+        .lsu_ex_forward_MemRead(lsu_ex_forward_MemRead),
+        .lsu_wb_wdata(lsu_wb_write_rd_data),
+        .lsu_wb_rd(lsu_wb_rd),
+        .lsu_wb_RegWrite(lsu_wb_RegWrite),
+        .lsu_wb_valid(lsu_wb_valid),
+        .ex_lsu_forward_las(ex_lsu_forward_las),
         .id_ex_inst(id_ex_inst),
         .id_ex_pc(id_ex_pc),
         .id_ex_imm(id_ex_imm),
@@ -216,123 +216,123 @@ module rv32e (
         .id_ex_csrrci(id_ex_csrrci),
         .ex_flush(ex_flush),
         .ex_flush_pc(ex_flush_pc),
-        .ex_mem_inst(ex_mem_inst),
-        .ex_mem_pc(ex_mem_pc),
-        .ex_mem_src2(ex_mem_src2),
-        .ex_mem_RegWrite(ex_mem_RegWrite),
-        .ex_mem_rd(ex_mem_rd),
-        .ex_mem_MemRead(ex_mem_MemRead),
-        .ex_mem_MemWrite(ex_mem_MemWrite),
-        .ex_mem_MemLen(ex_mem_MemLen),
-        .ex_mem_opcode(ex_mem_opcode),
-        .ex_mem_csr(ex_mem_csr),
-        .ex_mem_csr_wen1(ex_mem_csr_wen1),
-        .ex_mem_csr_wen2(ex_mem_csr_wen2),
-        .ex_mem_csr_wr_addr1(ex_mem_csr_wr_addr1),
-        .ex_mem_csr_wr_addr2(ex_mem_csr_wr_addr2),
-        .ex_mem_csr_wr_data1(ex_mem_csr_wr_data1),
-        .ex_mem_csr_wr_data2(ex_mem_csr_wr_data2),
-        .ex_mem_csr_rdata(ex_mem_csr_rdata),
-        .ex_mem_csr_ecall(ex_mem_csr_ecall),
-        .ex_mem_csr_mret(ex_mem_csr_mret),
-        .ex_mem_imm(ex_mem_imm),
-        .ex_mem_process_result(ex_mem_process_result)
+        .ex_lsu_inst(ex_lsu_inst),
+        .ex_lsu_pc(ex_lsu_pc),
+        .ex_lsu_src2(ex_lsu_src2),
+        .ex_lsu_RegWrite(ex_lsu_RegWrite),
+        .ex_lsu_rd(ex_lsu_rd),
+        .ex_lsu_MemRead(ex_lsu_MemRead),
+        .ex_lsu_MemWrite(ex_lsu_MemWrite),
+        .ex_lsu_MemLen(ex_lsu_MemLen),
+        .ex_lsu_opcode(ex_lsu_opcode),
+        .ex_lsu_csr(ex_lsu_csr),
+        .ex_lsu_csr_wen1(ex_lsu_csr_wen1),
+        .ex_lsu_csr_wen2(ex_lsu_csr_wen2),
+        .ex_lsu_csr_wr_addr1(ex_lsu_csr_wr_addr1),
+        .ex_lsu_csr_wr_addr2(ex_lsu_csr_wr_addr2),
+        .ex_lsu_csr_wr_data1(ex_lsu_csr_wr_data1),
+        .ex_lsu_csr_wr_data2(ex_lsu_csr_wr_data2),
+        .ex_lsu_csr_rdata(ex_lsu_csr_rdata),
+        .ex_lsu_csr_ecall(ex_lsu_csr_ecall),
+        .ex_lsu_csr_mret(ex_lsu_csr_mret),
+        .ex_lsu_imm(ex_lsu_imm),
+        .ex_lsu_process_result(ex_lsu_process_result)
     );
 
     // wire        MEM_LSU_write_ready;
     // wire        MEM_LSU_read_ready;
     // MEM（内存访问）模块
-    MEM mem (
+    LSU lsu (
         .clk(clk),
         .rst(reset),
-        .ex_mem_imm(ex_mem_imm),
+        .ex_lsu_imm(ex_lsu_imm),
         // .MEM_LSU_write_ready(MEM_LSU_write_ready),
         // .MEM_LSU_read_ready(MEM_LSU_read_ready),
-        .ex_mem_valid(ex_mem_valid),
-        .mem_ex_ready(mem_ex_ready),
-        .wb_mem_ready(wb_mem_ready),
-        .mem_wb_valid(mem_wb_valid),
-        .ex_mem_forward_las(ex_mem_forward_las),
-        .ex_mem_RegWrite(ex_mem_RegWrite),
-        .ex_mem_rd(ex_mem_rd),
-        .ex_mem_MemRead(ex_mem_MemRead),
-        .ex_mem_MemWrite(ex_mem_MemWrite),
-        .ex_mem_MemLen(ex_mem_MemLen),
-        .ex_mem_inst(ex_mem_inst),
-        .ex_mem_pc(ex_mem_pc),
-        .addr(ex_mem_process_result), // 从 EX 传入的内存地址
-        .data_in(ex_mem_src2),        // 从 EX 传入的写数据
-        .ex_mem_opcode(ex_mem_opcode),
-        .mem_ex_forward_rd(mem_ex_forward_rd),
-        .mem_ex_forward_RegWrite(mem_ex_forward_RegWrite),
-        .mem_ex_forward_MemRead(mem_ex_forward_MemRead),
-        .ex_mem_csr(ex_mem_csr),
-        .ex_mem_csr_wen1(ex_mem_csr_wen1),
-        .ex_mem_csr_wen2(ex_mem_csr_wen2),
-        .ex_mem_csr_wr_data1(ex_mem_csr_wr_data1),
-        .ex_mem_csr_wr_data2(ex_mem_csr_wr_data2),
-        .ex_mem_csr_wr_addr1(ex_mem_csr_wr_addr1),
-        .ex_mem_csr_wr_addr2(ex_mem_csr_wr_addr2),
-        .ex_mem_csr_rdata(ex_mem_csr_rdata),
-        .ex_mem_csr_ecall(ex_mem_csr_ecall),
-        .ex_mem_csr_mret(ex_mem_csr_mret),
-        .ex_mem_process_result(ex_mem_process_result),
-        .mem_wb_inst(mem_wb_inst),
-        .mem_wb_pc(mem_wb_pc),
+        .ex_lsu_valid(ex_lsu_valid),
+        .lsu_ex_ready(lsu_ex_ready),
+        .wb_lsu_ready(wb_lsu_ready),
+        .lsu_wb_valid(lsu_wb_valid),
+        .ex_lsu_forward_las(ex_lsu_forward_las),
+        .ex_lsu_RegWrite(ex_lsu_RegWrite),
+        .ex_lsu_rd(ex_lsu_rd),
+        .ex_lsu_MemRead(ex_lsu_MemRead),
+        .ex_lsu_MemWrite(ex_lsu_MemWrite),
+        .ex_lsu_MemLen(ex_lsu_MemLen),
+        .ex_lsu_inst(ex_lsu_inst),
+        .ex_lsu_pc(ex_lsu_pc),
+        .addr(ex_lsu_process_result), // 从 EX 传入的内存地址
+        .data_in(ex_lsu_src2),        // 从 EX 传入的写数据
+        .ex_lsu_opcode(ex_lsu_opcode),
+        .lsu_ex_forward_rd(lsu_ex_forward_rd),
+        .lsu_ex_forward_RegWrite(lsu_ex_forward_RegWrite),
+        .lsu_ex_forward_MemRead(lsu_ex_forward_MemRead),
+        .ex_lsu_csr(ex_lsu_csr),
+        .ex_lsu_csr_wen1(ex_lsu_csr_wen1),
+        .ex_lsu_csr_wen2(ex_lsu_csr_wen2),
+        .ex_lsu_csr_wr_data1(ex_lsu_csr_wr_data1),
+        .ex_lsu_csr_wr_data2(ex_lsu_csr_wr_data2),
+        .ex_lsu_csr_wr_addr1(ex_lsu_csr_wr_addr1),
+        .ex_lsu_csr_wr_addr2(ex_lsu_csr_wr_addr2),
+        .ex_lsu_csr_rdata(ex_lsu_csr_rdata),
+        .ex_lsu_csr_ecall(ex_lsu_csr_ecall),
+        .ex_lsu_csr_mret(ex_lsu_csr_mret),
+        .ex_lsu_process_result(ex_lsu_process_result),
+        .lsu_wb_inst(lsu_wb_inst),
+        .lsu_wb_pc(lsu_wb_pc),
         .ex_flush(ex_flush),
-        .mem_wb_flush(mem_wb_flush),
-        .mem_wb_csr_wr_data1(mem_wb_csr_wr_data1),
-        .mem_wb_csr_wr_data2(mem_wb_csr_wr_data2),
-        .mem_wb_csr_wr_addr1(mem_wb_csr_wr_addr1),
-        .mem_wb_csr_wr_addr2(mem_wb_csr_wr_addr2),
-        .mem_wb_csr_wen1(mem_wb_csr_wen1),
-        .mem_wb_csr_wen2(mem_wb_csr_wen2),
-        .mem_wb_RegWrite(mem_wb_RegWrite),
-        .mem_wb_rd(mem_wb_rd),
-        .mem_wb_write_rd_data(mem_wb_write_rd_data)
+        .lsu_wb_flush(lsu_wb_flush),
+        .lsu_wb_csr_wr_data1(lsu_wb_csr_wr_data1),
+        .lsu_wb_csr_wr_data2(lsu_wb_csr_wr_data2),
+        .lsu_wb_csr_wr_addr1(lsu_wb_csr_wr_addr1),
+        .lsu_wb_csr_wr_addr2(lsu_wb_csr_wr_addr2),
+        .lsu_wb_csr_wen1(lsu_wb_csr_wen1),
+        .lsu_wb_csr_wen2(lsu_wb_csr_wen2),
+        .lsu_wb_RegWrite(lsu_wb_RegWrite),
+        .lsu_wb_rd(lsu_wb_rd),
+        .lsu_wb_write_rd_data(lsu_wb_write_rd_data)
     );
 
     // WBU（写回）模块
     WBU wbu (
         .clk(clk),
         .rst(reset),
-        .wen(mem_wb_RegWrite),
-        .mem_wb_valid(mem_wb_valid),
-        .wb_mem_ready(wb_mem_ready),
-        .wdata(mem_wb_write_rd_data),
-        .waddr(mem_wb_rd),
+        .wen(lsu_wb_RegWrite),
+        .lsu_wb_valid(lsu_wb_valid),
+        .wb_lsu_ready(wb_lsu_ready),
+        .wdata(lsu_wb_write_rd_data),
+        .waddr(lsu_wb_rd),
         .rs1(id_wb_rs1),
         .rs2(id_wb_rs2),
         .src1(wb_ex_src1),
         .src2(wb_ex_src2),
         .wb_valid(wb_valid),
-        .mem_wb_flush(mem_wb_flush),
+        .lsu_wb_flush(lsu_wb_flush),
         .raddr_csr1(id_wb_csr_addr1),
         .raddr_csr2(id_wb_csr_addr2),
-        .wen_csr1(mem_wb_csr_wen1),
-        .wen_csr2(mem_wb_csr_wen2),
-        .wdata_csr1(mem_wb_csr_wr_data1),
-        .wdata_csr2(mem_wb_csr_wr_data2),
-        .waddr_csr1(mem_wb_csr_wr_addr1),
-        .waddr_csr2(mem_wb_csr_wr_addr2),
+        .wen_csr1(lsu_wb_csr_wen1),
+        .wen_csr2(lsu_wb_csr_wen2),
+        .wdata_csr1(lsu_wb_csr_wr_data1),
+        .wdata_csr2(lsu_wb_csr_wr_data2),
+        .waddr_csr1(lsu_wb_csr_wr_addr1),
+        .waddr_csr2(lsu_wb_csr_wr_addr2),
         .rdata_csr1(wb_ex_csr_num1),
         .rdata_csr2(wb_ex_csr_num2)
     );
     // assign MEM_LSU_write_ready = 1;
     // assign MEM_LSU_read_ready = 1;
     // 内存接口赋值
-    assign addr = ex_mem_process_result; // 从 EX 传入的内存地址
-    assign wdata = ex_mem_src2;          // 从 EX 传入的内存写数据
-    assign wen = ex_mem_MemWrite;        // 从 EX 传入的内存写使能
-    assign mask = (ex_mem_MemLen == 3'b001) ? 2'b00 : // 字节
-                  (ex_mem_MemLen == 3'b010) ? 2'b01 : // 半字
-                  (ex_mem_MemLen == 3'b100) ? 2'b11 : // 字
+    assign addr = ex_lsu_process_result; // 从 EX 传入的内存地址
+    assign wdata = ex_lsu_src2;          // 从 EX 传入的内存写数据
+    assign wen = ex_lsu_MemWrite;        // 从 EX 传入的内存写使能
+    assign mask = (ex_lsu_MemLen == 3'b001) ? 2'b00 : // 字节
+                  (ex_lsu_MemLen == 3'b010) ? 2'b01 : // 半字
+                  (ex_lsu_MemLen == 3'b100) ? 2'b11 : // 字
                   2'b00;                      // 默认
 
     // EBREAK 处理
     always @(*) begin
-        if (ex_mem_inst == 32'h00100073) begin
-            ebreak(`HIT_TRAP, ex_mem_inst);
+        if (ex_lsu_inst == 32'h00100073) begin
+            ebreak(`HIT_TRAP, ex_lsu_inst);
         end
         if(ex_flush) begin
             $display("       [EX] flush pc = %h", ex_flush_pc);

@@ -7,19 +7,19 @@ module EX (
     input             id_ready,        // ID -> IF
     input             id_valid,
     output reg        ex_ready,
-    input             mem_ready,
-    output reg        ex_mem_valid,
+    input             lsu_ready,
+    output reg        ex_lsu_valid,
 
     input      [4:0]  id_wb_rs1,
     input      [4:0]  id_wb_rs2,
-    input      [4:0]  mem_ex_forward_rd,
-    input             mem_ex_forward_RegWrite,
-    input             mem_ex_forward_MemRead,
-    input      [31:0] mem_wb_wdata,
-    input      [4:0]  mem_wb_rd,
-    input             mem_wb_RegWrite,
-    input             mem_wb_valid,
-    output reg        ex_mem_forward_las,
+    input      [4:0]  lsu_ex_forward_rd,
+    input             lsu_ex_forward_RegWrite,
+    input             lsu_ex_forward_MemRead,
+    input      [31:0] lsu_wb_wdata,
+    input      [4:0]  lsu_wb_rd,
+    input             lsu_wb_RegWrite,
+    input             lsu_wb_valid,
+    output reg        ex_lsu_forward_las,
 
     input      [31:0] id_ex_inst,
     input      [31:0] id_ex_pc,
@@ -65,30 +65,30 @@ module EX (
     // output reg        ex_actual_taken,  // 实际跳转结果
     // output reg [31:0] ex_actual_target, // 实际目标地址
 
-    output reg [31:0] ex_mem_inst,
-    output reg [31:0] ex_mem_pc,
-    output reg [31:0] ex_mem_src2,
-    output reg        ex_mem_RegWrite,
-    output reg [4:0]  ex_mem_rd,
-    output reg        ex_mem_MemRead,
-    output reg        ex_mem_MemWrite,
-    output reg [2:0]  ex_mem_MemLen,
-    output reg [6:0]  ex_mem_opcode,
+    output reg [31:0] ex_lsu_inst,
+    output reg [31:0] ex_lsu_pc,
+    output reg [31:0] ex_lsu_src2,
+    output reg        ex_lsu_RegWrite,
+    output reg [4:0]  ex_lsu_rd,
+    output reg        ex_lsu_MemRead,
+    output reg        ex_lsu_MemWrite,
+    output reg [2:0]  ex_lsu_MemLen,
+    output reg [6:0]  ex_lsu_opcode,
 
-    output reg        ex_mem_csr,
-    output reg        ex_mem_csr_wen1,
-    output reg        ex_mem_csr_wen2,
-    output reg [11:0] ex_mem_csr_wr_addr1,
-    output reg [11:0] ex_mem_csr_wr_addr2,
-    output reg [31:0] ex_mem_csr_wr_data1,
-    output reg [31:0] ex_mem_csr_wr_data2,
-    output reg [31:0] ex_mem_csr_rdata,
+    output reg        ex_lsu_csr,
+    output reg        ex_lsu_csr_wen1,
+    output reg        ex_lsu_csr_wen2,
+    output reg [11:0] ex_lsu_csr_wr_addr1,
+    output reg [11:0] ex_lsu_csr_wr_addr2,
+    output reg [31:0] ex_lsu_csr_wr_data1,
+    output reg [31:0] ex_lsu_csr_wr_data2,
+    output reg [31:0] ex_lsu_csr_rdata,
 
-    output reg        ex_mem_csr_ecall,
-    output reg        ex_mem_csr_mret,
+    output reg        ex_lsu_csr_ecall,
+    output reg        ex_lsu_csr_mret,
 
-    output reg [31:0] ex_mem_imm,
-    output reg [31:0] ex_mem_process_result
+    output reg [31:0] ex_lsu_imm,
+    output reg [31:0] ex_lsu_process_result
 );
 
     // 前递信号定义
@@ -97,25 +97,25 @@ module EX (
     wire       forward_las;
     wire [3:0] load_use_flag;
 
-    assign forward_rs1[1] = ex_mem_RegWrite & (|ex_mem_rd) & (ex_mem_rd == id_wb_rs1) & ex_mem_valid;
-    assign forward_rs1[0] = mem_wb_RegWrite & (|mem_wb_rd) & (mem_wb_rd == id_wb_rs1) & mem_wb_valid;
-    assign forward_rs2[1] = ex_mem_RegWrite & (|ex_mem_rd) & (ex_mem_rd == id_wb_rs2) & ex_mem_valid;
-    assign forward_rs2[0] = mem_wb_RegWrite & (|mem_wb_rd) & (mem_wb_rd == id_wb_rs2) & mem_wb_valid;
+    assign forward_rs1[1] = ex_lsu_RegWrite & (|ex_lsu_rd) & (ex_lsu_rd == id_wb_rs1) & ex_lsu_valid;
+    assign forward_rs1[0] = lsu_wb_RegWrite & (|lsu_wb_rd) & (lsu_wb_rd == id_wb_rs1) & lsu_wb_valid;
+    assign forward_rs2[1] = ex_lsu_RegWrite & (|ex_lsu_rd) & (ex_lsu_rd == id_wb_rs2) & ex_lsu_valid;
+    assign forward_rs2[0] = lsu_wb_RegWrite & (|lsu_wb_rd) & (lsu_wb_rd == id_wb_rs2) & lsu_wb_valid;
 
-    assign forward_las = id_ex_MemWrite & ex_mem_MemRead & ex_mem_RegWrite & ex_mem_valid &
-                         (|ex_mem_rd) & (ex_mem_rd != id_wb_rs1) & (ex_mem_rd == id_wb_rs2);
+    assign forward_las = id_ex_MemWrite & ex_lsu_MemRead & ex_lsu_RegWrite & ex_lsu_valid &
+                         (|ex_lsu_rd) & (ex_lsu_rd != id_wb_rs1) & (ex_lsu_rd == id_wb_rs2);
 
-    assign load_use_flag[3] = mem_ex_forward_MemRead & mem_ex_forward_RegWrite & (|mem_ex_forward_rd) & (mem_ex_forward_rd == id_wb_rs1);
-    assign load_use_flag[2] = mem_ex_forward_MemRead & mem_ex_forward_RegWrite & (|mem_ex_forward_rd) & (mem_ex_forward_rd == id_wb_rs2);
-    assign load_use_flag[1] = ex_mem_MemRead & ex_mem_RegWrite & (|ex_mem_rd) & (ex_mem_rd == id_wb_rs1) & ex_mem_valid;
-    assign load_use_flag[0] = ex_mem_MemRead & ex_mem_RegWrite & ex_mem_valid & (|ex_mem_rd) & (ex_mem_rd == id_wb_rs2);
+    assign load_use_flag[3] = lsu_ex_forward_MemRead & lsu_ex_forward_RegWrite & (|lsu_ex_forward_rd) & (lsu_ex_forward_rd == id_wb_rs1);
+    assign load_use_flag[2] = lsu_ex_forward_MemRead & lsu_ex_forward_RegWrite & (|lsu_ex_forward_rd) & (lsu_ex_forward_rd == id_wb_rs2);
+    assign load_use_flag[1] = ex_lsu_MemRead & ex_lsu_RegWrite & (|ex_lsu_rd) & (ex_lsu_rd == id_wb_rs1) & ex_lsu_valid;
+    assign load_use_flag[0] = ex_lsu_MemRead & ex_lsu_RegWrite & ex_lsu_valid & (|ex_lsu_rd) & (ex_lsu_rd == id_wb_rs2);
 
     // 前递后的源寄存器值
-    wire [31:0] src1 = (forward_rs1[1] ? ex_mem_process_result : 
-                       (forward_rs1[0] | load_use_flag[1]) ? mem_wb_wdata : 
+    wire [31:0] src1 = (forward_rs1[1] ? ex_lsu_process_result : 
+                       (forward_rs1[0] | load_use_flag[1]) ? lsu_wb_wdata : 
                        wb_ex_src1);
-    wire [31:0] src2 = (forward_rs2[1] ? ex_mem_process_result : 
-                       (forward_rs2[0] | load_use_flag[0]) ? mem_wb_wdata : 
+    wire [31:0] src2 = (forward_rs2[1] ? ex_lsu_process_result : 
+                       (forward_rs2[0] | load_use_flag[0]) ? lsu_wb_wdata : 
                        wb_ex_src2);
 
     // ALU 操作中间变量
@@ -323,77 +323,77 @@ module EX (
 
     // 流水线控制
     always @(*) begin
-        ex_ready = (mem_ready || !ex_mem_valid) && (load_use_flag == 4'b0);
+        ex_ready = (lsu_ready || !ex_lsu_valid) && (load_use_flag == 4'b0);
     end
 
     always @(posedge clk or posedge reset) begin
         if (reset) begin
-            ex_mem_valid <= 1'b0;
+            ex_lsu_valid <= 1'b0;
         end
-        else if ((id_valid && ex_ready) && (mem_ready || !ex_mem_valid)) begin
-            ex_mem_valid <= 1'b1;
+        else if ((id_valid && ex_ready) && (lsu_ready || !ex_lsu_valid)) begin
+            ex_lsu_valid <= 1'b1;
         end
-        else if (!(id_valid && ex_ready) && mem_ready) begin
-            ex_mem_valid <= 1'b0;
+        else if (!(id_valid && ex_ready) && lsu_ready) begin
+            ex_lsu_valid <= 1'b0;
         end
     end
 
     // 输出信号赋值
     always @(posedge clk or posedge reset) begin
         if (reset) begin
-            ex_mem_inst           <= 32'h0;
-            ex_mem_pc             <= 32'h0;
-            ex_mem_src2           <= 32'h0;
-            ex_mem_RegWrite       <= 1'b0;
-            ex_mem_rd             <= 5'b0;
-            ex_mem_MemRead        <= 1'b0;
-            ex_mem_MemWrite       <= 1'b0;
-            ex_mem_MemLen         <= 3'b0;
-            ex_mem_process_result <= 32'h0;
-            ex_mem_forward_las    <= 1'b0;
-            ex_mem_csr            <= 1'b0;
-            ex_mem_csr_wen1       <= 1'b0;
-            ex_mem_csr_wen2       <= 1'b0;
-            ex_mem_csr_wr_addr1   <= 12'b0;
-            ex_mem_csr_wr_addr2   <= 12'b0;
-            ex_mem_csr_wr_data1   <= 32'h0;
-            ex_mem_csr_wr_data2   <= 32'h0;
-            ex_mem_csr_rdata      <= 32'h0;
-            ex_mem_csr_ecall      <= 1'b0;
-            ex_mem_csr_mret       <= 1'b0;
-            ex_mem_imm            <= 32'h0;
-            ex_mem_opcode         <= 7'b0;
+            ex_lsu_inst           <= 32'h0;
+            ex_lsu_pc             <= 32'h0;
+            ex_lsu_src2           <= 32'h0;
+            ex_lsu_RegWrite       <= 1'b0;
+            ex_lsu_rd             <= 5'b0;
+            ex_lsu_MemRead        <= 1'b0;
+            ex_lsu_MemWrite       <= 1'b0;
+            ex_lsu_MemLen         <= 3'b0;
+            ex_lsu_process_result <= 32'h0;
+            ex_lsu_forward_las    <= 1'b0;
+            ex_lsu_csr            <= 1'b0;
+            ex_lsu_csr_wen1       <= 1'b0;
+            ex_lsu_csr_wen2       <= 1'b0;
+            ex_lsu_csr_wr_addr1   <= 12'b0;
+            ex_lsu_csr_wr_addr2   <= 12'b0;
+            ex_lsu_csr_wr_data1   <= 32'h0;
+            ex_lsu_csr_wr_data2   <= 32'h0;
+            ex_lsu_csr_rdata      <= 32'h0;
+            ex_lsu_csr_ecall      <= 1'b0;
+            ex_lsu_csr_mret       <= 1'b0;
+            ex_lsu_imm            <= 32'h0;
+            ex_lsu_opcode         <= 7'b0;
         end
         else if (id_valid && ex_ready) begin
-            ex_mem_inst           <= id_ex_inst;
-            ex_mem_pc             <= id_ex_pc;
-            ex_mem_src2           <= src2;
-            ex_mem_RegWrite       <= id_ex_RegWrite;
-            ex_mem_rd             <= id_ex_rd;
-            ex_mem_MemRead        <= id_ex_MemRead;
-            ex_mem_MemWrite       <= id_ex_MemWrite;
-            ex_mem_MemLen         <= id_ex_MemLen;
-            ex_mem_process_result <= process_result;
-            ex_mem_forward_las    <= forward_las;
-            ex_mem_csr            <= id_ex_csr;
-            ex_mem_csr_wen1       <= id_ex_csr_wen1;
-            ex_mem_csr_wen2       <= id_ex_csr_wen2;
-            ex_mem_csr_wr_addr1   <= id_ex_csr_wr_addr1;
-            ex_mem_csr_wr_addr2   <= id_ex_csr_wr_addr2;
-            ex_mem_csr_wr_data1   <= csr_write_wire;
-            ex_mem_csr_wr_data2   <= csr_write_ecall;
-            ex_mem_csr_rdata      <= wb_ex_csr_num1;
-            ex_mem_csr_ecall      <= id_ex_csr_ecall;
-            ex_mem_csr_mret       <= id_ex_csr_mret;
-            ex_mem_imm            <= id_ex_imm;
-            ex_mem_opcode         <= id_ex_opcode;
+            ex_lsu_inst           <= id_ex_inst;
+            ex_lsu_pc             <= id_ex_pc;
+            ex_lsu_src2           <= src2;
+            ex_lsu_RegWrite       <= id_ex_RegWrite;
+            ex_lsu_rd             <= id_ex_rd;
+            ex_lsu_MemRead        <= id_ex_MemRead;
+            ex_lsu_MemWrite       <= id_ex_MemWrite;
+            ex_lsu_MemLen         <= id_ex_MemLen;
+            ex_lsu_process_result <= process_result;
+            ex_lsu_forward_las    <= forward_las;
+            ex_lsu_csr            <= id_ex_csr;
+            ex_lsu_csr_wen1       <= id_ex_csr_wen1;
+            ex_lsu_csr_wen2       <= id_ex_csr_wen2;
+            ex_lsu_csr_wr_addr1   <= id_ex_csr_wr_addr1;
+            ex_lsu_csr_wr_addr2   <= id_ex_csr_wr_addr2;
+            ex_lsu_csr_wr_data1   <= csr_write_wire;
+            ex_lsu_csr_wr_data2   <= csr_write_ecall;
+            ex_lsu_csr_rdata      <= wb_ex_csr_num1;
+            ex_lsu_csr_ecall      <= id_ex_csr_ecall;
+            ex_lsu_csr_mret       <= id_ex_csr_mret;
+            ex_lsu_imm            <= id_ex_imm;
+            ex_lsu_opcode         <= id_ex_opcode;
         end
     end
 
 // always @(posedge clk) begin
 //     if (id_valid && ex_ready) begin
-//         $display("EX: inst=%h, src1=%h, src2=%h, forward_rs1=%b, ex_mem_process_result=%h",
-//                  id_ex_inst, src1, src2, forward_rs1, ex_mem_process_result);
+//         $display("EX: inst=%h, src1=%h, src2=%h, forward_rs1=%b, ex_lsu_process_result=%h",
+//                  id_ex_inst, src1, src2, forward_rs1, ex_lsu_process_result);
 //     end
 // end
 endmodule
