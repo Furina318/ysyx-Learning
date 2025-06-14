@@ -113,7 +113,6 @@ static long load_img() {//load_img函数用于加载镜像文件
   return size;
 }
 
-//load_func_table函数用于加载ELF文件中的符号表
 typedef struct {
   uint32_t addr;  // 函数地址
   uint32_t size;  // 函数大小
@@ -122,7 +121,7 @@ typedef struct {
 
 func_symbol_t func_table[4096]; // 符号表
 int func_count = 0;             // 符号数量
-#define CODE_BASE_ADDR 0x80000000;  // 根据 ELF 的 Program Header 动态获取
+// #define CODE_BASE_ADDR 0x80000000;  
 
 void load_func_table(const char *elf_file) {
   // 打开ELF文件
@@ -140,13 +139,13 @@ void load_func_table(const char *elf_file) {
   Elf32_Ehdr elf_header;   // ELF文件头结构
   assert(fread(&elf_header, sizeof(Elf32_Ehdr), 1, fp)==1);  // 读取文件头
 
-  /*=== 读取节头表(section header table) ===*/
+  /*=== 读取节头表 ===*/
   fseek(fp, elf_header.e_shoff, SEEK_SET);  // 定位到节头表起始位置
   Elf32_Shdr sh_table[elf_header.e_shnum];  // 创建节头表数组
   // 读取所有节头表条目
   assert(fread(sh_table, sizeof(Elf32_Shdr), elf_header.e_shnum, fp)==elf_header.e_shnum);
 
-  /*=== 定位关键节 ===*/
+  /*=== 定位符号表和字符串表 ===*/
   Elf32_Shdr *symtab = NULL;  // 符号表指针
   Elf32_Shdr *strtab = NULL;  // 字符串表指针
   for (int i = 0; i < elf_header.e_shnum; i++) {
@@ -159,7 +158,6 @@ void load_func_table(const char *elf_file) {
       strtab = &sh_table[i];
     }
   }
-  // 验证是否找到两个关键表
   Assert(symtab && strtab, "Failed to locate symbol table or string table");
 
   /*=== 读取符号表数据 ===*/
@@ -174,7 +172,7 @@ void load_func_table(const char *elf_file) {
   assert(fread(strtab_data, strtab->sh_size, 1, fp)==1);  // 读取整个字符串表
 
   /*=== 解析函数符号 ===*/
-  func_count = 0;  // 重置符号计数器
+  func_count = 0; 
   for (int i = 0; i < symtab->sh_size / sizeof(Elf32_Sym); i++) {
     // 只处理函数类型符号(STT_FUNC)
     if (ELF32_ST_TYPE(symbols[i].st_info) == STT_FUNC) {
@@ -186,8 +184,6 @@ void load_func_table(const char *elf_file) {
       strncpy(func_table[func_count].name, 
              &strtab_data[symbols[i].st_name], 
              sizeof(func_table[func_count].name) - 1);
-      
-      // 确保字符串终止
       func_table[func_count].name[sizeof(func_table[func_count].name) - 1] = '\0';
       func_count++;  // 递增有效符号计数
     }

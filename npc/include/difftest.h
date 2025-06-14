@@ -24,5 +24,6 @@ typedef struct {
     riscv32_CSRs csr;
 }CPU_state;
 void init_difftest(char *ref_so_file, long img_size, int port);
+void update_cpu_state(CPU_state *cpu);
 void difftest_skip_ref();
 #endif

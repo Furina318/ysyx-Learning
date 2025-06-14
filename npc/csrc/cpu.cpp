@@ -27,6 +27,7 @@ extern void display_iringbuf(void);
 
 #ifdef CONFIG_DIFFTEST
 extern void difftest_step(vaddr_t pc, vaddr_t npc);
+// extern void update_cpu_state(CPU_state *cpu);
 extern void (*ref_difftest_regcpy)(void *dut, bool direction);
 #endif
 
@@ -221,33 +222,52 @@ static void trace_and_difftest(){
     IFDEF(CONFIG_ITRACE,puts(logbuf));
   }
   //difftest
-  #ifdef CONFIG_DIFFTEST
-  if(!top->rootp->rv32e__DOT__wbu__DOT__flush){
-    diff_pc[2] = diff_pc[1];
-    diff_pc[1] = diff_pc[0];
-    diff_pc[0] = PCSet.pc;
-    if(run_time >= start_time - 6 && !is_flush){
-      printf("pc: %08x | npc: %08x\n",diff_pc[2],diff_pc[1]);
-      difftest_step(diff_pc[2],diff_pc[1]);
-    }else{
-      is_flush = false;
+#ifdef CONFIG_DIFFTEST
+    // 获取流水线信号
+    bool wb_valid = top->rootp->rv32e__DOT__wb_valid; // WB 阶段指令有效
+    bool ex_flush = top->rootp->rv32e__DOT__ex_flush; // EX 阶段冲刷
+    vaddr_t wb_pc = top->rootp->rv32e__DOT__lsu_wb_pc; // WB 阶段 PC
+    vaddr_t ex_flush_pc = top->rootp->rv32e__DOT__ex_flush_pc; // EX 冲刷目标 PC
+    vaddr_t wb_inst = top->rootp->rv32e__DOT__lsu_wb_inst; // WB 阶段指令
+
+    // 更新 CPU 状态
+    CPU_state ref_r;
+    update_cpu_state(&ref_r);
+
+    // 处理冲刷情况
+    if (ex_flush) {
+        // 冲刷时，同步寄存器和 PC 到参考模型，跳过差分测试
+        ref_r.pc = ex_flush_pc; // 使用冲刷目标 PC
+        ref_difftest_regcpy(&ref_r, DIFFTEST_TO_REF);
+        printf("flush: skip difftest at pc: 0x%08x, sync to ref pc: 0x%08x\n", wb_pc, ex_flush_pc);
+        return;
     }
-  }else{
-    diff_pc[2] = diff_pc[1];
-    diff_pc[1] = top->rootp->rv32e__DOT__IF_ID_pc;
-    if(run_time >= start_time - 6 ){
-      printf("flush: pc: %08x | npc: %08x\n",diff_pc[1],diff_pc[0]);
-      difftest_step(diff_pc[1],diff_pc[0]);
-      is_flush = true;
+
+    // 仅对有效指令进行差分测试
+    if (wb_valid && run_time >= start_time) {
+        // 计算 NPC
+        vaddr_t npc = wb_pc + 4; // 默认顺序执行
+        uint32_t opcode = wb_inst & 0x7F;
+        if (opcode == 0x6F || opcode == 0x67) { // JAL 或 JALR
+            // 使用 EX/MEM 阶段的目标 PC
+            npc = top->rootp->rv32e__DOT__ex_lsu_pc;
+        } else if (opcode == 0x63) { // 分支指令 (B-type)
+            // 检查分支是否发生
+            bool take_branch = top->rootp->rv32e__DOT__exu__DOT__take_branch;
+            if (take_branch) {
+                npc = wb_pc + top->rootp->rv32e__DOT__id_ex_imm;
+            }
+        }
+
+        // 同步 DUT 状态到参考模型
+        ref_r.pc = wb_pc;
+        ref_difftest_regcpy(&ref_r, DIFFTEST_TO_REF);
+
+        // 执行差分测试
+        printf("difftest: pc: 0x%08x | npc: 0x%08x | nemu-pc: 0x%08x\n", wb_pc, npc, ref_r.pc);
+        difftest_step(wb_pc, npc);
     }
-  }
-  // if(top->rootp->rv32e__DOT__wb_valid){
-  //   // printf("pc=0x%08x | inst=0x%08x\n",PCSet.pc,PCSet.inst);
-  //   // printf("next_pc=0x%08x | next_inst=0x%08x\n\n",PCSet.next_pc,PCSet.ninst);
-    
-  //   difftest_step(PCSet.pc,PCSet.next_pc);
-  // }
-  #endif
+#endif
 }
 
 static void execute(uint64_t n) {

@@ -333,10 +333,22 @@ module rv32e (
     always @(*) begin
         if (ex_lsu_inst == 32'h00100073) begin
             ebreak(`HIT_TRAP, ex_lsu_inst);
+            // $display("Count = %d", flush_counter);
         end
         if(ex_flush) begin
             $display("       [EX] flush pc = %h", ex_flush_pc);
         end
     end
+
+    // reg [31:0] flush_counter;
+    // initial begin
+    //         flush_counter = 0;
+    // end
+    // always @(posedge clk) begin    
+    //     if(ex_flush_pc == 32'h8000_0010) begin
+    //         flush_counter = flush_counter + 1;
+            
+    //     end
+    // end
 
 endmodule
