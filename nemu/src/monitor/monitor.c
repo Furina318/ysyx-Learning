@@ -122,7 +122,7 @@ void load_func_table(const char *elf_file) {
   Assert(symtab && strtab, "Failed to locate symbol table or string table");
   //读取符号表数据
   Elf32_Sym symbols[symtab->sh_size / sizeof(Elf32_Sym)];//缓冲区设置
-  fseek(fp, symtab->sh_offset, SEEK_SET);//定位到符号表偏移
+  fseek(fp, symtab->sh_offset, SEEK_SET);//定位到符号表偏移(后续或许名称偏移量)
   assert(fread(symbols, symtab->sh_size, 1, fp)==1);//读取符号表数据
   //读取字符串表数据
   char strtab_data[strtab->sh_size];
