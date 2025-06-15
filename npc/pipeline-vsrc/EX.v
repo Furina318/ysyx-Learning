@@ -154,6 +154,7 @@ module EX (
             ex_num1 = src1;
             // ex_num2 = {27'b0, src2[4:0]}; //位移指令只取src2低5位
             // ex_num2 = {27'b0, id_ex_imm[4:0]}; 
+            
             // if(id_ex_opcode[6:2] == `INST_TYPE_I) begin
             //     ex_num2 = {27'b0, id_ex_imm[4:0]};
             // end
