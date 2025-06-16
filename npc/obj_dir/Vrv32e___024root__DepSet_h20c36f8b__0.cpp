@@ -581,10 +581,11 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__0(Vrv32e___024root* vlSe
         vlSelf->rv32e__DOT__lsu_wb_csr_wr_data1 = 0U;
         vlSelf->rv32e__DOT__lsu_wb_rd = 0U;
         vlSelf->rv32e__DOT__lsu__DOT__l_rd_addr = __Vdly__rv32e__DOT__lsu__DOT__l_rd_addr;
-        vlSelf->rv32e__DOT__id_wb_csr_addr2 = 0U;
         vlSelf->rv32e__DOT__exu__DOT__ex_flush_condition = 1U;
+        vlSelf->rv32e__DOT__id_wb_csr_addr2 = 0U;
         vlSelf->rv32e__DOT__id_wb_csr_addr1 = 0U;
         vlSelf->rv32e__DOT__id_ex_func3 = 0U;
+        vlSelf->rv32e__DOT__id_ex_shamt = 0U;
         vlSelf->rv32e__DOT__wb_valid = 0U;
     } else {
         if ((((IData)(vlSelf->rv32e__DOT__ex_lsu_valid) 
@@ -692,6 +693,11 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__0(Vrv32e___024root* vlSe
         vlSelf->rv32e__DOT__lsu__DOT__l_pc = __Vdly__rv32e__DOT__lsu__DOT__l_pc;
         vlSelf->rv32e__DOT__lsu__DOT__l_rd_en = __Vdly__rv32e__DOT__lsu__DOT__l_rd_en;
         vlSelf->rv32e__DOT__lsu__DOT__l_rd_addr = __Vdly__rv32e__DOT__lsu__DOT__l_rd_addr;
+        if (vlSelf->rv32e__DOT__ex_flush) {
+            vlSelf->rv32e__DOT__exu__DOT__ex_flush_condition = 0U;
+        } else if (vlSelf->rv32e__DOT__id_ready) {
+            vlSelf->rv32e__DOT__exu__DOT__ex_flush_condition = 1U;
+        }
         if (((IData)(vlSelf->rv32e__DOT__IF_valid) 
              & (IData)(vlSelf->rv32e__DOT__id_ready))) {
             if (vlSelf->rv32e__DOT__idu__DOT__csr_mret) {
@@ -706,11 +712,9 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__0(Vrv32e___024root* vlSe
             vlSelf->rv32e__DOT__id_ex_func3 = (7U & 
                                                (vlSelf->rv32e__DOT__IF_ID_inst 
                                                 >> 0xcU));
-        }
-        if (vlSelf->rv32e__DOT__ex_flush) {
-            vlSelf->rv32e__DOT__exu__DOT__ex_flush_condition = 0U;
-        } else if (vlSelf->rv32e__DOT__id_ready) {
-            vlSelf->rv32e__DOT__exu__DOT__ex_flush_condition = 1U;
+            vlSelf->rv32e__DOT__id_ex_shamt = (0x3fU 
+                                               & (vlSelf->rv32e__DOT__IF_ID_inst 
+                                                  >> 0x14U));
         }
         if (((IData)(vlSelf->rv32e__DOT__lsu_wb_valid) 
              & (~ (IData)(vlSelf->rv32e__DOT__wbu__DOT__flush)))) {
@@ -1282,14 +1286,17 @@ VL_INLINE_OPT void Vrv32e___024root___nba_comb__TOP__0(Vrv32e___024root* vlSelf)
                                                   | (8U 
                                                      == (IData)(vlSelf->rv32e__DOT__id_ex_alu_op)))
                                                   ? 
-                                                 ((4U 
-                                                   == 
-                                                   (0x1fU 
-                                                    & ((IData)(vlSelf->rv32e__DOT__id_ex_opcode) 
-                                                       >> 2U)))
+                                                 ((IData)(
+                                                          ((0x10U 
+                                                            == 
+                                                            (0x7cU 
+                                                             & (IData)(vlSelf->rv32e__DOT__id_ex_opcode))) 
+                                                           & (~ 
+                                                              ((IData)(vlSelf->rv32e__DOT__id_ex_shamt) 
+                                                               >> 5U))))
                                                    ? 
                                                   (0x1fU 
-                                                   & vlSelf->rv32e__DOT__id_ex_imm)
+                                                   & (IData)(vlSelf->rv32e__DOT__id_ex_shamt))
                                                    : 
                                                   ((0xcU 
                                                     == 

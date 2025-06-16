@@ -21,6 +21,7 @@ module ID (
     output reg [4:0]  id_wb_rs2,              // 源寄存器2地址
     output reg [4:0]  id_ex_zimm,             // CSR立即数（zimm）
     output reg [31:0] id_ex_imm,              // 立即数值
+    output reg [5:0]  id_ex_shamt,              // 移位量
 
     output reg [3:0]  id_ex_alu_op,
     output reg [2:0]  id_ex_MemLen,
@@ -67,6 +68,7 @@ module ID (
     wire [4:0] rd     = instr[11:7];
     wire [2:0] func3  = instr[14:12];
     wire [6:0] func7  = instr[31:25];
+    wire [5:0] shamt  = instr[25:20];
     wire [4:0] get_opcode = opcode[6:2];
 
     wire [31:0] imm;
@@ -152,6 +154,7 @@ module ID (
             id_wb_rs2 <= 5'b0;
             id_ex_zimm <= 5'b0;
             id_ex_imm <= 32'b0;
+            id_ex_shamt <= 6'b0;
             id_ex_pc <= 32'b0;
             id_ex_inst <= 32'b0;
             id_ex_alu_op <= 4'b0;
@@ -187,6 +190,7 @@ module ID (
             id_wb_rs2 <= rs2;
             id_ex_zimm <= rs1;
             id_ex_imm <= imm;
+            id_ex_shamt <= shamt;
 
             id_ex_pc <= if_id_pc;
             id_ex_inst <= if_id_inst;

@@ -23,6 +23,7 @@ module rv32e (
     wire [4:0]  id_wb_rs2;        // ID 到 WB：源寄存器 2
     wire [4:0]  id_ex_zimm;       // ID 到 EX：CSR 立即数
     wire [31:0] id_ex_imm;        // ID 到 EX：立即数
+    wire [5:0]  id_ex_shamt;      // ID 到 EX：移位量
     wire [3:0]  id_ex_alu_op;     // ID 到 EX：ALU 操作
     wire [2:0]  id_ex_MemLen;     // ID 到 EX：内存访问长度
     wire        id_ex_MemWrite;   // ID 到 EX：内存写使能
@@ -139,6 +140,7 @@ module rv32e (
         .id_wb_rs2(id_wb_rs2),
         .id_ex_zimm(id_ex_zimm),
         .id_ex_imm(id_ex_imm),
+        .id_ex_shamt(id_ex_shamt),
         .id_ex_alu_op(id_ex_alu_op),
         .id_ex_MemLen(id_ex_MemLen),
         .id_ex_MemWrite(id_ex_MemWrite),
@@ -187,6 +189,7 @@ module rv32e (
         .id_ex_pc(id_ex_pc),
         .id_ex_imm(id_ex_imm),
         .id_ex_zimm(id_ex_zimm),
+        .id_ex_shamt(id_ex_shamt),
         .wb_ex_src1(wb_ex_src1),
         .wb_ex_src2(wb_ex_src2),
         .id_ex_RegWrite(id_ex_RegWrite),

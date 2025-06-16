@@ -25,6 +25,7 @@ module EX (
     input      [31:0] id_ex_pc,
     input      [31:0] id_ex_imm,
     input      [4:0]  id_ex_zimm,
+    input      [5:0]  id_ex_shamt,
     input      [31:0] wb_ex_src1,
     input      [31:0] wb_ex_src2,
     input             id_ex_RegWrite,
@@ -146,7 +147,7 @@ module EX (
             // else begin
             //     ex_num2 = 32'b0; // 如果不是位移指令，ex_num2为0
             // end
-            ex_num2 = (id_ex_opcode[6:2] == `INST_TYPE_I) ? {27'b0, id_ex_imm[4:0]} :
+            ex_num2 = (id_ex_opcode[6:2] == `INST_TYPE_I && !id_ex_shamt[5]) ? {27'b0, id_ex_shamt[4:0]} :
                         (id_ex_opcode[6:2] == `INST_TYPE_R) ? {27'b0, src2[4:0]} : 32'b0;
         end
         else begin

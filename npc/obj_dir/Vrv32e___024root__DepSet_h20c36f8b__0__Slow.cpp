@@ -263,14 +263,17 @@ VL_ATTR_COLD void Vrv32e___024root___stl_sequent__TOP__0(Vrv32e___024root* vlSel
                                                   | (8U 
                                                      == (IData)(vlSelf->rv32e__DOT__id_ex_alu_op)))
                                                   ? 
-                                                 ((4U 
-                                                   == 
-                                                   (0x1fU 
-                                                    & ((IData)(vlSelf->rv32e__DOT__id_ex_opcode) 
-                                                       >> 2U)))
+                                                 ((IData)(
+                                                          ((0x10U 
+                                                            == 
+                                                            (0x7cU 
+                                                             & (IData)(vlSelf->rv32e__DOT__id_ex_opcode))) 
+                                                           & (~ 
+                                                              ((IData)(vlSelf->rv32e__DOT__id_ex_shamt) 
+                                                               >> 5U))))
                                                    ? 
                                                   (0x1fU 
-                                                   & vlSelf->rv32e__DOT__id_ex_imm)
+                                                   & (IData)(vlSelf->rv32e__DOT__id_ex_shamt))
                                                    : 
                                                   ((0xcU 
                                                     == 
@@ -778,6 +781,7 @@ VL_ATTR_COLD void Vrv32e___024root___ctor_var_reset(Vrv32e___024root* vlSelf) {
     vlSelf->rv32e__DOT__id_wb_rs2 = VL_RAND_RESET_I(5);
     vlSelf->rv32e__DOT__id_ex_zimm = VL_RAND_RESET_I(5);
     vlSelf->rv32e__DOT__id_ex_imm = VL_RAND_RESET_I(32);
+    vlSelf->rv32e__DOT__id_ex_shamt = VL_RAND_RESET_I(6);
     vlSelf->rv32e__DOT__id_ex_alu_op = VL_RAND_RESET_I(4);
     vlSelf->rv32e__DOT__id_ex_MemLen = VL_RAND_RESET_I(3);
     vlSelf->rv32e__DOT__id_ex_MemWrite = VL_RAND_RESET_I(1);

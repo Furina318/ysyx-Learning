@@ -26,6 +26,7 @@ class Vrv32e___024root final : public VerilatedModule {
         CData/*4:0*/ rv32e__DOT__id_wb_rs1;
         CData/*4:0*/ rv32e__DOT__id_wb_rs2;
         CData/*4:0*/ rv32e__DOT__id_ex_zimm;
+        CData/*5:0*/ rv32e__DOT__id_ex_shamt;
         CData/*3:0*/ rv32e__DOT__id_ex_alu_op;
         CData/*2:0*/ rv32e__DOT__id_ex_MemLen;
         CData/*0:0*/ rv32e__DOT__id_ex_MemWrite;
@@ -78,9 +79,9 @@ class Vrv32e___024root final : public VerilatedModule {
         CData/*0:0*/ rv32e__DOT__exu__DOT__take_branch;
         CData/*0:0*/ rv32e__DOT__exu__DOT__ex_flush_condition;
         CData/*3:0*/ rv32e__DOT__exu__DOT__load_use_flag;
-        CData/*0:0*/ rv32e__DOT__exu__DOT____VdfgTmp_h9653a62d__0;
     };
     struct {
+        CData/*0:0*/ rv32e__DOT__exu__DOT____VdfgTmp_h9653a62d__0;
         CData/*0:0*/ rv32e__DOT__exu__DOT____VdfgTmp_h666fa1ae__0;
         CData/*0:0*/ rv32e__DOT__exu__DOT____VdfgTmp_hb53dc38f__0;
         CData/*0:0*/ rv32e__DOT__exu__DOT____VdfgTmp_h93a4b40d__0;
@@ -144,9 +145,9 @@ class Vrv32e___024root final : public VerilatedModule {
         IData/*31:0*/ rv32e__DOT__exu__DOT__jalr_target;
         IData/*31:0*/ rv32e__DOT__lsu__DOT__l_inst;
         IData/*31:0*/ rv32e__DOT__lsu__DOT__l_pc;
-        IData/*31:0*/ rv32e__DOT__lsu__DOT__read_lsu_data;
     };
     struct {
+        IData/*31:0*/ rv32e__DOT__lsu__DOT__read_lsu_data;
         IData/*31:0*/ rv32e__DOT__lsu__DOT__rd_data;
         IData/*31:0*/ rv32e__DOT__wbu__DOT__i;
         IData/*31:0*/ rv32e__DOT__wbu__DOT__k;

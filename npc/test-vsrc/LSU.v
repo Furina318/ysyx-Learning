@@ -1,206 +1,392 @@
-module LSU #(
-    parameter DATA_WIDTH = 64,
-    parameter ADDR_WIDTH = 32,
-    parameter WSTRB_WIDTH = 8,
-    parameter RD_WIDTH = 5
-) (
-    input  wire        clk,
-    input  wire        reset,
-    // EXU_LSU_DATA interface
-    input  wire        exu_lsu_valid,
-    output reg         exu_lsu_ready,
-    input  wire [DATA_WIDTH-1:0] result,
-    input  wire [DATA_WIDTH-1:0] src2,
-    input  wire [DATA_WIDTH-1:0] csrdata,
-    input  wire [2:0]            arsize,
-    input  wire [2:0]            awsize,
-    input  wire [WSTRB_WIDTH-1:0] wstrb,
-    input  wire [RD_WIDTH-1:0]   rd,
-    input  wire                  rden,
-    input  wire                  MemtoReg,
-    input  wire                  MemWr,
-    input  wire [2:0]            RegNum,
-    input  wire                  CsrWr,
-    input  wire [31:0]           lsu_pc,
-    input  wire [31:0]           dnpc,
-    // LSU_WBU_DATA interface
-    output reg         lsu_wbu_valid,
-    input  wire        lsu_wbu_ready,
-    output reg  [DATA_WIDTH-1:0] regdata,
-    output reg  [DATA_WIDTH-1:0] wbu_csrdata,
-    output reg  [RD_WIDTH-1:0]   wbu_rd,
-    output reg                   wbu_rden,
-    output reg  [WSTRB_WIDTH-1:0] wbu_wstrb,
-    output reg  [ADDR_WIDTH-1:0]  wbu_araddr,
-    output reg  [ADDR_WIDTH-1:0]  wbu_awaddr,
-    output reg  [DATA_WIDTH-1:0] wbu_wdata,
-    output reg  [2:0]            wbu_arsize,
-    output reg                   wbu_arvalid,
-    output reg                   wbu_awvalid,
-    output reg  [31:0]           wbu_pc,
-    output reg  [31:0]           wbu_dnpc,
-    // LSU_IDU_RAW interface
-    output reg         lsu_idu_valid,
-    output reg  [DATA_WIDTH-1:0] lsu_idu_regdata,
-    output reg  [RD_WIDTH-1:0]   lsu_idu_rd,
-    output reg                   lsu_idu_rden,
-    output reg                   lsu_idu_MemtoReg,
-    // AXI4 Master interface
-    input  wire        axi_awready,
-    output reg         axi_awvalid,
-    output reg  [ADDR_WIDTH-1:0] axi_awaddr,
-    output reg  [3:0]  axi_awid,
-    output reg  [7:0]  axi_awlen,
-    output reg  [2:0]  axi_awsize,
-    output reg  [1:0]  axi_awburst,
-    input  wire        axi_wready,
-    output reg         axi_wvalid,
-    output reg  [DATA_WIDTH-1:0] axi_wdata,
-    output reg  [WSTRB_WIDTH-1:0] axi_wstrb,
-    output reg         axi_wlast,
-    output reg         axi_bready,
-    input  wire        axi_bvalid,
-    input  wire [1:0]  axi_bresp,
-    input  wire [3:0]  axi_bid,
-    input  wire        axi_arready,
-    output reg         axi_arvalid,
-    output reg  [ADDR_WIDTH-1:0] axi_araddr,
-    output reg  [3:0]  axi_arid,
-    output reg  [7:0]  axi_arlen,
-    output reg  [2:0]  axi_arsize,
-    output reg  [1:0]  axi_arburst,
-    output reg         axi_rready,
-    input  wire        axi_rvalid,
-    input  wire [1:0]  axi_rresp,
-    input  wire [DATA_WIDTH-1:0] axi_rdata,
-    input  wire        axi_rlast,
-    input  wire [3:0]  axi_rid
+`timescale 1ns/1ns
+
+module LSU (
+    input         clk,
+    input         rst,
+
+    input         EXU_LSU_valid,
+    output reg    LSU_EXU_ready,
+    input         WBU_LSU_ready,
+    output reg    LSU_WBU_valid,
+
+    input         EXU_LSU_forward_las,
+
+    input      [31:0]   MEM_LSU_rd_data,
+    output reg [31:0]   LSU_MEM_rd_addr,
+    output reg          LSU_MEM_read_valid,
+    input               MEM_LSU_read_ready,
+
+    output reg [31:0]   LSU_MEM_wr_data,
+    output reg [31:0]   LSU_MEM_wr_addr,
+    output reg [7 :0]   LSU_MEM_wr_mask,
+    output reg          LSU_MEM_write_valid,
+    input               MEM_LSU_write_ready,
+
+    //xbar
+    // output reg        CPU_MEM_req,
+    // output reg [31:0] CPU_MEM_araddr,
+    // output reg        CPU_MEM_arvalid,
+    // input             MEM_CPU_arready,
+
+    // input      [31:0] MEM_CPU_rdata,
+    // input      [1:0]  MEM_CPU_rresp,
+    // input             MEM_CPU_rvalid,
+    // output reg        CPU_MEM_rready,
+
+    // output reg [31:0] CPU_MEM_awaddr,
+    // output reg        CPU_MEM_awvalid,
+    // input             MEM_CPU_awready,
+
+    // output reg [31:0] CPU_MEM_wdata,
+    // output reg [7:0]  CPU_MEM_wstrb,
+    // output reg        CPU_MEM_wvalid,
+    // input             MEM_CPU_wready,
+
+    // input      [1:0]  MEM_CPU_bresp,
+    // input             MEM_CPU_bvalid,
+    // output reg        CPU_MEM_bready,
+    //xbar
+    input  [31:0] EXU_LSU_inst,
+    input  [31:0] EXU_LSU_pc,
+    input  [31:0] EXU_LSU_src2,
+
+    input         EXU_LSU_rd_en,
+    input  [ 4:0] EXU_LSU_rd_addr,
+    
+    input         EXU_LSU_load,
+    input         EXU_LSU_store,
+    input         EXU_LSU_byte,
+    input         EXU_LSU_half_byte,
+    input         EXU_LSU_word,
+    input         EXU_LSU_extern_flag,     //高电平为无符号，低电平为有符号，跟随IDU—EXU-imm-unsigned
+
+    input         EXU_LSU_csr,
+    input         EXU_LSU_csr_wen1,
+    input         EXU_LSU_csr_wen2,
+    input [31:0]  EXU_LSU_csr_wr_data1,
+    input [31:0]  EXU_LSU_csr_wr_data2,
+    input [11:0]  EXU_LSU_csr_wr_addr1,
+    input [11:0]  EXU_LSU_csr_wr_addr2,
+    input [31:0]  EXU_LSU_csr_rdata,
+
+    input         EXU_LSU_csr_ecall,
+    input         EXU_LSU_csr_mret,
+    
+    input  [31:0] EXU_LSU_process_result,  //普通指令的结果
+
+    output [4:0]	 LSU_EXU_forward_rd_addr,
+	output			 LSU_EXU_forward_rd_en,
+	output			 LSU_EXU_forward_load,
+
+    output reg [31:0] LSU_WBU_inst,
+    output reg [31:0] LSU_WBU_pc,
+    output reg [31:0] LSU_WBU_csr_wr_data1,
+    output reg [31:0] LSU_WBU_csr_wr_data2,
+    output reg [11:0] LSU_WBU_csr_wr_addr1,
+    output reg [11:0] LSU_WBU_csr_wr_addr2,
+    output reg        LSU_WBU_csr_wen1,
+    output reg        LSU_WBU_csr_wen2,
+
+    output reg        LSU_WBU_rd_en,
+    output reg [ 4:0] LSU_WBU_rd_addr,
+    output reg [31:0] LSU_WBU_write_rd_data  //写入rd的数据
 );
-    localparam S_IDLE = 3'd0, S_WAIT_RSLAVE = 3'd1, S_WAIT_WSLAVE = 3'd2, S_WAIT_READY = 3'd3, S_WAIT_PREPARE = 3'd4, S_WAIT_SIGN = 3'd5;
-    reg [2:0] state;
-    reg [DATA_WIDTH-1:0] regdata_reg;
-    wire [DATA_WIDTH-1:0] rdata, rdata_b, rdata_h, wdata_b, wdata_h, DataOut;
-    wire [WSTRB_WIDTH-1:0] wstrb_b, wstrb_h;
-    wire prepare;
+reg l_load;
+reg l_rd_en;
+reg l_byte;
+reg l_half_byte;
+reg l_word;
+reg l_extern_flag;
 
-    // Data alignment for reads
-    assign rdata_h = (result[1:0] == 2'd2) ? (axi_rdata >> 16) :
-                     (result[1:0] == 2'd0) ? axi_rdata : {DATA_WIDTH{1'b0}};
-    assign rdata_b = (result[1:0] == 2'd3) ? (axi_rdata >> 24) :
-                     (result[1:0] == 2'd2) ? (axi_rdata >> 16) :
-                     (result[1:0] == 2'd1) ? (axi_rdata >> 8) : axi_rdata;
+reg [4:0] l_rd_addr;
+reg [31:0] l_inst;
+reg [31:0] l_pc;
 
-    // Data alignment for writes
-    assign wdata_h = (result[1:0] == 2'd2) ? (src2 << 16) :
-                     (result[1:0] == 2'd0) ? src2 : {DATA_WIDTH{1'b0}};
-    assign wdata_b = (result[1:0] == 2'd3) ? {src2[7:0], {24{1'b0}}} :
-                     (result[1:0] == 2'd2) ? {{8{1'b0}}, src2[7:0], {16{1'b0}}} :
-                     (result[1:0] == 2'd1) ? {{16{1'b0}}, src2[7:0], {8{1'b0}}} :
-                     {{24{1'b0}}, src2[7:0]};
+assign LSU_EXU_forward_rd_addr = l_rd_addr;
+assign LSU_EXU_forward_rd_en = l_rd_en;
+assign LSU_EXU_forward_load = l_load;
 
-    // Write strobe alignment
-    assign wstrb_h = (result[1:0] == 2'd2) ? (wstrb << 2) :
-                     (result[1:0] == 2'd0) ? wstrb : {WSTRB_WIDTH{1'b0}};
-    assign wstrb_b = (result[1:0] == 2'd3) ? (wstrb << 3) :
-                     (result[1:0] == 2'd2) ? (wstrb << 2) :
-                     (result[1:0] == 2'd1) ? (wstrb << 1) : wstrb;
 
-    // Prepare signal
-    assign prepare = (MemtoReg && axi_rvalid && axi_rlast) || (MemWr && axi_bvalid);
-
-    // Data output selection
-    assign DataOut = MemtoReg ? (arsize == 3'd0 ? rdata_b : (arsize == 3'd1 ? rdata_h : axi_rdata)) : result;
-
-    // Register data update
-    always @(posedge clk) begin
-        if (axi_rvalid && axi_rready)
-            regdata_reg <= DataOut;
+always @(posedge clk) begin
+    if (rst) begin
+        l_load  <= 0;
+        l_rd_en <= 0;
+        l_rd_addr <= 0;
+        l_inst  <= 0;
+        l_pc    <= 0;
+        l_byte  <= 0;
+        l_half_byte <= 0;
+        l_word  <= 0;
+        l_extern_flag <= 0;
     end
-
-    // State machine
-    always @(posedge clk or posedge reset) begin
-        if (reset)
-            state <= S_IDLE;
-        else begin
-            case (state)
-                S_IDLE: state <= exu_lsu_valid ? S_WAIT_SIGN : S_IDLE;
-                S_WAIT_SIGN: state <= MemtoReg ? S_WAIT_RSLAVE : (MemWr ? S_WAIT_WSLAVE : S_WAIT_READY);
-                S_WAIT_RSLAVE: state <= axi_arready ? (axi_rvalid && axi_rlast ? (lsu_wbu_ready ? S_IDLE : S_WAIT_READY) : S_WAIT_PREPARE) : S_WAIT_RSLAVE;
-                S_WAIT_WSLAVE: state <= axi_wready ? S_WAIT_PREPARE : S_WAIT_WSLAVE;
-                S_WAIT_PREPARE: state <= prepare ? (lsu_wbu_ready ? S_IDLE : S_WAIT_READY) : S_WAIT_PREPARE;
-                S_WAIT_READY: state <= lsu_wbu_ready ? S_IDLE : S_WAIT_READY;
-                default: state <= S_IDLE;
-            endcase
-        end
+    else if ((EXU_LSU_valid & LSU_EXU_ready) & (EXU_LSU_load | EXU_LSU_store)) begin
+        l_load  <= EXU_LSU_load;
+        l_rd_en <= EXU_LSU_rd_en;
+        l_rd_addr <= EXU_LSU_rd_addr;
+        l_inst  <= EXU_LSU_inst;
+        l_pc    <= EXU_LSU_pc;
+        l_byte  <= EXU_LSU_byte;
+        l_half_byte <= EXU_LSU_half_byte;
+        l_word  <= EXU_LSU_word;
+        l_extern_flag <= EXU_LSU_extern_flag;
     end
-
-    // AXI4 signals
-    always @(*) begin
-        axi_awvalid = reset ? 1'b0 : (MemWr && (state == S_WAIT_WSLAVE));
-        axi_awaddr = result[ADDR_WIDTH-1:0];
-        axi_awid = 4'h2;
-        axi_awlen = 8'h0;
-        axi_awsize = awsize;
-        axi_awburst = 2'b01;
-        axi_wvalid = reset ? 1'b0 : (MemWr && (state == S_WAIT_WSLAVE));
-        axi_wdata = (awsize == 3'd0) ? wdata_b : (awsize == 3'd1 ? wdata_h : src2);
-        axi_wstrb = (awsize == 3'd0) ? wstrb_b : (awsize == 3'd1 ? wstrb_h : wstrb);
-        axi_wlast = MemWr && (state == S_WAIT_WSLAVE);
-        axi_bready = 1'b1;
-        axi_arvalid = reset ? 1'b0 : ((state == S_WAIT_RSLAVE) && MemtoReg);
-        axi_araddr = result[ADDR_WIDTH-1:0];
-        axi_arid = 4'h2;
-        axi_arlen = 8'h0;
-        axi_arsize = arsize;
-        axi_arburst = 2'b01;
-        axi_rready = (state == S_IDLE || state == S_WAIT_RSLAVE || state == S_WAIT_PREPARE);
+    else if (LSU_WBU_valid & WBU_LSU_ready) begin
+        l_load  <= 0;
+        l_rd_en <= EXU_LSU_rd_en;
+        l_rd_addr <= EXU_LSU_rd_addr;
+        l_inst  <= EXU_LSU_inst;
+        l_pc    <= EXU_LSU_pc;
+        l_byte  <= EXU_LSU_byte;
+        l_half_byte <= EXU_LSU_half_byte;
+        l_word  <= EXU_LSU_word;
+        l_extern_flag <= EXU_LSU_extern_flag;
     end
-
-    // Output assignments
-    always @(*) begin
-        exu_lsu_ready = (state == S_IDLE);
-        lsu_wbu_valid = (state == S_WAIT_READY) || ((state == S_WAIT_PREPARE && prepare) || (state == S_WAIT_RSLAVE && axi_arready && axi_rvalid && axi_rlast && lsu_wbu_ready));
-        regdata = (state == S_WAIT_RSLAVE || state == S_WAIT_PREPARE || (!MemtoReg && !MemWr)) ? DataOut : regdata_reg;
-        wbu_csrdata = result;
-        wbu_rd = rd;
-        wbu_rden = rden;
-        wbu_wstrb = wstrb;
-        wbu_araddr = axi_araddr;
-        wbu_awaddr = axi_awaddr;
-        wbu_wdata = src2;
-        wbu_arsize = arsize;
-        wbu_arvalid = MemtoReg;
-        wbu_awvalid = MemWr;
-        wbu_pc = lsu_pc;
-        wbu_dnpc = dnpc;
-        lsu_idu_valid = (state == S_WAIT_READY) || axi_rvalid;
-        lsu_idu_regdata = regdata;
-        lsu_idu_rd = rd;
-        lsu_idu_rden = rden;
-        lsu_idu_MemtoReg = MemtoReg;
+    else if (EXU_LSU_valid & LSU_EXU_ready) begin
+        l_load <= l_load;
+        l_rd_en <= EXU_LSU_rd_en;
+        l_rd_addr <= EXU_LSU_rd_addr;
+        l_inst  <= EXU_LSU_inst;
+        l_pc    <= EXU_LSU_pc;
+        l_byte  <= EXU_LSU_byte;
+        l_half_byte <= EXU_LSU_half_byte;
+        l_word  <= EXU_LSU_word;
+        l_extern_flag <= EXU_LSU_extern_flag;
     end
+end
 
-    // Data formatting based on RegNum
-    always @(*) begin
-        if (CsrWr)
-            regdata = csrdata;
-        else begin
-            case (RegNum)
-                3'b010: regdata = DataOut;
-                3'b101: regdata = DataOut;
-                3'b011: regdata = {{24{1'b0}}, DataOut[7:0]};
-                3'b100: regdata = {{16{1'b0}}, DataOut[15:0]};
-                3'b000: regdata = {{24{DataOut[7]}}, DataOut[7:0]};
-                3'b001: regdata = {{16{DataOut[15]}}, DataOut[15:0]};
-                default: regdata = DataOut;
-            endcase
-        end
+always @(posedge clk) begin
+    if (rst) begin
+        LSU_MEM_read_valid <= 0;
+        LSU_MEM_rd_addr    <= 0;
     end
+    else if ((EXU_LSU_valid & LSU_EXU_ready) & (EXU_LSU_load & ~EXU_LSU_store)) begin
+        LSU_MEM_read_valid <= 1;
+        LSU_MEM_rd_addr    <= EXU_LSU_process_result;
+    end
+    else if (LSU_MEM_read_valid & MEM_LSU_read_ready) begin
+        LSU_MEM_read_valid <= 0;
+        LSU_MEM_rd_addr    <= 0;
+    end
+end
+reg [31:0] read_mem_data;
+always @(posedge clk) begin
+    if (rst) begin
+        read_mem_data <= 0;
+    end
+    else if (LSU_MEM_read_valid & MEM_LSU_read_ready) begin
+        read_mem_data <= MEM_LSU_rd_data;
+    end 
+end
 
-    `ifdef USE_COUNTER
-    LSU_COUNTER lsu_counter (
-        .clock(clk),
-        .state(state)
-    );
-    `endif
+always @(posedge clk) begin
+    if (rst) begin
+        LSU_MEM_write_valid <= 0;
+        LSU_MEM_wr_addr     <= 0;
+        LSU_MEM_wr_data     <= 0;
+        LSU_MEM_wr_mask     <= 0;
+    end
+    else if ((EXU_LSU_valid & LSU_EXU_ready) & (~EXU_LSU_load & EXU_LSU_store)) begin
+        LSU_MEM_write_valid <= 1;
+        LSU_MEM_wr_addr     <= EXU_LSU_process_result;
+        LSU_MEM_wr_data     <= write_mem_data;
+        LSU_MEM_wr_mask     <= wmask;
+    end
+    else if (LSU_MEM_write_valid & MEM_LSU_write_ready) begin
+        LSU_MEM_write_valid <= 0;
+        LSU_MEM_wr_addr     <= 0;
+        LSU_MEM_wr_data     <= 0;
+        LSU_MEM_wr_mask     <= 0;
+    end
+end
+
+//中间变量
+reg  [31:0] write_mem_data;    //要写入memory的数据
+reg  [31:0] wr_rd_data;        //要写入rd的数据
+reg  [ 7:0] wmask;             //写入memory的字节（掩码）
+
+wire [ 7:0] temp_byte;
+wire [15:0] temp_half_byte;
+wire [31:0] temp_word;
+
+
+assign   temp_byte      = read_mem_data[7:0];   //&32'h000000ff
+assign   temp_half_byte = read_mem_data[15:0];  //&32'h0000ffff
+assign   temp_word      = read_mem_data[31:0];  //&32'hffffffff
+
+//写入memory的位选
+always @(*) begin
+    if (EXU_LSU_store & EXU_LSU_byte) begin
+        wmask = 8'h1;
+        write_mem_data = {24'b0,EXU_LSU_src2[7:0]};
+    end
+    else if (EXU_LSU_store & EXU_LSU_half_byte) begin
+        wmask = 8'h3;
+        write_mem_data = {16'b0,EXU_LSU_src2[15:0]};
+    end
+    else if (EXU_LSU_store & EXU_LSU_word) begin
+        wmask = 8'hf;
+        write_mem_data = EXU_LSU_src2;
+    end
+    else begin
+        wmask = 8'h0;
+        write_mem_data = 0;
+    end
+end
+
+//写入memory的位选
+always @(*) begin
+    if(l_load & l_byte & l_extern_flag)begin
+        wr_rd_data = {24'b0,temp_byte};
+    end
+    else if(l_load & l_byte & !l_extern_flag)begin
+        wr_rd_data = {{24{temp_byte[7]}},temp_byte};
+    end
+    else if(l_load & l_half_byte & l_extern_flag)begin
+        wr_rd_data = {16'b0,temp_half_byte};
+    end
+    else if(l_load & l_half_byte & !l_extern_flag)begin
+        wr_rd_data = {{16{temp_half_byte[15]}},temp_half_byte};
+    end
+    else if(l_load & l_word)begin
+        wr_rd_data = temp_word;
+    end
+    else begin
+        wr_rd_data = 0;
+    end
+end
+
+
+reg [31:0] rd_data;
+always @(*) begin
+    if(l_load)begin
+        rd_data = wr_rd_data;
+    end
+    else if (EXU_LSU_forward_las) begin
+        rd_data = write_mem_data;
+    end
+    else if(EXU_LSU_store)begin
+        rd_data = 32'b0;
+    end
+    else if (EXU_LSU_csr & !EXU_LSU_csr_ecall & !EXU_LSU_csr_mret) begin
+        rd_data = EXU_LSU_csr_rdata;
+    end
+    else begin
+        rd_data = EXU_LSU_process_result;
+    end
+end
+
+
+always @(posedge clk)begin
+	if(rst)begin
+		LSU_EXU_ready <= 1;
+	end
+	else if((EXU_LSU_valid && LSU_EXU_ready) && (EXU_LSU_load || EXU_LSU_store))begin
+		LSU_EXU_ready <= 0;
+	end
+	else if(LSU_WBU_valid && WBU_LSU_ready)begin
+		LSU_EXU_ready <= 1;
+	end
+end
+reg axi_handshake;
+always @(posedge clk) begin
+    if (rst) begin
+        axi_handshake <= 0;
+    end
+    else if(LSU_MEM_read_valid && MEM_LSU_read_ready) begin
+        axi_handshake <= 1;
+    end
+    else begin
+        axi_handshake <= 0;
+    end
+end
+always @(posedge clk) begin
+    if (rst) begin
+        LSU_WBU_valid <= 0;
+    end
+    else if (EXU_LSU_valid && LSU_EXU_ready && (~(EXU_LSU_load || EXU_LSU_store))) begin
+        LSU_WBU_valid <= 1;
+    end
+    else if (LSU_MEM_write_valid && MEM_LSU_write_ready) begin
+        LSU_WBU_valid <= 1;
+    end
+    else if (axi_handshake) begin
+        LSU_WBU_valid <= 1;
+    end
+    else if (EXU_LSU_valid && LSU_EXU_ready && (EXU_LSU_load || EXU_LSU_store))begin
+        LSU_WBU_valid <= 0;
+    end
+    else if ((~(EXU_LSU_valid && LSU_EXU_ready)) && LSU_WBU_valid) begin 
+        LSU_WBU_valid <= 0;
+    end
+end
+
+always @(posedge clk) begin
+    if (rst) begin
+        LSU_WBU_rd_en <= 0;
+        LSU_WBU_rd_addr <= 0;
+        LSU_WBU_csr_wen1 <= 0;
+        LSU_WBU_csr_wen2 <= 0;
+        LSU_WBU_csr_wr_addr1 <= 0;
+        LSU_WBU_csr_wr_addr2 <= 0;
+        LSU_WBU_csr_wr_data1 <= 0;
+        LSU_WBU_csr_wr_data2 <= 0;
+        LSU_WBU_write_rd_data <= 0;
+        LSU_WBU_inst <= 0;
+        LSU_WBU_pc <= 0;
+    end
+    else if (LSU_MEM_write_valid && MEM_LSU_write_ready) begin
+        LSU_WBU_rd_en <= l_rd_en;
+        LSU_WBU_rd_addr <= l_rd_addr;
+        LSU_WBU_csr_wen1 <= EXU_LSU_csr_wen1;
+        LSU_WBU_csr_wen2 <= EXU_LSU_csr_wen2;
+        LSU_WBU_csr_wr_addr1 <= EXU_LSU_csr_wr_addr1;
+        LSU_WBU_csr_wr_addr2 <= EXU_LSU_csr_wr_addr2;
+        LSU_WBU_csr_wr_data1 <= EXU_LSU_csr_wr_data1;
+        LSU_WBU_csr_wr_data2 <= EXU_LSU_csr_wr_data2;
+        LSU_WBU_write_rd_data <= rd_data;
+        LSU_WBU_inst <= l_inst;
+        LSU_WBU_pc <= l_pc;
+    end
+    else if (axi_handshake) begin
+        LSU_WBU_rd_en <= l_rd_en;
+        LSU_WBU_rd_addr <= l_rd_addr;
+        LSU_WBU_csr_wen1 <= EXU_LSU_csr_wen1;
+        LSU_WBU_csr_wen2 <= EXU_LSU_csr_wen2;
+        LSU_WBU_csr_wr_addr1 <= EXU_LSU_csr_wr_addr1;
+        LSU_WBU_csr_wr_addr2 <= EXU_LSU_csr_wr_addr2;
+        LSU_WBU_csr_wr_data1 <= EXU_LSU_csr_wr_data1;
+        LSU_WBU_csr_wr_data2 <= EXU_LSU_csr_wr_data2;
+        LSU_WBU_write_rd_data <= rd_data;
+        LSU_WBU_inst <= l_inst;
+        LSU_WBU_pc <= l_pc;
+    end
+    else if (EXU_LSU_valid && LSU_EXU_ready && (~(EXU_LSU_load || EXU_LSU_store))) begin
+        LSU_WBU_rd_en <= EXU_LSU_rd_en;
+        LSU_WBU_rd_addr <= EXU_LSU_rd_addr;
+        LSU_WBU_csr_wen1 <= EXU_LSU_csr_wen1;
+        LSU_WBU_csr_wen2 <= EXU_LSU_csr_wen2;
+        LSU_WBU_csr_wr_addr1 <= EXU_LSU_csr_wr_addr1;
+        LSU_WBU_csr_wr_addr2 <= EXU_LSU_csr_wr_addr2;
+        LSU_WBU_csr_wr_data1 <= EXU_LSU_csr_wr_data1;
+        LSU_WBU_csr_wr_data2 <= EXU_LSU_csr_wr_data2;
+        LSU_WBU_write_rd_data <= rd_data;
+        LSU_WBU_inst <= EXU_LSU_inst;
+        LSU_WBU_pc <= EXU_LSU_pc;
+    end
+    else begin
+        LSU_WBU_rd_en <= LSU_WBU_rd_en;
+        LSU_WBU_rd_addr <= LSU_WBU_rd_addr;
+        LSU_WBU_csr_wen1 <= LSU_WBU_csr_wen1;
+        LSU_WBU_csr_wen2 <= LSU_WBU_csr_wen2;
+        LSU_WBU_csr_wr_addr1 <= LSU_WBU_csr_wr_addr1;
+        LSU_WBU_csr_wr_addr2 <= LSU_WBU_csr_wr_addr2;
+        LSU_WBU_csr_wr_data1 <= LSU_WBU_csr_wr_data1;
+        LSU_WBU_csr_wr_data2 <= LSU_WBU_csr_wr_data2;
+        LSU_WBU_write_rd_data <= LSU_WBU_write_rd_data;
+        LSU_WBU_inst <= LSU_WBU_inst;
+        LSU_WBU_pc <= LSU_WBU_pc;
+    end
+end
+
 endmodule
+
