@@ -177,25 +177,25 @@ VL_ATTR_COLD void Vrv32e___024root__trace_init_sub__TOP__0(Vrv32e___024root* vlS
     tracep->declBit(c+127,"ex_lsu_csr_mret", false,-1);
     tracep->declBus(c+128,"ex_lsu_imm", false,-1, 31,0);
     tracep->declBus(c+117,"ex_lsu_process_result", false,-1, 31,0);
-    tracep->declBus(c+183,"forward_rs1", false,-1, 1,0);
-    tracep->declBus(c+184,"forward_rs2", false,-1, 1,0);
-    tracep->declBit(c+185,"forward_las", false,-1);
-    tracep->declBus(c+167,"load_use_flag", false,-1, 3,0);
-    tracep->declBus(c+168,"src1", false,-1, 31,0);
-    tracep->declBus(c+169,"src2", false,-1, 31,0);
-    tracep->declBus(c+170,"ex_num1", false,-1, 31,0);
-    tracep->declBus(c+171,"ex_num2", false,-1, 31,0);
-    tracep->declBus(c+172,"process_result", false,-1, 31,0);
-    tracep->declBit(c+173,"alu_zero", false,-1);
-    tracep->declBit(c+174,"alu_less", false,-1);
-    tracep->declBus(c+175,"jal_target", false,-1, 31,0);
-    tracep->declBus(c+176,"jalr_target", false,-1, 31,0);
-    tracep->declBit(c+177,"take_branch", false,-1);
+    tracep->declBus(c+167,"src1", false,-1, 31,0);
+    tracep->declBus(c+168,"src2", false,-1, 31,0);
+    tracep->declBus(c+169,"ex_num1", false,-1, 31,0);
+    tracep->declBus(c+170,"ex_num2", false,-1, 31,0);
+    tracep->declBus(c+171,"process_result", false,-1, 31,0);
+    tracep->declBit(c+172,"alu_zero", false,-1);
+    tracep->declBit(c+173,"alu_less", false,-1);
+    tracep->declBus(c+174,"jal_target", false,-1, 31,0);
+    tracep->declBus(c+175,"jalr_target", false,-1, 31,0);
+    tracep->declBit(c+176,"take_branch", false,-1);
     tracep->declBit(c+65,"ex_flush_condition", false,-1);
     tracep->declBus(c+160,"csr_write_ecall", false,-1, 31,0);
     tracep->declBus(c+161,"mstatus_t", false,-1, 31,0);
     tracep->declBus(c+162,"mpie", false,-1, 31,0);
-    tracep->declBus(c+186,"csr_write_wire", false,-1, 31,0);
+    tracep->declBus(c+183,"csr_write_wire", false,-1, 31,0);
+    tracep->declBus(c+184,"forward_rs1", false,-1, 1,0);
+    tracep->declBus(c+185,"forward_rs2", false,-1, 1,0);
+    tracep->declBit(c+186,"forward_las", false,-1);
+    tracep->declBus(c+177,"load_use_flag", false,-1, 3,0);
     tracep->popNamePrefix(1);
     tracep->pushNamePrefix("idu ");
     tracep->declBit(c+179,"clk", false,-1);
@@ -736,17 +736,17 @@ VL_ATTR_COLD void Vrv32e___024root__trace_full_sub_0(Vrv32e___024root* vlSelf, V
     bufp->fullBit(oldp+164,(vlSelf->rv32e__DOT__ex_ready));
     bufp->fullBit(oldp+165,(vlSelf->rv32e__DOT__ex_flush));
     bufp->fullIData(oldp+166,(vlSelf->rv32e__DOT__ex_flush_pc),32);
-    bufp->fullCData(oldp+167,(vlSelf->rv32e__DOT__exu__DOT__load_use_flag),4);
-    bufp->fullIData(oldp+168,(vlSelf->rv32e__DOT__exu__DOT__src1),32);
-    bufp->fullIData(oldp+169,(vlSelf->rv32e__DOT__exu__DOT__src2),32);
-    bufp->fullIData(oldp+170,(vlSelf->rv32e__DOT__exu__DOT__ex_num1),32);
-    bufp->fullIData(oldp+171,(vlSelf->rv32e__DOT__exu__DOT__ex_num2),32);
-    bufp->fullIData(oldp+172,(vlSelf->rv32e__DOT__exu__DOT__process_result),32);
-    bufp->fullBit(oldp+173,(vlSelf->rv32e__DOT__exu__DOT__alu_zero));
-    bufp->fullBit(oldp+174,(vlSelf->rv32e__DOT__exu__DOT__alu_less));
-    bufp->fullIData(oldp+175,(vlSelf->rv32e__DOT__exu__DOT__jal_target),32);
-    bufp->fullIData(oldp+176,(vlSelf->rv32e__DOT__exu__DOT__jalr_target),32);
-    bufp->fullBit(oldp+177,(vlSelf->rv32e__DOT__exu__DOT__take_branch));
+    bufp->fullIData(oldp+167,(vlSelf->rv32e__DOT__exu__DOT__src1),32);
+    bufp->fullIData(oldp+168,(vlSelf->rv32e__DOT__exu__DOT__src2),32);
+    bufp->fullIData(oldp+169,(vlSelf->rv32e__DOT__exu__DOT__ex_num1),32);
+    bufp->fullIData(oldp+170,(vlSelf->rv32e__DOT__exu__DOT__ex_num2),32);
+    bufp->fullIData(oldp+171,(vlSelf->rv32e__DOT__exu__DOT__process_result),32);
+    bufp->fullBit(oldp+172,(vlSelf->rv32e__DOT__exu__DOT__alu_zero));
+    bufp->fullBit(oldp+173,(vlSelf->rv32e__DOT__exu__DOT__alu_less));
+    bufp->fullIData(oldp+174,(vlSelf->rv32e__DOT__exu__DOT__jal_target),32);
+    bufp->fullIData(oldp+175,(vlSelf->rv32e__DOT__exu__DOT__jalr_target),32);
+    bufp->fullBit(oldp+176,(vlSelf->rv32e__DOT__exu__DOT__take_branch));
+    bufp->fullCData(oldp+177,(vlSelf->rv32e__DOT__exu__DOT__load_use_flag),4);
     bufp->fullIData(oldp+178,(vlSelf->rv32e__DOT__lsu__DOT__rd_data),32);
     bufp->fullBit(oldp+179,(vlSelf->clk));
     bufp->fullBit(oldp+180,(vlSelf->reset));
@@ -754,19 +754,7 @@ VL_ATTR_COLD void Vrv32e___024root__trace_full_sub_0(Vrv32e___024root* vlSelf, V
     bufp->fullIData(oldp+182,(((0U == (IData)(vlSelf->rv32e__DOT__id_wb_rs1))
                                 ? 0U : vlSelf->rv32e__DOT__wbu__DOT__regs
                                [vlSelf->rv32e__DOT__id_wb_rs1])),32);
-    bufp->fullCData(oldp+183,((((IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h9653a62d__0) 
-                                << 1U) | (IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h666fa1ae__0))),2);
-    bufp->fullCData(oldp+184,((((IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_hcfc89bc9__0) 
-                                << 1U) | (IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h3556a05f__0))),2);
-    bufp->fullBit(oldp+185,(((IData)(vlSelf->rv32e__DOT__id_ex_MemWrite) 
-                             & ((IData)(vlSelf->rv32e__DOT__ex_lsu_MemRead) 
-                                & ((IData)(vlSelf->rv32e__DOT__ex_lsu_RegWrite) 
-                                   & ((IData)(vlSelf->rv32e__DOT__ex_lsu_valid) 
-                                      & ((0U != (IData)(vlSelf->rv32e__DOT__ex_lsu_rd)) 
-                                         & (((IData)(vlSelf->rv32e__DOT__ex_lsu_rd) 
-                                             != (IData)(vlSelf->rv32e__DOT__id_wb_rs1)) 
-                                            & (IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_he5bf04e5__0)))))))));
-    bufp->fullIData(oldp+186,(((IData)(vlSelf->rv32e__DOT__id_ex_csrrw)
+    bufp->fullIData(oldp+183,(((IData)(vlSelf->rv32e__DOT__id_ex_csrrw)
                                 ? vlSelf->rv32e__DOT__exu__DOT__src1
                                 : ((IData)(vlSelf->rv32e__DOT__id_ex_csrrc)
                                     ? (vlSelf->rv32e__DOT__wb_ex_csr_num1 
@@ -796,6 +784,18 @@ VL_ATTR_COLD void Vrv32e___024root__trace_full_sub_0(Vrv32e___024root* vlSelf, V
                                                             & (vlSelf->rv32e__DOT__wb_ex_csr_num1 
                                                                >> 4U))))
                                                       : 0U))))))))),32);
+    bufp->fullCData(oldp+184,((((IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h9653a62d__0) 
+                                << 1U) | (IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h666fa1ae__0))),2);
+    bufp->fullCData(oldp+185,((((IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_hcfc89bc9__0) 
+                                << 1U) | (IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h3556a05f__0))),2);
+    bufp->fullBit(oldp+186,(((IData)(vlSelf->rv32e__DOT__id_ex_MemWrite) 
+                             & ((IData)(vlSelf->rv32e__DOT__ex_lsu_MemRead) 
+                                & ((IData)(vlSelf->rv32e__DOT__ex_lsu_RegWrite) 
+                                   & ((IData)(vlSelf->rv32e__DOT__ex_lsu_valid) 
+                                      & ((0U != (IData)(vlSelf->rv32e__DOT__ex_lsu_rd)) 
+                                         & (((IData)(vlSelf->rv32e__DOT__ex_lsu_rd) 
+                                             != (IData)(vlSelf->rv32e__DOT__id_wb_rs1)) 
+                                            & (IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_he5bf04e5__0)))))))));
     bufp->fullBit(oldp+187,(1U));
     bufp->fullIData(oldp+188,(0U),32);
     bufp->fullIData(oldp+189,(5U),32);

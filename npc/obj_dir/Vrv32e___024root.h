@@ -73,21 +73,21 @@ class Vrv32e___024root final : public VerilatedModule {
         CData/*0:0*/ rv32e__DOT__idu__DOT__csr_mret;
         CData/*0:0*/ rv32e__DOT__idu__DOT____VdfgTmp_h05244652__0;
         CData/*0:0*/ rv32e__DOT__idu__DOT____VdfgTmp_h69b43165__0;
-        CData/*3:0*/ rv32e__DOT__exu__DOT__load_use_flag;
         CData/*0:0*/ rv32e__DOT__exu__DOT__alu_zero;
         CData/*0:0*/ rv32e__DOT__exu__DOT__alu_less;
         CData/*0:0*/ rv32e__DOT__exu__DOT__take_branch;
         CData/*0:0*/ rv32e__DOT__exu__DOT__ex_flush_condition;
+        CData/*3:0*/ rv32e__DOT__exu__DOT__load_use_flag;
         CData/*0:0*/ rv32e__DOT__exu__DOT____VdfgTmp_h9653a62d__0;
     };
     struct {
         CData/*0:0*/ rv32e__DOT__exu__DOT____VdfgTmp_h666fa1ae__0;
-        CData/*0:0*/ rv32e__DOT__exu__DOT____VdfgTmp_hcfc89bc9__0;
-        CData/*0:0*/ rv32e__DOT__exu__DOT____VdfgTmp_h3556a05f__0;
-        CData/*0:0*/ rv32e__DOT__exu__DOT____VdfgTmp_he5bf04e5__0;
         CData/*0:0*/ rv32e__DOT__exu__DOT____VdfgTmp_hb53dc38f__0;
         CData/*0:0*/ rv32e__DOT__exu__DOT____VdfgTmp_h93a4b40d__0;
         CData/*0:0*/ rv32e__DOT__exu__DOT____VdfgTmp_h9a38ce48__0;
+        CData/*0:0*/ rv32e__DOT__exu__DOT____VdfgTmp_hcfc89bc9__0;
+        CData/*0:0*/ rv32e__DOT__exu__DOT____VdfgTmp_h3556a05f__0;
+        CData/*0:0*/ rv32e__DOT__exu__DOT____VdfgTmp_he5bf04e5__0;
         CData/*0:0*/ rv32e__DOT__exu__DOT____VdfgTmp_h69af1a50__0;
         CData/*0:0*/ rv32e__DOT__exu__DOT____VdfgTmp_hc613623f__0;
         CData/*0:0*/ rv32e__DOT__exu__DOT____VdfgTmp_h384f4e33__0;

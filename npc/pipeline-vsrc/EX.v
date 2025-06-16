@@ -90,26 +90,8 @@ module EX (
     output reg [31:0] ex_lsu_imm,
     output reg [31:0] ex_lsu_process_result
 );
-
-    // 前递信号定义
-    wire [1:0] forward_rs1;
-    wire [1:0] forward_rs2;
-    wire       forward_las;
-    wire [3:0] load_use_flag;
-
-    assign forward_rs1[1] = ex_lsu_RegWrite & (|ex_lsu_rd) & (ex_lsu_rd == id_wb_rs1) & ex_lsu_valid;
-    assign forward_rs1[0] = lsu_wb_RegWrite & (|lsu_wb_rd) & (lsu_wb_rd == id_wb_rs1) & lsu_wb_valid;
-    assign forward_rs2[1] = ex_lsu_RegWrite & (|ex_lsu_rd) & (ex_lsu_rd == id_wb_rs2) & ex_lsu_valid;
-    assign forward_rs2[0] = lsu_wb_RegWrite & (|lsu_wb_rd) & (lsu_wb_rd == id_wb_rs2) & lsu_wb_valid;
-
-    assign forward_las = id_ex_MemWrite & ex_lsu_MemRead & ex_lsu_RegWrite & ex_lsu_valid &
-                         (|ex_lsu_rd) & (ex_lsu_rd != id_wb_rs1) & (ex_lsu_rd == id_wb_rs2);
-
-    assign load_use_flag[3] = lsu_ex_forward_MemRead & lsu_ex_forward_RegWrite & (|lsu_ex_forward_rd) & (lsu_ex_forward_rd == id_wb_rs1);
-    assign load_use_flag[2] = lsu_ex_forward_MemRead & lsu_ex_forward_RegWrite & (|lsu_ex_forward_rd) & (lsu_ex_forward_rd == id_wb_rs2);
-    assign load_use_flag[1] = ex_lsu_MemRead & ex_lsu_RegWrite & (|ex_lsu_rd) & (ex_lsu_rd == id_wb_rs1) & ex_lsu_valid;
-    assign load_use_flag[0] = ex_lsu_MemRead & ex_lsu_RegWrite & ex_lsu_valid & (|ex_lsu_rd) & (ex_lsu_rd == id_wb_rs2);
-
+    import "DPI-C" function void ebreak(input int station, input int inst);
+    
     // 前递后的源寄存器值
     wire [31:0] src1 = (forward_rs1[1] ? ex_lsu_process_result : 
                        (forward_rs1[0] | load_use_flag[1]) ? lsu_wb_wdata : 
@@ -189,7 +171,7 @@ module EX (
             `ALU_SRA:  process_result = $signed(ex_num1) >>> ex_num2[4:0];
             `ALU_SLL:  process_result = ex_num1 << ex_num2[4:0];
             `ALU_SRL:  process_result = ex_num1 >> ex_num2[4:0];
-            default:   process_result = 32'b0;
+            default:   begin process_result = 32'b0; ebreak(`ABORT,32'hdeadbeef); end
         endcase
         alu_zero = (process_result == 32'b0);
         alu_less = (id_ex_alu_op == `ALU_SLT) ? ($signed(ex_num1) < $signed(ex_num2)) :
@@ -323,6 +305,26 @@ module EX (
             csr_write_wire = 32'b0;
         end
     end
+
+    // 前递信号定义
+    wire [1:0] forward_rs1;
+    wire [1:0] forward_rs2;
+    wire       forward_las;
+    wire [3:0] load_use_flag;
+
+    assign forward_rs1[1] = ex_lsu_RegWrite & (|ex_lsu_rd) & (ex_lsu_rd == id_wb_rs1) & ex_lsu_valid;
+    assign forward_rs1[0] = lsu_wb_RegWrite & (|lsu_wb_rd) & (lsu_wb_rd == id_wb_rs1) & lsu_wb_valid;
+    assign forward_rs2[1] = ex_lsu_RegWrite & (|ex_lsu_rd) & (ex_lsu_rd == id_wb_rs2) & ex_lsu_valid;
+    assign forward_rs2[0] = lsu_wb_RegWrite & (|lsu_wb_rd) & (lsu_wb_rd == id_wb_rs2) & lsu_wb_valid;
+
+    assign forward_las = id_ex_MemWrite & ex_lsu_MemRead & ex_lsu_RegWrite & ex_lsu_valid &
+                         (|ex_lsu_rd) & (ex_lsu_rd != id_wb_rs1) & (ex_lsu_rd == id_wb_rs2);
+
+    assign load_use_flag[3] = lsu_ex_forward_MemRead & lsu_ex_forward_RegWrite & (|lsu_ex_forward_rd) & (lsu_ex_forward_rd == id_wb_rs1);
+    assign load_use_flag[2] = lsu_ex_forward_MemRead & lsu_ex_forward_RegWrite & (|lsu_ex_forward_rd) & (lsu_ex_forward_rd == id_wb_rs2);
+    assign load_use_flag[1] = ex_lsu_MemRead & ex_lsu_RegWrite & (|ex_lsu_rd) & (ex_lsu_rd == id_wb_rs1) & ex_lsu_valid;
+    assign load_use_flag[0] = ex_lsu_MemRead & ex_lsu_RegWrite & ex_lsu_valid & (|ex_lsu_rd) & (ex_lsu_rd == id_wb_rs2);
+
 
     // 流水线控制
     always @(*) begin
