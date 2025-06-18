@@ -62,6 +62,8 @@ module LSU (
     // DPI 函数声明
     import "DPI-C" function int unsigned pmem_read(input int unsigned raddr, input int len);
     import "DPI-C" function void pmem_write(input int unsigned waddr, input int unsigned wdata, input int len);
+    import "DPI-C" function void ebreak(input int station, input int inst);
+
     // 内部寄存器
     reg l_load;            // 加载标志
     reg l_rd_en;           // 寄存器写使能
@@ -157,9 +159,13 @@ module LSU (
                 `Mem_Word:  begin
                     read_lsu_data = pmem_read(addr, 4);
                 end
-                default: read_lsu_data = 32'h0;
+                // default: read_lsu_data = 32'h0;
+                default: begin
+                    ebreak(`ABORT, 32'hdead_beef); // 错误处理
+                    $display("\033[32mError: Unsupported memory read length %b at address %h\033[0m", l_MemLen, addr);
+                end
             endcase
-            $display("read addr: %h, data: %h, MemLen: %b, opcode: %b", addr, read_lsu_data, l_MemLen, l_opcode);
+            $display("read addr: %h, data: %h, MemLen: %b, opcode: %b", addr, read_lsu_data, l_MemLen, ex_lsu_opcode);
         end
         // else if (LSU_MEM_read_valid & MEM_LSU_read_ready) begin
         //     LSU_MEM_read_valid <= 0;
@@ -187,9 +193,13 @@ module LSU (
                 `Mem_Bit:  pmem_write(addr,data_in,1);//sb
                 `Mem_Half: pmem_write(addr,data_in,2);//sh
                 `Mem_Word: pmem_write(addr,data_in,4);//sw
-                default:   pmem_write(addr,data_in,4);
+                // default:   pmem_write(addr,data_in,4);
+                default: begin
+                    ebreak(`ABORT, 32'hdead_beef); // 错误处理
+                    $display("\033[32mError: Unsupported memory write length %b at address %h\033[0m", ex_lsu_MemLen, addr);
+                end
             endcase
-            $display("write addr: %h, data: %h", addr, data_in);
+            $display("write addr: %h, data: %h, MemLen: %b, opcode: %b", addr, data_in, ex_lsu_MemLen, ex_lsu_opcode);
         end
         else begin
             write_valid <= 0;

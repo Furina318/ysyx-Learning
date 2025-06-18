@@ -27,6 +27,7 @@ extern void display_iringbuf(void);
 
 #ifdef CONFIG_DIFFTEST
 extern void difftest_step(vaddr_t pc, vaddr_t npc);
+extern void difftest_skip_ref();
 // extern void update_cpu_state(CPU_state *cpu);
 extern void (*ref_difftest_regcpy)(void *dut, bool direction);
 #endif
@@ -128,26 +129,29 @@ const char *get_func_name(vaddr_t addr){
 #ifdef CONFIG_FTRACE
 static void ftrace_handle() {
     // 获取当前流水线级信号
-    uint32_t pc = top->rootp->rv32e__DOT__IF_ID_pc;
-    uint32_t instr = top->rootp->rv32e__DOT__IF_ID_inst;
+    // uint32_t pc = top->rootp->rv32e__DOT__IF_ID_pc;
+    // uint32_t instr = top->rootp->rv32e__DOT__IF_ID_inst;
+    uint32_t pc = top->rootp->rv32e__DOT__id_ex_pc;
+    uint32_t instr = top->rootp->rv32e__DOT__id_ex_inst;
     uint32_t opcode = instr & 0x7F;
     
     // 获取译码阶段信号
-    uint32_t imm = top->rootp->rv32e__DOT__id_ex_imm;
-    uint32_t rs1_val = top->rootp->rv32e__DOT__exu__DOT__src1;
+    // uint32_t imm = top->rootp->rv32e__DOT__id_ex_imm;
+    // uint32_t rs1_val = top->rootp->rv32e__DOT__exu__DOT__src1;
+    uint32_t target = top->rootp->rv32e__DOT__ex_flush_pc;
 
     // 计算真实跳转目标
     if (opcode == 0x6F) { // JAL
-        uint32_t target = pc + imm;
+        // uint32_t target = pc + imm;
         const char* name = get_func_name(target);
         ftrace_call(pc, name, pc + 4, target);
     }
     else if (opcode == 0x67) { // JALR
-        uint32_t target = (rs1_val + imm) & ~0x1;
-        if (target != pc + 4) { // 排除简单的寄存器操作
-            const char* name = get_func_name(target);
-            ftrace_call(pc, name, pc + 4, target);
-        }
+        // uint32_t target = (rs1_val + imm) & ~0x1;
+        // if (target != pc + 4) { // 排除简单的寄存器操作
+        //     const char* name = get_func_name(target);
+        //     ftrace_call(pc, name, pc + 4, target);
+        // }
         
         // 处理ret指令（JALR x0, x1, 0）
         if ((instr & 0xFFFFF07F) == 0x00008067) {//通过掩码提取指令的x1（rs1）和x0(rd)，0(imm)
@@ -211,9 +215,13 @@ static void execute_once() {
 
 }
 
-word_t diff_pc[10];
-bool is_flush = false;
-int count = 0;
+// 用于跟踪流水线状态的全局变量
+static bool prev_ex_flush = false;
+static vaddr_t prev_ex_flush_pc = 0;
+static bool wb_valid_delayed = false;
+static vaddr_t wb_pc_delayed = 0;
+static vaddr_t wb_inst_delayed = 0;
+
 static void trace_and_difftest(){
   #ifdef CONFIG_ITRACE
     log_write("%s\n",logbuf);
@@ -221,6 +229,7 @@ static void trace_and_difftest(){
   if(g_print_step){
     IFDEF(CONFIG_ITRACE,puts(logbuf));
   }
+  
   //difftest
 #ifdef CONFIG_DIFFTEST
     // 获取流水线信号
@@ -230,42 +239,78 @@ static void trace_and_difftest(){
     vaddr_t ex_flush_pc = top->rootp->rv32e__DOT__ex_flush_pc; // EX 冲刷目标 PC
     vaddr_t wb_inst = top->rootp->rv32e__DOT__lsu_wb_inst; // WB 阶段指令
 
-    // 更新 CPU 状态
-    CPU_state ref_r;
-    update_cpu_state(&ref_r);
-
-    // 处理冲刷情况
+    // 处理流水线冲刷
     if (ex_flush) {
-        // 冲刷时，同步寄存器和 PC 到参考模型，跳过差分测试
-        ref_r.pc = ex_flush_pc; // 使用冲刷目标 PC
+        // 记录冲刷状态，在下一个周期处理
+        prev_ex_flush = true;
+        prev_ex_flush_pc = ex_flush_pc;
+        
+        // 如果当前 WB 阶段有有效指令，先处理它
+        if (wb_valid && run_time >= start_time) {
+            // 计算 NPC（下一个 PC 值）
+            vaddr_t npc = ex_flush_pc; // 冲刷情况下，下一个 PC 是冲刷目标
+            
+            // 执行差分测试
+            difftest_step(wb_pc, npc);
+            
+            // 通知参考模型跳过一条指令（因为冲刷会导致流水线中的指令被丢弃）
+            difftest_skip_ref();
+            
+            if (g_print_step) {
+                printf("difftest: pc: 0x%08x | npc: 0x%08x (flush to 0x%08x)\n", 
+                       wb_pc, npc, ex_flush_pc);
+            }
+        }
+        return;
+    }
+    
+    // 处理前一个周期的冲刷
+    if (prev_ex_flush) {
+        // 同步 DUT 状态到参考模型
+        CPU_state ref_r;
+        update_cpu_state(&ref_r);
+        ref_r.pc = prev_ex_flush_pc; // 使用冲刷目标 PC
         ref_difftest_regcpy(&ref_r, DIFFTEST_TO_REF);
-        printf("flush: skip difftest at pc: 0x%08x, sync to ref pc: 0x%08x\n", wb_pc, ex_flush_pc);
+        
+        if (g_print_step) {
+            printf("flush: sync to ref pc: 0x%08x\n", prev_ex_flush_pc);
+        }
+        
+        prev_ex_flush = false;
         return;
     }
 
-    // 仅对有效指令进行差分测试
-    if (wb_valid && run_time >= start_time) {
-        // 计算 NPC
-        vaddr_t npc = wb_pc + 4; // 默认顺序执行
-        uint32_t opcode = wb_inst & 0x7F;
+    // 处理延迟的 WB 指令
+    if (wb_valid_delayed) {
+        vaddr_t npc = wb_pc_delayed + 4; // 默认顺序执行
+        uint32_t opcode = wb_inst_delayed & 0x7F;
+        
+        // 根据指令类型确定实际的下一个 PC
         if (opcode == 0x6F || opcode == 0x67) { // JAL 或 JALR
-            // 使用 EX/MEM 阶段的目标 PC
-            npc = top->rootp->rv32e__DOT__ex_lsu_pc;
+            // 对于跳转指令，下一个 PC 应该是跳转目标
+            npc = wb_valid ? wb_pc : top->rootp->rv32e__DOT__IF_ID_pc;
         } else if (opcode == 0x63) { // 分支指令 (B-type)
-            // 检查分支是否发生
             bool take_branch = top->rootp->rv32e__DOT__exu__DOT__take_branch;
             if (take_branch) {
-                npc = wb_pc + top->rootp->rv32e__DOT__id_ex_imm;
+                // 对于成功的分支，下一个 PC 是分支目标
+                npc = wb_valid ? wb_pc : top->rootp->rv32e__DOT__IF_ID_pc;
             }
         }
-
-        // 同步 DUT 状态到参考模型
-        ref_r.pc = wb_pc;
-        ref_difftest_regcpy(&ref_r, DIFFTEST_TO_REF);
-
+        
         // 执行差分测试
-        printf("difftest: pc: 0x%08x | npc: 0x%08x | nemu-pc: 0x%08x\n", wb_pc, npc, ref_r.pc);
-        difftest_step(wb_pc, npc);
+        if (g_print_step) {
+            printf("difftest (delayed): pc: 0x%08x | npc: 0x%08x\n", wb_pc_delayed, npc);
+        }
+        difftest_step(wb_pc_delayed, npc);
+        wb_valid_delayed = false;
+    }
+
+    // 处理当前 WB 阶段的有效指令
+    if (wb_valid && run_time >= start_time) {
+        // 延迟处理当前指令，等到下一个周期确定 npc
+        wb_valid_delayed = true;
+        wb_pc_delayed = wb_pc;
+        wb_inst_delayed = wb_inst;
     }
 #endif
 }

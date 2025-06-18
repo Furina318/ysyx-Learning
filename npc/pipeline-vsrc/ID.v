@@ -105,8 +105,10 @@ module ID (
                     (get_opcode == `INST_TYPE_L && func3 == `F3_LHU) ? `Mem_UHalf : 
                     (get_opcode == `INST_TYPE_L && func3 == `F3_LBU) ? `Mem_UBit : `Mem_Word; 
     
-    wire jal = (get_opcode == `INST_TYPE_JAL);
-    wire jalr = (get_opcode == `INST_TYPE_JALR);
+    // wire jal = (get_opcode == `INST_TYPE_JAL);
+    // wire jalr = (get_opcode == `INST_TYPE_JALR) & (func3 == 3'b000);
+    wire jal = (opcode == `INST_JAL);
+    wire jalr = (opcode == `INST_JALR) & (func3 == 3'b000);
 
     // CSR信号
     wire csr       = (opcode == `INST_CSR);

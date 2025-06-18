@@ -101,8 +101,15 @@ class Vrv32e___024root final : public VerilatedModule {
         CData/*0:0*/ rv32e__DOT__lsu__DOT__read_valid;
         CData/*0:0*/ rv32e__DOT__lsu__DOT__write_valid;
         CData/*0:0*/ rv32e__DOT__wbu__DOT__flush;
-        CData/*0:0*/ __Vdly__rv32e__DOT__id_valid;
-        CData/*0:0*/ __Vdly__rv32e__DOT__lsu_ex_ready;
+        CData/*0:0*/ __Vdly__rv32e__DOT__ex_lsu_valid;
+        CData/*0:0*/ __Vdly__rv32e__DOT__ex_lsu_csr_wen1;
+        CData/*2:0*/ __Vdly__rv32e__DOT__ex_lsu_MemLen;
+        CData/*0:0*/ __Vdly__rv32e__DOT__ex_lsu_MemWrite;
+        CData/*0:0*/ __Vdly__rv32e__DOT__ex_lsu_MemRead;
+        CData/*4:0*/ __Vdly__rv32e__DOT__ex_lsu_rd;
+        CData/*0:0*/ __Vdly__rv32e__DOT__ex_lsu_RegWrite;
+        CData/*0:0*/ __Vdly__rv32e__DOT__ex_lsu_csr_wen2;
+        CData/*6:0*/ __Vdly__rv32e__DOT__ex_lsu_opcode;
         CData/*0:0*/ __Vtrigrprev__TOP__clk;
         CData/*0:0*/ __Vtrigrprev__TOP__reset;
         CData/*0:0*/ __VactContinue;
@@ -115,6 +122,8 @@ class Vrv32e___024root final : public VerilatedModule {
         SData/*11:0*/ rv32e__DOT__lsu_wb_csr_wr_addr1;
         SData/*11:0*/ rv32e__DOT__lsu_wb_csr_wr_addr2;
         SData/*11:0*/ rv32e__DOT__idu__DOT____VdfgTmp_hf81b0dad__0;
+        SData/*11:0*/ __Vdly__rv32e__DOT__ex_lsu_csr_wr_addr1;
+        SData/*11:0*/ __Vdly__rv32e__DOT__ex_lsu_csr_wr_addr2;
         IData/*31:0*/ rv32e__DOT__IF_ID_pc;
         IData/*31:0*/ rv32e__DOT__IF_ID_inst;
         IData/*31:0*/ rv32e__DOT__id_ex_pc;
@@ -136,6 +145,8 @@ class Vrv32e___024root final : public VerilatedModule {
         IData/*31:0*/ rv32e__DOT__lsu_wb_csr_wr_data2;
         IData/*31:0*/ rv32e__DOT__wb_ex_csr_num1;
         IData/*31:0*/ rv32e__DOT__idu__DOT__imm;
+    };
+    struct {
         IData/*31:0*/ rv32e__DOT__exu__DOT__src1;
         IData/*31:0*/ rv32e__DOT__exu__DOT__src2;
         IData/*31:0*/ rv32e__DOT__exu__DOT__ex_num1;
@@ -145,20 +156,24 @@ class Vrv32e___024root final : public VerilatedModule {
         IData/*31:0*/ rv32e__DOT__exu__DOT__jalr_target;
         IData/*31:0*/ rv32e__DOT__lsu__DOT__l_inst;
         IData/*31:0*/ rv32e__DOT__lsu__DOT__l_pc;
-    };
-    struct {
         IData/*31:0*/ rv32e__DOT__lsu__DOT__read_lsu_data;
         IData/*31:0*/ rv32e__DOT__lsu__DOT__rd_data;
         IData/*31:0*/ rv32e__DOT__wbu__DOT__i;
         IData/*31:0*/ rv32e__DOT__wbu__DOT__k;
         IData/*31:0*/ __Vfunc_rv32e__DOT__ifu__DOT__pmem_read__1__Vfuncout;
         IData/*31:0*/ __Vdly__rv32e__DOT__IF_ID_pc;
+        IData/*31:0*/ __Vdly__rv32e__DOT__ex_lsu_src2;
+        IData/*31:0*/ __Vdly__rv32e__DOT__ex_lsu_pc;
+        IData/*31:0*/ __Vdly__rv32e__DOT__ex_lsu_inst;
+        IData/*31:0*/ __Vdly__rv32e__DOT__ex_lsu_process_result;
+        IData/*31:0*/ __Vdly__rv32e__DOT__ex_lsu_csr_wr_data1;
+        IData/*31:0*/ __Vdly__rv32e__DOT__ex_lsu_csr_wr_data2;
         IData/*31:0*/ __VstlIterCount;
         IData/*31:0*/ __VicoIterCount;
         IData/*31:0*/ __VactIterCount;
         VlUnpacked<IData/*31:0*/, 4096> rv32e__DOT__wbu__DOT__CSR;
         VlUnpacked<IData/*31:0*/, 32> rv32e__DOT__wbu__DOT__regs;
-        VlUnpacked<CData/*0:0*/, 7> __Vm_traceActivity;
+        VlUnpacked<CData/*0:0*/, 6> __Vm_traceActivity;
     };
     VlTriggerVec<1> __VstlTriggered;
     VlTriggerVec<1> __VicoTriggered;

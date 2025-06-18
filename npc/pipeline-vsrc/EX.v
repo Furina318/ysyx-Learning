@@ -59,12 +59,6 @@ module EX (
 
     output reg        ex_flush,
     output reg [31:0] ex_flush_pc,
-    // input             predict_taken,    // 分支预测输入
-    // input      [31:0] predict_target,   // 预测目标地址
-    // output reg        ex_mispredict,    // 预测错误信号
-    // output reg [31:0] ex_correct_pc,    // 纠正的PC
-    // output reg        ex_actual_taken,  // 实际跳转结果
-    // output reg [31:0] ex_actual_target, // 实际目标地址
 
     output reg [31:0] ex_lsu_inst,
     output reg [31:0] ex_lsu_pc,
@@ -105,6 +99,7 @@ module EX (
     reg [31:0] ex_num1;
     reg [31:0] ex_num2;
     reg [31:0] process_result;
+    // reg [31:0] link_addr; // 存储链接地址
 
     // ALU 输入选择
     always @(*) begin
@@ -124,29 +119,8 @@ module EX (
             ex_num1 = id_ex_pc;
             ex_num2 = id_ex_imm;
         end
-        // else if (id_ex_opcode == `INST_CSRRW || id_ex_opcode == `INST_CSRRC || id_ex_opcode == `INST_CSRRS ||
-        //          id_ex_opcode == `INST_CSRRWI || id_ex_opcode == `INST_CSRRCI || id_ex_opcode == `INST_CSRRSI) begin
-        //     ex_num1 = wb_ex_csr_num1;
-        //     if (id_ex_csrrw || id_ex_csrrc || id_ex_csrrs) begin
-        //         ex_num2 = src1;
-        //     end
-        //     else begin
-        //         ex_num2 = {27'b0, id_ex_zimm};
-        // end
         else if(id_ex_alu_op == `ALU_SLL || id_ex_alu_op == `ALU_SRL || id_ex_alu_op == `ALU_SRA) begin
             ex_num1 = src1;
-            // ex_num2 = {27'b0, src2[4:0]}; //位移指令只取src2低5位
-            // ex_num2 = {27'b0, id_ex_imm[4:0]}; 
-            
-            // if(id_ex_opcode[6:2] == `INST_TYPE_I) begin
-            //     ex_num2 = {27'b0, id_ex_imm[4:0]};
-            // end
-            // else if(id_ex_opcode[6:2] == `INST_TYPE_R) begin
-            //     ex_num2 = {27'b0, src2[4:0]};
-            // end
-            // else begin
-            //     ex_num2 = 32'b0; // 如果不是位移指令，ex_num2为0
-            // end
             ex_num2 = (id_ex_opcode[6:2] == `INST_TYPE_I && !id_ex_shamt[5]) ? {27'b0, id_ex_shamt[4:0]} :
                         (id_ex_opcode[6:2] == `INST_TYPE_R) ? {27'b0, src2[4:0]} : 32'b0;
         end
@@ -154,6 +128,8 @@ module EX (
             ex_num1 = src1;
             ex_num2 = (id_ex_opcode[6:2] == `INST_TYPE_R || id_ex_opcode[6:2] == `INST_TYPE_B) ? src2 : id_ex_imm;
         end
+
+        // link_addr = id_ex_pc + 4; // 保存链接地址(PC+4)
     end
 
     // ALU 操作
@@ -198,7 +174,7 @@ module EX (
         );
 
         if (id_ex_jal) begin
-            ex_flush = 1'b1 & ex_flush_condition & (~(|load_use_flag));//添加加载使用冒险检测
+            ex_flush = 1'b1 & ex_flush_condition & (~(|load_use_flag));
             ex_flush_pc = jal_target;
         end
         else if (id_ex_jalr) begin
@@ -221,32 +197,6 @@ module EX (
             ex_flush = 1'b0;
             ex_flush_pc = 32'h0;
         end
-
-        // // 预测对比逻辑
-        // if (id_ex_jal) begin
-        //     ex_actual_taken = 1;
-        //     ex_actual_target = jal_target;
-        //     ex_mispredict = (predict_taken != 1) || (predict_target != jal_target);
-        //     ex_correct_pc = jal_target;
-        // end
-        // else if (id_ex_jalr) begin
-        //     ex_actual_taken = 1;
-        //     ex_actual_target = jalr_target;
-        //     ex_mispredict = (predict_taken != 1) || (predict_target != jalr_target);
-        //     ex_correct_pc = jalr_target;
-        // end
-        // else if (id_ex_opcode == `INST_B) begin
-        //     ex_actual_taken = take_branch;
-        //     ex_actual_target = id_ex_pc + id_ex_imm;
-        //     ex_mispredict = (predict_taken != take_branch) || (predict_taken && predict_target != ex_actual_target);
-        //     ex_correct_pc = take_branch ? ex_actual_target : (id_ex_pc + 4);
-        // end
-        // else begin
-        //     ex_actual_taken = 0;
-        //     ex_actual_target = 32'h0;
-        //     ex_mispredict = 0;
-        //     ex_correct_pc = 32'h0;
-        // end
     end
     
     always @(posedge clk)begin
@@ -326,7 +276,6 @@ module EX (
     assign load_use_flag[1] = ex_lsu_MemRead & ex_lsu_RegWrite & (|ex_lsu_rd) & (ex_lsu_rd == id_wb_rs1) & ex_lsu_valid;
     assign load_use_flag[0] = ex_lsu_MemRead & ex_lsu_RegWrite & ex_lsu_valid & (|ex_lsu_rd) & (ex_lsu_rd == id_wb_rs2);
 
-
     // 流水线控制
     always @(*) begin
         ex_ready = (lsu_ready || !ex_lsu_valid) && (load_use_flag == 4'b0);
@@ -336,6 +285,9 @@ module EX (
         if (reset) begin
             ex_lsu_valid <= 1'b0;
         end
+        // else if(load_use_flag != 4'b0) begin
+        //     ex_lsu_valid <= 1'b0; // 如果存在load-use冲突，禁止流水线继续
+        // end
         else if ((id_valid && ex_ready) && (lsu_ready || !ex_lsu_valid)) begin
             ex_lsu_valid <= 1'b1;
         end
@@ -379,6 +331,8 @@ module EX (
             ex_lsu_MemRead        <= id_ex_MemRead;
             ex_lsu_MemWrite       <= id_ex_MemWrite;
             ex_lsu_MemLen         <= id_ex_MemLen;
+            // 对于JAL/JALR指令，传递链接地址而不是ALU结果
+            // ex_lsu_process_result <= (id_ex_jal || id_ex_jalr) ? link_addr : process_result;
             ex_lsu_process_result <= process_result;
             ex_lsu_forward_las    <= forward_las;
             ex_lsu_csr            <= id_ex_csr;
@@ -393,6 +347,32 @@ module EX (
             ex_lsu_csr_mret       <= id_ex_csr_mret;
             ex_lsu_imm            <= id_ex_imm;
             ex_lsu_opcode         <= id_ex_opcode;
+        end
+        else begin
+            ex_lsu_inst           <= ex_lsu_inst;
+            ex_lsu_pc             <= ex_lsu_pc;
+            ex_lsu_src2           <= ex_lsu_src2;
+            ex_lsu_RegWrite       <= ex_lsu_RegWrite;
+            ex_lsu_rd             <= ex_lsu_rd;
+            ex_lsu_MemRead        <= ex_lsu_MemRead;
+            ex_lsu_MemWrite       <= ex_lsu_MemWrite;
+            // ex_lsu_MemRead        <= 1'b0;
+            // ex_lsu_MemWrite       <= 1'b0;
+            ex_lsu_MemLen         <= ex_lsu_MemLen;
+            ex_lsu_process_result <= ex_lsu_process_result;
+            ex_lsu_forward_las    <= ex_lsu_forward_las;
+            ex_lsu_csr            <= ex_lsu_csr;
+            ex_lsu_csr_wen1       <= ex_lsu_csr_wen1;
+            ex_lsu_csr_wen2       <= ex_lsu_csr_wen2;
+            ex_lsu_csr_wr_addr1   <= ex_lsu_csr_wr_addr1;
+            ex_lsu_csr_wr_addr2   <= ex_lsu_csr_wr_addr2;
+            ex_lsu_csr_wr_data1   <= ex_lsu_csr_wr_data1;
+            ex_lsu_csr_wr_data2   <= ex_lsu_csr_wr_data2;
+            ex_lsu_csr_rdata      <= ex_lsu_csr_rdata;
+            ex_lsu_csr_ecall      <= ex_lsu_csr_ecall;
+            ex_lsu_csr_mret       <= ex_lsu_csr_mret;
+            ex_lsu_imm            <= ex_lsu_imm;
+            ex_lsu_opcode         <= ex_lsu_opcode;
         end
     end
 

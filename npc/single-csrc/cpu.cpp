@@ -132,19 +132,19 @@ static void ftrace_handle() {
     // 获取译码阶段信号
     uint32_t imm = top->rootp->rv32e__DOT__imm;
     uint32_t rs1_val = top->rootp->rv32e__DOT__rs1_val;
-
+    uint32_t target = top->rootp->rv32e__DOT__jal_target;
     // 计算真实跳转目标
     if (opcode == 0x6F) { // JAL
-        uint32_t target = pc + imm;
+        // uint32_t target = pc + imm;
         const char* name = get_func_name(target);
         ftrace_call(pc, name, pc + 4, target);
     }
     else if (opcode == 0x67) { // JALR
-        uint32_t target = (rs1_val + imm) & ~0x1;
-        if (target != pc + 4) { // 排除简单的寄存器操作
-            const char* name = get_func_name(target);
-            ftrace_call(pc, name, pc + 4, target);
-        }
+        // uint32_t target = (rs1_val + imm) & ~0x1;
+        // if (target != pc + 4) { // 排除简单的寄存器操作
+        //     const char* name = get_func_name(target);
+        //     ftrace_call(pc, name, pc + 4, target);
+        // }
         
         // 处理ret指令（JALR x0, x1, 0）
         if ((instr & 0xFFFFF07F) == 0x00008067) {
