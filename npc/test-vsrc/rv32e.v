@@ -2,11 +2,13 @@
 
 module rv32e(
     input  clk,
-    input  rst,
+    input  reset,
     output  [31:0] pc,
     output  [31:0] next_pc,
     output  [31:0] instruction
 );
+import "DPI-C" function void ebreak(input int station, input int inst);
+
 assign pc = WBU_pc;
 assign instruction = WBU_inst;
 assign next_pc = IFU_IDU_pc;
@@ -126,7 +128,7 @@ wire [31:0] IFU_IDU_inst;
 // wire [31:0] IFU_MEM_pc;
 IFU ifu(
     .clk(clk),
-    .rst(rst),
+    .rst(reset),
     .EXU_out_flush(EXU_out_flush),
     .EXU_out_flush_pc(EXU_out_flush_pc),
     .IDU_IFU_ready(IDU_IFU_ready),
@@ -145,7 +147,7 @@ wire IDU_EXU_valid;
 wire [31:0] IDU_EXU_inst;
 IDU idu (
     .clk(clk),
-    .rst(rst),
+    .rst(reset),
     .IFU_IDU_pc(IFU_IDU_pc),
     .IFU_IDU_inst(IFU_IDU_inst),
 
@@ -224,7 +226,7 @@ wire LSU_EXU_forward_load;
 wire EXU_LSU_forward_las;
 EXU exu (
     .clk(clk),
-    .rst(rst),
+    .rst(reset),
 //##################  AXI ################\\
     .IDU_IFU_ready(IDU_IFU_ready),
     .IDU_EXU_valid(IDU_EXU_valid),
@@ -344,7 +346,7 @@ wire [31:0] LSU_WBU_inst;
 wire [31:0] LSU_WBU_pc;
 LSU lsu(
     .clk(clk),
-    .rst(rst),
+    .rst(reset),
 
 //##################  AXI ################\\
     .EXU_LSU_valid(EXU_LSU_valid),
@@ -410,7 +412,7 @@ wire [31:0] WBU_inst;
 wire [31:0] WBU_pc;
 WBU wbu(
     .clk(clk),
-    .rst(rst),
+    .rst(reset),
 
 //##################  AXI ################\\
     .WBU_LSU_ready(WBU_LSU_ready),
@@ -469,7 +471,7 @@ wire         ARB_MEM_bready;*/
 // 实例化 SRAM 模块
 SRAM sram(
     .clk(clk),
-    .rst(rst),
+    .rst(reset),
     // .MEM_IFU_inst(MEM_IFU_inst),
     // .MEM_IFU_valid(MEM_IFU_valid),
     // .IFU_MEM_ready(IFU_MEM_ready),
@@ -512,7 +514,7 @@ wire        ARB_UART_bready;
 // 实例化 UART 模块
 UART uart(
     .clk(clk),
-    .rst(rst),
+    .rst(reset),
     .CPU_MEM_awaddr(ARB_UART_awaddr),
     .CPU_MEM_awvalid(ARB_UART_awvalid),
     .MEM_CPU_awready(UART_ARB_awready),
@@ -562,7 +564,7 @@ wire        ARB_CLINT_bready;*/
 // 实例化 CLINT 模块
 /*CLINT CLINT(
     .clk(clk),
-    .rst(rst),
+    .rst(reset),
     .CPU_MEM_awaddr(ARB_CLINT_awaddr),
     .CPU_MEM_awvalid(ARB_CLINT_awvalid),
     .MEM_CPU_awready(CLINT_ARB_awready),
@@ -758,7 +760,8 @@ wire           LSU_ARB_bready;*/
 
 always @(*) begin
     if (IFU_IDU_inst == 32'h00100073) begin
-        end_simulation(IFU_IDU_pc,trapcode1);
+        // end_simulation(IFU_IDU_pc,trapcode1);
+        ebreak(1, trapcode1);
     end
 end
 

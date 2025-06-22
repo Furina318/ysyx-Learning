@@ -41,29 +41,29 @@ endif
 
 
 # 伪目标：运行 GTKWave 查看波形
-.PHONY: gtkw
-gtkw: uae.gtkw
-	@echo
-	@echo "### WAVES ###"
-	gtkwave uae.gtkw
+# .PHONY: gtkw
+# gtkw: uae.gtkw
+# 	@echo
+# 	@echo "### WAVES ###"
+# 	gtkwave uae.gtkw
 
-# 伪目标：仿真
-.PHONY: sim
-sim: wave.vcd
+# # 伪目标：仿真
+# .PHONY: sim
+# sim: wave.vcd
 
-# 伪目标：查看波形
-.PHONY: waves
-waves: wave.vcd
-	@echo
-	@echo "### WAVES ###"
-	gtkwave wave.vcd
+# # 伪目标：查看波形
+# .PHONY: waves
+# waves: wave.vcd
+# 	@echo
+# 	@echo "### WAVES ###"
+# 	gtkwave wave.vcd
 
-#生成波形文件
-.PHONY: wave.vcd
-wave.vcd: $(BINARY)
-	@echo
-	@echo "### SIMULATING ###"
-	@$(BINARY) #+verilator+rand+reset+2
+# #生成波形文件
+# .PHONY: wave.vcd
+# wave.vcd: $(BINARY)
+# 	@echo
+# 	@echo "### SIMULATING ###"
+# 	@$(BINARY) #+verilator+rand+reset+2
 
 
 
@@ -72,27 +72,9 @@ wave.vcd: $(BINARY)
 run-env: $(BINARY) $(DIFF_REF_SO)
 
 # 伪目标：运行仿真
-# 在原有Makefile基础上添加以下计时功能
-
 .PHONY: run
 run: run-env
-	@echo "\n======= Simulation Start ======="
-	@echo "Start time: $$(date +'%Y-%m-%d %H:%M:%S')" 
-	@start_time=$$(date +%s%3N); \
-	$(NPC_EXEC); exit_code=$$?; \
-	end_time=$$(date +%s%3N); \
-	duration=$$((end_time - start_time)); \
-	seconds=$$((duration / 1000)); \
-	ms=$$((duration % 1000)); \
-	printf "\n======= Time Statistics =======\n"; \
-	printf "Total duration: %d.%03d seconds\n" $$seconds $$ms; \
-	printf "===============================\n"; \
-	exit $$exit_code
-
-# .PHONY: run
-# run: run-env
-# 	$(NPC_EXEC)
-# 其他已有内容保持不变...
+	$(NPC_EXEC)
 
 # 伪目标：调试
 .PHONY: gdb
@@ -117,8 +99,8 @@ verilate: .stamp.verilate
 .stamp.verilate: $(VSRCS) $(CSRCS)
 	@echo
 	@echo "### VERILATING ###"
-	verilator -Wno-STMTDLY -Wno-MODDUP --trace --top-module $(MODULE) -cc $(VSRCS) --exe $(CSRCS) -I$(INC_PATH) $(CFLAGS)
-#	verilator -Wno-STMTDLY -Wno-MODDUP --top-module $(MODULE) -cc $(VSRCS) --exe $(CSRCS) -I$(INC_PATH) $(CFLAGS)
+	# verilator -Wno-STMTDLY -Wno-MODDUP --trace --top-module $(MODULE) -cc $(VSRCS) --exe $(CSRCS) -I$(INC_PATH) $(CFLAGS)
+	verilator -Wno-STMTDLY -Wno-MODDUP --top-module $(MODULE) -cc $(VSRCS) --exe $(CSRCS) -I$(INC_PATH) $(CFLAGS)
 	@echo "LIBS += $(LIBS)" >> ./obj_dir/V$(MODULE).mk    # 添加链接库
 	@echo "CXXFLAGS += -I$(INC_PATH)" >> ./obj_dir/V$(MODULE).mk  # 添加包含路径
 	@touch .stamp.verilate
@@ -133,9 +115,9 @@ lint: $(MODULE).v
 clean:
 	rm -rf .stamp.*
 	rm -rf ./obj_dir
-	rm -rf wave.vcd
+#	rm -rf wave.vcd
 	rm -rf ./log/*
 
-.PHONY: wave
-wave:
-	gtkwave wave.vcd
+# .PHONY: wave
+# wave:
+# 	gtkwave wave.vcd

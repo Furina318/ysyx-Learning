@@ -88,12 +88,21 @@ module EX (
     import "DPI-C" function void ebreak(input int station, input int inst);
     
     // 前递后的源寄存器值
-    wire [31:0] src1 = (forward_rs1[1] ? ex_lsu_process_result : 
-                       (forward_rs1[0] | load_use_flag[1]) ? lsu_wb_wdata : 
-                       wb_ex_src1);
-    wire [31:0] src2 = (forward_rs2[1] ? ex_lsu_process_result : 
-                       (forward_rs2[0] | load_use_flag[0]) ? lsu_wb_wdata : 
-                       wb_ex_src2);
+    // wire [31:0] src1 = (forward_rs1[1] ? ex_lsu_process_result : 
+    //                    (forward_rs1[0] | load_use_flag[1]) ? lsu_wb_wdata : 
+    //                    wb_ex_src1);
+    // wire [31:0] src2 = (forward_rs2[1] ? ex_lsu_process_result : 
+    //                    (forward_rs2[0] | load_use_flag[0]) ? lsu_wb_wdata : 
+    //                    wb_ex_src2);
+    wire [31:0] src1 = (forward_rs1[1]) ? ex_lsu_process_result : 
+                    (forward_rs1[0]) ? lsu_wb_wdata : 
+                    (load_use_flag[3]) ? lsu_wb_wdata : 
+                    wb_ex_src1;
+
+    wire [31:0] src2 = (forward_rs2[1]) ? ex_lsu_process_result : 
+                    (forward_rs2[0]) ? lsu_wb_wdata : 
+                    (load_use_flag[2]) ? lsu_wb_wdata : 
+                    wb_ex_src2;
 
     // ALU 操作中间变量
     reg [31:0] ex_num1;

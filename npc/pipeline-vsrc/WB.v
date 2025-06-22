@@ -44,9 +44,9 @@ always @(posedge clk) begin
         end
     end
     else if (lsu_wb_valid && wen && (waddr != 5'b0)) begin
-        if (regs[waddr] != wdata) begin
-            $display("[WBU] Reg x%d changed to 0x%h",  waddr, wdata);
-        end
+        // if (regs[waddr] != wdata) begin
+        //     $display("[WBU] Reg x%d changed to 0x%h",  waddr, wdata);
+        // end
         regs[waddr] <= wdata;
     end
 end

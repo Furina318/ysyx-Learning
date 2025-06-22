@@ -21,12 +21,6 @@ VL_ATTR_COLD void Vrv32e___024root___eval_initial(Vrv32e___024root* vlSelf) {
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vrv32e___024root___eval_initial\n"); );
     // Body
     Vrv32e___024root___eval_initial__TOP(vlSelf);
-    vlSelf->__Vm_traceActivity[5U] = 1U;
-    vlSelf->__Vm_traceActivity[4U] = 1U;
-    vlSelf->__Vm_traceActivity[3U] = 1U;
-    vlSelf->__Vm_traceActivity[2U] = 1U;
-    vlSelf->__Vm_traceActivity[1U] = 1U;
-    vlSelf->__Vm_traceActivity[0U] = 1U;
     vlSelf->__Vtrigrprev__TOP__clk = vlSelf->clk;
     vlSelf->__Vtrigrprev__TOP__reset = vlSelf->reset;
 }
@@ -35,14 +29,16 @@ VL_ATTR_COLD void Vrv32e___024root___eval_initial__TOP(Vrv32e___024root* vlSelf)
     if (false && vlSelf) {}  // Prevent unused
     Vrv32e__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vrv32e___024root___eval_initial__TOP\n"); );
+    // Init
+    IData/*31:0*/ rv32e__DOT__wbu__DOT__k;
+    rv32e__DOT__wbu__DOT__k = 0;
     // Body
-    vlSelf->rv32e__DOT__wbu__DOT__k = 0U;
-    while (VL_GTS_III(32, 0x1000U, vlSelf->rv32e__DOT__wbu__DOT__k)) {
-        vlSelf->rv32e__DOT__wbu__DOT__CSR[(0xfffU & vlSelf->rv32e__DOT__wbu__DOT__k)] 
-            = ((0x300U == vlSelf->rv32e__DOT__wbu__DOT__k)
-                ? 0x1800U : 0U);
-        vlSelf->rv32e__DOT__wbu__DOT__k = ((IData)(1U) 
-                                           + vlSelf->rv32e__DOT__wbu__DOT__k);
+    rv32e__DOT__wbu__DOT__k = 0U;
+    while (VL_GTS_III(32, 0x1000U, rv32e__DOT__wbu__DOT__k)) {
+        vlSelf->rv32e__DOT__wbu__DOT__CSR[(0xfffU & rv32e__DOT__wbu__DOT__k)] 
+            = ((0x300U == rv32e__DOT__wbu__DOT__k) ? 0x1800U
+                : 0U);
+        rv32e__DOT__wbu__DOT__k = ((IData)(1U) + rv32e__DOT__wbu__DOT__k);
     }
 }
 
@@ -108,6 +104,9 @@ VL_ATTR_COLD void Vrv32e___024root___stl_sequent__TOP__0(Vrv32e___024root* vlSel
     Vrv32e__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vrv32e___024root___stl_sequent__TOP__0\n"); );
     // Body
+    if ((0x100073U == vlSelf->rv32e__DOT__ex_lsu_inst)) {
+        Vrv32e___024root____Vdpiimwrap_rv32e__DOT__ebreak_TOP(1U, vlSelf->rv32e__DOT__ex_lsu_inst);
+    }
     vlSelf->rv32e__DOT__lsu__DOT__rd_data = ((IData)(vlSelf->rv32e__DOT__lsu__DOT__l_load)
                                               ? ((0U 
                                                   == (IData)(vlSelf->rv32e__DOT__lsu__DOT__l_MemLen))
@@ -160,85 +159,83 @@ VL_ATTR_COLD void Vrv32e___024root___stl_sequent__TOP__0(Vrv32e___024root* vlSel
                                                     : vlSelf->rv32e__DOT__ex_lsu_process_result))));
     vlSelf->rv32e__DOT__wb_ex_csr_num1 = vlSelf->rv32e__DOT__wbu__DOT__CSR
         [vlSelf->rv32e__DOT__id_wb_csr_addr1];
-    vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_hb53dc38f__0 
-        = ((IData)(vlSelf->rv32e__DOT__lsu__DOT__l_load) 
-           & ((IData)(vlSelf->rv32e__DOT__lsu__DOT__l_rd_en) 
-              & (0U != (IData)(vlSelf->rv32e__DOT__lsu__DOT__l_rd_addr))));
-    vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h69af1a50__0 
-        = ((IData)(vlSelf->rv32e__DOT__ex_lsu_RegWrite) 
-           & (0U != (IData)(vlSelf->rv32e__DOT__ex_lsu_rd)));
-    vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h384f4e33__0 
-        = ((IData)(vlSelf->rv32e__DOT__lsu_wb_RegWrite) 
-           & (0U != (IData)(vlSelf->rv32e__DOT__lsu_wb_rd)));
+    vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h804502ec__0 
+        = ((IData)(vlSelf->rv32e__DOT__ex_lsu_MemRead) 
+           & (IData)(vlSelf->rv32e__DOT__ex_lsu_RegWrite));
     vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_he5bf04e5__0 
         = ((IData)(vlSelf->rv32e__DOT__ex_lsu_rd) == (IData)(vlSelf->rv32e__DOT__id_wb_rs2));
     vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_hc613623f__0 
         = (((IData)(vlSelf->rv32e__DOT__ex_lsu_rd) 
             == (IData)(vlSelf->rv32e__DOT__id_wb_rs1)) 
            & (IData)(vlSelf->rv32e__DOT__ex_lsu_valid));
-    vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h804502ec__0 
-        = ((IData)(vlSelf->rv32e__DOT__ex_lsu_MemRead) 
-           & (IData)(vlSelf->rv32e__DOT__ex_lsu_RegWrite));
-    vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h3556a05f__0 
-        = ((IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h384f4e33__0) 
-           & (((IData)(vlSelf->rv32e__DOT__id_wb_rs2) 
-               == (IData)(vlSelf->rv32e__DOT__lsu_wb_rd)) 
-              & (IData)(vlSelf->rv32e__DOT__lsu_wb_valid)));
-    vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h666fa1ae__0 
-        = ((IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h384f4e33__0) 
-           & (((IData)(vlSelf->rv32e__DOT__id_wb_rs1) 
-               == (IData)(vlSelf->rv32e__DOT__lsu_wb_rd)) 
-              & (IData)(vlSelf->rv32e__DOT__lsu_wb_valid)));
-    vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_hcfc89bc9__0 
-        = ((IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h69af1a50__0) 
-           & ((IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_he5bf04e5__0) 
-              & (IData)(vlSelf->rv32e__DOT__ex_lsu_valid)));
-    vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h9653a62d__0 
-        = ((IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h69af1a50__0) 
-           & (IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_hc613623f__0));
-    vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h9a38ce48__0 
-        = ((IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h804502ec__0) 
-           & ((IData)(vlSelf->rv32e__DOT__ex_lsu_valid) 
-              & ((0U != (IData)(vlSelf->rv32e__DOT__ex_lsu_rd)) 
-                 & (IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_he5bf04e5__0))));
-    vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h93a4b40d__0 
-        = ((IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h804502ec__0) 
-           & ((0U != (IData)(vlSelf->rv32e__DOT__ex_lsu_rd)) 
-              & (IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_hc613623f__0)));
-    vlSelf->rv32e__DOT__exu__DOT__src2 = ((IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_hcfc89bc9__0)
+    vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h69af1a50__0 
+        = ((IData)(vlSelf->rv32e__DOT__ex_lsu_RegWrite) 
+           & (0U != (IData)(vlSelf->rv32e__DOT__ex_lsu_rd)));
+    vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h384f4e33__0 
+        = ((IData)(vlSelf->rv32e__DOT__lsu_wb_RegWrite) 
+           & (0U != (IData)(vlSelf->rv32e__DOT__lsu_wb_rd)));
+    vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_hb53dc38f__0 
+        = ((IData)(vlSelf->rv32e__DOT__lsu__DOT__l_load) 
+           & ((IData)(vlSelf->rv32e__DOT__lsu__DOT__l_rd_en) 
+              & (0U != (IData)(vlSelf->rv32e__DOT__lsu__DOT__l_rd_addr))));
+    vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_hadc13f7a__0 
+        = ((IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_hb53dc38f__0) 
+           & ((IData)(vlSelf->rv32e__DOT__id_wb_rs2) 
+              == (IData)(vlSelf->rv32e__DOT__lsu__DOT__l_rd_addr)));
+    vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h0017749a__0 
+        = ((IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_hb53dc38f__0) 
+           & ((IData)(vlSelf->rv32e__DOT__id_wb_rs1) 
+              == (IData)(vlSelf->rv32e__DOT__lsu__DOT__l_rd_addr)));
+    vlSelf->rv32e__DOT__exu__DOT__src2 = (((IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h69af1a50__0) 
+                                           & ((IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_he5bf04e5__0) 
+                                              & (IData)(vlSelf->rv32e__DOT__ex_lsu_valid)))
                                            ? vlSelf->rv32e__DOT__ex_lsu_process_result
-                                           : (((IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h3556a05f__0) 
-                                               | (IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h9a38ce48__0))
+                                           : (((IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h384f4e33__0) 
+                                               & (((IData)(vlSelf->rv32e__DOT__id_wb_rs2) 
+                                                   == (IData)(vlSelf->rv32e__DOT__lsu_wb_rd)) 
+                                                  & (IData)(vlSelf->rv32e__DOT__lsu_wb_valid)))
                                                ? vlSelf->rv32e__DOT__lsu_wb_write_rd_data
-                                               : ((0U 
-                                                   == (IData)(vlSelf->rv32e__DOT__id_wb_rs2))
-                                                   ? 0U
+                                               : ((IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_hadc13f7a__0)
+                                                   ? vlSelf->rv32e__DOT__lsu_wb_write_rd_data
                                                    : 
-                                                  vlSelf->rv32e__DOT__wbu__DOT__regs
-                                                  [vlSelf->rv32e__DOT__id_wb_rs2])));
+                                                  ((0U 
+                                                    == (IData)(vlSelf->rv32e__DOT__id_wb_rs2))
+                                                    ? 0U
+                                                    : 
+                                                   vlSelf->rv32e__DOT__wbu__DOT__regs
+                                                   [vlSelf->rv32e__DOT__id_wb_rs2]))));
     vlSelf->rv32e__DOT__exu__DOT__load_use_flag = (
-                                                   (((IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_hb53dc38f__0) 
-                                                     & ((IData)(vlSelf->rv32e__DOT__id_wb_rs1) 
-                                                        == (IData)(vlSelf->rv32e__DOT__lsu__DOT__l_rd_addr))) 
+                                                   ((IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h0017749a__0) 
                                                     << 3U) 
-                                                   | ((((IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_hb53dc38f__0) 
-                                                        & ((IData)(vlSelf->rv32e__DOT__id_wb_rs2) 
-                                                           == (IData)(vlSelf->rv32e__DOT__lsu__DOT__l_rd_addr))) 
+                                                   | (((IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_hadc13f7a__0) 
                                                        << 2U) 
-                                                      | (((IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h93a4b40d__0) 
+                                                      | ((((IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h804502ec__0) 
+                                                           & ((0U 
+                                                               != (IData)(vlSelf->rv32e__DOT__ex_lsu_rd)) 
+                                                              & (IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_hc613623f__0))) 
                                                           << 1U) 
-                                                         | (IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h9a38ce48__0))));
-    vlSelf->rv32e__DOT__exu__DOT__src1 = ((IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h9653a62d__0)
+                                                         | ((IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h804502ec__0) 
+                                                            & ((IData)(vlSelf->rv32e__DOT__ex_lsu_valid) 
+                                                               & ((0U 
+                                                                   != (IData)(vlSelf->rv32e__DOT__ex_lsu_rd)) 
+                                                                  & (IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_he5bf04e5__0)))))));
+    vlSelf->rv32e__DOT__exu__DOT__src1 = (((IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h69af1a50__0) 
+                                           & (IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_hc613623f__0))
                                            ? vlSelf->rv32e__DOT__ex_lsu_process_result
-                                           : (((IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h666fa1ae__0) 
-                                               | (IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h93a4b40d__0))
+                                           : (((IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h384f4e33__0) 
+                                               & (((IData)(vlSelf->rv32e__DOT__id_wb_rs1) 
+                                                   == (IData)(vlSelf->rv32e__DOT__lsu_wb_rd)) 
+                                                  & (IData)(vlSelf->rv32e__DOT__lsu_wb_valid)))
                                                ? vlSelf->rv32e__DOT__lsu_wb_write_rd_data
-                                               : ((0U 
-                                                   == (IData)(vlSelf->rv32e__DOT__id_wb_rs1))
-                                                   ? 0U
+                                               : ((IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h0017749a__0)
+                                                   ? vlSelf->rv32e__DOT__lsu_wb_write_rd_data
                                                    : 
-                                                  vlSelf->rv32e__DOT__wbu__DOT__regs
-                                                  [vlSelf->rv32e__DOT__id_wb_rs1])));
+                                                  ((0U 
+                                                    == (IData)(vlSelf->rv32e__DOT__id_wb_rs1))
+                                                    ? 0U
+                                                    : 
+                                                   vlSelf->rv32e__DOT__wbu__DOT__regs
+                                                   [vlSelf->rv32e__DOT__id_wb_rs1]))));
     if (((IData)(vlSelf->rv32e__DOT__id_ex_MemRead) 
          | (IData)(vlSelf->rv32e__DOT__id_ex_MemWrite))) {
         vlSelf->rv32e__DOT__exu__DOT__ex_num2 = vlSelf->rv32e__DOT__id_ex_imm;
@@ -410,13 +407,6 @@ VL_ATTR_COLD void Vrv32e___024root___stl_sequent__TOP__0(Vrv32e___024root* vlSel
         vlSelf->rv32e__DOT__ex_flush = 0U;
         vlSelf->rv32e__DOT__ex_flush_pc = 0U;
     }
-    if ((0x100073U == vlSelf->rv32e__DOT__ex_lsu_inst)) {
-        Vrv32e___024root____Vdpiimwrap_rv32e__DOT__ebreak_TOP(1U, vlSelf->rv32e__DOT__ex_lsu_inst);
-    }
-    if (VL_UNLIKELY(vlSelf->rv32e__DOT__ex_flush)) {
-        VL_WRITEF("       [EX] flush pc = %x\n",32,
-                  vlSelf->rv32e__DOT__ex_flush_pc);
-    }
     vlSelf->rv32e__DOT__id_ready = (1U & ((~ (IData)(vlSelf->rv32e__DOT__ex_flush)) 
                                           & ((~ (IData)(vlSelf->rv32e__DOT__id_valid)) 
                                              | (IData)(vlSelf->rv32e__DOT__ex_ready))));
@@ -562,133 +552,153 @@ VL_ATTR_COLD void Vrv32e___024root___stl_sequent__TOP__0(Vrv32e___024root* vlSel
         = ((0x73U == (0x7fU & vlSelf->rv32e__DOT__IF_ID_inst))
             ? (vlSelf->rv32e__DOT__IF_ID_inst >> 0x14U)
             : 0U);
+    vlSelf->rv32e__DOT__idu__DOT____VdfgTmp_h4eb56789__0 
+        = (IData)((0x30U == (0x707cU & vlSelf->rv32e__DOT__IF_ID_inst)));
     vlSelf->rv32e__DOT__idu__DOT____VdfgTmp_h05244652__0 
         = ((0xcU == (0x1fU & (vlSelf->rv32e__DOT__IF_ID_inst 
                               >> 2U))) | (4U == (0x1fU 
                                                  & (vlSelf->rv32e__DOT__IF_ID_inst 
                                                     >> 2U))));
-    vlSelf->rv32e__DOT__idu__DOT__alu_op = ((IData)(
-                                                    (0x40000030U 
-                                                     == 
-                                                     (0x4000707cU 
-                                                      & vlSelf->rv32e__DOT__IF_ID_inst)))
+    vlSelf->rv32e__DOT__idu__DOT____VdfgTmp_hcf9d2862__0 
+        = ((IData)(vlSelf->rv32e__DOT__idu__DOT____VdfgTmp_h05244652__0) 
+           & (0x5000U == (0x7000U & vlSelf->rv32e__DOT__IF_ID_inst)));
+    vlSelf->rv32e__DOT__idu__DOT__alu_op = (((IData)(vlSelf->rv32e__DOT__idu__DOT____VdfgTmp_h4eb56789__0) 
+                                             & (vlSelf->rv32e__DOT__IF_ID_inst 
+                                                >> 0x1eU))
                                              ? 1U : 
-                                            ((IData)(
-                                                     ((0x60U 
+                                            (((~ (vlSelf->rv32e__DOT__IF_ID_inst 
+                                                  >> 0x1eU)) 
+                                              & (IData)(vlSelf->rv32e__DOT__idu__DOT____VdfgTmp_h4eb56789__0))
+                                              ? 0U : 
+                                             ((IData)(
+                                                      (0x10U 
                                                        == 
-                                                       (0x7cU 
-                                                        & vlSelf->rv32e__DOT__IF_ID_inst)) 
-                                                      & ((0U 
-                                                          == 
-                                                          (7U 
-                                                           & (vlSelf->rv32e__DOT__IF_ID_inst 
-                                                              >> 0xcU))) 
-                                                         | (1U 
-                                                            == 
-                                                            (7U 
-                                                             & (vlSelf->rv32e__DOT__IF_ID_inst 
-                                                                >> 0xcU))))))
-                                              ? 1U : 
-                                             (((IData)(vlSelf->rv32e__DOT__idu__DOT____VdfgTmp_h05244652__0) 
-                                               & (0x6000U 
-                                                  == 
-                                                  (0x7000U 
-                                                   & vlSelf->rv32e__DOT__IF_ID_inst)))
-                                               ? 3U
-                                               : (((IData)(vlSelf->rv32e__DOT__idu__DOT____VdfgTmp_h05244652__0) 
-                                                   & (0x4000U 
-                                                      == 
-                                                      (0x7000U 
-                                                       & vlSelf->rv32e__DOT__IF_ID_inst)))
-                                                   ? 4U
-                                                   : 
-                                                  (((IData)(vlSelf->rv32e__DOT__idu__DOT____VdfgTmp_h05244652__0) 
-                                                    & (0x7000U 
-                                                       == 
-                                                       (0x7000U 
+                                                       (0x707cU 
                                                         & vlSelf->rv32e__DOT__IF_ID_inst)))
-                                                    ? 2U
+                                               ? 0U
+                                               : ((IData)(
+                                                          (0x2010U 
+                                                           == 
+                                                           (0x707cU 
+                                                            & vlSelf->rv32e__DOT__IF_ID_inst)))
+                                                   ? 7U
+                                                   : 
+                                                  ((IData)(
+                                                           ((0x60U 
+                                                             == 
+                                                             (0x7cU 
+                                                              & vlSelf->rv32e__DOT__IF_ID_inst)) 
+                                                            & ((0U 
+                                                                == 
+                                                                (7U 
+                                                                 & (vlSelf->rv32e__DOT__IF_ID_inst 
+                                                                    >> 0xcU))) 
+                                                               | (1U 
+                                                                  == 
+                                                                  (7U 
+                                                                   & (vlSelf->rv32e__DOT__IF_ID_inst 
+                                                                      >> 0xcU))))))
+                                                    ? 1U
                                                     : 
                                                    ((IData)(
-                                                            (0x3030U 
-                                                             == 
-                                                             (0xfe00707cU 
-                                                              & vlSelf->rv32e__DOT__IF_ID_inst)))
-                                                     ? 6U
+                                                            ((0x60U 
+                                                              == 
+                                                              (0x7cU 
+                                                               & vlSelf->rv32e__DOT__IF_ID_inst)) 
+                                                             & ((4U 
+                                                                 == 
+                                                                 (7U 
+                                                                  & (vlSelf->rv32e__DOT__IF_ID_inst 
+                                                                     >> 0xcU))) 
+                                                                | (5U 
+                                                                   == 
+                                                                   (7U 
+                                                                    & (vlSelf->rv32e__DOT__IF_ID_inst 
+                                                                       >> 0xcU))))))
+                                                     ? 7U
                                                      : 
                                                     ((IData)(
-                                                             ((0x3000U 
+                                                             ((0x60U 
                                                                == 
-                                                               (0x7000U 
+                                                               (0x7cU 
                                                                 & vlSelf->rv32e__DOT__IF_ID_inst)) 
-                                                              & ((4U 
+                                                              & ((6U 
                                                                   == 
-                                                                  (0x1fU 
+                                                                  (7U 
                                                                    & (vlSelf->rv32e__DOT__IF_ID_inst 
-                                                                      >> 2U))) 
-                                                                 | (0x18U 
+                                                                      >> 0xcU))) 
+                                                                 | (7U 
                                                                     == 
-                                                                    (0x1fU 
+                                                                    (7U 
                                                                      & (vlSelf->rv32e__DOT__IF_ID_inst 
-                                                                        >> 2U))))))
+                                                                        >> 0xcU))))))
                                                       ? 6U
                                                       : 
-                                                     ((IData)(
-                                                              (0x7060U 
-                                                               == 
-                                                               (0x707cU 
-                                                                & vlSelf->rv32e__DOT__IF_ID_inst)))
-                                                       ? 6U
+                                                     (((IData)(vlSelf->rv32e__DOT__idu__DOT____VdfgTmp_h05244652__0) 
+                                                       & (0x6000U 
+                                                          == 
+                                                          (0x7000U 
+                                                           & vlSelf->rv32e__DOT__IF_ID_inst)))
+                                                       ? 3U
                                                        : 
                                                       (((IData)(vlSelf->rv32e__DOT__idu__DOT____VdfgTmp_h05244652__0) 
-                                                        & (IData)(
-                                                                  (0x5000U 
-                                                                   == 
-                                                                   (0xfe007000U 
-                                                                    & vlSelf->rv32e__DOT__IF_ID_inst))))
-                                                        ? 9U
+                                                        & (0x4000U 
+                                                           == 
+                                                           (0x7000U 
+                                                            & vlSelf->rv32e__DOT__IF_ID_inst)))
+                                                        ? 4U
                                                         : 
                                                        (((IData)(vlSelf->rv32e__DOT__idu__DOT____VdfgTmp_h05244652__0) 
-                                                         & (IData)(
-                                                                   (0x40005000U 
-                                                                    == 
-                                                                    (0xfe007000U 
-                                                                     & vlSelf->rv32e__DOT__IF_ID_inst))))
-                                                         ? 8U
+                                                         & (0x7000U 
+                                                            == 
+                                                            (0x7000U 
+                                                             & vlSelf->rv32e__DOT__IF_ID_inst)))
+                                                         ? 2U
                                                          : 
-                                                        (((IData)(vlSelf->rv32e__DOT__idu__DOT____VdfgTmp_h05244652__0) 
-                                                          & (IData)(
-                                                                    (0x1000U 
-                                                                     == 
-                                                                     (0xfe007000U 
-                                                                      & vlSelf->rv32e__DOT__IF_ID_inst))))
-                                                          ? 5U
+                                                        ((IData)(
+                                                                 (0x3030U 
+                                                                  == 
+                                                                  (0xfe00707cU 
+                                                                   & vlSelf->rv32e__DOT__IF_ID_inst)))
+                                                          ? 6U
                                                           : 
-                                                         (((IData)(vlSelf->rv32e__DOT__idu__DOT____VdfgTmp_h05244652__0) 
-                                                           & (IData)(
-                                                                     (0x2000U 
-                                                                      == 
-                                                                      (0xfe007000U 
-                                                                       & vlSelf->rv32e__DOT__IF_ID_inst))))
-                                                           ? 7U
+                                                         ((IData)(
+                                                                  (0x3010U 
+                                                                   == 
+                                                                   (0x707cU 
+                                                                    & vlSelf->rv32e__DOT__IF_ID_inst)))
+                                                           ? 6U
                                                            : 
-                                                          ((IData)(
-                                                                   ((0x60U 
-                                                                     == 
-                                                                     (0x7cU 
-                                                                      & vlSelf->rv32e__DOT__IF_ID_inst)) 
-                                                                    & ((5U 
-                                                                        == 
-                                                                        (7U 
-                                                                         & (vlSelf->rv32e__DOT__IF_ID_inst 
-                                                                            >> 0xcU))) 
-                                                                       | (4U 
+                                                          (((IData)(vlSelf->rv32e__DOT__idu__DOT____VdfgTmp_hcf9d2862__0) 
+                                                            & (0U 
+                                                               == 
+                                                               (vlSelf->rv32e__DOT__IF_ID_inst 
+                                                                >> 0x19U)))
+                                                            ? 9U
+                                                            : 
+                                                           (((IData)(vlSelf->rv32e__DOT__idu__DOT____VdfgTmp_hcf9d2862__0) 
+                                                             & (0x20U 
+                                                                == 
+                                                                (vlSelf->rv32e__DOT__IF_ID_inst 
+                                                                 >> 0x19U)))
+                                                             ? 8U
+                                                             : 
+                                                            (((IData)(vlSelf->rv32e__DOT__idu__DOT____VdfgTmp_h05244652__0) 
+                                                              & (IData)(
+                                                                        (0x1000U 
+                                                                         == 
+                                                                         (0xfe007000U 
+                                                                          & vlSelf->rv32e__DOT__IF_ID_inst))))
+                                                              ? 5U
+                                                              : 
+                                                             (((IData)(vlSelf->rv32e__DOT__idu__DOT____VdfgTmp_h05244652__0) 
+                                                               & (IData)(
+                                                                         (0x2000U 
                                                                           == 
-                                                                          (7U 
-                                                                           & (vlSelf->rv32e__DOT__IF_ID_inst 
-                                                                              >> 0xcU))))))
-                                                            ? 7U
-                                                            : 0U)))))))))))));
+                                                                          (0xfe007000U 
+                                                                           & vlSelf->rv32e__DOT__IF_ID_inst))))
+                                                               ? 7U
+                                                               : 0U))))))))))))))));
 }
 
 VL_ATTR_COLD void Vrv32e___024root___eval_stl(Vrv32e___024root* vlSelf) {
@@ -698,12 +708,6 @@ VL_ATTR_COLD void Vrv32e___024root___eval_stl(Vrv32e___024root* vlSelf) {
     // Body
     if (vlSelf->__VstlTriggered.at(0U)) {
         Vrv32e___024root___stl_sequent__TOP__0(vlSelf);
-        vlSelf->__Vm_traceActivity[5U] = 1U;
-        vlSelf->__Vm_traceActivity[4U] = 1U;
-        vlSelf->__Vm_traceActivity[3U] = 1U;
-        vlSelf->__Vm_traceActivity[2U] = 1U;
-        vlSelf->__Vm_traceActivity[1U] = 1U;
-        vlSelf->__Vm_traceActivity[0U] = 1U;
     }
 }
 
@@ -803,7 +807,6 @@ VL_ATTR_COLD void Vrv32e___024root___ctor_var_reset(Vrv32e___024root* vlSelf) {
     vlSelf->rv32e__DOT__id_ex_csr_wr_addr2 = VL_RAND_RESET_I(12);
     vlSelf->rv32e__DOT__id_wb_csr_addr1 = VL_RAND_RESET_I(12);
     vlSelf->rv32e__DOT__id_wb_csr_addr2 = VL_RAND_RESET_I(12);
-    vlSelf->rv32e__DOT__ex_lsu_pc = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__ex_lsu_inst = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__ex_lsu_valid = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__lsu_ex_ready = VL_RAND_RESET_I(1);
@@ -826,10 +829,6 @@ VL_ATTR_COLD void Vrv32e___024root___ctor_var_reset(Vrv32e___024root* vlSelf) {
     vlSelf->rv32e__DOT__ex_lsu_csr_rdata = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__ex_lsu_csr_ecall = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__ex_lsu_csr_mret = VL_RAND_RESET_I(1);
-    vlSelf->rv32e__DOT__ex_lsu_imm = VL_RAND_RESET_I(32);
-    vlSelf->rv32e__DOT__ex_lsu_opcode = VL_RAND_RESET_I(7);
-    vlSelf->rv32e__DOT__lsu_wb_pc = VL_RAND_RESET_I(32);
-    vlSelf->rv32e__DOT__lsu_wb_inst = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__lsu_wb_valid = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__lsu_wb_RegWrite = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__lsu_wb_rd = VL_RAND_RESET_I(5);
@@ -840,8 +839,6 @@ VL_ATTR_COLD void Vrv32e___024root___ctor_var_reset(Vrv32e___024root* vlSelf) {
     vlSelf->rv32e__DOT__lsu_wb_csr_wr_addr2 = VL_RAND_RESET_I(12);
     vlSelf->rv32e__DOT__lsu_wb_csr_wen1 = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__lsu_wb_csr_wen2 = VL_RAND_RESET_I(1);
-    vlSelf->rv32e__DOT__lsu_wb_flush = VL_RAND_RESET_I(1);
-    vlSelf->rv32e__DOT__wb_valid = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__wb_ex_csr_num1 = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__ex_lsu_forward_las = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__ifu__DOT__check = VL_RAND_RESET_I(1);
@@ -849,7 +846,9 @@ VL_ATTR_COLD void Vrv32e___024root___ctor_var_reset(Vrv32e___024root* vlSelf) {
     vlSelf->rv32e__DOT__idu__DOT__alu_op = VL_RAND_RESET_I(4);
     vlSelf->rv32e__DOT__idu__DOT__csr_ecall = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__idu__DOT__csr_mret = VL_RAND_RESET_I(1);
+    vlSelf->rv32e__DOT__idu__DOT____VdfgTmp_h4eb56789__0 = 0;
     vlSelf->rv32e__DOT__idu__DOT____VdfgTmp_h05244652__0 = 0;
+    vlSelf->rv32e__DOT__idu__DOT____VdfgTmp_hcf9d2862__0 = 0;
     vlSelf->rv32e__DOT__idu__DOT____VdfgTmp_h69b43165__0 = 0;
     vlSelf->rv32e__DOT__idu__DOT____VdfgTmp_hf81b0dad__0 = 0;
     vlSelf->rv32e__DOT__exu__DOT__src1 = VL_RAND_RESET_I(32);
@@ -864,25 +863,18 @@ VL_ATTR_COLD void Vrv32e___024root___ctor_var_reset(Vrv32e___024root* vlSelf) {
     vlSelf->rv32e__DOT__exu__DOT__take_branch = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__exu__DOT__ex_flush_condition = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__exu__DOT__load_use_flag = VL_RAND_RESET_I(4);
-    vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h9653a62d__0 = 0;
-    vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h666fa1ae__0 = 0;
-    vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_hb53dc38f__0 = 0;
-    vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h93a4b40d__0 = 0;
-    vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h9a38ce48__0 = 0;
-    vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_hcfc89bc9__0 = 0;
-    vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h3556a05f__0 = 0;
+    vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h0017749a__0 = 0;
+    vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_hadc13f7a__0 = 0;
+    vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h804502ec__0 = 0;
+    vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_hc613623f__0 = 0;
     vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_he5bf04e5__0 = 0;
     vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h69af1a50__0 = 0;
-    vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_hc613623f__0 = 0;
     vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h384f4e33__0 = 0;
-    vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h804502ec__0 = 0;
+    vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_hb53dc38f__0 = 0;
     vlSelf->rv32e__DOT__lsu__DOT__l_load = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__lsu__DOT__l_rd_en = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__lsu__DOT__l_rd_addr = VL_RAND_RESET_I(5);
-    vlSelf->rv32e__DOT__lsu__DOT__l_inst = VL_RAND_RESET_I(32);
-    vlSelf->rv32e__DOT__lsu__DOT__l_pc = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__lsu__DOT__l_MemLen = VL_RAND_RESET_I(3);
-    vlSelf->rv32e__DOT__lsu__DOT__l_opcode = VL_RAND_RESET_I(7);
     vlSelf->rv32e__DOT__lsu__DOT__read_valid = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__lsu__DOT__write_valid = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__lsu__DOT__read_lsu_data = VL_RAND_RESET_I(32);
@@ -893,9 +885,6 @@ VL_ATTR_COLD void Vrv32e___024root___ctor_var_reset(Vrv32e___024root* vlSelf) {
     for (int __Vi0 = 0; __Vi0 < 32; ++__Vi0) {
         vlSelf->rv32e__DOT__wbu__DOT__regs[__Vi0] = VL_RAND_RESET_I(32);
     }
-    vlSelf->rv32e__DOT__wbu__DOT__flush = VL_RAND_RESET_I(1);
-    vlSelf->rv32e__DOT__wbu__DOT__i = VL_RAND_RESET_I(32);
-    vlSelf->rv32e__DOT__wbu__DOT__k = VL_RAND_RESET_I(32);
     vlSelf->__Vfunc_rv32e__DOT__ifu__DOT__pmem_read__1__Vfuncout = 0;
     vlSelf->__Vdly__rv32e__DOT__IF_ID_pc = VL_RAND_RESET_I(32);
     vlSelf->__Vdly__rv32e__DOT__ex_lsu_valid = VL_RAND_RESET_I(1);
@@ -906,18 +895,12 @@ VL_ATTR_COLD void Vrv32e___024root___ctor_var_reset(Vrv32e___024root* vlSelf) {
     vlSelf->__Vdly__rv32e__DOT__ex_lsu_rd = VL_RAND_RESET_I(5);
     vlSelf->__Vdly__rv32e__DOT__ex_lsu_RegWrite = VL_RAND_RESET_I(1);
     vlSelf->__Vdly__rv32e__DOT__ex_lsu_src2 = VL_RAND_RESET_I(32);
-    vlSelf->__Vdly__rv32e__DOT__ex_lsu_pc = VL_RAND_RESET_I(32);
-    vlSelf->__Vdly__rv32e__DOT__ex_lsu_inst = VL_RAND_RESET_I(32);
     vlSelf->__Vdly__rv32e__DOT__ex_lsu_process_result = VL_RAND_RESET_I(32);
     vlSelf->__Vdly__rv32e__DOT__ex_lsu_csr_wen2 = VL_RAND_RESET_I(1);
     vlSelf->__Vdly__rv32e__DOT__ex_lsu_csr_wr_addr1 = VL_RAND_RESET_I(12);
     vlSelf->__Vdly__rv32e__DOT__ex_lsu_csr_wr_addr2 = VL_RAND_RESET_I(12);
     vlSelf->__Vdly__rv32e__DOT__ex_lsu_csr_wr_data1 = VL_RAND_RESET_I(32);
     vlSelf->__Vdly__rv32e__DOT__ex_lsu_csr_wr_data2 = VL_RAND_RESET_I(32);
-    vlSelf->__Vdly__rv32e__DOT__ex_lsu_opcode = VL_RAND_RESET_I(7);
     vlSelf->__Vtrigrprev__TOP__clk = VL_RAND_RESET_I(1);
     vlSelf->__Vtrigrprev__TOP__reset = VL_RAND_RESET_I(1);
-    for (int __Vi0 = 0; __Vi0 < 6; ++__Vi0) {
-        vlSelf->__Vm_traceActivity[__Vi0] = 0;
-    }
 }

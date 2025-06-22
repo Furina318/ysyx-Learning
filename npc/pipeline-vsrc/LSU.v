@@ -165,7 +165,7 @@ module LSU (
                     $display("\033[32mError: Unsupported memory read length %b at address %h\033[0m", l_MemLen, addr);
                 end
             endcase
-            $display("read addr: %h, data: %h, MemLen: %b, opcode: %b", addr, read_lsu_data, l_MemLen, ex_lsu_opcode);
+            // $display("read addr: %h, data: %h, MemLen: %b, opcode: %b", addr, read_lsu_data, l_MemLen, ex_lsu_opcode);
         end
         // else if (LSU_MEM_read_valid & MEM_LSU_read_ready) begin
         //     LSU_MEM_read_valid <= 0;
@@ -199,7 +199,7 @@ module LSU (
                     $display("\033[32mError: Unsupported memory write length %b at address %h\033[0m", ex_lsu_MemLen, addr);
                 end
             endcase
-            $display("write addr: %h, data: %h, MemLen: %b, opcode: %b", addr, data_in, ex_lsu_MemLen, ex_lsu_opcode);
+            // $display("write addr: %h, data: %h, MemLen: %b, opcode: %b", addr, data_in, ex_lsu_MemLen, ex_lsu_opcode);
         end
         else begin
             write_valid <= 0;

@@ -22,10 +22,10 @@ extern word_t   reg_str2val(const char *s, bool *success);
 extern uint8_t* guest_to_host(paddr_t paddr);
 extern word_t   host_read(void *addr, int len);
 extern word_t   expr(char *e);
+extern void     display_iringbuf();
 extern "C" void     pmem_write(paddr_t waddr,word_t wdata,int len);
 extern "C" word_t   pmem_read(paddr_t raddr,int len);
 extern void die();
-extern void display_iringbuf();
 // extern NPCState npc_state;
 /*********************************************/
 
@@ -99,7 +99,8 @@ static int cmd_info(char *args){
 //           wp->NO, wp->expr ? wp->expr : "N/A", wp->old_val);
 //         wp=wp->next;
 //      }
-//    }else printf("Invalid operation,please specify 'r' or 'w'.\n");
+//    }
+    else printf("Invalid operation, please specify 'r'.\n");
   }else printf("No argument provided. Please specify 'r'.\n");
   return 0;
 }
@@ -214,7 +215,6 @@ static int cmd_itrace(char *args) {
   IFNDEF(CONFIG_ITRACE, printf("Instruction trace not enabled.\n"));
   return 0;
 }
-
 static int cmd_help(char *args);
 
 static struct {

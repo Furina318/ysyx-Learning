@@ -335,23 +335,17 @@ module rv32e (
     // EBREAK 处理
     always @(*) begin
         if (ex_lsu_inst == 32'h00100073) begin
+            // $display("*-------------------*---------------------*---------------------*");
+            // $display("| Total predictions | Correct predictions | Prediction accuracy |");
+            // $display("| %10d        | %10d          | %10.2f%%         |", 
+            //         total_predictions, correct_predictions, 
+            //         (total_predictions == 0) ? 0.0 : (real'(correct_predictions) / real'(total_predictions) * 100.0));
+            // $display("*-------------------*---------------------*---------------------*");
             ebreak(`HIT_TRAP, ex_lsu_inst);
-            // $display("Count = %d", flush_counter);
         end
-        if(ex_flush) begin
-            $display("       [EX] flush pc = %h", ex_flush_pc);
-        end
+        // if(ex_flush) begin
+        //     $display("       [EX] flush pc = %h", ex_flush_pc);
+        // end
     end
-
-    // reg [31:0] flush_counter;
-    // initial begin
-    //         flush_counter = 0;
-    // end
-    // always @(posedge clk) begin    
-    //     if(ex_flush_pc == 32'h8000_0010) begin
-    //         flush_counter = flush_counter + 1;
-            
-    //     end
-    // end
 
 endmodule

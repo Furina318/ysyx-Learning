@@ -343,8 +343,8 @@ assign ALU_num2_shift = {27'b0,exu_num2[4:0]};
 //assign ALU_num1_signed = $signed(exu_num1);
 assign ALU_out_shift = IDU_EXU_logic ? (IDU_EXU_left ? (exu_num1 << ALU_num2_shift) : (exu_num1 >> ALU_num2_shift)) : (IDU_EXU_left ? (exu_num1 << ALU_num2_shift) : (exu_num1 >>> ALU_num2_shift));
 
-aways @(*) begin
-    progress_result2 = exu_num3 + exu_num4; // 计算跳转地址
+always @(*) begin
+    process_result2 = exu_num3 + exu_num4; // 计算跳转地址
 end
 
 reg [31:0] csr_write_ecall;

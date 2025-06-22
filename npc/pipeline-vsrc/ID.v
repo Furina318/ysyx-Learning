@@ -81,21 +81,44 @@ module ID (
                 (opcode == `INST_CSR && (func3 == `F3_CSRRCI || func3 == `F3_CSRRSI || func3 == `F3_CSRRWI)) ? immCSR : 32'h0;
 
     wire [3:0] alu_op;
-    assign alu_op = (get_opcode == `INST_TYPE_R && (func3 == 3'b000 && func7[5])) ? `ALU_SUB :
-                    (get_opcode == `INST_TYPE_B && (func3 == `F3_BEQ || func3 == `F3_BNE)) ? `ALU_SUB :
-                    ((get_opcode == `INST_TYPE_R || get_opcode == `INST_TYPE_I) && (func3 == `F3_ORI)) ? `ALU_OR :
-                    ((get_opcode == `INST_TYPE_R || get_opcode == `INST_TYPE_I) && (func3 == `F3_XORI)) ? `ALU_XOR :
-                    ((get_opcode == `INST_TYPE_R || get_opcode == `INST_TYPE_I) && (func3 == `F3_ANDI)) ? `ALU_AND :
-                    (get_opcode == `INST_TYPE_R && (func3 == `F3_SLTU && func7 == 7'b0000_000)) ? `ALU_SLTU :
-                    ((get_opcode == `INST_TYPE_I || get_opcode == `INST_TYPE_B) && func3 == `F3_SLTU) ? `ALU_SLTU :
-                    (get_opcode == `INST_TYPE_B && func3 == `F3_BGEU) ? `ALU_SLTU :
-                    ((get_opcode == `INST_TYPE_R || get_opcode == `INST_TYPE_I) && (func3 == `F3_RSH && func7 == 7'b0000_000)) ? `ALU_SRL :
-                    ((get_opcode == `INST_TYPE_R || get_opcode == `INST_TYPE_I) && (func3 == `F3_RSH && func7 == 7'b0100_000)) ? `ALU_SRA :
-                    ((get_opcode == `INST_TYPE_R || get_opcode == `INST_TYPE_I) && (func3 == `F3_LSH && func7 == 7'b0000_000)) ? `ALU_SLL :
-                    ((get_opcode == `INST_TYPE_R || get_opcode == `INST_TYPE_I) && (func3 == `F3_SLT && func7 == 7'b0000_000)) ? `ALU_SLT :
-                    (get_opcode == `INST_TYPE_B && (func3 == `F3_BGE || func3 ==  `F3_BLT)) ? `ALU_SLT : `ALU_ADD;
+    // assign alu_op = (get_opcode == `INST_TYPE_R && (func3 == 3'b000 && func7[5])) ? `ALU_SUB :
+    //                 (get_opcode == `INST_TYPE_B && (func3 == `F3_BEQ || func3 == `F3_BNE)) ? `ALU_SUB :
+    //                 ((get_opcode == `INST_TYPE_R || get_opcode == `INST_TYPE_I) && (func3 == `F3_ORI)) ? `ALU_OR :
+    //                 ((get_opcode == `INST_TYPE_R || get_opcode == `INST_TYPE_I) && (func3 == `F3_XORI)) ? `ALU_XOR :
+    //                 ((get_opcode == `INST_TYPE_R || get_opcode == `INST_TYPE_I) && (func3 == `F3_ANDI)) ? `ALU_AND :
+    //                 (get_opcode == `INST_TYPE_R && (func3 == `F3_SLTU && func7 == 7'b0000_000)) ? `ALU_SLTU :
+    //                 ((get_opcode == `INST_TYPE_I || get_opcode == `INST_TYPE_B) && func3 == `F3_SLTU) ? `ALU_SLTU :
+    //                 (get_opcode == `INST_TYPE_B && func3 == `F3_BGEU) ? `ALU_SLTU :
+    //                 ((get_opcode == `INST_TYPE_R || get_opcode == `INST_TYPE_I) && (func3 == `F3_RSH && func7 == 7'b0000_000)) ? `ALU_SRL :
+    //                 ((get_opcode == `INST_TYPE_R || get_opcode == `INST_TYPE_I) && (func3 == `F3_RSH && func7 == 7'b0100_000)) ? `ALU_SRA :
+    //                 ((get_opcode == `INST_TYPE_R || get_opcode == `INST_TYPE_I) && (func3 == `F3_LSH && func7 == 7'b0000_000)) ? `ALU_SLL :
+    //                 ((get_opcode == `INST_TYPE_R || get_opcode == `INST_TYPE_I) && (func3 == `F3_SLT && func7 == 7'b0000_000)) ? `ALU_SLT :
+    //                 (get_opcode == `INST_TYPE_B && (func3 == `F3_BGE || func3 ==  `F3_BLT)) ? `ALU_SLT : 
+    //                 (get_opcode == `INST_TYPE_I && (func3 == `F3_ADDI)) ? `ALU_ADD :
+    //                 (get_opcode == `INST_TYPE_I && (func3 == `F3_SLTI)) ? `ALU_SLT : 
+    //                 (get_opcode == `INST_TYPE_R && func3 == 3'b000 && !func7[5]) ? `ALU_ADD :
+    //                 (get_opcode == `INST_TYPE_L || get_opcode == `INST_TYPE_AUIPC) ? `ALU_ADD : `ALU_ADD;
 
-    wire MemRead = (get_opcode == `INST_TYPE_L);
+    assign alu_op = (get_opcode == `INST_TYPE_R && func3 == 3'b000 && func7[5]) ? `ALU_SUB :
+                 (get_opcode == `INST_TYPE_R && func3 == 3'b000 && !func7[5]) ? `ALU_ADD :
+                 (get_opcode == `INST_TYPE_I && func3 == `F3_ADDI) ? `ALU_ADD :
+                 (get_opcode == `INST_TYPE_I && func3 == `F3_SLTI) ? `ALU_SLT :
+                 (get_opcode == `INST_TYPE_B && (func3 == `F3_BEQ || func3 == `F3_BNE)) ? `ALU_SUB :
+                 (get_opcode == `INST_TYPE_B && (func3 == `F3_BLT || func3 == `F3_BGE)) ? `ALU_SLT :
+                 (get_opcode == `INST_TYPE_B && (func3 == `F3_BLTU || func3 == `F3_BGEU)) ? `ALU_SLTU :
+                 ((get_opcode == `INST_TYPE_R || get_opcode == `INST_TYPE_I) && func3 == `F3_ORI) ? `ALU_OR :
+                 ((get_opcode == `INST_TYPE_R || get_opcode == `INST_TYPE_I) && func3 == `F3_XORI) ? `ALU_XOR :
+                 ((get_opcode == `INST_TYPE_R || get_opcode == `INST_TYPE_I) && func3 == `F3_ANDI) ? `ALU_AND :
+                 (get_opcode == `INST_TYPE_R && func3 == `F3_SLTU && func7 == 7'b0000000) ? `ALU_SLTU :
+                 (get_opcode == `INST_TYPE_I && func3 == `F3_SLTU) ? `ALU_SLTU :
+                 ((get_opcode == `INST_TYPE_R || get_opcode == `INST_TYPE_I) && func3 == `F3_RSH && func7 == 7'b0000000) ? `ALU_SRL :
+                 ((get_opcode == `INST_TYPE_R || get_opcode == `INST_TYPE_I) && func3 == `F3_RSH && func7 == 7'b0100000) ? `ALU_SRA :
+                 ((get_opcode == `INST_TYPE_R || get_opcode == `INST_TYPE_I) && func3 == `F3_LSH && func7 == 7'b0000000) ? `ALU_SLL :
+                 ((get_opcode == `INST_TYPE_R || get_opcode == `INST_TYPE_I) && func3 == `F3_SLT && func7 == 7'b0000000) ? `ALU_SLT :
+                 (get_opcode == `INST_TYPE_L || get_opcode == `INST_TYPE_AUIPC) ? `ALU_ADD : `ALU_ADD;
+
+    wire MemRead = (get_opcode == `INST_TYPE_L) &&
+                    ((func3 == `F3_LW) || (func3 == `F3_LH) || (func3 == `F3_LB) || (func3 == `F3_LHU) || (func3 == `F3_LBU));
     wire MemWrite = (get_opcode == `INST_TYPE_S);
 
     wire [2:0] MemLen;
@@ -121,11 +144,16 @@ module ID (
     wire csrrwi    = csr && (func3 == `F3_CSRRWI);
     wire csrrsi    = csr && (func3 == `F3_CSRRSI);
     wire csrrci    = csr && (func3 == `F3_CSRRCI);
-    wire [11:0] csr_wr_addr1 = csr_ecall ? 12'h342 : (csr_mret ? 12'h300 : (csr ? instr[31:20] : 12'b0));
-    wire [11:0] csr_wr_addr2 = csr_ecall ? 12'h341 : 12'b0;
-    wire [11:0] csr_rd_addr1 = csr_mret ? 12'h300 : (csr_ecall ? 12'h305 : (csr ? instr[31:20] : 12'b0));
-    wire [11:0] csr_rd_addr2 = csr_mret ? 12'h341 : 12'b0;
+    wire [11:0] csr_wr_addr1 = csr_ecall ? `MCAUSE : (csr_mret ? `MSTATUS : (csr ? instr[31:20] : 12'b0));
+    wire [11:0] csr_wr_addr2 = csr_ecall ? `MEPC : 12'b0;
+    wire [11:0] csr_rd_addr1 = csr_mret ? `MSTATUS : (csr_ecall ? `MTVEC : (csr ? instr[31:20] : 12'b0));
+    wire [11:0] csr_rd_addr2 = csr_mret ? `MEPC : 12'b0;
 
+    // wire [1:0] csr_op = (csr && ((func3 == `F3_CSRRW) || (func3 == `F3_CSRRWI))) ? `CSR_CSRRW :
+    //                     (csr && ((func3 == `F3_CSRRS) || (func3 == `F3_CSRRSI))) ? `CSR_CSRRS :
+    //                     (csr && ((func3 == `F3_CSRRC) || (func3 == `F3_CSRRCI))) ? `CSR_CSRRC : `CSR_NONE;
+
+    // wire csr_rd_en = csr && !csr_ecall && !csr_mret;
     wire rd_en = (get_opcode == `INST_TYPE_LUI || get_opcode == `INST_TYPE_AUIPC || get_opcode == `INST_TYPE_L ||
                     get_opcode == `INST_TYPE_JAL || get_opcode == `INST_TYPE_JALR || get_opcode == `INST_TYPE_R ||
                     get_opcode == `INST_TYPE_I || csr_rd_en);

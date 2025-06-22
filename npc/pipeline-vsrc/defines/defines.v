@@ -91,3 +91,8 @@
 `define CSR_CSRRS 2'b10
 `define CSR_CSRRC 2'b11
 `define CSR_NONE  2'b00
+
+`define MSTATUS 12'h300
+`define MTVEC   12'h305
+`define MEPC    12'h341
+`define MCAUSE  12'h342
