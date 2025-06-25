@@ -40,12 +40,7 @@ class Vrv32e___024root final : public VerilatedModule {
         CData/*0:0*/ rv32e__DOT__id_ex_csr_wen2;
         CData/*0:0*/ rv32e__DOT__id_ex_csr_ecall;
         CData/*0:0*/ rv32e__DOT__id_ex_csr_mret;
-        CData/*0:0*/ rv32e__DOT__id_ex_csrrw;
-        CData/*0:0*/ rv32e__DOT__id_ex_csrrs;
-        CData/*0:0*/ rv32e__DOT__id_ex_csrrc;
-        CData/*0:0*/ rv32e__DOT__id_ex_csrrwi;
-        CData/*0:0*/ rv32e__DOT__id_ex_csrrsi;
-        CData/*0:0*/ rv32e__DOT__id_ex_csrrci;
+        CData/*1:0*/ rv32e__DOT__id_ex_csr_op;
         CData/*0:0*/ rv32e__DOT__ex_lsu_valid;
         CData/*0:0*/ rv32e__DOT__lsu_ex_ready;
         CData/*0:0*/ rv32e__DOT__ex_lsu_RegWrite;
@@ -79,13 +74,13 @@ class Vrv32e___024root final : public VerilatedModule {
         CData/*0:0*/ rv32e__DOT__exu__DOT__ex_flush_condition;
         CData/*3:0*/ rv32e__DOT__exu__DOT__load_use_flag;
         CData/*0:0*/ rv32e__DOT__exu__DOT____VdfgTmp_h0017749a__0;
-    };
-    struct {
         CData/*0:0*/ rv32e__DOT__exu__DOT____VdfgTmp_hadc13f7a__0;
         CData/*0:0*/ rv32e__DOT__exu__DOT____VdfgTmp_h804502ec__0;
         CData/*0:0*/ rv32e__DOT__exu__DOT____VdfgTmp_hc613623f__0;
         CData/*0:0*/ rv32e__DOT__exu__DOT____VdfgTmp_he5bf04e5__0;
         CData/*0:0*/ rv32e__DOT__exu__DOT____VdfgTmp_h69af1a50__0;
+    };
+    struct {
         CData/*0:0*/ rv32e__DOT__exu__DOT____VdfgTmp_h384f4e33__0;
         CData/*0:0*/ rv32e__DOT__exu__DOT____VdfgTmp_hb53dc38f__0;
         CData/*0:0*/ rv32e__DOT__lsu__DOT__l_load;
@@ -145,13 +140,13 @@ class Vrv32e___024root final : public VerilatedModule {
         IData/*31:0*/ __Vfunc_rv32e__DOT__ifu__DOT__pmem_read__1__Vfuncout;
         IData/*31:0*/ __Vdly__rv32e__DOT__IF_ID_pc;
         IData/*31:0*/ __Vdly__rv32e__DOT__ex_lsu_src2;
-    };
-    struct {
         IData/*31:0*/ __Vdly__rv32e__DOT__ex_lsu_process_result;
         IData/*31:0*/ __Vdly__rv32e__DOT__ex_lsu_csr_wr_data1;
         IData/*31:0*/ __Vdly__rv32e__DOT__ex_lsu_csr_wr_data2;
         IData/*31:0*/ __VstlIterCount;
         IData/*31:0*/ __VicoIterCount;
+    };
+    struct {
         IData/*31:0*/ __VactIterCount;
         VlUnpacked<IData/*31:0*/, 4096> rv32e__DOT__wbu__DOT__CSR;
         VlUnpacked<IData/*31:0*/, 32> rv32e__DOT__wbu__DOT__regs;

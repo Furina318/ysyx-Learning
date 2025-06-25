@@ -40,12 +40,13 @@ module ID (
     output reg        id_ex_csr_wen2,         // CSR写使能2
     output reg        id_ex_csr_ecall,        // ECALL信号
     output reg        id_ex_csr_mret,         // MRET信号
-    output reg        id_ex_csrrw,            // CSRRW指令信号
-    output reg        id_ex_csrrs,            // CSRRS指令信号
-    output reg        id_ex_csrrc,            // CSRRC指令信号
-    output reg        id_ex_csrrwi,           // CSRRWI指令信号
-    output reg        id_ex_csrrsi,           // CSRRSI指令信号
-    output reg        id_ex_csrrci,           // CSRRCI指令信号
+    // output reg        id_ex_csrrw,            // CSRRW指令信号
+    // output reg        id_ex_csrrs,            // CSRRS指令信号
+    // output reg        id_ex_csrrc,            // CSRRC指令信号
+    // output reg        id_ex_csrrwi,           // CSRRWI指令信号
+    // output reg        id_ex_csrrsi,           // CSRRSI指令信号
+    // output reg        id_ex_csrrci,           // CSRRCI指令信号
+    output reg [1:0]  id_ex_csr_op,
 
     output reg [11:0] id_ex_csr_wr_addr1,     // CSR写地址1
     output reg [11:0] id_ex_csr_wr_addr2,     // CSR写地址2
@@ -135,25 +136,25 @@ module ID (
 
     // CSR信号
     wire csr       = (opcode == `INST_CSR);
-    wire csr_rd_en = csr && !csr_ecall && !csr_mret;
+    // wire csr_rd_en = csr && !csr_ecall && !csr_mret;
     wire csr_ecall = csr && (instr == `INST_ECALL);
     wire csr_mret  = csr && (instr == `INST_MRET);
-    wire csrrw     = csr && (func3 == `F3_CSRRW);
-    wire csrrs     = csr && (func3 == `F3_CSRRS);
-    wire csrrc     = csr && (func3 == `F3_CSRRC);
-    wire csrrwi    = csr && (func3 == `F3_CSRRWI);
-    wire csrrsi    = csr && (func3 == `F3_CSRRSI);
-    wire csrrci    = csr && (func3 == `F3_CSRRCI);
+    // wire csrrw     = csr && (func3 == `F3_CSRRW);
+    // wire csrrs     = csr && (func3 == `F3_CSRRS);
+    // wire csrrc     = csr && (func3 == `F3_CSRRC);
+    // wire csrrwi    = csr && (func3 == `F3_CSRRWI);
+    // wire csrrsi    = csr && (func3 == `F3_CSRRSI);
+    // wire csrrci    = csr && (func3 == `F3_CSRRCI);
     wire [11:0] csr_wr_addr1 = csr_ecall ? `MCAUSE : (csr_mret ? `MSTATUS : (csr ? instr[31:20] : 12'b0));
     wire [11:0] csr_wr_addr2 = csr_ecall ? `MEPC : 12'b0;
     wire [11:0] csr_rd_addr1 = csr_mret ? `MSTATUS : (csr_ecall ? `MTVEC : (csr ? instr[31:20] : 12'b0));
     wire [11:0] csr_rd_addr2 = csr_mret ? `MEPC : 12'b0;
 
-    // wire [1:0] csr_op = (csr && ((func3 == `F3_CSRRW) || (func3 == `F3_CSRRWI))) ? `CSR_CSRRW :
-    //                     (csr && ((func3 == `F3_CSRRS) || (func3 == `F3_CSRRSI))) ? `CSR_CSRRS :
-    //                     (csr && ((func3 == `F3_CSRRC) || (func3 == `F3_CSRRCI))) ? `CSR_CSRRC : `CSR_NONE;
+    wire [1:0] csr_op = (csr && ((func3 == `F3_CSRRW) || (func3 == `F3_CSRRWI))) ? `CSR_CSRRW :
+                        (csr && ((func3 == `F3_CSRRS) || (func3 == `F3_CSRRSI))) ? `CSR_CSRRS :
+                        (csr && ((func3 == `F3_CSRRC) || (func3 == `F3_CSRRCI))) ? `CSR_CSRRC : `CSR_NONE;
 
-    // wire csr_rd_en = csr && !csr_ecall && !csr_mret;
+    wire csr_rd_en = csr && !csr_ecall && !csr_mret;
     wire rd_en = (get_opcode == `INST_TYPE_LUI || get_opcode == `INST_TYPE_AUIPC || get_opcode == `INST_TYPE_L ||
                     get_opcode == `INST_TYPE_JAL || get_opcode == `INST_TYPE_JALR || get_opcode == `INST_TYPE_R ||
                     get_opcode == `INST_TYPE_I || csr_rd_en);
@@ -201,12 +202,13 @@ module ID (
             id_ex_csr_wen2 <= 1'b0;
             id_ex_csr_ecall <= 1'b0;
             id_ex_csr_mret <= 1'b0;
-            id_ex_csrrw <= 1'b0;
-            id_ex_csrrs <= 1'b0;
-            id_ex_csrrc <= 1'b0;
-            id_ex_csrrwi <= 1'b0;
-            id_ex_csrrsi <= 1'b0;
-            id_ex_csrrci <= 1'b0;
+            // id_ex_csrrw <= 1'b0;
+            // id_ex_csrrs <= 1'b0;
+            // id_ex_csrrc <= 1'b0;
+            // id_ex_csrrwi <= 1'b0;
+            // id_ex_csrrsi <= 1'b0;
+            // id_ex_csrrci <= 1'b0;
+            id_ex_csr_op <= 2'b0;
             id_ex_csr_wr_addr1 <= 12'b0;
             id_ex_csr_wr_addr2 <= 12'b0;
             id_wb_csr_addr1 <= 12'b0;
@@ -238,12 +240,13 @@ module ID (
             id_ex_csr_wen2 <= csr_ecall;
             id_ex_csr_ecall <= csr_ecall;
             id_ex_csr_mret <= csr_mret;
-            id_ex_csrrw <= csrrw;
-            id_ex_csrrs <= csrrs;
-            id_ex_csrrc <= csrrc;
-            id_ex_csrrwi <= csrrwi;
-            id_ex_csrrsi <= csrrsi;
-            id_ex_csrrci <= csrrci;
+            // id_ex_csrrw <= csrrw;
+            // id_ex_csrrs <= csrrs;
+            // id_ex_csrrc <= csrrc;
+            // id_ex_csrrwi <= csrrwi;
+            // id_ex_csrrsi <= csrrsi;
+            // id_ex_csrrci <= csrrci;
+            id_ex_csr_op <= csr_op;
             id_ex_csr_wr_addr1 <= csr_wr_addr1;
             id_ex_csr_wr_addr2 <= csr_wr_addr2;
             id_wb_csr_addr1 <= csr_rd_addr1;

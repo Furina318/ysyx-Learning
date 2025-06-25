@@ -37,12 +37,13 @@ module rv32e (
     wire        id_ex_csr_wen2;   // ID 到 EX：CSR 写使能 2
     wire        id_ex_csr_ecall;  // ID 到 EX：ECALL 信号
     wire        id_ex_csr_mret;   // ID 到 EX：MRET 信号
-    wire        id_ex_csrrw;      // ID 到 EX：CSRRW 指令信号
-    wire        id_ex_csrrs;      // ID 到 EX：CSRRS 指令信号
-    wire        id_ex_csrrc;      // ID 到 EX：CSRRC 指令信号
-    wire        id_ex_csrrwi;     // ID 到 EX：CSRRWI 指令信号
-    wire        id_ex_csrrsi;     // ID 到 EX：CSRRSI 指令信号
-    wire        id_ex_csrrci;     // ID 到 EX：CSRRCI 指令信号
+    // wire        id_ex_csrrw;      // ID 到 EX：CSRRW 指令信号
+    // wire        id_ex_csrrs;      // ID 到 EX：CSRRS 指令信号
+    // wire        id_ex_csrrc;      // ID 到 EX：CSRRC 指令信号
+    // wire        id_ex_csrrwi;     // ID 到 EX：CSRRWI 指令信号
+    // wire        id_ex_csrrsi;     // ID 到 EX：CSRRSI 指令信号
+    // wire        id_ex_csrrci;     // ID 到 EX：CSRRCI 指令信号
+    wire [1:0]  id_ex_csr_op;
     wire [11:0] id_ex_csr_wr_addr1; // ID 到 EX：CSR 写地址 1
     wire [11:0] id_ex_csr_wr_addr2; // ID 到 EX：CSR 写地址 2
     wire [11:0] id_wb_csr_addr1;  // ID 到 WB：CSR 读地址 1
@@ -154,12 +155,13 @@ module rv32e (
         .id_ex_csr_wen2(id_ex_csr_wen2),
         .id_ex_csr_ecall(id_ex_csr_ecall),
         .id_ex_csr_mret(id_ex_csr_mret),
-        .id_ex_csrrw(id_ex_csrrw),
-        .id_ex_csrrs(id_ex_csrrs),
-        .id_ex_csrrc(id_ex_csrrc),
-        .id_ex_csrrwi(id_ex_csrrwi),
-        .id_ex_csrrsi(id_ex_csrrsi),
-        .id_ex_csrrci(id_ex_csrrci),
+        // .id_ex_csrrw(id_ex_csrrw),
+        // .id_ex_csrrs(id_ex_csrrs),
+        // .id_ex_csrrc(id_ex_csrrc),
+        // .id_ex_csrrwi(id_ex_csrrwi),
+        // .id_ex_csrrsi(id_ex_csrrsi),
+        // .id_ex_csrrci(id_ex_csrrci),
+        .id_ex_csr_op(id_ex_csr_op),
         .id_ex_csr_wr_addr1(id_ex_csr_wr_addr1),
         .id_ex_csr_wr_addr2(id_ex_csr_wr_addr2),
         .id_wb_csr_addr1(id_wb_csr_addr1),
@@ -211,12 +213,13 @@ module rv32e (
         .id_ex_csr_wr_addr2(id_ex_csr_wr_addr2),
         .id_ex_csr_ecall(id_ex_csr_ecall),
         .id_ex_csr_mret(id_ex_csr_mret),
-        .id_ex_csrrw(id_ex_csrrw),
-        .id_ex_csrrs(id_ex_csrrs),
-        .id_ex_csrrc(id_ex_csrrc),
-        .id_ex_csrrwi(id_ex_csrrwi),
-        .id_ex_csrrsi(id_ex_csrrsi),
-        .id_ex_csrrci(id_ex_csrrci),
+        // .id_ex_csrrw(id_ex_csrrw),
+        // .id_ex_csrrs(id_ex_csrrs),
+        // .id_ex_csrrc(id_ex_csrrc),
+        // .id_ex_csrrwi(id_ex_csrrwi),
+        // .id_ex_csrrsi(id_ex_csrrsi),
+        // .id_ex_csrrci(id_ex_csrrci),
+        .id_ex_csr_op(id_ex_csr_op),
         .ex_flush(ex_flush),
         .ex_flush_pc(ex_flush_pc),
         .ex_lsu_inst(ex_lsu_inst),

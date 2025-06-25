@@ -797,12 +797,7 @@ VL_ATTR_COLD void Vrv32e___024root___ctor_var_reset(Vrv32e___024root* vlSelf) {
     vlSelf->rv32e__DOT__id_ex_csr_wen2 = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__id_ex_csr_ecall = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__id_ex_csr_mret = VL_RAND_RESET_I(1);
-    vlSelf->rv32e__DOT__id_ex_csrrw = VL_RAND_RESET_I(1);
-    vlSelf->rv32e__DOT__id_ex_csrrs = VL_RAND_RESET_I(1);
-    vlSelf->rv32e__DOT__id_ex_csrrc = VL_RAND_RESET_I(1);
-    vlSelf->rv32e__DOT__id_ex_csrrwi = VL_RAND_RESET_I(1);
-    vlSelf->rv32e__DOT__id_ex_csrrsi = VL_RAND_RESET_I(1);
-    vlSelf->rv32e__DOT__id_ex_csrrci = VL_RAND_RESET_I(1);
+    vlSelf->rv32e__DOT__id_ex_csr_op = VL_RAND_RESET_I(2);
     vlSelf->rv32e__DOT__id_ex_csr_wr_addr1 = VL_RAND_RESET_I(12);
     vlSelf->rv32e__DOT__id_ex_csr_wr_addr2 = VL_RAND_RESET_I(12);
     vlSelf->rv32e__DOT__id_wb_csr_addr1 = VL_RAND_RESET_I(12);

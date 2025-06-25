@@ -50,12 +50,13 @@ module EX (
     input      [11:0] id_ex_csr_wr_addr2,
     input             id_ex_csr_ecall,
     input             id_ex_csr_mret,
-    input             id_ex_csrrw,
-    input             id_ex_csrrs,
-    input             id_ex_csrrc,
-    input             id_ex_csrrwi,
-    input             id_ex_csrrsi,
-    input             id_ex_csrrci,
+    // input             id_ex_csrrw,
+    // input             id_ex_csrrs,
+    // input             id_ex_csrrc,
+    // input             id_ex_csrrwi,
+    // input             id_ex_csrrsi,
+    // input             id_ex_csrrci,
+    input      [1:0]  id_ex_csr_op,
 
     output reg        ex_flush,
     output reg [31:0] ex_flush_pc,
@@ -235,34 +236,34 @@ module EX (
     assign mpie = (wb_ex_csr_num1 >> 7) & 32'h1;
     assign mstatus_t = (((wb_ex_csr_num1 & ~(32'h3 << 11)) & ~(32'h1 << 3)) | (mpie << 3)) | (32'h1 << 7);
 
-    reg [31:0] csr_write_wire;
+    reg [31:0] csr_write_data;
     always @(*) begin
-        if (id_ex_csrrw) begin
-            csr_write_wire = src1;
+        if (id_ex_csr_op == `CSR_CSRRW && id_ex_func3 == `F3_CSRRW) begin
+            csr_write_data = src1;
         end
-        else if (id_ex_csrrc) begin
-            csr_write_wire = (wb_ex_csr_num1 & ~src1);
+        else if (id_ex_csr_op == `CSR_CSRRC && id_ex_func3 == `F3_CSRRC) begin
+            csr_write_data = (wb_ex_csr_num1 & ~src1);
         end
-        else if (id_ex_csrrs) begin
-            csr_write_wire = (wb_ex_csr_num1 | src1);
+        else if (id_ex_csr_op == `CSR_CSRRS && id_ex_func3 == `F3_CSRRS) begin
+            csr_write_data = (wb_ex_csr_num1 | src1);
         end
-        else if (id_ex_csrrwi) begin
-            csr_write_wire = {27'b0,id_ex_zimm};
+        else if (id_ex_csr_op == `CSR_CSRRW && id_ex_func3 == `F3_CSRRWI) begin
+            csr_write_data = {27'b0,id_ex_zimm};
         end
-        else if (id_ex_csrrci) begin
-            csr_write_wire = wb_ex_csr_num1 & ~({27'b0,id_ex_zimm});
+        else if (id_ex_csr_op == `CSR_CSRRC && id_ex_func3 == `F3_CSRRCI) begin
+            csr_write_data = wb_ex_csr_num1 & ~({27'b0,id_ex_zimm});
         end
-        else if (id_ex_csrrsi) begin
-            csr_write_wire = wb_ex_csr_num1 | ({27'b0,id_ex_zimm});
+        else if (id_ex_csr_op == `CSR_CSRRS && id_ex_func3 == `F3_CSRRSI) begin
+            csr_write_data = wb_ex_csr_num1 | ({27'b0,id_ex_zimm});
         end
         else if (id_ex_csr_ecall) begin
-            csr_write_wire = 32'd11;
+            csr_write_data = 32'd11;
         end
         else if (id_ex_csr_mret) begin
-            csr_write_wire = mstatus_t;
+            csr_write_data = mstatus_t;
         end
         else begin
-            csr_write_wire = 32'b0;
+            csr_write_data = 32'b0;
         end
     end
 
@@ -349,7 +350,7 @@ module EX (
             ex_lsu_csr_wen2       <= id_ex_csr_wen2;
             ex_lsu_csr_wr_addr1   <= id_ex_csr_wr_addr1;
             ex_lsu_csr_wr_addr2   <= id_ex_csr_wr_addr2;
-            ex_lsu_csr_wr_data1   <= csr_write_wire;
+            ex_lsu_csr_wr_data1   <= csr_write_data;
             ex_lsu_csr_wr_data2   <= csr_write_ecall;
             ex_lsu_csr_rdata      <= wb_ex_csr_num1;
             ex_lsu_csr_ecall      <= id_ex_csr_ecall;
