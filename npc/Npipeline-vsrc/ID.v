@@ -1,12 +1,11 @@
 `timescale 1ns/1ns
-`include "/home/furina/ysyx-workbench/npc/pipeline-vsrc/defines/defines.v"
+`include "/home/furina/ysyx-workbench/npc/Npipeline-vsrc/defines/defines.v"
 module ID (
     input             clk,                    // 时钟信号
     input             reset,                  // 复位信号
     input      [31:0] if_id_pc,               // 从IFU传递的PC值
-    input      [31:0] if_id_pc2,              // 用于分支预测的PC值
     input      [31:0] if_id_inst,             // 从IFU传递的指令
-    input             ex_flush,               // 执行单元的冲刷信号
+    input             ex_flush,                // 执行单元的冲刷信号
 
     // 握手信号
     input             if_valid,                // IFU到ID的有效信号
@@ -15,7 +14,6 @@ module ID (
     output reg        id_valid,                // ID到EXU的有效信号
 
     output reg [31:0] id_ex_pc,               // 传递到EXU的PC值
-    output reg [31:0] id_ex_pc2,              // 用于分支预测的PC值
     output reg [31:0] id_ex_inst,             // 传递到EXU的指令
     output reg        id_ex_RegWrite,         // 寄存器写使能
     output reg [4:0]  id_ex_rd,               // 寄存器写地址
@@ -34,11 +32,8 @@ module ID (
 
     output reg        id_ex_jal,              // JAL跳转信号
     output reg        id_ex_jalr,             // JALR跳转信号
-
-    input             predict_taken,         // 分支预测输入
-    input      [31:0] predict_target,       // 预测目标地址
-    output reg        id_ex_predict_taken,       // 分支预测输出
-    output reg [31:0] id_ex_predict_target,       // 分支预测实际目标地址
+    // input             predict_taken,         // 分支预测输入
+    // output reg        id_ex_predict_taken,       // 分支预测输出
 
     output reg        id_ex_csr,              // CSR指令信号
     output reg        id_ex_csr_wen1,         // CSR写使能1
@@ -132,7 +127,6 @@ module ID (
     // wire jalr = (get_opcode == `INST_TYPE_JALR) & (func3 == 3'b000);
     wire jal = (opcode == `INST_JAL);
     wire jalr = (opcode == `INST_JALR) & (func3 == 3'b000);
-    wire is_branch = (get_opcode == `INST_TYPE_B);
 
     // CSR信号
     wire csr       = (opcode == `INST_CSR);
@@ -195,13 +189,18 @@ module ID (
             id_ex_csr_wen2 <= 1'b0;
             id_ex_csr_ecall <= 1'b0;
             id_ex_csr_mret <= 1'b0;
+            // id_ex_csrrw <= 1'b0;
+            // id_ex_csrrs <= 1'b0;
+            // id_ex_csrrc <= 1'b0;
+            // id_ex_csrrwi <= 1'b0;
+            // id_ex_csrrsi <= 1'b0;
+            // id_ex_csrrci <= 1'b0;
             id_ex_csr_op <= 2'b0;
             id_ex_csr_wr_addr1 <= 12'b0;
             id_ex_csr_wr_addr2 <= 12'b0;
             id_wb_csr_addr1 <= 12'b0;
             id_wb_csr_addr2 <= 12'b0;
-            id_ex_predict_taken <= 1'b0;
-            id_ex_predict_target <= 32'b0; // 分支预测实际目标地址
+            // id_ex_predict_taken <= 1'b0;
         end
         else if (if_valid && id_ready) begin
             id_ex_RegWrite <= rd_en;
@@ -213,7 +212,6 @@ module ID (
             id_ex_shamt <= shamt;
 
             id_ex_pc <= if_id_pc;
-            id_ex_pc2 <= if_id_pc2; // 用于分支预测
             id_ex_inst <= if_id_inst;
             id_ex_opcode <= opcode;
             id_ex_MemRead <= MemRead;
@@ -229,13 +227,18 @@ module ID (
             id_ex_csr_wen2 <= csr_ecall;
             id_ex_csr_ecall <= csr_ecall;
             id_ex_csr_mret <= csr_mret;
+            // id_ex_csrrw <= csrrw;
+            // id_ex_csrrs <= csrrs;
+            // id_ex_csrrc <= csrrc;
+            // id_ex_csrrwi <= csrrwi;
+            // id_ex_csrrsi <= csrrsi;
+            // id_ex_csrrci <= csrrci;
             id_ex_csr_op <= csr_op;
             id_ex_csr_wr_addr1 <= csr_wr_addr1;
             id_ex_csr_wr_addr2 <= csr_wr_addr2;
             id_wb_csr_addr1 <= csr_rd_addr1;
             id_wb_csr_addr2 <= csr_rd_addr2;
-            id_ex_predict_taken <= predict_taken & (is_branch || jalr || jal);
-            id_ex_predict_target <= predict_target; // 分支预测实际目标地址
+            // id_ex_predict_taken <= predict_taken;
         end
     end
 

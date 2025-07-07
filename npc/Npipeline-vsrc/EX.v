@@ -1,5 +1,5 @@
 `timescale 1ns/1ns
-`include "/home/furina/ysyx-workbench/npc/pipeline-vsrc/defines/defines.v"
+`include "/home/furina/ysyx-workbench/npc/Npipeline-vsrc/defines/defines.v"
 
 module EX (
     input             clk,
@@ -23,7 +23,6 @@ module EX (
 
     input      [31:0] id_ex_inst,
     input      [31:0] id_ex_pc,
-    input      [31:0] id_ex_pc2, // 用于分支预测的PC值
     input      [31:0] id_ex_imm,
     input      [4:0]  id_ex_zimm,
     input      [5:0]  id_ex_shamt,
@@ -79,15 +78,7 @@ module EX (
     output reg        ex_lsu_csr_mret,
 
     output reg [31:0] ex_lsu_imm,
-    output reg [31:0] ex_lsu_process_result,
-
-    input      [31:0] id_ex_predict_target, // 分支预测实际目标地址
-    input             id_ex_predict_taken, // 分支预测输入
-    output reg        ex_bpu_update,      // EX阶段更新信号
-    output reg [31:0] ex_bpu_pc,          // EX阶段分支
-    output reg        ex_bpu_taken,       // EX阶段实际跳转结果
-    output reg [31:0] ex_bpu_target,      // EX阶段实际目标
-    output reg        ex_bpu_correct     // EX阶段预测是否正确
+    output reg [31:0] ex_lsu_process_result
 );
     import "DPI-C" function void ebreak(input int station, input int inst);
     
@@ -173,7 +164,6 @@ module EX (
     reg [31:0] jalr_target;
     reg        take_branch;
     reg        ex_flush_condition;
-    reg [31:0] actual_target;
 
     always @(*) begin
         jal_target  = id_ex_pc + id_ex_imm;
@@ -186,46 +176,19 @@ module EX (
                     (id_ex_func3 == `F3_BLTU && alu_less) || // bltu
                     (id_ex_func3 == `F3_BGEU && !alu_less)   // bgeu
         );
-        // 默认赋值，防止latch
-        ex_flush        = 1'b0;
-        ex_flush_pc     = 32'h0;
-        ex_bpu_update   = 1'b0;
-        ex_bpu_pc       = 32'h0;
-        ex_bpu_taken    = 1'b0;
-        ex_bpu_target   = 32'h0;
-        ex_bpu_correct  = 1'b0;
-        actual_target   = 32'h0;
 
-        // if (id_ex_jal) begin
-        //     ex_flush = 1'b1 & ex_flush_condition & (~(|load_use_flag));
-        //     ex_flush_pc = jal_target;
-        // end
-        // else if (id_ex_jalr) begin
-        //     ex_flush = 1'b1 & ex_flush_condition & (~(|load_use_flag));
-        //     ex_flush_pc = jalr_target;
-        // end
         if (id_ex_jal) begin
-            ex_bpu_update  = 1'b1;
-            ex_bpu_pc      = id_ex_pc;
-            ex_bpu_taken   = 1'b1;
-            ex_bpu_target  = id_ex_pc + id_ex_imm;
-            ex_bpu_correct = (id_ex_predict_taken == 1'b1) && (id_ex_predict_target == (id_ex_pc + id_ex_imm));
-            ex_flush = !ex_bpu_correct & ex_flush_condition & (~(|load_use_flag));
-            ex_flush_pc = id_ex_pc + id_ex_imm;
+            ex_flush = 1'b1 & ex_flush_condition & (~(|load_use_flag));
+            ex_flush_pc = jal_target;
         end
         else if (id_ex_jalr) begin
-            ex_bpu_update  = 1'b1;
-            ex_bpu_pc      = id_ex_pc;
-            ex_bpu_taken   = 1'b1;
-            ex_bpu_target  = (src1 + id_ex_imm) & ~32'h1;
-            ex_bpu_correct = (id_ex_predict_taken == 1'b1) && (id_ex_predict_target == ((src1 + id_ex_imm) & ~32'h1));
-            ex_flush = !ex_bpu_correct & ex_flush_condition & (~(|load_use_flag));
-            ex_flush_pc = (src1 + id_ex_imm) & ~32'h1;
+            ex_flush = 1'b1 & ex_flush_condition & (~(|load_use_flag));
+            ex_flush_pc = jalr_target;
         end
-        // else if (take_branch) begin
-        //     ex_flush = 1'b1 & ex_flush_condition & (~(|load_use_flag));
-        //     ex_flush_pc = id_ex_pc + id_ex_imm;
-        // end
+        else if (take_branch) begin
+            ex_flush = 1'b1 & ex_flush_condition & (~(|load_use_flag));
+            ex_flush_pc = id_ex_pc + id_ex_imm;
+        end
         else if (id_ex_csr_ecall) begin
             ex_flush = 1'b1 & ex_flush_condition & (~(|load_use_flag));
             ex_flush_pc = wb_ex_csr_num1;
@@ -234,30 +197,8 @@ module EX (
             ex_flush = 1'b1 & ex_flush_condition & (~(|load_use_flag));
             ex_flush_pc = wb_ex_csr_num2;
         end
-        // else begin
-        //     ex_flush = 1'b0;
-        //     ex_flush_pc = 32'h0;
-        // end
-
-        else if(id_ex_opcode == `INST_B) begin
-            actual_target = take_branch ? (id_ex_pc + id_ex_imm) : id_ex_pc2;
-            ex_bpu_update = 1'b1; // 分支指令需要更新BPU
-            ex_bpu_pc = id_ex_pc;
-            ex_bpu_taken = take_branch;
-            ex_bpu_target = id_ex_pc + id_ex_imm;
-            ex_bpu_correct = (take_branch == id_ex_predict_taken) && (actual_target == id_ex_predict_target);
-            if(!ex_bpu_correct) begin
-                ex_flush = 1'b1 & ex_flush_condition & (~(|load_use_flag));
-                ex_flush_pc = take_branch ? ex_bpu_target : (id_ex_pc + 4);    
-            end
-        end
         else begin
-            ex_bpu_update = 1'b0; // 非分支指令不需要更新BPU
-            ex_bpu_pc = 32'h0;
-            ex_bpu_taken = 1'b0;
-            ex_bpu_target = 32'h0;
-            ex_bpu_correct = 1'b0;
-            ex_flush = 1'b0; // 非分支指令不需要冲刷
+            ex_flush = 1'b0;
             ex_flush_pc = 32'h0;
         end
     end

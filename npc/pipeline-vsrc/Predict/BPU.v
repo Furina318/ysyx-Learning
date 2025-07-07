@@ -1,117 +1,134 @@
 `timescale 1ns/1ns
-// `include "/home/furina/ysyx-workbench/npc/pipeline-vsrc/defines/defines.v"
 
 module BPU (
     input             clk,
     input             reset,
-    input      [31:0] if_pc,              // 当前取指PC
-    output reg        predict_taken,      // 预测是否跳转
-    output reg [31:0] predict_target,     // 预测目标地址
+    input      [31:0] if_pc,
+    output reg        predict_taken,
+    output reg [31:0] predict_target,
 
-    input             ex_bpu_update,      // EX阶段更新信号
-    input      [31:0] ex_bpu_pc,          // EX阶段分支指令的PC
-    input             ex_bpu_taken,       // EX阶段实际跳转结果
-    input      [31:0] ex_bpu_target,      // EX阶段实际目标地址
+    input             ex_bpu_update,
+    input      [31:0] ex_bpu_pc,
+    input             ex_bpu_taken,
+    input      [31:0] ex_bpu_target,
     input             ex_bpu_correct,
     output reg [31:0] correct_predictions,
     output reg [31:0] total_predictions
 );
-    // BHT配置
-    localparam BHT_INDEX_BITS = 10;       // BHT索引位数 (1024项)
-    localparam BHR_BITS = 10;             // BHR历史记录位数
-    
-    // PHT配置
-    localparam PHT_INDEX_BITS = 10;       // PHT索引位数 (1024项)
-    
-    // BHT表：存储分支历史寄存器(BHR)
-    reg [BHR_BITS-1:0] bht [0:(1<<BHT_INDEX_BITS)-1];
-    
-    // PHT表：存储饱和计数器
-    reg [1:0] pht [0:(1<<PHT_INDEX_BITS)-1];
-    
-    // BTB表：存储目标地址
+    localparam BHT_INDEX_BITS = 10;
+    localparam BHR_BITS = 10;
+    localparam PHT_INDEX_BITS = 10;
+
+    localparam RE_CPHT = 2'b01;
+    localparam RE_LOCAL = 2'b10;
+    localparam RE_GLOBAL = 2'b10;
+
+    reg [1:0] cpht [0:(1<<BHT_INDEX_BITS)-1];
+    reg [BHR_BITS-1:0] local_bht [0:(1<<BHT_INDEX_BITS)-1];
+    reg [1:0] local_pht [0:(1<<PHT_INDEX_BITS)-1];
+    reg [BHR_BITS-1:0] global_bhr;
+    reg [1:0] global_pht [0:(1<<PHT_INDEX_BITS)-1];
     reg [31:0] btb [0:(1<<BHT_INDEX_BITS)-1];
-    
-    // 初始化
+    reg valid [0:(1<<BHT_INDEX_BITS)-1];
+
     integer i;
     initial begin
         for (i = 0; i < (1<<BHT_INDEX_BITS); i = i + 1) begin
-            bht[i] = {BHR_BITS{1'b0}};    // 初始历史记录为0
-            pht[i] = 2'b10;               // 初始状态：弱跳转
-            btb[i] = 32'h8000_0004;       // 初始目标：复位地址+4
+            cpht[i] = RE_CPHT;
+            local_bht[i] = {BHR_BITS{1'b0}};
+            btb[i] = 32'h8000_0000 + (i << 2);
+            valid[i] = 1'b0;
         end
+        for (i = 0; i < (1<<PHT_INDEX_BITS); i = i + 1) begin
+            local_pht[i] = RE_LOCAL;
+            global_pht[i] = RE_GLOBAL;
+        end
+        global_bhr = 0;
+        correct_predictions = 0;
+        total_predictions = 0;
     end
 
     reg [BHT_INDEX_BITS-1:0] bht_index;
-    reg [BHR_BITS-1:0] bhr;
-    reg [PHT_INDEX_BITS-1:0] pht_index;
-    reg [1:0] sat_counter;
+    reg [PHT_INDEX_BITS-1:0] local_pht_index, global_pht_index;
+    reg local_predict, global_predict;
 
-    // 预测逻辑
     always @(*) begin
-        // BHT索引：PC的哈希处理
-        bht_index = if_pc[BHT_INDEX_BITS+1:2];    // 使用PC[11:2]
-        
-        // 获取BHR
-        bhr = bht[bht_index];
-        
-        // PHT索引：BHR与PC部分位的异或
-        pht_index = bhr ^ if_pc[PHT_INDEX_BITS+1:2];
-        
-        // 获取饱和计数器状态
-        sat_counter = pht[pht_index];
-        
-        // 预测跳转（高位为1）
-        predict_taken = sat_counter[1];
-        
-        // 预测目标地址
-        predict_target = btb[bht_index];
+        bht_index = if_pc[BHT_INDEX_BITS+1:2];
+        local_pht_index = local_bht[bht_index] ^ if_pc[PHT_INDEX_BITS+1:2];
+        global_pht_index = global_bhr ^ if_pc[PHT_INDEX_BITS+1:2];
+
+        local_predict = local_pht[local_pht_index][1];
+        global_predict = global_pht[global_pht_index][1];
+
+        if (cpht[bht_index] < 2'b10)
+            predict_taken = local_predict && valid[bht_index];
+        else
+            predict_taken = global_predict && valid[bht_index];
+
+        predict_target = valid[bht_index] ? btb[bht_index] : (if_pc + 4);
     end
 
     reg [BHT_INDEX_BITS-1:0] ex_bht_index;
-    reg [BHT_INDEX_BITS-1:0] ex_pht_index;
-    reg [BHR_BITS-1:0] current_bhr;
+    reg [PHT_INDEX_BITS-1:0] ex_local_pht_index, ex_global_pht_index;
+    reg local_correct, global_correct;
 
-    // 更新逻辑
     always @(posedge clk) begin
         if (reset) begin
-            // 复位初始化
             for (i = 0; i < (1<<BHT_INDEX_BITS); i = i + 1) begin
-                bht[i] = {BHR_BITS{1'b0}};
-                pht[i] = 2'b10;
-                btb[i] = 32'h8000_0004;
+                cpht[i] = RE_CPHT;
+                local_bht[i] = 0;
+                btb[i] = 32'h8000_0000 + (i << 2);
+                valid[i] = 1'b0;
             end
+            for (i = 0; i < (1<<PHT_INDEX_BITS); i = i + 1) begin
+                local_pht[i] = RE_LOCAL;
+                global_pht[i] = RE_GLOBAL;
+            end
+            global_bhr <= 0;
             correct_predictions <= 0;
             total_predictions <= 0;
         end
         else if (ex_bpu_update) begin
             total_predictions <= total_predictions + 1;
-            if(ex_bpu_update) correct_predictions <= correct_predictions + 1;
-            // 计算BHT索引
+            if (ex_bpu_correct)
+                correct_predictions <= correct_predictions + 1;
+
             ex_bht_index = ex_bpu_pc[BHT_INDEX_BITS+1:2];
-            
-            // 获取当前BHR
-            current_bhr = bht[ex_bht_index];
-            
-            // 计算PHT索引
-            ex_pht_index = current_bhr ^ ex_bpu_pc[PHT_INDEX_BITS+1:2];
-            
-            // 更新PHT（饱和计数器）
-            if (ex_bpu_taken) begin
-                if (pht[ex_pht_index] < 2'b11) 
-                    pht[ex_pht_index] <= pht[ex_pht_index] + 1;
-            end else begin
-                if (pht[ex_pht_index] > 2'b00) 
-                    pht[ex_pht_index] <= pht[ex_pht_index] - 1;
-            end
-            
-            // 更新BHR：移位新结果
-            bht[ex_bht_index] <= {current_bhr[BHR_BITS-2:0], ex_bpu_taken};
-            
-            // 更新BTB：仅当实际跳转时更新目标地址
+            ex_local_pht_index = local_bht[ex_bht_index] ^ ex_bpu_pc[PHT_INDEX_BITS+1:2];
+            ex_global_pht_index = global_bhr ^ ex_bpu_pc[PHT_INDEX_BITS+1:2];
+
+            local_correct = (local_pht[ex_local_pht_index][1] == ex_bpu_taken);
+            global_correct = (global_pht[ex_global_pht_index][1] == ex_bpu_taken);
+
+            // 替代 CPHT 更新策略：基于预测正确性而非失败计数
+            if (local_correct && !global_correct && cpht[ex_bht_index] > 2'b00)
+                cpht[ex_bht_index] <= cpht[ex_bht_index] - 1;
+            else if (!local_correct && global_correct && cpht[ex_bht_index] < 2'b11)
+                cpht[ex_bht_index] <= cpht[ex_bht_index] + 1;
+
+            // 更新局部预测器
+            if (ex_bpu_taken && local_pht[ex_local_pht_index] < 2'b11)
+                local_pht[ex_local_pht_index] <= local_pht[ex_local_pht_index] + 1;
+            else if (!ex_bpu_taken && local_pht[ex_local_pht_index] > 2'b00)
+                local_pht[ex_local_pht_index] <= local_pht[ex_local_pht_index] - 1;
+
+            local_bht[ex_bht_index] <= {local_bht[ex_bht_index][BHR_BITS-2:0], ex_bpu_taken};
+
+            // 更新全局预测器
+            if (ex_bpu_taken && global_pht[ex_global_pht_index] < 2'b11)
+                global_pht[ex_global_pht_index] <= global_pht[ex_global_pht_index] + 1;
+            else if (!ex_bpu_taken && global_pht[ex_global_pht_index] > 2'b00)
+                global_pht[ex_global_pht_index] <= global_pht[ex_global_pht_index] - 1;
+
+            global_bhr <= {global_bhr[BHR_BITS-2:0], ex_bpu_taken};
+
+            // 只在跳转时更新 BTB
             if (ex_bpu_taken) begin
                 btb[ex_bht_index] <= ex_bpu_target;
+                valid[ex_bht_index] <= 1'b1;
             end
+            // btb[ex_bht_index] <= ex_bpu_taken ? ex_bpu_target : (ex_bpu_pc + 4);
+            // valid[ex_bht_index] <= 1'b1;
         end
     end
 endmodule

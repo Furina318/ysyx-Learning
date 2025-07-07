@@ -1,5 +1,5 @@
 `timescale 1ns/1ns
-`include "/home/furina/ysyx-workbench/npc/pipeline-vsrc/defines/defines.v"
+`include "/home/furina/ysyx-workbench/npc/Npipeline-vsrc/defines/defines.v"
 
 module rv32e (
     input clk,
@@ -12,10 +12,8 @@ module rv32e (
     wire [31:0] IF_ID_inst;       // IF 到 ID：指令
     wire        IF_valid;         // IF 到 ID：有效信号
     wire        id_ready;         // ID 到 IF：就绪信号
-    wire [31:0] IF_ID_pc2;        // IF 到 ID：用于分支预测的 PC
 
     wire [31:0] id_ex_pc;         // ID 到 EX：程序计数器
-    wire [31:0] id_ex_pc2;      // ID 到 EX：用于分支预测的 PC
     wire [31:0] id_ex_inst;       // ID 到 EX：指令
     wire        id_valid;         // ID 到 EX：有效信号
     wire        ex_ready;         // EX 到 ID：就绪信号
@@ -104,18 +102,7 @@ module rv32e (
     wire        wen;              // 内存写使能
     wire [1:0]  mask;             // 内存写掩码
 
-    // BPU（分支预测单元）信号
-    wire        predict_taken;     // 分支预测是否跳转
-    wire [31:0] predict_target;    // 分支预测目标地址
-    wire        ex_bpu_update;    // EX 阶段更新信号
-    wire [31:0] ex_bpu_pc;         // EX 阶段分
-    wire        ex_bpu_taken;      // EX 阶段实际跳转结果
-    wire [31:0] ex_bpu_target;     // EX 阶段实际目标地址
-    wire        ex_bpu_correct;    // EX 阶段预测是否正确
-    wire [31:0] correct_predictions; // 正确预测计数
-    wire [31:0] total_predictions;   // 总预测计数
-    wire        id_ex_predict_taken; // ID 到 EX：预测是否跳转
-    wire [31:0] id_ex_predict_target; // ID 到 EX：预测实际目标地址
+    // 模块例化
 
     // IF（指令获取）模块
     IF ifu (
@@ -126,10 +113,7 @@ module rv32e (
         .ID_ready(id_ready),
         .IF_valid(IF_valid),
         .IF_ID_pc(IF_ID_pc),
-        .IF_ID_pc2(IF_ID_pc2), // 用于分支预测
-        .IF_ID_inst(IF_ID_inst),
-        .predict_taken(predict_taken), // 分支预测输入
-        .predict_target(predict_target) // 预测目标地址 
+        .IF_ID_inst(IF_ID_inst)
     );
 
     // ID（指令解码）模块
@@ -137,7 +121,6 @@ module rv32e (
         .clk(clk),
         .reset(reset),
         .if_id_pc(IF_ID_pc),
-        .if_id_pc2(IF_ID_pc2), // 用于分支预测
         .if_id_inst(IF_ID_inst),
         .ex_flush(ex_flush),
         .if_valid(IF_valid),
@@ -145,7 +128,6 @@ module rv32e (
         .ex_ready(ex_ready),
         .id_valid(id_valid),
         .id_ex_pc(id_ex_pc),
-        .id_ex_pc2(id_ex_pc2), // 用于分支预测
         .id_ex_inst(id_ex_inst),
         .id_ex_RegWrite(id_ex_RegWrite),
         .id_ex_rd(id_ex_rd),
@@ -171,11 +153,7 @@ module rv32e (
         .id_ex_csr_wr_addr1(id_ex_csr_wr_addr1),
         .id_ex_csr_wr_addr2(id_ex_csr_wr_addr2),
         .id_wb_csr_addr1(id_wb_csr_addr1),
-        .id_wb_csr_addr2(id_wb_csr_addr2),
-        .predict_taken(predict_taken), // 分支预测输入
-        .predict_target(predict_target), // 预测目标地址
-        .id_ex_predict_target(id_ex_predict_target), // ID 到 EX：预测实际目标地址
-        .id_ex_predict_taken(id_ex_predict_taken) // ID 到 EX：预测是否跳转
+        .id_wb_csr_addr2(id_wb_csr_addr2)
     );
 
     // EX（执行）模块
@@ -199,7 +177,6 @@ module rv32e (
         .ex_lsu_forward_las(ex_lsu_forward_las),
         .id_ex_inst(id_ex_inst),
         .id_ex_pc(id_ex_pc),
-        .id_ex_pc2(id_ex_pc2), // 用于分支预测
         .id_ex_imm(id_ex_imm),
         .id_ex_zimm(id_ex_zimm),
         .id_ex_shamt(id_ex_shamt),
@@ -247,14 +224,7 @@ module rv32e (
         .ex_lsu_csr_ecall(ex_lsu_csr_ecall),
         .ex_lsu_csr_mret(ex_lsu_csr_mret),
         .ex_lsu_imm(ex_lsu_imm),
-        .ex_lsu_process_result(ex_lsu_process_result),
-        .id_ex_predict_taken(id_ex_predict_taken), // ID 到 EX：预测是否跳转
-        .id_ex_predict_target(id_ex_predict_target), // ID 到 EX：预测实际目标地址
-        .ex_bpu_update(ex_bpu_update), // EX 阶段更新信号
-        .ex_bpu_pc(ex_bpu_pc),         // EX 阶段分支
-        .ex_bpu_taken(ex_bpu_taken),   // EX 阶段实际跳转结果
-        .ex_bpu_target(ex_bpu_target), // EX 阶段实际目标地址
-        .ex_bpu_correct(ex_bpu_correct) // EX 阶段预测是否正确
+        .ex_lsu_process_result(ex_lsu_process_result)
     );
 
     // wire        MEM_LSU_write_ready;
@@ -336,21 +306,8 @@ module rv32e (
         .rdata_csr1(wb_ex_csr_num1),
         .rdata_csr2(wb_ex_csr_num2)
     );
-    
-    BPU bpu (
-        .clk(clk),
-        .reset(reset),
-        .if_pc(IF_ID_pc),              // 当前取指PC
-        .predict_taken(predict_taken), // 预测是否跳转
-        .predict_target(predict_target), // 预测目标地址
-        .ex_bpu_update(ex_bpu_update), // EX 阶段更新信号
-        .ex_bpu_pc(ex_bpu_pc),         // EX 阶段分支指令的PC
-        .ex_bpu_taken(ex_bpu_taken),   // EX 阶段实际跳转结果
-        .ex_bpu_target(ex_bpu_target), // EX 阶段实际目标地址
-        .ex_bpu_correct(ex_bpu_correct), // EX 阶段预测是否正确
-        .correct_predictions(correct_predictions), // 正确预测计数
-        .total_predictions(total_predictions) // 总预测计数
-    );
+    // assign MEM_LSU_write_ready = 1;
+    // assign MEM_LSU_read_ready = 1;
     // 内存接口赋值
     assign addr = ex_lsu_process_result; // 从 EX 传入的内存地址
     assign wdata = ex_lsu_src2;          // 从 EX 传入的内存写数据
@@ -361,21 +318,19 @@ module rv32e (
                   2'b00;                      // 默认
 
     // EBREAK 处理
-    always @(posedge clk) begin
+    always @(*) begin
         if (IF_ID_inst == 32'h00100073) begin
-            $display("+-------------------+---------------------+---------------------+");
-            $display("| Total predictions | Correct predictions | Prediction accuracy |");
-            $display("| %10d        | %10d          | %10.2f%%         |", 
-                    total_predictions, correct_predictions, 
-                    (total_predictions == 0) ? 0.0 : (real'(correct_predictions) / real'(total_predictions) * 100.0));
-            $display("+-------------------+---------------------+---------------------+");
+            // $display("*-------------------*---------------------*---------------------*");
+            // $display("| Total predictions | Correct predictions | Prediction accuracy |");
+            // $display("| %10d        | %10d          | %10.2f%%         |", 
+            //         total_predictions, correct_predictions, 
+            //         (total_predictions == 0) ? 0.0 : (real'(correct_predictions) / real'(total_predictions) * 100.0));
+            // $display("*-------------------*---------------------*---------------------*");
             ebreak(`HIT_TRAP, ex_lsu_inst);
         end
         // if(ex_flush) begin
         //     $display("       [EX] flush pc = %h", ex_flush_pc);
         // end
-
-        // $display("[IF] pc = %h, inst = %h", IF_ID_pc, IF_ID_inst);
     end
 
 endmodule

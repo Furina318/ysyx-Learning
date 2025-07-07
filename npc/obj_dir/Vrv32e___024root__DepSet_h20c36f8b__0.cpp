@@ -141,6 +141,10 @@ VL_INLINE_OPT void Vrv32e___024root___ico_sequent__TOP__0(Vrv32e___024root* vlSe
                                                       & (vlSelf->rv32e__DOT__IF_ID_inst 
                                                          >> 0xfU))
                                                       : 0U)))))));
+    vlSelf->rv32e__DOT__idu__DOT__jalr = (IData)((0x67U 
+                                                  == 
+                                                  (0x707fU 
+                                                   & vlSelf->rv32e__DOT__IF_ID_inst)));
     vlSelf->rv32e__DOT__idu__DOT__csr_ecall = (IData)(
                                                       (0x73U 
                                                        == vlSelf->rv32e__DOT__IF_ID_inst));
@@ -322,213 +326,12 @@ void Vrv32e___024root___eval_act(Vrv32e___024root* vlSelf) {
 }
 
 void Vrv32e___024root____Vdpiimwrap_rv32e__DOT__ebreak_TOP(IData/*31:0*/ station, IData/*31:0*/ inst);
+void Vrv32e___024root____Vdpiimwrap_rv32e__DOT__lsu__DOT__pmem_write_TOP(IData/*31:0*/ waddr, IData/*31:0*/ wdata, IData/*31:0*/ len);
 
 VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__0(Vrv32e___024root* vlSelf) {
     if (false && vlSelf) {}  // Prevent unused
     Vrv32e__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vrv32e___024root___nba_sequent__TOP__0\n"); );
-    // Init
-    CData/*0:0*/ __Vdly__rv32e__DOT__ifu__DOT__check;
-    __Vdly__rv32e__DOT__ifu__DOT__check = 0;
-    // Body
-    vlSelf->__Vdly__rv32e__DOT__ex_lsu_src2 = vlSelf->rv32e__DOT__ex_lsu_src2;
-    vlSelf->__Vdly__rv32e__DOT__ex_lsu_csr_wr_addr2 
-        = vlSelf->rv32e__DOT__ex_lsu_csr_wr_addr2;
-    vlSelf->__Vdly__rv32e__DOT__ex_lsu_csr_wen2 = vlSelf->rv32e__DOT__ex_lsu_csr_wen2;
-    vlSelf->__Vdly__rv32e__DOT__ex_lsu_csr_wr_addr1 
-        = vlSelf->rv32e__DOT__ex_lsu_csr_wr_addr1;
-    vlSelf->__Vdly__rv32e__DOT__ex_lsu_csr_wen1 = vlSelf->rv32e__DOT__ex_lsu_csr_wen1;
-    vlSelf->__Vdly__rv32e__DOT__ex_lsu_MemLen = vlSelf->rv32e__DOT__ex_lsu_MemLen;
-    __Vdly__rv32e__DOT__ifu__DOT__check = vlSelf->rv32e__DOT__ifu__DOT__check;
-    vlSelf->__Vdly__rv32e__DOT__IF_ID_pc = vlSelf->rv32e__DOT__IF_ID_pc;
-    vlSelf->__Vdly__rv32e__DOT__ex_lsu_MemWrite = vlSelf->rv32e__DOT__ex_lsu_MemWrite;
-    vlSelf->__Vdly__rv32e__DOT__ex_lsu_process_result 
-        = vlSelf->rv32e__DOT__ex_lsu_process_result;
-    vlSelf->__Vdly__rv32e__DOT__ex_lsu_csr_wr_data2 
-        = vlSelf->rv32e__DOT__ex_lsu_csr_wr_data2;
-    vlSelf->__Vdly__rv32e__DOT__ex_lsu_MemRead = vlSelf->rv32e__DOT__ex_lsu_MemRead;
-    vlSelf->__Vdly__rv32e__DOT__ex_lsu_RegWrite = vlSelf->rv32e__DOT__ex_lsu_RegWrite;
-    vlSelf->__Vdly__rv32e__DOT__ex_lsu_csr_wr_data1 
-        = vlSelf->rv32e__DOT__ex_lsu_csr_wr_data1;
-    vlSelf->__Vdly__rv32e__DOT__ex_lsu_valid = vlSelf->rv32e__DOT__ex_lsu_valid;
-    vlSelf->__Vdly__rv32e__DOT__ex_lsu_rd = vlSelf->rv32e__DOT__ex_lsu_rd;
-    if (vlSelf->reset) {
-        vlSelf->rv32e__DOT__ex_lsu_csr_rdata = 0U;
-        vlSelf->__Vdly__rv32e__DOT__ex_lsu_src2 = 0U;
-        vlSelf->__Vdly__rv32e__DOT__ex_lsu_csr_wr_addr2 = 0U;
-        vlSelf->__Vdly__rv32e__DOT__ex_lsu_csr_wr_addr1 = 0U;
-        vlSelf->rv32e__DOT__ex_lsu_inst = 0U;
-        vlSelf->__Vdly__rv32e__DOT__ex_lsu_MemLen = 0U;
-        vlSelf->__Vdly__rv32e__DOT__IF_ID_pc = 0x80000000U;
-        __Vdly__rv32e__DOT__ifu__DOT__check = 1U;
-        vlSelf->__Vdly__rv32e__DOT__ex_lsu_process_result = 0U;
-        vlSelf->__Vdly__rv32e__DOT__ex_lsu_csr_wr_data2 = 0U;
-        vlSelf->__Vdly__rv32e__DOT__ex_lsu_csr_wr_data1 = 0U;
-        vlSelf->__Vdly__rv32e__DOT__ex_lsu_valid = 0U;
-        vlSelf->__Vdly__rv32e__DOT__ex_lsu_rd = 0U;
-    } else {
-        if (((IData)(vlSelf->rv32e__DOT__id_valid) 
-             & (IData)(vlSelf->rv32e__DOT__ex_ready))) {
-            vlSelf->rv32e__DOT__ex_lsu_csr_rdata = vlSelf->rv32e__DOT__wb_ex_csr_num1;
-            vlSelf->__Vdly__rv32e__DOT__ex_lsu_src2 
-                = vlSelf->rv32e__DOT__exu__DOT__src2;
-            vlSelf->__Vdly__rv32e__DOT__ex_lsu_csr_wr_addr2 
-                = vlSelf->rv32e__DOT__id_ex_csr_wr_addr2;
-            vlSelf->__Vdly__rv32e__DOT__ex_lsu_csr_wr_addr1 
-                = vlSelf->rv32e__DOT__id_ex_csr_wr_addr1;
-            vlSelf->rv32e__DOT__ex_lsu_inst = vlSelf->rv32e__DOT__id_ex_inst;
-            vlSelf->__Vdly__rv32e__DOT__ex_lsu_MemLen 
-                = vlSelf->rv32e__DOT__id_ex_MemLen;
-            vlSelf->__Vdly__rv32e__DOT__ex_lsu_process_result 
-                = vlSelf->rv32e__DOT__exu__DOT__process_result;
-            vlSelf->__Vdly__rv32e__DOT__ex_lsu_csr_wr_data2 
-                = ((IData)(vlSelf->rv32e__DOT__id_ex_csr_ecall)
-                    ? vlSelf->rv32e__DOT__id_ex_pc : 0U);
-            vlSelf->__Vdly__rv32e__DOT__ex_lsu_csr_wr_data1 
-                = (((1U == (IData)(vlSelf->rv32e__DOT__id_ex_csr_op)) 
-                    & (1U == (IData)(vlSelf->rv32e__DOT__id_ex_func3)))
-                    ? vlSelf->rv32e__DOT__exu__DOT__src1
-                    : (((3U == (IData)(vlSelf->rv32e__DOT__id_ex_csr_op)) 
-                        & (3U == (IData)(vlSelf->rv32e__DOT__id_ex_func3)))
-                        ? (vlSelf->rv32e__DOT__wb_ex_csr_num1 
-                           & (~ vlSelf->rv32e__DOT__exu__DOT__src1))
-                        : (((2U == (IData)(vlSelf->rv32e__DOT__id_ex_csr_op)) 
-                            & (2U == (IData)(vlSelf->rv32e__DOT__id_ex_func3)))
-                            ? (vlSelf->rv32e__DOT__wb_ex_csr_num1 
-                               | vlSelf->rv32e__DOT__exu__DOT__src1)
-                            : (((1U == (IData)(vlSelf->rv32e__DOT__id_ex_csr_op)) 
-                                & (5U == (IData)(vlSelf->rv32e__DOT__id_ex_func3)))
-                                ? (IData)(vlSelf->rv32e__DOT__id_ex_zimm)
-                                : (((3U == (IData)(vlSelf->rv32e__DOT__id_ex_csr_op)) 
-                                    & (7U == (IData)(vlSelf->rv32e__DOT__id_ex_func3)))
-                                    ? (vlSelf->rv32e__DOT__wb_ex_csr_num1 
-                                       & (~ (IData)(vlSelf->rv32e__DOT__id_ex_zimm)))
-                                    : (((2U == (IData)(vlSelf->rv32e__DOT__id_ex_csr_op)) 
-                                        & (6U == (IData)(vlSelf->rv32e__DOT__id_ex_func3)))
-                                        ? (vlSelf->rv32e__DOT__wb_ex_csr_num1 
-                                           | (IData)(vlSelf->rv32e__DOT__id_ex_zimm))
-                                        : ((IData)(vlSelf->rv32e__DOT__id_ex_csr_ecall)
-                                            ? 0xbU : 
-                                           ((IData)(vlSelf->rv32e__DOT__id_ex_csr_mret)
-                                             ? (0x80U 
-                                                | ((0xffffe7f7U 
-                                                    & vlSelf->rv32e__DOT__wb_ex_csr_num1) 
-                                                   | (8U 
-                                                      & (vlSelf->rv32e__DOT__wb_ex_csr_num1 
-                                                         >> 4U))))
-                                             : 0U))))))));
-            vlSelf->__Vdly__rv32e__DOT__ex_lsu_rd = vlSelf->rv32e__DOT__id_ex_rd;
-        } else {
-            vlSelf->rv32e__DOT__ex_lsu_csr_rdata = vlSelf->rv32e__DOT__ex_lsu_csr_rdata;
-            vlSelf->__Vdly__rv32e__DOT__ex_lsu_src2 
-                = vlSelf->rv32e__DOT__ex_lsu_src2;
-            vlSelf->__Vdly__rv32e__DOT__ex_lsu_csr_wr_addr2 
-                = vlSelf->rv32e__DOT__ex_lsu_csr_wr_addr2;
-            vlSelf->__Vdly__rv32e__DOT__ex_lsu_csr_wr_addr1 
-                = vlSelf->rv32e__DOT__ex_lsu_csr_wr_addr1;
-            vlSelf->rv32e__DOT__ex_lsu_inst = vlSelf->rv32e__DOT__ex_lsu_inst;
-            vlSelf->__Vdly__rv32e__DOT__ex_lsu_MemLen 
-                = vlSelf->rv32e__DOT__ex_lsu_MemLen;
-            vlSelf->__Vdly__rv32e__DOT__ex_lsu_process_result 
-                = vlSelf->rv32e__DOT__ex_lsu_process_result;
-            vlSelf->__Vdly__rv32e__DOT__ex_lsu_csr_wr_data2 
-                = vlSelf->rv32e__DOT__ex_lsu_csr_wr_data2;
-            vlSelf->__Vdly__rv32e__DOT__ex_lsu_csr_wr_data1 
-                = vlSelf->rv32e__DOT__ex_lsu_csr_wr_data1;
-            vlSelf->__Vdly__rv32e__DOT__ex_lsu_rd = vlSelf->rv32e__DOT__ex_lsu_rd;
-        }
-        if (vlSelf->rv32e__DOT__ifu__DOT__check) {
-            vlSelf->__Vdly__rv32e__DOT__IF_ID_pc = vlSelf->rv32e__DOT__IF_ID_pc;
-            __Vdly__rv32e__DOT__ifu__DOT__check = 0U;
-        } else if (((IData)(vlSelf->rv32e__DOT__ex_flush) 
-                    & (~ (IData)(vlSelf->rv32e__DOT__ifu__DOT__check)))) {
-            vlSelf->__Vdly__rv32e__DOT__IF_ID_pc = vlSelf->rv32e__DOT__ex_flush_pc;
-        } else if (((IData)(vlSelf->rv32e__DOT__IF_valid) 
-                    & (IData)(vlSelf->rv32e__DOT__id_ready))) {
-            vlSelf->__Vdly__rv32e__DOT__IF_ID_pc = 
-                ((IData)(4U) + vlSelf->rv32e__DOT__IF_ID_pc);
-        }
-        if ((((IData)(vlSelf->rv32e__DOT__id_valid) 
-              & (IData)(vlSelf->rv32e__DOT__ex_ready)) 
-             & ((IData)(vlSelf->rv32e__DOT__lsu_ex_ready) 
-                | (~ (IData)(vlSelf->rv32e__DOT__ex_lsu_valid))))) {
-            vlSelf->__Vdly__rv32e__DOT__ex_lsu_valid = 1U;
-        } else if (((~ ((IData)(vlSelf->rv32e__DOT__id_valid) 
-                        & (IData)(vlSelf->rv32e__DOT__ex_ready))) 
-                    & (IData)(vlSelf->rv32e__DOT__lsu_ex_ready))) {
-            vlSelf->__Vdly__rv32e__DOT__ex_lsu_valid = 0U;
-        }
-    }
-    vlSelf->__Vdly__rv32e__DOT__ex_lsu_csr_wen2 = (
-                                                   (~ (IData)(vlSelf->reset)) 
-                                                   & (((IData)(vlSelf->rv32e__DOT__id_valid) 
-                                                       & (IData)(vlSelf->rv32e__DOT__ex_ready))
-                                                       ? (IData)(vlSelf->rv32e__DOT__id_ex_csr_wen2)
-                                                       : (IData)(vlSelf->rv32e__DOT__ex_lsu_csr_wen2)));
-    vlSelf->__Vdly__rv32e__DOT__ex_lsu_csr_wen1 = (
-                                                   (~ (IData)(vlSelf->reset)) 
-                                                   & (((IData)(vlSelf->rv32e__DOT__id_valid) 
-                                                       & (IData)(vlSelf->rv32e__DOT__ex_ready))
-                                                       ? (IData)(vlSelf->rv32e__DOT__id_ex_csr_wen1)
-                                                       : (IData)(vlSelf->rv32e__DOT__ex_lsu_csr_wen1)));
-    vlSelf->rv32e__DOT__ex_lsu_csr = ((~ (IData)(vlSelf->reset)) 
-                                      & (((IData)(vlSelf->rv32e__DOT__id_valid) 
-                                          & (IData)(vlSelf->rv32e__DOT__ex_ready))
-                                          ? (IData)(vlSelf->rv32e__DOT__id_ex_csr)
-                                          : (IData)(vlSelf->rv32e__DOT__ex_lsu_csr)));
-    vlSelf->rv32e__DOT__ex_lsu_csr_mret = ((~ (IData)(vlSelf->reset)) 
-                                           & (((IData)(vlSelf->rv32e__DOT__id_valid) 
-                                               & (IData)(vlSelf->rv32e__DOT__ex_ready))
-                                               ? (IData)(vlSelf->rv32e__DOT__id_ex_csr_mret)
-                                               : (IData)(vlSelf->rv32e__DOT__ex_lsu_csr_mret)));
-    vlSelf->rv32e__DOT__ex_lsu_csr_ecall = ((~ (IData)(vlSelf->reset)) 
-                                            & (((IData)(vlSelf->rv32e__DOT__id_valid) 
-                                                & (IData)(vlSelf->rv32e__DOT__ex_ready))
-                                                ? (IData)(vlSelf->rv32e__DOT__id_ex_csr_ecall)
-                                                : (IData)(vlSelf->rv32e__DOT__ex_lsu_csr_ecall)));
-    vlSelf->__Vdly__rv32e__DOT__ex_lsu_MemWrite = (
-                                                   (~ (IData)(vlSelf->reset)) 
-                                                   & (((IData)(vlSelf->rv32e__DOT__id_valid) 
-                                                       & (IData)(vlSelf->rv32e__DOT__ex_ready))
-                                                       ? (IData)(vlSelf->rv32e__DOT__id_ex_MemWrite)
-                                                       : (IData)(vlSelf->rv32e__DOT__ex_lsu_MemWrite)));
-    vlSelf->__Vdly__rv32e__DOT__ex_lsu_MemRead = ((~ (IData)(vlSelf->reset)) 
-                                                  & (((IData)(vlSelf->rv32e__DOT__id_valid) 
-                                                      & (IData)(vlSelf->rv32e__DOT__ex_ready))
-                                                      ? (IData)(vlSelf->rv32e__DOT__id_ex_MemRead)
-                                                      : (IData)(vlSelf->rv32e__DOT__ex_lsu_MemRead)));
-    vlSelf->__Vdly__rv32e__DOT__ex_lsu_RegWrite = (
-                                                   (~ (IData)(vlSelf->reset)) 
-                                                   & (((IData)(vlSelf->rv32e__DOT__id_valid) 
-                                                       & (IData)(vlSelf->rv32e__DOT__ex_ready))
-                                                       ? (IData)(vlSelf->rv32e__DOT__id_ex_RegWrite)
-                                                       : (IData)(vlSelf->rv32e__DOT__ex_lsu_RegWrite)));
-    vlSelf->rv32e__DOT__ex_lsu_forward_las = ((~ (IData)(vlSelf->reset)) 
-                                              & (((IData)(vlSelf->rv32e__DOT__id_valid) 
-                                                  & (IData)(vlSelf->rv32e__DOT__ex_ready))
-                                                  ? 
-                                                 ((IData)(vlSelf->rv32e__DOT__id_ex_MemWrite) 
-                                                  & ((IData)(vlSelf->rv32e__DOT__ex_lsu_MemRead) 
-                                                     & ((IData)(vlSelf->rv32e__DOT__ex_lsu_RegWrite) 
-                                                        & ((IData)(vlSelf->rv32e__DOT__ex_lsu_valid) 
-                                                           & ((0U 
-                                                               != (IData)(vlSelf->rv32e__DOT__ex_lsu_rd)) 
-                                                              & (((IData)(vlSelf->rv32e__DOT__ex_lsu_rd) 
-                                                                  != (IData)(vlSelf->rv32e__DOT__id_wb_rs1)) 
-                                                                 & (IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_he5bf04e5__0)))))))
-                                                  : (IData)(vlSelf->rv32e__DOT__ex_lsu_forward_las)));
-    vlSelf->rv32e__DOT__ifu__DOT__check = __Vdly__rv32e__DOT__ifu__DOT__check;
-    if ((0x100073U == vlSelf->rv32e__DOT__ex_lsu_inst)) {
-        Vrv32e___024root____Vdpiimwrap_rv32e__DOT__ebreak_TOP(1U, vlSelf->rv32e__DOT__ex_lsu_inst);
-    }
-}
-
-void Vrv32e___024root____Vdpiimwrap_rv32e__DOT__lsu__DOT__pmem_write_TOP(IData/*31:0*/ waddr, IData/*31:0*/ wdata, IData/*31:0*/ len);
-
-VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSelf) {
-    if (false && vlSelf) {}  // Prevent unused
-    Vrv32e__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
-    VL_DEBUG_IF(VL_DBG_MSGF("+    Vrv32e___024root___nba_sequent__TOP__1\n"); );
     // Init
     IData/*31:0*/ __Vfunc_rv32e__DOT__lsu__DOT__pmem_read__6__Vfuncout;
     __Vfunc_rv32e__DOT__lsu__DOT__pmem_read__6__Vfuncout = 0;
@@ -540,16 +343,12 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSe
     __Vfunc_rv32e__DOT__lsu__DOT__pmem_read__9__Vfuncout = 0;
     IData/*31:0*/ __Vfunc_rv32e__DOT__lsu__DOT__pmem_read__10__Vfuncout;
     __Vfunc_rv32e__DOT__lsu__DOT__pmem_read__10__Vfuncout = 0;
-    CData/*0:0*/ __Vdly__rv32e__DOT__id_valid;
-    __Vdly__rv32e__DOT__id_valid = 0;
     CData/*0:0*/ __Vdly__rv32e__DOT__lsu__DOT__l_rd_en;
     __Vdly__rv32e__DOT__lsu__DOT__l_rd_en = 0;
     CData/*4:0*/ __Vdly__rv32e__DOT__lsu__DOT__l_rd_addr;
     __Vdly__rv32e__DOT__lsu__DOT__l_rd_addr = 0;
     CData/*2:0*/ __Vdly__rv32e__DOT__lsu__DOT__l_MemLen;
     __Vdly__rv32e__DOT__lsu__DOT__l_MemLen = 0;
-    CData/*0:0*/ __Vdly__rv32e__DOT__lsu_ex_ready;
-    __Vdly__rv32e__DOT__lsu_ex_ready = 0;
     CData/*0:0*/ __Vdly__rv32e__DOT__lsu_wb_valid;
     __Vdly__rv32e__DOT__lsu_wb_valid = 0;
     CData/*0:0*/ __Vdlyvset__rv32e__DOT__wbu__DOT__regs__v0;
@@ -578,10 +377,86 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSe
     __Vdlyvval__rv32e__DOT__wbu__DOT__CSR__v3 = 0;
     CData/*0:0*/ __Vdlyvset__rv32e__DOT__wbu__DOT__CSR__v3;
     __Vdlyvset__rv32e__DOT__wbu__DOT__CSR__v3 = 0;
+    SData/*9:0*/ __Vdly__rv32e__DOT__bpu__DOT__global_bhr;
+    __Vdly__rv32e__DOT__bpu__DOT__global_bhr = 0;
+    SData/*9:0*/ __Vdlyvdim0__rv32e__DOT__bpu__DOT__cpht__v0;
+    __Vdlyvdim0__rv32e__DOT__bpu__DOT__cpht__v0 = 0;
+    CData/*1:0*/ __Vdlyvval__rv32e__DOT__bpu__DOT__cpht__v0;
+    __Vdlyvval__rv32e__DOT__bpu__DOT__cpht__v0 = 0;
+    CData/*0:0*/ __Vdlyvset__rv32e__DOT__bpu__DOT__cpht__v0;
+    __Vdlyvset__rv32e__DOT__bpu__DOT__cpht__v0 = 0;
+    SData/*9:0*/ __Vdlyvdim0__rv32e__DOT__bpu__DOT__cpht__v1;
+    __Vdlyvdim0__rv32e__DOT__bpu__DOT__cpht__v1 = 0;
+    CData/*1:0*/ __Vdlyvval__rv32e__DOT__bpu__DOT__cpht__v1;
+    __Vdlyvval__rv32e__DOT__bpu__DOT__cpht__v1 = 0;
+    CData/*0:0*/ __Vdlyvset__rv32e__DOT__bpu__DOT__cpht__v1;
+    __Vdlyvset__rv32e__DOT__bpu__DOT__cpht__v1 = 0;
+    SData/*9:0*/ __Vdlyvdim0__rv32e__DOT__bpu__DOT__local_pht__v0;
+    __Vdlyvdim0__rv32e__DOT__bpu__DOT__local_pht__v0 = 0;
+    CData/*1:0*/ __Vdlyvval__rv32e__DOT__bpu__DOT__local_pht__v0;
+    __Vdlyvval__rv32e__DOT__bpu__DOT__local_pht__v0 = 0;
+    CData/*0:0*/ __Vdlyvset__rv32e__DOT__bpu__DOT__local_pht__v0;
+    __Vdlyvset__rv32e__DOT__bpu__DOT__local_pht__v0 = 0;
+    SData/*9:0*/ __Vdlyvdim0__rv32e__DOT__bpu__DOT__local_pht__v1;
+    __Vdlyvdim0__rv32e__DOT__bpu__DOT__local_pht__v1 = 0;
+    CData/*1:0*/ __Vdlyvval__rv32e__DOT__bpu__DOT__local_pht__v1;
+    __Vdlyvval__rv32e__DOT__bpu__DOT__local_pht__v1 = 0;
+    CData/*0:0*/ __Vdlyvset__rv32e__DOT__bpu__DOT__local_pht__v1;
+    __Vdlyvset__rv32e__DOT__bpu__DOT__local_pht__v1 = 0;
+    SData/*9:0*/ __Vdlyvdim0__rv32e__DOT__bpu__DOT__local_bht__v0;
+    __Vdlyvdim0__rv32e__DOT__bpu__DOT__local_bht__v0 = 0;
+    SData/*9:0*/ __Vdlyvval__rv32e__DOT__bpu__DOT__local_bht__v0;
+    __Vdlyvval__rv32e__DOT__bpu__DOT__local_bht__v0 = 0;
+    CData/*0:0*/ __Vdlyvset__rv32e__DOT__bpu__DOT__local_bht__v0;
+    __Vdlyvset__rv32e__DOT__bpu__DOT__local_bht__v0 = 0;
+    SData/*9:0*/ __Vdlyvdim0__rv32e__DOT__bpu__DOT__global_pht__v0;
+    __Vdlyvdim0__rv32e__DOT__bpu__DOT__global_pht__v0 = 0;
+    CData/*1:0*/ __Vdlyvval__rv32e__DOT__bpu__DOT__global_pht__v0;
+    __Vdlyvval__rv32e__DOT__bpu__DOT__global_pht__v0 = 0;
+    CData/*0:0*/ __Vdlyvset__rv32e__DOT__bpu__DOT__global_pht__v0;
+    __Vdlyvset__rv32e__DOT__bpu__DOT__global_pht__v0 = 0;
+    SData/*9:0*/ __Vdlyvdim0__rv32e__DOT__bpu__DOT__global_pht__v1;
+    __Vdlyvdim0__rv32e__DOT__bpu__DOT__global_pht__v1 = 0;
+    CData/*1:0*/ __Vdlyvval__rv32e__DOT__bpu__DOT__global_pht__v1;
+    __Vdlyvval__rv32e__DOT__bpu__DOT__global_pht__v1 = 0;
+    CData/*0:0*/ __Vdlyvset__rv32e__DOT__bpu__DOT__global_pht__v1;
+    __Vdlyvset__rv32e__DOT__bpu__DOT__global_pht__v1 = 0;
+    SData/*9:0*/ __Vdlyvdim0__rv32e__DOT__bpu__DOT__btb__v0;
+    __Vdlyvdim0__rv32e__DOT__bpu__DOT__btb__v0 = 0;
+    IData/*31:0*/ __Vdlyvval__rv32e__DOT__bpu__DOT__btb__v0;
+    __Vdlyvval__rv32e__DOT__bpu__DOT__btb__v0 = 0;
+    CData/*0:0*/ __Vdlyvset__rv32e__DOT__bpu__DOT__btb__v0;
+    __Vdlyvset__rv32e__DOT__bpu__DOT__btb__v0 = 0;
+    SData/*9:0*/ __Vdlyvdim0__rv32e__DOT__bpu__DOT__valid__v0;
+    __Vdlyvdim0__rv32e__DOT__bpu__DOT__valid__v0 = 0;
+    IData/*31:0*/ __Vdly__rv32e__DOT__correct_predictions;
+    __Vdly__rv32e__DOT__correct_predictions = 0;
+    IData/*31:0*/ __Vdly__rv32e__DOT__total_predictions;
+    __Vdly__rv32e__DOT__total_predictions = 0;
     // Body
-    __Vdly__rv32e__DOT__id_valid = vlSelf->rv32e__DOT__id_valid;
+    if (VL_UNLIKELY((0x100073U == vlSelf->rv32e__DOT__IF_ID_inst))) {
+        VL_WRITEF("+-------------------+---------------------+---------------------+\n| Total predictions | Correct predictions | Prediction accuracy |\n| %10#        | %10#          | %10.2f%%         |\n+-------------------+---------------------+---------------------+\n",
+                  32,vlSelf->rv32e__DOT__total_predictions,
+                  32,vlSelf->rv32e__DOT__correct_predictions,
+                  64,((0U == vlSelf->rv32e__DOT__total_predictions)
+                       ? 0.0 : (100.0 * (VL_ITOR_D_I(32, vlSelf->rv32e__DOT__correct_predictions) 
+                                         / VL_ITOR_D_I(32, vlSelf->rv32e__DOT__total_predictions)))));
+        Vrv32e___024root____Vdpiimwrap_rv32e__DOT__ebreak_TOP(1U, vlSelf->rv32e__DOT__ex_lsu_inst);
+    }
+    __Vdly__rv32e__DOT__total_predictions = vlSelf->rv32e__DOT__total_predictions;
+    __Vdly__rv32e__DOT__correct_predictions = vlSelf->rv32e__DOT__correct_predictions;
+    vlSelf->__Vdly__rv32e__DOT__id_valid = vlSelf->rv32e__DOT__id_valid;
+    __Vdly__rv32e__DOT__bpu__DOT__global_bhr = vlSelf->rv32e__DOT__bpu__DOT__global_bhr;
+    __Vdlyvset__rv32e__DOT__bpu__DOT__local_bht__v0 = 0U;
+    __Vdlyvset__rv32e__DOT__bpu__DOT__global_pht__v0 = 0U;
+    __Vdlyvset__rv32e__DOT__bpu__DOT__global_pht__v1 = 0U;
+    __Vdlyvset__rv32e__DOT__bpu__DOT__local_pht__v0 = 0U;
+    __Vdlyvset__rv32e__DOT__bpu__DOT__local_pht__v1 = 0U;
+    __Vdlyvset__rv32e__DOT__bpu__DOT__cpht__v0 = 0U;
+    __Vdlyvset__rv32e__DOT__bpu__DOT__cpht__v1 = 0U;
+    __Vdlyvset__rv32e__DOT__bpu__DOT__btb__v0 = 0U;
     __Vdly__rv32e__DOT__lsu__DOT__l_MemLen = vlSelf->rv32e__DOT__lsu__DOT__l_MemLen;
-    __Vdly__rv32e__DOT__lsu_ex_ready = vlSelf->rv32e__DOT__lsu_ex_ready;
+    vlSelf->__Vdly__rv32e__DOT__lsu_ex_ready = vlSelf->rv32e__DOT__lsu_ex_ready;
     __Vdlyvset__rv32e__DOT__wbu__DOT__CSR__v0 = 0U;
     __Vdlyvset__rv32e__DOT__wbu__DOT__CSR__v1 = 0U;
     __Vdlyvset__rv32e__DOT__wbu__DOT__CSR__v3 = 0U;
@@ -590,13 +465,14 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSe
     __Vdlyvset__rv32e__DOT__wbu__DOT__regs__v32 = 0U;
     __Vdly__rv32e__DOT__lsu_wb_valid = vlSelf->rv32e__DOT__lsu_wb_valid;
     __Vdly__rv32e__DOT__lsu__DOT__l_rd_addr = vlSelf->rv32e__DOT__lsu__DOT__l_rd_addr;
-    __Vdly__rv32e__DOT__lsu_ex_ready = ((IData)(vlSelf->reset) 
-                                        | ((~ (((IData)(vlSelf->rv32e__DOT__ex_lsu_valid) 
-                                                & (IData)(vlSelf->rv32e__DOT__lsu_ex_ready)) 
-                                               & ((IData)(vlSelf->rv32e__DOT__ex_lsu_MemRead) 
-                                                  | (IData)(vlSelf->rv32e__DOT__ex_lsu_MemWrite)))) 
-                                           & ((IData)(vlSelf->rv32e__DOT__lsu_wb_valid) 
-                                              | (IData)(vlSelf->rv32e__DOT__lsu_ex_ready))));
+    vlSelf->__Vdly__rv32e__DOT__lsu_ex_ready = ((IData)(vlSelf->reset) 
+                                                | ((~ 
+                                                    (((IData)(vlSelf->rv32e__DOT__ex_lsu_valid) 
+                                                      & (IData)(vlSelf->rv32e__DOT__lsu_ex_ready)) 
+                                                     & ((IData)(vlSelf->rv32e__DOT__ex_lsu_MemRead) 
+                                                        | (IData)(vlSelf->rv32e__DOT__ex_lsu_MemWrite)))) 
+                                                   & ((IData)(vlSelf->rv32e__DOT__lsu_wb_valid) 
+                                                      | (IData)(vlSelf->rv32e__DOT__lsu_ex_ready))));
     vlSelf->rv32e__DOT__lsu__DOT__l_load = ((~ (IData)(vlSelf->reset)) 
                                             & ((((IData)(vlSelf->rv32e__DOT__ex_lsu_valid) 
                                                  & (IData)(vlSelf->rv32e__DOT__lsu_ex_ready)) 
@@ -607,19 +483,155 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSe
                                                    (~ (IData)(vlSelf->rv32e__DOT__lsu_wb_valid)) 
                                                    & (IData)(vlSelf->rv32e__DOT__lsu__DOT__l_load))));
     if (vlSelf->reset) {
-        __Vdly__rv32e__DOT__id_valid = 0U;
+        __Vdly__rv32e__DOT__total_predictions = 0U;
+        __Vdly__rv32e__DOT__correct_predictions = 0U;
+        vlSelf->__Vdly__rv32e__DOT__id_valid = 0U;
+        vlSelf->rv32e__DOT__bpu__DOT__i = 0U;
+        while (VL_GTS_III(32, 0x400U, vlSelf->rv32e__DOT__bpu__DOT__i)) {
+            vlSelf->rv32e__DOT__bpu__DOT__cpht[(0x3ffU 
+                                                & vlSelf->rv32e__DOT__bpu__DOT__i)] = 1U;
+            vlSelf->rv32e__DOT__bpu__DOT__local_bht[(0x3ffU 
+                                                     & vlSelf->rv32e__DOT__bpu__DOT__i)] = 0U;
+            vlSelf->rv32e__DOT__bpu__DOT__btb[(0x3ffU 
+                                               & vlSelf->rv32e__DOT__bpu__DOT__i)] 
+                = ((IData)(0x80000000U) + (vlSelf->rv32e__DOT__bpu__DOT__i 
+                                           << 2U));
+            vlSelf->rv32e__DOT__bpu__DOT__valid[(0x3ffU 
+                                                 & vlSelf->rv32e__DOT__bpu__DOT__i)] = 0U;
+            vlSelf->rv32e__DOT__bpu__DOT__i = ((IData)(1U) 
+                                               + vlSelf->rv32e__DOT__bpu__DOT__i);
+        }
+        __Vdly__rv32e__DOT__bpu__DOT__global_bhr = 0U;
+        vlSelf->rv32e__DOT__bpu__DOT__i = 0U;
+        while (VL_GTS_III(32, 0x400U, vlSelf->rv32e__DOT__bpu__DOT__i)) {
+            vlSelf->rv32e__DOT__bpu__DOT__local_pht[(0x3ffU 
+                                                     & vlSelf->rv32e__DOT__bpu__DOT__i)] = 2U;
+            vlSelf->rv32e__DOT__bpu__DOT__global_pht[(0x3ffU 
+                                                      & vlSelf->rv32e__DOT__bpu__DOT__i)] = 2U;
+            vlSelf->rv32e__DOT__bpu__DOT__i = ((IData)(1U) 
+                                               + vlSelf->rv32e__DOT__bpu__DOT__i);
+        }
         __Vdly__rv32e__DOT__lsu__DOT__l_MemLen = 0U;
         __Vdlyvset__rv32e__DOT__wbu__DOT__CSR__v0 = 1U;
     } else {
+        if (vlSelf->rv32e__DOT__ex_bpu_update) {
+            __Vdly__rv32e__DOT__total_predictions = 
+                ((IData)(1U) + vlSelf->rv32e__DOT__total_predictions);
+            if (vlSelf->rv32e__DOT__ex_bpu_correct) {
+                __Vdly__rv32e__DOT__correct_predictions 
+                    = ((IData)(1U) + vlSelf->rv32e__DOT__correct_predictions);
+            }
+            vlSelf->rv32e__DOT__bpu__DOT__ex_bht_index 
+                = (0x3ffU & (vlSelf->rv32e__DOT__ex_bpu_pc 
+                             >> 2U));
+            vlSelf->rv32e__DOT__bpu__DOT__ex_local_pht_index 
+                = (0x3ffU & (vlSelf->rv32e__DOT__bpu__DOT__local_bht
+                             [vlSelf->rv32e__DOT__bpu__DOT__ex_bht_index] 
+                             ^ (vlSelf->rv32e__DOT__ex_bpu_pc 
+                                >> 2U)));
+            vlSelf->rv32e__DOT__bpu__DOT__ex_global_pht_index 
+                = (0x3ffU & ((IData)(vlSelf->rv32e__DOT__bpu__DOT__global_bhr) 
+                             ^ (vlSelf->rv32e__DOT__ex_bpu_pc 
+                                >> 2U)));
+            vlSelf->rv32e__DOT__bpu__DOT__local_correct 
+                = ((1U & (vlSelf->rv32e__DOT__bpu__DOT__local_pht
+                          [vlSelf->rv32e__DOT__bpu__DOT__ex_local_pht_index] 
+                          >> 1U)) == (IData)(vlSelf->rv32e__DOT__ex_bpu_taken));
+            vlSelf->rv32e__DOT__bpu__DOT__global_correct 
+                = ((1U & (vlSelf->rv32e__DOT__bpu__DOT__global_pht
+                          [vlSelf->rv32e__DOT__bpu__DOT__ex_global_pht_index] 
+                          >> 1U)) == (IData)(vlSelf->rv32e__DOT__ex_bpu_taken));
+            if ((((IData)(vlSelf->rv32e__DOT__bpu__DOT__local_correct) 
+                  & (~ (IData)(vlSelf->rv32e__DOT__bpu__DOT__global_correct))) 
+                 & (0U < vlSelf->rv32e__DOT__bpu__DOT__cpht
+                    [vlSelf->rv32e__DOT__bpu__DOT__ex_bht_index]))) {
+                __Vdlyvval__rv32e__DOT__bpu__DOT__cpht__v0 
+                    = (3U & (vlSelf->rv32e__DOT__bpu__DOT__cpht
+                             [vlSelf->rv32e__DOT__bpu__DOT__ex_bht_index] 
+                             - (IData)(1U)));
+                __Vdlyvset__rv32e__DOT__bpu__DOT__cpht__v0 = 1U;
+                __Vdlyvdim0__rv32e__DOT__bpu__DOT__cpht__v0 
+                    = vlSelf->rv32e__DOT__bpu__DOT__ex_bht_index;
+            } else if ((((~ (IData)(vlSelf->rv32e__DOT__bpu__DOT__local_correct)) 
+                         & (IData)(vlSelf->rv32e__DOT__bpu__DOT__global_correct)) 
+                        & (3U > vlSelf->rv32e__DOT__bpu__DOT__cpht
+                           [vlSelf->rv32e__DOT__bpu__DOT__ex_bht_index]))) {
+                __Vdlyvval__rv32e__DOT__bpu__DOT__cpht__v1 
+                    = (3U & ((IData)(1U) + vlSelf->rv32e__DOT__bpu__DOT__cpht
+                             [vlSelf->rv32e__DOT__bpu__DOT__ex_bht_index]));
+                __Vdlyvset__rv32e__DOT__bpu__DOT__cpht__v1 = 1U;
+                __Vdlyvdim0__rv32e__DOT__bpu__DOT__cpht__v1 
+                    = vlSelf->rv32e__DOT__bpu__DOT__ex_bht_index;
+            }
+            if (((IData)(vlSelf->rv32e__DOT__ex_bpu_taken) 
+                 & (3U > vlSelf->rv32e__DOT__bpu__DOT__local_pht
+                    [vlSelf->rv32e__DOT__bpu__DOT__ex_local_pht_index]))) {
+                __Vdlyvval__rv32e__DOT__bpu__DOT__local_pht__v0 
+                    = (3U & ((IData)(1U) + vlSelf->rv32e__DOT__bpu__DOT__local_pht
+                             [vlSelf->rv32e__DOT__bpu__DOT__ex_local_pht_index]));
+                __Vdlyvset__rv32e__DOT__bpu__DOT__local_pht__v0 = 1U;
+                __Vdlyvdim0__rv32e__DOT__bpu__DOT__local_pht__v0 
+                    = vlSelf->rv32e__DOT__bpu__DOT__ex_local_pht_index;
+            } else if (((~ (IData)(vlSelf->rv32e__DOT__ex_bpu_taken)) 
+                        & (0U < vlSelf->rv32e__DOT__bpu__DOT__local_pht
+                           [vlSelf->rv32e__DOT__bpu__DOT__ex_local_pht_index]))) {
+                __Vdlyvval__rv32e__DOT__bpu__DOT__local_pht__v1 
+                    = (3U & (vlSelf->rv32e__DOT__bpu__DOT__local_pht
+                             [vlSelf->rv32e__DOT__bpu__DOT__ex_local_pht_index] 
+                             - (IData)(1U)));
+                __Vdlyvset__rv32e__DOT__bpu__DOT__local_pht__v1 = 1U;
+                __Vdlyvdim0__rv32e__DOT__bpu__DOT__local_pht__v1 
+                    = vlSelf->rv32e__DOT__bpu__DOT__ex_local_pht_index;
+            }
+            __Vdlyvval__rv32e__DOT__bpu__DOT__local_bht__v0 
+                = ((0x3feU & (vlSelf->rv32e__DOT__bpu__DOT__local_bht
+                              [vlSelf->rv32e__DOT__bpu__DOT__ex_bht_index] 
+                              << 1U)) | (IData)(vlSelf->rv32e__DOT__ex_bpu_taken));
+            __Vdlyvset__rv32e__DOT__bpu__DOT__local_bht__v0 = 1U;
+            __Vdlyvdim0__rv32e__DOT__bpu__DOT__local_bht__v0 
+                = vlSelf->rv32e__DOT__bpu__DOT__ex_bht_index;
+            if (((IData)(vlSelf->rv32e__DOT__ex_bpu_taken) 
+                 & (3U > vlSelf->rv32e__DOT__bpu__DOT__global_pht
+                    [vlSelf->rv32e__DOT__bpu__DOT__ex_global_pht_index]))) {
+                __Vdlyvval__rv32e__DOT__bpu__DOT__global_pht__v0 
+                    = (3U & ((IData)(1U) + vlSelf->rv32e__DOT__bpu__DOT__global_pht
+                             [vlSelf->rv32e__DOT__bpu__DOT__ex_global_pht_index]));
+                __Vdlyvset__rv32e__DOT__bpu__DOT__global_pht__v0 = 1U;
+                __Vdlyvdim0__rv32e__DOT__bpu__DOT__global_pht__v0 
+                    = vlSelf->rv32e__DOT__bpu__DOT__ex_global_pht_index;
+            } else if (((~ (IData)(vlSelf->rv32e__DOT__ex_bpu_taken)) 
+                        & (0U < vlSelf->rv32e__DOT__bpu__DOT__global_pht
+                           [vlSelf->rv32e__DOT__bpu__DOT__ex_global_pht_index]))) {
+                __Vdlyvval__rv32e__DOT__bpu__DOT__global_pht__v1 
+                    = (3U & (vlSelf->rv32e__DOT__bpu__DOT__global_pht
+                             [vlSelf->rv32e__DOT__bpu__DOT__ex_global_pht_index] 
+                             - (IData)(1U)));
+                __Vdlyvset__rv32e__DOT__bpu__DOT__global_pht__v1 = 1U;
+                __Vdlyvdim0__rv32e__DOT__bpu__DOT__global_pht__v1 
+                    = vlSelf->rv32e__DOT__bpu__DOT__ex_global_pht_index;
+            }
+            __Vdly__rv32e__DOT__bpu__DOT__global_bhr 
+                = ((0x3feU & ((IData)(vlSelf->rv32e__DOT__bpu__DOT__global_bhr) 
+                              << 1U)) | (IData)(vlSelf->rv32e__DOT__ex_bpu_taken));
+            if (vlSelf->rv32e__DOT__ex_bpu_taken) {
+                __Vdlyvval__rv32e__DOT__bpu__DOT__btb__v0 
+                    = vlSelf->rv32e__DOT__ex_bpu_target;
+                __Vdlyvset__rv32e__DOT__bpu__DOT__btb__v0 = 1U;
+                __Vdlyvdim0__rv32e__DOT__bpu__DOT__btb__v0 
+                    = vlSelf->rv32e__DOT__bpu__DOT__ex_bht_index;
+                __Vdlyvdim0__rv32e__DOT__bpu__DOT__valid__v0 
+                    = vlSelf->rv32e__DOT__bpu__DOT__ex_bht_index;
+            }
+        }
         if ((((IData)(vlSelf->rv32e__DOT__IF_valid) 
               & (IData)(vlSelf->rv32e__DOT__id_ready)) 
              & ((IData)(vlSelf->rv32e__DOT__ex_ready) 
                 | (~ (IData)(vlSelf->rv32e__DOT__id_valid))))) {
-            __Vdly__rv32e__DOT__id_valid = 1U;
+            vlSelf->__Vdly__rv32e__DOT__id_valid = 1U;
         } else if (((~ ((IData)(vlSelf->rv32e__DOT__IF_valid) 
                         & (IData)(vlSelf->rv32e__DOT__id_ready))) 
                     & (IData)(vlSelf->rv32e__DOT__ex_ready))) {
-            __Vdly__rv32e__DOT__id_valid = 0U;
+            vlSelf->__Vdly__rv32e__DOT__id_valid = 0U;
         }
         __Vdly__rv32e__DOT__lsu__DOT__l_MemLen = ((
                                                    ((IData)(vlSelf->rv32e__DOT__ex_lsu_valid) 
@@ -780,7 +792,48 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSe
                                                         | (IData)(vlSelf->rv32e__DOT__ex_lsu_MemWrite))))
                                                     ? (IData)(vlSelf->rv32e__DOT__ex_lsu_RegWrite)
                                                     : (IData)(vlSelf->rv32e__DOT__lsu_wb_RegWrite)))));
-    vlSelf->rv32e__DOT__id_valid = __Vdly__rv32e__DOT__id_valid;
+    if ((1U & (~ (IData)(vlSelf->reset)))) {
+        if (((IData)(vlSelf->rv32e__DOT__IF_valid) 
+             & (IData)(vlSelf->rv32e__DOT__id_ready))) {
+            vlSelf->rv32e__DOT__id_ex_pc2 = vlSelf->rv32e__DOT__IF_ID_pc2;
+        }
+    }
+    vlSelf->rv32e__DOT__total_predictions = __Vdly__rv32e__DOT__total_predictions;
+    vlSelf->rv32e__DOT__correct_predictions = __Vdly__rv32e__DOT__correct_predictions;
+    vlSelf->rv32e__DOT__bpu__DOT__global_bhr = __Vdly__rv32e__DOT__bpu__DOT__global_bhr;
+    if (__Vdlyvset__rv32e__DOT__bpu__DOT__local_bht__v0) {
+        vlSelf->rv32e__DOT__bpu__DOT__local_bht[__Vdlyvdim0__rv32e__DOT__bpu__DOT__local_bht__v0] 
+            = __Vdlyvval__rv32e__DOT__bpu__DOT__local_bht__v0;
+    }
+    if (__Vdlyvset__rv32e__DOT__bpu__DOT__cpht__v0) {
+        vlSelf->rv32e__DOT__bpu__DOT__cpht[__Vdlyvdim0__rv32e__DOT__bpu__DOT__cpht__v0] 
+            = __Vdlyvval__rv32e__DOT__bpu__DOT__cpht__v0;
+    }
+    if (__Vdlyvset__rv32e__DOT__bpu__DOT__cpht__v1) {
+        vlSelf->rv32e__DOT__bpu__DOT__cpht[__Vdlyvdim0__rv32e__DOT__bpu__DOT__cpht__v1] 
+            = __Vdlyvval__rv32e__DOT__bpu__DOT__cpht__v1;
+    }
+    if (__Vdlyvset__rv32e__DOT__bpu__DOT__local_pht__v0) {
+        vlSelf->rv32e__DOT__bpu__DOT__local_pht[__Vdlyvdim0__rv32e__DOT__bpu__DOT__local_pht__v0] 
+            = __Vdlyvval__rv32e__DOT__bpu__DOT__local_pht__v0;
+    }
+    if (__Vdlyvset__rv32e__DOT__bpu__DOT__local_pht__v1) {
+        vlSelf->rv32e__DOT__bpu__DOT__local_pht[__Vdlyvdim0__rv32e__DOT__bpu__DOT__local_pht__v1] 
+            = __Vdlyvval__rv32e__DOT__bpu__DOT__local_pht__v1;
+    }
+    if (__Vdlyvset__rv32e__DOT__bpu__DOT__global_pht__v0) {
+        vlSelf->rv32e__DOT__bpu__DOT__global_pht[__Vdlyvdim0__rv32e__DOT__bpu__DOT__global_pht__v0] 
+            = __Vdlyvval__rv32e__DOT__bpu__DOT__global_pht__v0;
+    }
+    if (__Vdlyvset__rv32e__DOT__bpu__DOT__global_pht__v1) {
+        vlSelf->rv32e__DOT__bpu__DOT__global_pht[__Vdlyvdim0__rv32e__DOT__bpu__DOT__global_pht__v1] 
+            = __Vdlyvval__rv32e__DOT__bpu__DOT__global_pht__v1;
+    }
+    if (__Vdlyvset__rv32e__DOT__bpu__DOT__btb__v0) {
+        vlSelf->rv32e__DOT__bpu__DOT__valid[__Vdlyvdim0__rv32e__DOT__bpu__DOT__valid__v0] = 1U;
+        vlSelf->rv32e__DOT__bpu__DOT__btb[__Vdlyvdim0__rv32e__DOT__bpu__DOT__btb__v0] 
+            = __Vdlyvval__rv32e__DOT__bpu__DOT__btb__v0;
+    }
     if (__Vdlyvset__rv32e__DOT__wbu__DOT__CSR__v0) {
         vlSelf->rv32e__DOT__wbu__DOT__CSR[0x300U] = 0x1800U;
     }
@@ -885,33 +938,17 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSe
               & (0U != (IData)(vlSelf->rv32e__DOT__lsu__DOT__l_rd_addr))));
     if (vlSelf->reset) {
         vlSelf->rv32e__DOT__id_wb_csr_addr2 = 0U;
+        vlSelf->rv32e__DOT__id_ex_predict_target = 0U;
         vlSelf->rv32e__DOT__id_wb_csr_addr1 = 0U;
         vlSelf->rv32e__DOT__exu__DOT__ex_flush_condition = 1U;
+        vlSelf->rv32e__DOT__id_ex_predict_taken = 0U;
         vlSelf->rv32e__DOT__id_ex_shamt = 0U;
         vlSelf->rv32e__DOT__id_ex_alu_op = 0U;
         vlSelf->rv32e__DOT__id_ex_imm = 0U;
         vlSelf->rv32e__DOT__id_ex_jalr = 0U;
-        vlSelf->rv32e__DOT__id_ex_jal = 0U;
         vlSelf->rv32e__DOT__id_ex_opcode = 0U;
+        vlSelf->rv32e__DOT__id_ex_jal = 0U;
         vlSelf->rv32e__DOT__id_wb_rs2 = 0U;
-        vlSelf->rv32e__DOT__id_ex_csr_wr_addr2 = 0U;
-        vlSelf->rv32e__DOT__id_ex_csr_wen2 = 0U;
-        vlSelf->rv32e__DOT__id_ex_csr_wr_addr1 = 0U;
-        vlSelf->rv32e__DOT__id_ex_csr_wen1 = 0U;
-        vlSelf->rv32e__DOT__id_ex_inst = 0U;
-        vlSelf->rv32e__DOT__id_ex_MemLen = 0U;
-        vlSelf->rv32e__DOT__id_ex_csr = 0U;
-        vlSelf->rv32e__DOT__id_ex_pc = 0U;
-        vlSelf->rv32e__DOT__id_ex_MemRead = 0U;
-        vlSelf->rv32e__DOT__id_ex_RegWrite = 0U;
-        vlSelf->rv32e__DOT__id_ex_csr_op = 0U;
-        vlSelf->rv32e__DOT__id_ex_zimm = 0U;
-        vlSelf->rv32e__DOT__id_ex_csr_mret = 0U;
-        vlSelf->rv32e__DOT__id_ex_csr_ecall = 0U;
-        vlSelf->rv32e__DOT__id_ex_func3 = 0U;
-        vlSelf->rv32e__DOT__id_ex_rd = 0U;
-        vlSelf->rv32e__DOT__id_ex_MemWrite = 0U;
-        vlSelf->rv32e__DOT__id_wb_rs1 = 0U;
     } else {
         if (((IData)(vlSelf->rv32e__DOT__IF_valid) 
              & (IData)(vlSelf->rv32e__DOT__id_ready))) {
@@ -924,224 +961,28 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSe
                     = ((IData)(vlSelf->rv32e__DOT__idu__DOT__csr_ecall)
                         ? 0x305U : (IData)(vlSelf->rv32e__DOT__idu__DOT____VdfgTmp_hf81b0dad__0));
             }
+            vlSelf->rv32e__DOT__id_ex_predict_target 
+                = vlSelf->rv32e__DOT__predict_target;
+            vlSelf->rv32e__DOT__id_ex_predict_taken 
+                = ((IData)(vlSelf->rv32e__DOT__predict_taken) 
+                   & (((0x18U == (0x1fU & (vlSelf->rv32e__DOT__IF_ID_inst 
+                                           >> 2U))) 
+                       | (IData)(vlSelf->rv32e__DOT__idu__DOT__jalr)) 
+                      | (0x6fU == (0x7fU & vlSelf->rv32e__DOT__IF_ID_inst))));
             vlSelf->rv32e__DOT__id_ex_shamt = (0x3fU 
                                                & (vlSelf->rv32e__DOT__IF_ID_inst 
                                                   >> 0x14U));
             vlSelf->rv32e__DOT__id_ex_alu_op = vlSelf->rv32e__DOT__idu__DOT__alu_op;
             vlSelf->rv32e__DOT__id_ex_imm = vlSelf->rv32e__DOT__idu__DOT__imm;
-            vlSelf->rv32e__DOT__id_ex_jalr = (IData)(
-                                                     (0x67U 
-                                                      == 
-                                                      (0x707fU 
-                                                       & vlSelf->rv32e__DOT__IF_ID_inst)));
+            vlSelf->rv32e__DOT__id_ex_jalr = vlSelf->rv32e__DOT__idu__DOT__jalr;
+            vlSelf->rv32e__DOT__id_ex_opcode = (0x7fU 
+                                                & vlSelf->rv32e__DOT__IF_ID_inst);
             vlSelf->rv32e__DOT__id_ex_jal = (0x6fU 
                                              == (0x7fU 
                                                  & vlSelf->rv32e__DOT__IF_ID_inst));
-            vlSelf->rv32e__DOT__id_ex_opcode = (0x7fU 
-                                                & vlSelf->rv32e__DOT__IF_ID_inst);
             vlSelf->rv32e__DOT__id_wb_rs2 = (0x1fU 
                                              & (vlSelf->rv32e__DOT__IF_ID_inst 
                                                 >> 0x14U));
-            if (vlSelf->rv32e__DOT__idu__DOT__csr_ecall) {
-                vlSelf->rv32e__DOT__id_ex_csr_wr_addr2 = 0x341U;
-                vlSelf->rv32e__DOT__id_ex_csr_wr_addr1 = 0x342U;
-                vlSelf->rv32e__DOT__id_ex_csr_wen2 = 1U;
-            } else {
-                vlSelf->rv32e__DOT__id_ex_csr_wr_addr2 = 0U;
-                vlSelf->rv32e__DOT__id_ex_csr_wr_addr1 
-                    = ((IData)(vlSelf->rv32e__DOT__idu__DOT__csr_mret)
-                        ? 0x300U : (IData)(vlSelf->rv32e__DOT__idu__DOT____VdfgTmp_hf81b0dad__0));
-                vlSelf->rv32e__DOT__id_ex_csr_wen2 = 0U;
-            }
-            vlSelf->rv32e__DOT__id_ex_csr_wen1 = (0x73U 
-                                                  == 
-                                                  (0x7fU 
-                                                   & vlSelf->rv32e__DOT__IF_ID_inst));
-            vlSelf->rv32e__DOT__id_ex_inst = vlSelf->rv32e__DOT__IF_ID_inst;
-            vlSelf->rv32e__DOT__id_ex_MemLen = (((IData)(vlSelf->rv32e__DOT__idu__DOT____VdfgTmp_h69b43165__0) 
-                                                 & (0x2000U 
-                                                    == 
-                                                    (0x7000U 
-                                                     & vlSelf->rv32e__DOT__IF_ID_inst)))
-                                                 ? 2U
-                                                 : 
-                                                (((IData)(vlSelf->rv32e__DOT__idu__DOT____VdfgTmp_h69b43165__0) 
-                                                  & (0x1000U 
-                                                     == 
-                                                     (0x7000U 
-                                                      & vlSelf->rv32e__DOT__IF_ID_inst)))
-                                                  ? 1U
-                                                  : 
-                                                 (((IData)(vlSelf->rv32e__DOT__idu__DOT____VdfgTmp_h69b43165__0) 
-                                                   & ((0U 
-                                                       == 
-                                                       (7U 
-                                                        & (vlSelf->rv32e__DOT__IF_ID_inst 
-                                                           >> 0xcU))) 
-                                                      | (IData)(
-                                                                (3U 
-                                                                 == 
-                                                                 (0x707fU 
-                                                                  & vlSelf->rv32e__DOT__IF_ID_inst)))))
-                                                   ? 4U
-                                                   : 
-                                                  ((IData)(
-                                                           (0x5000U 
-                                                            == 
-                                                            (0x707cU 
-                                                             & vlSelf->rv32e__DOT__IF_ID_inst)))
-                                                    ? 3U
-                                                    : 
-                                                   ((IData)(
-                                                            (0x4000U 
-                                                             == 
-                                                             (0x707cU 
-                                                              & vlSelf->rv32e__DOT__IF_ID_inst)))
-                                                     ? 0U
-                                                     : 2U)))));
-            vlSelf->rv32e__DOT__id_ex_csr = (0x73U 
-                                             == (0x7fU 
-                                                 & vlSelf->rv32e__DOT__IF_ID_inst));
-            vlSelf->rv32e__DOT__id_ex_pc = vlSelf->rv32e__DOT__IF_ID_pc;
-            vlSelf->rv32e__DOT__id_ex_MemRead = (IData)(
-                                                        ((0U 
-                                                          == 
-                                                          (0x7cU 
-                                                           & vlSelf->rv32e__DOT__IF_ID_inst)) 
-                                                         & ((2U 
-                                                             == 
-                                                             (7U 
-                                                              & (vlSelf->rv32e__DOT__IF_ID_inst 
-                                                                 >> 0xcU))) 
-                                                            | ((1U 
-                                                                == 
-                                                                (7U 
-                                                                 & (vlSelf->rv32e__DOT__IF_ID_inst 
-                                                                    >> 0xcU))) 
-                                                               | ((0U 
-                                                                   == 
-                                                                   (7U 
-                                                                    & (vlSelf->rv32e__DOT__IF_ID_inst 
-                                                                       >> 0xcU))) 
-                                                                  | ((5U 
-                                                                      == 
-                                                                      (7U 
-                                                                       & (vlSelf->rv32e__DOT__IF_ID_inst 
-                                                                          >> 0xcU))) 
-                                                                     | (4U 
-                                                                        == 
-                                                                        (7U 
-                                                                         & (vlSelf->rv32e__DOT__IF_ID_inst 
-                                                                            >> 0xcU)))))))));
-            vlSelf->rv32e__DOT__id_ex_RegWrite = ((0xdU 
-                                                   == 
-                                                   (0x1fU 
-                                                    & (vlSelf->rv32e__DOT__IF_ID_inst 
-                                                       >> 2U))) 
-                                                  | ((5U 
-                                                      == 
-                                                      (0x1fU 
-                                                       & (vlSelf->rv32e__DOT__IF_ID_inst 
-                                                          >> 2U))) 
-                                                     | ((0U 
-                                                         == 
-                                                         (0x1fU 
-                                                          & (vlSelf->rv32e__DOT__IF_ID_inst 
-                                                             >> 2U))) 
-                                                        | ((0x1bU 
-                                                            == 
-                                                            (0x1fU 
-                                                             & (vlSelf->rv32e__DOT__IF_ID_inst 
-                                                                >> 2U))) 
-                                                           | ((0x19U 
-                                                               == 
-                                                               (0x1fU 
-                                                                & (vlSelf->rv32e__DOT__IF_ID_inst 
-                                                                   >> 2U))) 
-                                                              | ((0xcU 
-                                                                  == 
-                                                                  (0x1fU 
-                                                                   & (vlSelf->rv32e__DOT__IF_ID_inst 
-                                                                      >> 2U))) 
-                                                                 | ((4U 
-                                                                     == 
-                                                                     (0x1fU 
-                                                                      & (vlSelf->rv32e__DOT__IF_ID_inst 
-                                                                         >> 2U))) 
-                                                                    | ((~ 
-                                                                        ((IData)(vlSelf->rv32e__DOT__idu__DOT__csr_ecall) 
-                                                                         | (IData)(vlSelf->rv32e__DOT__idu__DOT__csr_mret))) 
-                                                                       & (0x73U 
-                                                                          == 
-                                                                          (0x7fU 
-                                                                           & vlSelf->rv32e__DOT__IF_ID_inst))))))))));
-            vlSelf->rv32e__DOT__id_ex_csr_op = (((0x73U 
-                                                  == 
-                                                  (0x7fU 
-                                                   & vlSelf->rv32e__DOT__IF_ID_inst)) 
-                                                 & ((1U 
-                                                     == 
-                                                     (7U 
-                                                      & (vlSelf->rv32e__DOT__IF_ID_inst 
-                                                         >> 0xcU))) 
-                                                    | (5U 
-                                                       == 
-                                                       (7U 
-                                                        & (vlSelf->rv32e__DOT__IF_ID_inst 
-                                                           >> 0xcU)))))
-                                                 ? 1U
-                                                 : 
-                                                (((0x73U 
-                                                   == 
-                                                   (0x7fU 
-                                                    & vlSelf->rv32e__DOT__IF_ID_inst)) 
-                                                  & ((2U 
-                                                      == 
-                                                      (7U 
-                                                       & (vlSelf->rv32e__DOT__IF_ID_inst 
-                                                          >> 0xcU))) 
-                                                     | (6U 
-                                                        == 
-                                                        (7U 
-                                                         & (vlSelf->rv32e__DOT__IF_ID_inst 
-                                                            >> 0xcU)))))
-                                                  ? 2U
-                                                  : 
-                                                 (((0x73U 
-                                                    == 
-                                                    (0x7fU 
-                                                     & vlSelf->rv32e__DOT__IF_ID_inst)) 
-                                                   & ((3U 
-                                                       == 
-                                                       (7U 
-                                                        & (vlSelf->rv32e__DOT__IF_ID_inst 
-                                                           >> 0xcU))) 
-                                                      | (7U 
-                                                         == 
-                                                         (7U 
-                                                          & (vlSelf->rv32e__DOT__IF_ID_inst 
-                                                             >> 0xcU)))))
-                                                   ? 3U
-                                                   : 0U)));
-            vlSelf->rv32e__DOT__id_ex_zimm = (0x1fU 
-                                              & (vlSelf->rv32e__DOT__IF_ID_inst 
-                                                 >> 0xfU));
-            vlSelf->rv32e__DOT__id_ex_csr_mret = vlSelf->rv32e__DOT__idu__DOT__csr_mret;
-            vlSelf->rv32e__DOT__id_ex_csr_ecall = vlSelf->rv32e__DOT__idu__DOT__csr_ecall;
-            vlSelf->rv32e__DOT__id_ex_func3 = (7U & 
-                                               (vlSelf->rv32e__DOT__IF_ID_inst 
-                                                >> 0xcU));
-            vlSelf->rv32e__DOT__id_ex_rd = (0x1fU & 
-                                            (vlSelf->rv32e__DOT__IF_ID_inst 
-                                             >> 7U));
-            vlSelf->rv32e__DOT__id_ex_MemWrite = (8U 
-                                                  == 
-                                                  (0x1fU 
-                                                   & (vlSelf->rv32e__DOT__IF_ID_inst 
-                                                      >> 2U)));
-            vlSelf->rv32e__DOT__id_wb_rs1 = (0x1fU 
-                                             & (vlSelf->rv32e__DOT__IF_ID_inst 
-                                                >> 0xfU));
         }
         if (vlSelf->rv32e__DOT__ex_flush) {
             vlSelf->rv32e__DOT__exu__DOT__ex_flush_condition = 0U;
@@ -1217,40 +1058,225 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSe
     } else {
         vlSelf->rv32e__DOT__lsu__DOT__read_valid = 0U;
     }
-    vlSelf->rv32e__DOT__wb_ex_csr_num1 = vlSelf->rv32e__DOT__wbu__DOT__CSR
-        [vlSelf->rv32e__DOT__id_wb_csr_addr1];
     vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_hadc13f7a__0 
         = ((IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_hb53dc38f__0) 
            & ((IData)(vlSelf->rv32e__DOT__id_wb_rs2) 
               == (IData)(vlSelf->rv32e__DOT__lsu__DOT__l_rd_addr)));
-    vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h0017749a__0 
-        = ((IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_hb53dc38f__0) 
-           & ((IData)(vlSelf->rv32e__DOT__id_wb_rs1) 
-              == (IData)(vlSelf->rv32e__DOT__lsu__DOT__l_rd_addr)));
     vlSelf->rv32e__DOT__lsu__DOT__l_MemLen = __Vdly__rv32e__DOT__lsu__DOT__l_MemLen;
-    vlSelf->rv32e__DOT__lsu_ex_ready = __Vdly__rv32e__DOT__lsu_ex_ready;
 }
 
-VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__2(Vrv32e___024root* vlSelf) {
+VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSelf) {
     if (false && vlSelf) {}  // Prevent unused
     Vrv32e__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
-    VL_DEBUG_IF(VL_DBG_MSGF("+    Vrv32e___024root___nba_sequent__TOP__2\n"); );
+    VL_DEBUG_IF(VL_DBG_MSGF("+    Vrv32e___024root___nba_sequent__TOP__1\n"); );
+    // Init
+    IData/*31:0*/ __Vdly__rv32e__DOT__IF_ID_pc2;
+    __Vdly__rv32e__DOT__IF_ID_pc2 = 0;
+    CData/*0:0*/ __Vdly__rv32e__DOT__ifu__DOT__check;
+    __Vdly__rv32e__DOT__ifu__DOT__check = 0;
+    CData/*0:0*/ __Vdly__rv32e__DOT__ex_lsu_valid;
+    __Vdly__rv32e__DOT__ex_lsu_valid = 0;
+    CData/*0:0*/ __Vdly__rv32e__DOT__ex_lsu_MemRead;
+    __Vdly__rv32e__DOT__ex_lsu_MemRead = 0;
+    CData/*4:0*/ __Vdly__rv32e__DOT__ex_lsu_rd;
+    __Vdly__rv32e__DOT__ex_lsu_rd = 0;
+    CData/*0:0*/ __Vdly__rv32e__DOT__ex_lsu_RegWrite;
+    __Vdly__rv32e__DOT__ex_lsu_RegWrite = 0;
+    IData/*31:0*/ __Vtemp_heb90a236__0;
     // Body
-    vlSelf->rv32e__DOT__ex_lsu_csr_wr_addr2 = vlSelf->__Vdly__rv32e__DOT__ex_lsu_csr_wr_addr2;
-    vlSelf->rv32e__DOT__ex_lsu_csr_wen1 = vlSelf->__Vdly__rv32e__DOT__ex_lsu_csr_wen1;
-    vlSelf->rv32e__DOT__ex_lsu_csr_wen2 = vlSelf->__Vdly__rv32e__DOT__ex_lsu_csr_wen2;
-    vlSelf->rv32e__DOT__ex_lsu_csr_wr_addr1 = vlSelf->__Vdly__rv32e__DOT__ex_lsu_csr_wr_addr1;
-    vlSelf->rv32e__DOT__ex_lsu_csr_wr_data1 = vlSelf->__Vdly__rv32e__DOT__ex_lsu_csr_wr_data1;
-    vlSelf->rv32e__DOT__ex_lsu_csr_wr_data2 = vlSelf->__Vdly__rv32e__DOT__ex_lsu_csr_wr_data2;
-    vlSelf->rv32e__DOT__ex_lsu_RegWrite = vlSelf->__Vdly__rv32e__DOT__ex_lsu_RegWrite;
-    vlSelf->rv32e__DOT__ex_lsu_rd = vlSelf->__Vdly__rv32e__DOT__ex_lsu_rd;
-    vlSelf->rv32e__DOT__IF_ID_pc = vlSelf->__Vdly__rv32e__DOT__IF_ID_pc;
-    vlSelf->rv32e__DOT__ex_lsu_MemLen = vlSelf->__Vdly__rv32e__DOT__ex_lsu_MemLen;
-    vlSelf->rv32e__DOT__ex_lsu_src2 = vlSelf->__Vdly__rv32e__DOT__ex_lsu_src2;
-    vlSelf->rv32e__DOT__ex_lsu_MemWrite = vlSelf->__Vdly__rv32e__DOT__ex_lsu_MemWrite;
-    vlSelf->rv32e__DOT__ex_lsu_MemRead = vlSelf->__Vdly__rv32e__DOT__ex_lsu_MemRead;
-    vlSelf->rv32e__DOT__ex_lsu_process_result = vlSelf->__Vdly__rv32e__DOT__ex_lsu_process_result;
-    vlSelf->rv32e__DOT__ex_lsu_valid = vlSelf->__Vdly__rv32e__DOT__ex_lsu_valid;
+    __Vdly__rv32e__DOT__IF_ID_pc2 = vlSelf->rv32e__DOT__IF_ID_pc2;
+    __Vdly__rv32e__DOT__ifu__DOT__check = vlSelf->rv32e__DOT__ifu__DOT__check;
+    vlSelf->__Vdly__rv32e__DOT__IF_ID_pc = vlSelf->rv32e__DOT__IF_ID_pc;
+    __Vdly__rv32e__DOT__ex_lsu_MemRead = vlSelf->rv32e__DOT__ex_lsu_MemRead;
+    __Vdly__rv32e__DOT__ex_lsu_RegWrite = vlSelf->rv32e__DOT__ex_lsu_RegWrite;
+    __Vdly__rv32e__DOT__ex_lsu_valid = vlSelf->rv32e__DOT__ex_lsu_valid;
+    __Vdly__rv32e__DOT__ex_lsu_rd = vlSelf->rv32e__DOT__ex_lsu_rd;
+    if (vlSelf->reset) {
+        vlSelf->rv32e__DOT__ex_lsu_csr_rdata = 0U;
+        vlSelf->rv32e__DOT__ex_lsu_src2 = 0U;
+        vlSelf->rv32e__DOT__ex_lsu_csr_wr_addr2 = 0U;
+        vlSelf->rv32e__DOT__ex_lsu_csr_wr_addr1 = 0U;
+        vlSelf->rv32e__DOT__ex_lsu_inst = 0U;
+        vlSelf->rv32e__DOT__ex_lsu_MemLen = 0U;
+        vlSelf->__Vdly__rv32e__DOT__IF_ID_pc = 0x80000000U;
+        __Vdly__rv32e__DOT__IF_ID_pc2 = 0x80000000U;
+        __Vdly__rv32e__DOT__ifu__DOT__check = 1U;
+        vlSelf->rv32e__DOT__ex_lsu_process_result = 0U;
+        vlSelf->rv32e__DOT__ex_lsu_csr_wr_data2 = 0U;
+        __Vdly__rv32e__DOT__ex_lsu_valid = 0U;
+        __Vtemp_heb90a236__0 = 0U;
+        __Vdly__rv32e__DOT__ex_lsu_rd = 0U;
+    } else {
+        if (((IData)(vlSelf->rv32e__DOT__id_valid) 
+             & (IData)(vlSelf->rv32e__DOT__ex_ready))) {
+            vlSelf->rv32e__DOT__ex_lsu_csr_rdata = vlSelf->rv32e__DOT__wb_ex_csr_num1;
+            vlSelf->rv32e__DOT__ex_lsu_src2 = vlSelf->rv32e__DOT__exu__DOT__src2;
+            vlSelf->rv32e__DOT__ex_lsu_csr_wr_addr2 
+                = vlSelf->rv32e__DOT__id_ex_csr_wr_addr2;
+            vlSelf->rv32e__DOT__ex_lsu_csr_wr_addr1 
+                = vlSelf->rv32e__DOT__id_ex_csr_wr_addr1;
+            vlSelf->rv32e__DOT__ex_lsu_inst = vlSelf->rv32e__DOT__id_ex_inst;
+            vlSelf->rv32e__DOT__ex_lsu_MemLen = vlSelf->rv32e__DOT__id_ex_MemLen;
+            vlSelf->rv32e__DOT__ex_lsu_process_result 
+                = vlSelf->rv32e__DOT__exu__DOT__process_result;
+            vlSelf->rv32e__DOT__ex_lsu_csr_wr_data2 
+                = ((IData)(vlSelf->rv32e__DOT__id_ex_csr_ecall)
+                    ? vlSelf->rv32e__DOT__id_ex_pc : 0U);
+            __Vtemp_heb90a236__0 = (((1U == (IData)(vlSelf->rv32e__DOT__id_ex_csr_op)) 
+                                     & (1U == (IData)(vlSelf->rv32e__DOT__id_ex_func3)))
+                                     ? vlSelf->rv32e__DOT__exu__DOT__src1
+                                     : (((3U == (IData)(vlSelf->rv32e__DOT__id_ex_csr_op)) 
+                                         & (3U == (IData)(vlSelf->rv32e__DOT__id_ex_func3)))
+                                         ? (vlSelf->rv32e__DOT__wb_ex_csr_num1 
+                                            & (~ vlSelf->rv32e__DOT__exu__DOT__src1))
+                                         : (((2U == (IData)(vlSelf->rv32e__DOT__id_ex_csr_op)) 
+                                             & (2U 
+                                                == (IData)(vlSelf->rv32e__DOT__id_ex_func3)))
+                                             ? (vlSelf->rv32e__DOT__wb_ex_csr_num1 
+                                                | vlSelf->rv32e__DOT__exu__DOT__src1)
+                                             : (((1U 
+                                                  == (IData)(vlSelf->rv32e__DOT__id_ex_csr_op)) 
+                                                 & (5U 
+                                                    == (IData)(vlSelf->rv32e__DOT__id_ex_func3)))
+                                                 ? (IData)(vlSelf->rv32e__DOT__id_ex_zimm)
+                                                 : 
+                                                (((3U 
+                                                   == (IData)(vlSelf->rv32e__DOT__id_ex_csr_op)) 
+                                                  & (7U 
+                                                     == (IData)(vlSelf->rv32e__DOT__id_ex_func3)))
+                                                  ? 
+                                                 (vlSelf->rv32e__DOT__wb_ex_csr_num1 
+                                                  & (~ (IData)(vlSelf->rv32e__DOT__id_ex_zimm)))
+                                                  : 
+                                                 (((2U 
+                                                    == (IData)(vlSelf->rv32e__DOT__id_ex_csr_op)) 
+                                                   & (6U 
+                                                      == (IData)(vlSelf->rv32e__DOT__id_ex_func3)))
+                                                   ? 
+                                                  (vlSelf->rv32e__DOT__wb_ex_csr_num1 
+                                                   | (IData)(vlSelf->rv32e__DOT__id_ex_zimm))
+                                                   : 
+                                                  ((IData)(vlSelf->rv32e__DOT__id_ex_csr_ecall)
+                                                    ? 0xbU
+                                                    : 
+                                                   ((IData)(vlSelf->rv32e__DOT__id_ex_csr_mret)
+                                                     ? 
+                                                    (0x80U 
+                                                     | ((0xffffe7f7U 
+                                                         & vlSelf->rv32e__DOT__wb_ex_csr_num1) 
+                                                        | (8U 
+                                                           & (vlSelf->rv32e__DOT__wb_ex_csr_num1 
+                                                              >> 4U))))
+                                                     : 0U))))))));
+            __Vdly__rv32e__DOT__ex_lsu_rd = vlSelf->rv32e__DOT__id_ex_rd;
+        } else {
+            vlSelf->rv32e__DOT__ex_lsu_csr_rdata = vlSelf->rv32e__DOT__ex_lsu_csr_rdata;
+            vlSelf->rv32e__DOT__ex_lsu_src2 = vlSelf->rv32e__DOT__ex_lsu_src2;
+            vlSelf->rv32e__DOT__ex_lsu_csr_wr_addr2 
+                = vlSelf->rv32e__DOT__ex_lsu_csr_wr_addr2;
+            vlSelf->rv32e__DOT__ex_lsu_csr_wr_addr1 
+                = vlSelf->rv32e__DOT__ex_lsu_csr_wr_addr1;
+            vlSelf->rv32e__DOT__ex_lsu_inst = vlSelf->rv32e__DOT__ex_lsu_inst;
+            vlSelf->rv32e__DOT__ex_lsu_MemLen = vlSelf->rv32e__DOT__ex_lsu_MemLen;
+            vlSelf->rv32e__DOT__ex_lsu_process_result 
+                = vlSelf->rv32e__DOT__ex_lsu_process_result;
+            vlSelf->rv32e__DOT__ex_lsu_csr_wr_data2 
+                = vlSelf->rv32e__DOT__ex_lsu_csr_wr_data2;
+            __Vtemp_heb90a236__0 = vlSelf->rv32e__DOT__ex_lsu_csr_wr_data1;
+            __Vdly__rv32e__DOT__ex_lsu_rd = vlSelf->rv32e__DOT__ex_lsu_rd;
+        }
+        if (vlSelf->rv32e__DOT__ifu__DOT__check) {
+            vlSelf->__Vdly__rv32e__DOT__IF_ID_pc = vlSelf->rv32e__DOT__IF_ID_pc;
+            __Vdly__rv32e__DOT__IF_ID_pc2 = vlSelf->rv32e__DOT__IF_ID_pc2;
+            __Vdly__rv32e__DOT__ifu__DOT__check = 0U;
+        } else if (((IData)(vlSelf->rv32e__DOT__ex_flush) 
+                    & (~ (IData)(vlSelf->rv32e__DOT__ifu__DOT__check)))) {
+            vlSelf->__Vdly__rv32e__DOT__IF_ID_pc = vlSelf->rv32e__DOT__ex_flush_pc;
+            __Vdly__rv32e__DOT__IF_ID_pc2 = vlSelf->rv32e__DOT__ex_flush_pc;
+        } else if (((IData)(vlSelf->rv32e__DOT__IF_valid) 
+                    & (IData)(vlSelf->rv32e__DOT__id_ready))) {
+            vlSelf->__Vdly__rv32e__DOT__IF_ID_pc = 
+                (((IData)(vlSelf->rv32e__DOT__predict_taken) 
+                  & (((0x63U == (0x7fU & vlSelf->rv32e__DOT__IF_ID_inst)) 
+                      | (0x6fU == (0x7fU & vlSelf->rv32e__DOT__IF_ID_inst))) 
+                     | (IData)(vlSelf->rv32e__DOT__idu__DOT__jalr)))
+                  ? vlSelf->rv32e__DOT__predict_target
+                  : ((IData)(4U) + vlSelf->rv32e__DOT__IF_ID_pc));
+            __Vdly__rv32e__DOT__IF_ID_pc2 = ((IData)(4U) 
+                                             + vlSelf->rv32e__DOT__IF_ID_pc);
+        }
+        if ((((IData)(vlSelf->rv32e__DOT__id_valid) 
+              & (IData)(vlSelf->rv32e__DOT__ex_ready)) 
+             & ((IData)(vlSelf->rv32e__DOT__lsu_ex_ready) 
+                | (~ (IData)(vlSelf->rv32e__DOT__ex_lsu_valid))))) {
+            __Vdly__rv32e__DOT__ex_lsu_valid = 1U;
+        } else if (((~ ((IData)(vlSelf->rv32e__DOT__id_valid) 
+                        & (IData)(vlSelf->rv32e__DOT__ex_ready))) 
+                    & (IData)(vlSelf->rv32e__DOT__lsu_ex_ready))) {
+            __Vdly__rv32e__DOT__ex_lsu_valid = 0U;
+        }
+    }
+    vlSelf->rv32e__DOT__ex_lsu_csr_wen2 = ((~ (IData)(vlSelf->reset)) 
+                                           & (((IData)(vlSelf->rv32e__DOT__id_valid) 
+                                               & (IData)(vlSelf->rv32e__DOT__ex_ready))
+                                               ? (IData)(vlSelf->rv32e__DOT__id_ex_csr_wen2)
+                                               : (IData)(vlSelf->rv32e__DOT__ex_lsu_csr_wen2)));
+    vlSelf->rv32e__DOT__ex_lsu_csr_wen1 = ((~ (IData)(vlSelf->reset)) 
+                                           & (((IData)(vlSelf->rv32e__DOT__id_valid) 
+                                               & (IData)(vlSelf->rv32e__DOT__ex_ready))
+                                               ? (IData)(vlSelf->rv32e__DOT__id_ex_csr_wen1)
+                                               : (IData)(vlSelf->rv32e__DOT__ex_lsu_csr_wen1)));
+    vlSelf->rv32e__DOT__ex_lsu_csr = ((~ (IData)(vlSelf->reset)) 
+                                      & (((IData)(vlSelf->rv32e__DOT__id_valid) 
+                                          & (IData)(vlSelf->rv32e__DOT__ex_ready))
+                                          ? (IData)(vlSelf->rv32e__DOT__id_ex_csr)
+                                          : (IData)(vlSelf->rv32e__DOT__ex_lsu_csr)));
+    vlSelf->rv32e__DOT__ex_lsu_csr_mret = ((~ (IData)(vlSelf->reset)) 
+                                           & (((IData)(vlSelf->rv32e__DOT__id_valid) 
+                                               & (IData)(vlSelf->rv32e__DOT__ex_ready))
+                                               ? (IData)(vlSelf->rv32e__DOT__id_ex_csr_mret)
+                                               : (IData)(vlSelf->rv32e__DOT__ex_lsu_csr_mret)));
+    vlSelf->rv32e__DOT__ex_lsu_csr_ecall = ((~ (IData)(vlSelf->reset)) 
+                                            & (((IData)(vlSelf->rv32e__DOT__id_valid) 
+                                                & (IData)(vlSelf->rv32e__DOT__ex_ready))
+                                                ? (IData)(vlSelf->rv32e__DOT__id_ex_csr_ecall)
+                                                : (IData)(vlSelf->rv32e__DOT__ex_lsu_csr_ecall)));
+    vlSelf->rv32e__DOT__ex_lsu_MemWrite = ((~ (IData)(vlSelf->reset)) 
+                                           & (((IData)(vlSelf->rv32e__DOT__id_valid) 
+                                               & (IData)(vlSelf->rv32e__DOT__ex_ready))
+                                               ? (IData)(vlSelf->rv32e__DOT__id_ex_MemWrite)
+                                               : (IData)(vlSelf->rv32e__DOT__ex_lsu_MemWrite)));
+    __Vdly__rv32e__DOT__ex_lsu_MemRead = ((~ (IData)(vlSelf->reset)) 
+                                          & (((IData)(vlSelf->rv32e__DOT__id_valid) 
+                                              & (IData)(vlSelf->rv32e__DOT__ex_ready))
+                                              ? (IData)(vlSelf->rv32e__DOT__id_ex_MemRead)
+                                              : (IData)(vlSelf->rv32e__DOT__ex_lsu_MemRead)));
+    __Vdly__rv32e__DOT__ex_lsu_RegWrite = ((~ (IData)(vlSelf->reset)) 
+                                           & (((IData)(vlSelf->rv32e__DOT__id_valid) 
+                                               & (IData)(vlSelf->rv32e__DOT__ex_ready))
+                                               ? (IData)(vlSelf->rv32e__DOT__id_ex_RegWrite)
+                                               : (IData)(vlSelf->rv32e__DOT__ex_lsu_RegWrite)));
+    vlSelf->rv32e__DOT__ex_lsu_csr_wr_data1 = __Vtemp_heb90a236__0;
+    vlSelf->rv32e__DOT__ex_lsu_forward_las = ((~ (IData)(vlSelf->reset)) 
+                                              & (((IData)(vlSelf->rv32e__DOT__id_valid) 
+                                                  & (IData)(vlSelf->rv32e__DOT__ex_ready))
+                                                  ? 
+                                                 ((IData)(vlSelf->rv32e__DOT__id_ex_MemWrite) 
+                                                  & ((IData)(vlSelf->rv32e__DOT__ex_lsu_MemRead) 
+                                                     & ((IData)(vlSelf->rv32e__DOT__ex_lsu_RegWrite) 
+                                                        & ((IData)(vlSelf->rv32e__DOT__ex_lsu_valid) 
+                                                           & ((0U 
+                                                               != (IData)(vlSelf->rv32e__DOT__ex_lsu_rd)) 
+                                                              & (((IData)(vlSelf->rv32e__DOT__ex_lsu_rd) 
+                                                                  != (IData)(vlSelf->rv32e__DOT__id_wb_rs1)) 
+                                                                 & (IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_he5bf04e5__0)))))))
+                                                  : (IData)(vlSelf->rv32e__DOT__ex_lsu_forward_las)));
+    vlSelf->rv32e__DOT__ifu__DOT__check = __Vdly__rv32e__DOT__ifu__DOT__check;
+    vlSelf->rv32e__DOT__IF_ID_pc2 = __Vdly__rv32e__DOT__IF_ID_pc2;
+    vlSelf->rv32e__DOT__ex_lsu_RegWrite = __Vdly__rv32e__DOT__ex_lsu_RegWrite;
+    vlSelf->rv32e__DOT__ex_lsu_rd = __Vdly__rv32e__DOT__ex_lsu_rd;
+    vlSelf->rv32e__DOT__ex_lsu_MemRead = __Vdly__rv32e__DOT__ex_lsu_MemRead;
+    vlSelf->rv32e__DOT__ex_lsu_valid = __Vdly__rv32e__DOT__ex_lsu_valid;
     vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h69af1a50__0 
         = ((IData)(vlSelf->rv32e__DOT__ex_lsu_RegWrite) 
            & (0U != (IData)(vlSelf->rv32e__DOT__ex_lsu_rd)));
@@ -1259,13 +1285,252 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__2(Vrv32e___024root* vlSe
            & (IData)(vlSelf->rv32e__DOT__ex_lsu_RegWrite));
 }
 
+VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__2(Vrv32e___024root* vlSelf) {
+    if (false && vlSelf) {}  // Prevent unused
+    Vrv32e__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
+    VL_DEBUG_IF(VL_DBG_MSGF("+    Vrv32e___024root___nba_sequent__TOP__2\n"); );
+    // Body
+    vlSelf->rv32e__DOT__lsu_ex_ready = vlSelf->__Vdly__rv32e__DOT__lsu_ex_ready;
+    vlSelf->rv32e__DOT__wb_ex_csr_num1 = vlSelf->rv32e__DOT__wbu__DOT__CSR
+        [vlSelf->rv32e__DOT__id_wb_csr_addr1];
+    vlSelf->rv32e__DOT__id_valid = vlSelf->__Vdly__rv32e__DOT__id_valid;
+    if (vlSelf->reset) {
+        vlSelf->rv32e__DOT__id_ex_csr_wr_addr2 = 0U;
+        vlSelf->rv32e__DOT__id_ex_csr_wen2 = 0U;
+        vlSelf->rv32e__DOT__id_ex_csr_wr_addr1 = 0U;
+        vlSelf->rv32e__DOT__id_ex_inst = 0U;
+        vlSelf->rv32e__DOT__id_ex_csr_wen1 = 0U;
+        vlSelf->rv32e__DOT__id_ex_MemLen = 0U;
+        vlSelf->rv32e__DOT__id_ex_csr = 0U;
+        vlSelf->rv32e__DOT__id_ex_pc = 0U;
+        vlSelf->rv32e__DOT__id_ex_MemRead = 0U;
+        vlSelf->rv32e__DOT__id_ex_RegWrite = 0U;
+        vlSelf->rv32e__DOT__id_ex_csr_op = 0U;
+        vlSelf->rv32e__DOT__id_ex_zimm = 0U;
+        vlSelf->rv32e__DOT__id_ex_csr_mret = 0U;
+        vlSelf->rv32e__DOT__id_ex_csr_ecall = 0U;
+        vlSelf->rv32e__DOT__id_ex_func3 = 0U;
+        vlSelf->rv32e__DOT__id_ex_rd = 0U;
+        vlSelf->rv32e__DOT__id_ex_MemWrite = 0U;
+        vlSelf->rv32e__DOT__id_wb_rs1 = 0U;
+    } else if (((IData)(vlSelf->rv32e__DOT__IF_valid) 
+                & (IData)(vlSelf->rv32e__DOT__id_ready))) {
+        if (vlSelf->rv32e__DOT__idu__DOT__csr_ecall) {
+            vlSelf->rv32e__DOT__id_ex_csr_wr_addr2 = 0x341U;
+            vlSelf->rv32e__DOT__id_ex_csr_wr_addr1 = 0x342U;
+            vlSelf->rv32e__DOT__id_ex_csr_wen2 = 1U;
+        } else {
+            vlSelf->rv32e__DOT__id_ex_csr_wr_addr2 = 0U;
+            vlSelf->rv32e__DOT__id_ex_csr_wr_addr1 
+                = ((IData)(vlSelf->rv32e__DOT__idu__DOT__csr_mret)
+                    ? 0x300U : (IData)(vlSelf->rv32e__DOT__idu__DOT____VdfgTmp_hf81b0dad__0));
+            vlSelf->rv32e__DOT__id_ex_csr_wen2 = 0U;
+        }
+        vlSelf->rv32e__DOT__id_ex_inst = vlSelf->rv32e__DOT__IF_ID_inst;
+        vlSelf->rv32e__DOT__id_ex_csr_wen1 = (0x73U 
+                                              == (0x7fU 
+                                                  & vlSelf->rv32e__DOT__IF_ID_inst));
+        vlSelf->rv32e__DOT__id_ex_MemLen = (((IData)(vlSelf->rv32e__DOT__idu__DOT____VdfgTmp_h69b43165__0) 
+                                             & (0x2000U 
+                                                == 
+                                                (0x7000U 
+                                                 & vlSelf->rv32e__DOT__IF_ID_inst)))
+                                             ? 2U : 
+                                            (((IData)(vlSelf->rv32e__DOT__idu__DOT____VdfgTmp_h69b43165__0) 
+                                              & (0x1000U 
+                                                 == 
+                                                 (0x7000U 
+                                                  & vlSelf->rv32e__DOT__IF_ID_inst)))
+                                              ? 1U : 
+                                             (((IData)(vlSelf->rv32e__DOT__idu__DOT____VdfgTmp_h69b43165__0) 
+                                               & ((0U 
+                                                   == 
+                                                   (7U 
+                                                    & (vlSelf->rv32e__DOT__IF_ID_inst 
+                                                       >> 0xcU))) 
+                                                  | (IData)(
+                                                            (3U 
+                                                             == 
+                                                             (0x707fU 
+                                                              & vlSelf->rv32e__DOT__IF_ID_inst)))))
+                                               ? 4U
+                                               : ((IData)(
+                                                          (0x5000U 
+                                                           == 
+                                                           (0x707cU 
+                                                            & vlSelf->rv32e__DOT__IF_ID_inst)))
+                                                   ? 3U
+                                                   : 
+                                                  ((IData)(
+                                                           (0x4000U 
+                                                            == 
+                                                            (0x707cU 
+                                                             & vlSelf->rv32e__DOT__IF_ID_inst)))
+                                                    ? 0U
+                                                    : 2U)))));
+        vlSelf->rv32e__DOT__id_ex_csr = (0x73U == (0x7fU 
+                                                   & vlSelf->rv32e__DOT__IF_ID_inst));
+        vlSelf->rv32e__DOT__id_ex_pc = vlSelf->rv32e__DOT__IF_ID_pc;
+        vlSelf->rv32e__DOT__id_ex_MemRead = (IData)(
+                                                    ((0U 
+                                                      == 
+                                                      (0x7cU 
+                                                       & vlSelf->rv32e__DOT__IF_ID_inst)) 
+                                                     & ((2U 
+                                                         == 
+                                                         (7U 
+                                                          & (vlSelf->rv32e__DOT__IF_ID_inst 
+                                                             >> 0xcU))) 
+                                                        | ((1U 
+                                                            == 
+                                                            (7U 
+                                                             & (vlSelf->rv32e__DOT__IF_ID_inst 
+                                                                >> 0xcU))) 
+                                                           | ((0U 
+                                                               == 
+                                                               (7U 
+                                                                & (vlSelf->rv32e__DOT__IF_ID_inst 
+                                                                   >> 0xcU))) 
+                                                              | ((5U 
+                                                                  == 
+                                                                  (7U 
+                                                                   & (vlSelf->rv32e__DOT__IF_ID_inst 
+                                                                      >> 0xcU))) 
+                                                                 | (4U 
+                                                                    == 
+                                                                    (7U 
+                                                                     & (vlSelf->rv32e__DOT__IF_ID_inst 
+                                                                        >> 0xcU)))))))));
+        vlSelf->rv32e__DOT__id_ex_RegWrite = ((0xdU 
+                                               == (0x1fU 
+                                                   & (vlSelf->rv32e__DOT__IF_ID_inst 
+                                                      >> 2U))) 
+                                              | ((5U 
+                                                  == 
+                                                  (0x1fU 
+                                                   & (vlSelf->rv32e__DOT__IF_ID_inst 
+                                                      >> 2U))) 
+                                                 | ((0U 
+                                                     == 
+                                                     (0x1fU 
+                                                      & (vlSelf->rv32e__DOT__IF_ID_inst 
+                                                         >> 2U))) 
+                                                    | ((0x1bU 
+                                                        == 
+                                                        (0x1fU 
+                                                         & (vlSelf->rv32e__DOT__IF_ID_inst 
+                                                            >> 2U))) 
+                                                       | ((0x19U 
+                                                           == 
+                                                           (0x1fU 
+                                                            & (vlSelf->rv32e__DOT__IF_ID_inst 
+                                                               >> 2U))) 
+                                                          | ((0xcU 
+                                                              == 
+                                                              (0x1fU 
+                                                               & (vlSelf->rv32e__DOT__IF_ID_inst 
+                                                                  >> 2U))) 
+                                                             | ((4U 
+                                                                 == 
+                                                                 (0x1fU 
+                                                                  & (vlSelf->rv32e__DOT__IF_ID_inst 
+                                                                     >> 2U))) 
+                                                                | ((~ 
+                                                                    ((IData)(vlSelf->rv32e__DOT__idu__DOT__csr_ecall) 
+                                                                     | (IData)(vlSelf->rv32e__DOT__idu__DOT__csr_mret))) 
+                                                                   & (0x73U 
+                                                                      == 
+                                                                      (0x7fU 
+                                                                       & vlSelf->rv32e__DOT__IF_ID_inst))))))))));
+        vlSelf->rv32e__DOT__id_ex_csr_op = (((0x73U 
+                                              == (0x7fU 
+                                                  & vlSelf->rv32e__DOT__IF_ID_inst)) 
+                                             & ((1U 
+                                                 == 
+                                                 (7U 
+                                                  & (vlSelf->rv32e__DOT__IF_ID_inst 
+                                                     >> 0xcU))) 
+                                                | (5U 
+                                                   == 
+                                                   (7U 
+                                                    & (vlSelf->rv32e__DOT__IF_ID_inst 
+                                                       >> 0xcU)))))
+                                             ? 1U : 
+                                            (((0x73U 
+                                               == (0x7fU 
+                                                   & vlSelf->rv32e__DOT__IF_ID_inst)) 
+                                              & ((2U 
+                                                  == 
+                                                  (7U 
+                                                   & (vlSelf->rv32e__DOT__IF_ID_inst 
+                                                      >> 0xcU))) 
+                                                 | (6U 
+                                                    == 
+                                                    (7U 
+                                                     & (vlSelf->rv32e__DOT__IF_ID_inst 
+                                                        >> 0xcU)))))
+                                              ? 2U : 
+                                             (((0x73U 
+                                                == 
+                                                (0x7fU 
+                                                 & vlSelf->rv32e__DOT__IF_ID_inst)) 
+                                               & ((3U 
+                                                   == 
+                                                   (7U 
+                                                    & (vlSelf->rv32e__DOT__IF_ID_inst 
+                                                       >> 0xcU))) 
+                                                  | (7U 
+                                                     == 
+                                                     (7U 
+                                                      & (vlSelf->rv32e__DOT__IF_ID_inst 
+                                                         >> 0xcU)))))
+                                               ? 3U
+                                               : 0U)));
+        vlSelf->rv32e__DOT__id_ex_zimm = (0x1fU & (vlSelf->rv32e__DOT__IF_ID_inst 
+                                                   >> 0xfU));
+        vlSelf->rv32e__DOT__id_ex_csr_mret = vlSelf->rv32e__DOT__idu__DOT__csr_mret;
+        vlSelf->rv32e__DOT__id_ex_csr_ecall = vlSelf->rv32e__DOT__idu__DOT__csr_ecall;
+        vlSelf->rv32e__DOT__id_ex_func3 = (7U & (vlSelf->rv32e__DOT__IF_ID_inst 
+                                                 >> 0xcU));
+        vlSelf->rv32e__DOT__id_ex_rd = (0x1fU & (vlSelf->rv32e__DOT__IF_ID_inst 
+                                                 >> 7U));
+        vlSelf->rv32e__DOT__id_ex_MemWrite = (8U == 
+                                              (0x1fU 
+                                               & (vlSelf->rv32e__DOT__IF_ID_inst 
+                                                  >> 2U)));
+        vlSelf->rv32e__DOT__id_wb_rs1 = (0x1fU & (vlSelf->rv32e__DOT__IF_ID_inst 
+                                                  >> 0xfU));
+    }
+    vlSelf->rv32e__DOT__ex_bpu_update = 0U;
+    vlSelf->rv32e__DOT__ex_bpu_pc = 0U;
+    if (vlSelf->rv32e__DOT__id_ex_jal) {
+        vlSelf->rv32e__DOT__ex_bpu_update = 1U;
+        vlSelf->rv32e__DOT__ex_bpu_pc = vlSelf->rv32e__DOT__id_ex_pc;
+    } else if (vlSelf->rv32e__DOT__id_ex_jalr) {
+        vlSelf->rv32e__DOT__ex_bpu_update = 1U;
+        vlSelf->rv32e__DOT__ex_bpu_pc = vlSelf->rv32e__DOT__id_ex_pc;
+    } else if ((1U & (~ (IData)(vlSelf->rv32e__DOT__id_ex_csr_ecall)))) {
+        if ((1U & (~ (IData)(vlSelf->rv32e__DOT__id_ex_csr_mret)))) {
+            if ((0x63U == (IData)(vlSelf->rv32e__DOT__id_ex_opcode))) {
+                vlSelf->rv32e__DOT__ex_bpu_update = 1U;
+                vlSelf->rv32e__DOT__ex_bpu_pc = vlSelf->rv32e__DOT__id_ex_pc;
+            } else {
+                vlSelf->rv32e__DOT__ex_bpu_update = 0U;
+                vlSelf->rv32e__DOT__ex_bpu_pc = 0U;
+            }
+        }
+    }
+    vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h0017749a__0 
+        = ((IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_hb53dc38f__0) 
+           & ((IData)(vlSelf->rv32e__DOT__id_wb_rs1) 
+              == (IData)(vlSelf->rv32e__DOT__lsu__DOT__l_rd_addr)));
+}
+
 VL_INLINE_OPT void Vrv32e___024root___nba_comb__TOP__0(Vrv32e___024root* vlSelf) {
     if (false && vlSelf) {}  // Prevent unused
     Vrv32e__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vrv32e___024root___nba_comb__TOP__0\n"); );
     // Body
-    vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_he5bf04e5__0 
-        = ((IData)(vlSelf->rv32e__DOT__ex_lsu_rd) == (IData)(vlSelf->rv32e__DOT__id_wb_rs2));
     vlSelf->rv32e__DOT__lsu__DOT__rd_data = ((IData)(vlSelf->rv32e__DOT__lsu__DOT__l_load)
                                               ? ((0U 
                                                   == (IData)(vlSelf->rv32e__DOT__lsu__DOT__l_MemLen))
@@ -1316,6 +1581,8 @@ VL_INLINE_OPT void Vrv32e___024root___nba_comb__TOP__0(Vrv32e___024root* vlSelf)
                                                     & (~ (IData)(vlSelf->rv32e__DOT__ex_lsu_csr_mret)))
                                                     ? vlSelf->rv32e__DOT__ex_lsu_csr_rdata
                                                     : vlSelf->rv32e__DOT__ex_lsu_process_result))));
+    vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_he5bf04e5__0 
+        = ((IData)(vlSelf->rv32e__DOT__ex_lsu_rd) == (IData)(vlSelf->rv32e__DOT__id_wb_rs2));
     vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_hc613623f__0 
         = (((IData)(vlSelf->rv32e__DOT__ex_lsu_rd) 
             == (IData)(vlSelf->rv32e__DOT__id_wb_rs1)) 
@@ -1480,11 +1747,6 @@ VL_INLINE_OPT void Vrv32e___024root___nba_comb__TOP__0(Vrv32e___024root* vlSelf)
                            + vlSelf->rv32e__DOT__exu__DOT__ex_num2))));
     }
     vlSelf->rv32e__DOT__exu__DOT__alu_zero = (0U == vlSelf->rv32e__DOT__exu__DOT__process_result);
-    vlSelf->rv32e__DOT__exu__DOT__jal_target = (vlSelf->rv32e__DOT__id_ex_pc 
-                                                + vlSelf->rv32e__DOT__id_ex_imm);
-    vlSelf->rv32e__DOT__exu__DOT__jalr_target = (0xfffffffeU 
-                                                 & (vlSelf->rv32e__DOT__exu__DOT__src1 
-                                                    + vlSelf->rv32e__DOT__id_ex_imm));
     vlSelf->rv32e__DOT__exu__DOT__take_branch = ((0x63U 
                                                   == (IData)(vlSelf->rv32e__DOT__id_ex_opcode)) 
                                                  & (((((((1U 
@@ -1505,25 +1767,47 @@ VL_INLINE_OPT void Vrv32e___024root___nba_comb__TOP__0(Vrv32e___024root* vlSelf)
                                                     | ((7U 
                                                         == (IData)(vlSelf->rv32e__DOT__id_ex_func3)) 
                                                        & (~ (IData)(vlSelf->rv32e__DOT__exu__DOT__alu_less)))));
+    vlSelf->rv32e__DOT__ex_flush = 0U;
+    vlSelf->rv32e__DOT__ex_flush_pc = 0U;
+    vlSelf->rv32e__DOT__ex_bpu_taken = 0U;
+    vlSelf->rv32e__DOT__ex_bpu_target = 0U;
+    vlSelf->rv32e__DOT__ex_bpu_correct = 0U;
+    vlSelf->rv32e__DOT__exu__DOT__actual_target = 0U;
     if (vlSelf->rv32e__DOT__id_ex_jal) {
-        vlSelf->rv32e__DOT__ex_flush = ((IData)(vlSelf->rv32e__DOT__exu__DOT__ex_flush_condition) 
-                                        & (~ (IData)(
-                                                     (0U 
-                                                      != (IData)(vlSelf->rv32e__DOT__exu__DOT__load_use_flag)))));
-        vlSelf->rv32e__DOT__ex_flush_pc = vlSelf->rv32e__DOT__exu__DOT__jal_target;
-    } else if (vlSelf->rv32e__DOT__id_ex_jalr) {
-        vlSelf->rv32e__DOT__ex_flush = ((IData)(vlSelf->rv32e__DOT__exu__DOT__ex_flush_condition) 
-                                        & (~ (IData)(
-                                                     (0U 
-                                                      != (IData)(vlSelf->rv32e__DOT__exu__DOT__load_use_flag)))));
-        vlSelf->rv32e__DOT__ex_flush_pc = vlSelf->rv32e__DOT__exu__DOT__jalr_target;
-    } else if (vlSelf->rv32e__DOT__exu__DOT__take_branch) {
-        vlSelf->rv32e__DOT__ex_flush = ((IData)(vlSelf->rv32e__DOT__exu__DOT__ex_flush_condition) 
+        vlSelf->rv32e__DOT__ex_bpu_correct = ((IData)(vlSelf->rv32e__DOT__id_ex_predict_taken) 
+                                              & (vlSelf->rv32e__DOT__id_ex_predict_target 
+                                                 == 
+                                                 (vlSelf->rv32e__DOT__id_ex_pc 
+                                                  + vlSelf->rv32e__DOT__id_ex_imm)));
+        vlSelf->rv32e__DOT__ex_bpu_taken = 1U;
+        vlSelf->rv32e__DOT__ex_bpu_target = (vlSelf->rv32e__DOT__id_ex_pc 
+                                             + vlSelf->rv32e__DOT__id_ex_imm);
+        vlSelf->rv32e__DOT__ex_flush = (((~ (IData)(vlSelf->rv32e__DOT__ex_bpu_correct)) 
+                                         & (IData)(vlSelf->rv32e__DOT__exu__DOT__ex_flush_condition)) 
                                         & (~ (IData)(
                                                      (0U 
                                                       != (IData)(vlSelf->rv32e__DOT__exu__DOT__load_use_flag)))));
         vlSelf->rv32e__DOT__ex_flush_pc = (vlSelf->rv32e__DOT__id_ex_pc 
                                            + vlSelf->rv32e__DOT__id_ex_imm);
+    } else if (vlSelf->rv32e__DOT__id_ex_jalr) {
+        vlSelf->rv32e__DOT__ex_bpu_correct = ((IData)(vlSelf->rv32e__DOT__id_ex_predict_taken) 
+                                              & (vlSelf->rv32e__DOT__id_ex_predict_target 
+                                                 == 
+                                                 (0xfffffffeU 
+                                                  & (vlSelf->rv32e__DOT__exu__DOT__src1 
+                                                     + vlSelf->rv32e__DOT__id_ex_imm))));
+        vlSelf->rv32e__DOT__ex_bpu_taken = 1U;
+        vlSelf->rv32e__DOT__ex_bpu_target = (0xfffffffeU 
+                                             & (vlSelf->rv32e__DOT__exu__DOT__src1 
+                                                + vlSelf->rv32e__DOT__id_ex_imm));
+        vlSelf->rv32e__DOT__ex_flush = (((~ (IData)(vlSelf->rv32e__DOT__ex_bpu_correct)) 
+                                         & (IData)(vlSelf->rv32e__DOT__exu__DOT__ex_flush_condition)) 
+                                        & (~ (IData)(
+                                                     (0U 
+                                                      != (IData)(vlSelf->rv32e__DOT__exu__DOT__load_use_flag)))));
+        vlSelf->rv32e__DOT__ex_flush_pc = (0xfffffffeU 
+                                           & (vlSelf->rv32e__DOT__exu__DOT__src1 
+                                              + vlSelf->rv32e__DOT__id_ex_imm));
     } else if (vlSelf->rv32e__DOT__id_ex_csr_ecall) {
         vlSelf->rv32e__DOT__ex_flush = ((IData)(vlSelf->rv32e__DOT__exu__DOT__ex_flush_condition) 
                                         & (~ (IData)(
@@ -1537,13 +1821,91 @@ VL_INLINE_OPT void Vrv32e___024root___nba_comb__TOP__0(Vrv32e___024root* vlSelf)
                                                       != (IData)(vlSelf->rv32e__DOT__exu__DOT__load_use_flag)))));
         vlSelf->rv32e__DOT__ex_flush_pc = vlSelf->rv32e__DOT__wbu__DOT__CSR
             [vlSelf->rv32e__DOT__id_wb_csr_addr2];
+    } else if ((0x63U == (IData)(vlSelf->rv32e__DOT__id_ex_opcode))) {
+        if (vlSelf->rv32e__DOT__exu__DOT__take_branch) {
+            vlSelf->rv32e__DOT__exu__DOT__actual_target 
+                = (vlSelf->rv32e__DOT__id_ex_pc + vlSelf->rv32e__DOT__id_ex_imm);
+            vlSelf->rv32e__DOT__ex_bpu_taken = 1U;
+        } else {
+            vlSelf->rv32e__DOT__exu__DOT__actual_target 
+                = vlSelf->rv32e__DOT__id_ex_pc2;
+            vlSelf->rv32e__DOT__ex_bpu_taken = 0U;
+        }
+        vlSelf->rv32e__DOT__ex_bpu_target = (vlSelf->rv32e__DOT__id_ex_pc 
+                                             + vlSelf->rv32e__DOT__id_ex_imm);
+        vlSelf->rv32e__DOT__ex_bpu_correct = (((IData)(vlSelf->rv32e__DOT__exu__DOT__take_branch) 
+                                               == (IData)(vlSelf->rv32e__DOT__id_ex_predict_taken)) 
+                                              & (vlSelf->rv32e__DOT__exu__DOT__actual_target 
+                                                 == vlSelf->rv32e__DOT__id_ex_predict_target));
+        if ((1U & (~ (IData)(vlSelf->rv32e__DOT__ex_bpu_correct)))) {
+            vlSelf->rv32e__DOT__ex_flush = ((IData)(vlSelf->rv32e__DOT__exu__DOT__ex_flush_condition) 
+                                            & (~ (IData)(
+                                                         (0U 
+                                                          != (IData)(vlSelf->rv32e__DOT__exu__DOT__load_use_flag)))));
+            vlSelf->rv32e__DOT__ex_flush_pc = ((IData)(vlSelf->rv32e__DOT__exu__DOT__take_branch)
+                                                ? vlSelf->rv32e__DOT__ex_bpu_target
+                                                : ((IData)(4U) 
+                                                   + vlSelf->rv32e__DOT__id_ex_pc));
+        }
     } else {
+        vlSelf->rv32e__DOT__ex_bpu_taken = 0U;
+        vlSelf->rv32e__DOT__ex_bpu_target = 0U;
+        vlSelf->rv32e__DOT__ex_bpu_correct = 0U;
         vlSelf->rv32e__DOT__ex_flush = 0U;
         vlSelf->rv32e__DOT__ex_flush_pc = 0U;
     }
     vlSelf->rv32e__DOT__id_ready = (1U & ((~ (IData)(vlSelf->rv32e__DOT__ex_flush)) 
                                           & ((~ (IData)(vlSelf->rv32e__DOT__id_valid)) 
                                              | (IData)(vlSelf->rv32e__DOT__ex_ready))));
+}
+
+VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__3(Vrv32e___024root* vlSelf) {
+    if (false && vlSelf) {}  // Prevent unused
+    Vrv32e__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
+    VL_DEBUG_IF(VL_DBG_MSGF("+    Vrv32e___024root___nba_sequent__TOP__3\n"); );
+    // Body
+    vlSelf->rv32e__DOT__IF_ID_pc = vlSelf->__Vdly__rv32e__DOT__IF_ID_pc;
+}
+
+VL_INLINE_OPT void Vrv32e___024root___nba_comb__TOP__1(Vrv32e___024root* vlSelf) {
+    if (false && vlSelf) {}  // Prevent unused
+    Vrv32e__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
+    VL_DEBUG_IF(VL_DBG_MSGF("+    Vrv32e___024root___nba_comb__TOP__1\n"); );
+    // Body
+    vlSelf->rv32e__DOT__bpu__DOT__bht_index = (0x3ffU 
+                                               & (vlSelf->rv32e__DOT__IF_ID_pc 
+                                                  >> 2U));
+    vlSelf->rv32e__DOT__bpu__DOT__local_pht_index = 
+        (0x3ffU & (vlSelf->rv32e__DOT__bpu__DOT__local_bht
+                   [vlSelf->rv32e__DOT__bpu__DOT__bht_index] 
+                   ^ (vlSelf->rv32e__DOT__IF_ID_pc 
+                      >> 2U)));
+    vlSelf->rv32e__DOT__bpu__DOT__global_pht_index 
+        = (0x3ffU & ((IData)(vlSelf->rv32e__DOT__bpu__DOT__global_bhr) 
+                     ^ (vlSelf->rv32e__DOT__IF_ID_pc 
+                        >> 2U)));
+    vlSelf->rv32e__DOT__bpu__DOT__local_predict = (1U 
+                                                   & (vlSelf->rv32e__DOT__bpu__DOT__local_pht
+                                                      [vlSelf->rv32e__DOT__bpu__DOT__local_pht_index] 
+                                                      >> 1U));
+    vlSelf->rv32e__DOT__bpu__DOT__global_predict = 
+        (1U & (vlSelf->rv32e__DOT__bpu__DOT__global_pht
+               [vlSelf->rv32e__DOT__bpu__DOT__global_pht_index] 
+               >> 1U));
+    vlSelf->rv32e__DOT__predict_taken = ((2U > vlSelf->rv32e__DOT__bpu__DOT__cpht
+                                          [vlSelf->rv32e__DOT__bpu__DOT__bht_index])
+                                          ? ((IData)(vlSelf->rv32e__DOT__bpu__DOT__local_predict) 
+                                             & vlSelf->rv32e__DOT__bpu__DOT__valid
+                                             [vlSelf->rv32e__DOT__bpu__DOT__bht_index])
+                                          : ((IData)(vlSelf->rv32e__DOT__bpu__DOT__global_predict) 
+                                             & vlSelf->rv32e__DOT__bpu__DOT__valid
+                                             [vlSelf->rv32e__DOT__bpu__DOT__bht_index]));
+    vlSelf->rv32e__DOT__predict_target = (vlSelf->rv32e__DOT__bpu__DOT__valid
+                                          [vlSelf->rv32e__DOT__bpu__DOT__bht_index]
+                                           ? vlSelf->rv32e__DOT__bpu__DOT__btb
+                                          [vlSelf->rv32e__DOT__bpu__DOT__bht_index]
+                                           : ((IData)(4U) 
+                                              + vlSelf->rv32e__DOT__IF_ID_pc));
     if (((IData)(vlSelf->reset) | (IData)(vlSelf->rv32e__DOT__ifu__DOT__check))) {
         vlSelf->rv32e__DOT__IF_valid = 0U;
         vlSelf->rv32e__DOT__IF_ID_inst = 0U;
@@ -1671,6 +2033,10 @@ VL_INLINE_OPT void Vrv32e___024root___nba_comb__TOP__0(Vrv32e___024root* vlSelf)
                                                       & (vlSelf->rv32e__DOT__IF_ID_inst 
                                                          >> 0xfU))
                                                       : 0U)))))));
+    vlSelf->rv32e__DOT__idu__DOT__jalr = (IData)((0x67U 
+                                                  == 
+                                                  (0x707fU 
+                                                   & vlSelf->rv32e__DOT__IF_ID_inst)));
     vlSelf->rv32e__DOT__idu__DOT__csr_ecall = (IData)(
                                                       (0x73U 
                                                        == vlSelf->rv32e__DOT__IF_ID_inst));
@@ -1851,6 +2217,12 @@ void Vrv32e___024root___eval_nba(Vrv32e___024root* vlSelf) {
     }
     if ((vlSelf->__VnbaTriggered.at(0U) | vlSelf->__VnbaTriggered.at(1U))) {
         Vrv32e___024root___nba_comb__TOP__0(vlSelf);
+    }
+    if (vlSelf->__VnbaTriggered.at(1U)) {
+        Vrv32e___024root___nba_sequent__TOP__3(vlSelf);
+    }
+    if ((vlSelf->__VnbaTriggered.at(0U) | vlSelf->__VnbaTriggered.at(1U))) {
+        Vrv32e___024root___nba_comb__TOP__1(vlSelf);
     }
 }
 

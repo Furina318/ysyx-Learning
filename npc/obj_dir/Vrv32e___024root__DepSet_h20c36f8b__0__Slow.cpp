@@ -40,6 +40,32 @@ VL_ATTR_COLD void Vrv32e___024root___eval_initial__TOP(Vrv32e___024root* vlSelf)
                 : 0U);
         rv32e__DOT__wbu__DOT__k = ((IData)(1U) + rv32e__DOT__wbu__DOT__k);
     }
+    vlSelf->rv32e__DOT__bpu__DOT__i = 0U;
+    while (VL_GTS_III(32, 0x400U, vlSelf->rv32e__DOT__bpu__DOT__i)) {
+        vlSelf->rv32e__DOT__bpu__DOT__cpht[(0x3ffU 
+                                            & vlSelf->rv32e__DOT__bpu__DOT__i)] = 1U;
+        vlSelf->rv32e__DOT__bpu__DOT__local_bht[(0x3ffU 
+                                                 & vlSelf->rv32e__DOT__bpu__DOT__i)] = 0U;
+        vlSelf->rv32e__DOT__bpu__DOT__btb[(0x3ffU & vlSelf->rv32e__DOT__bpu__DOT__i)] 
+            = ((IData)(0x80000000U) + (vlSelf->rv32e__DOT__bpu__DOT__i 
+                                       << 2U));
+        vlSelf->rv32e__DOT__bpu__DOT__valid[(0x3ffU 
+                                             & vlSelf->rv32e__DOT__bpu__DOT__i)] = 0U;
+        vlSelf->rv32e__DOT__bpu__DOT__i = ((IData)(1U) 
+                                           + vlSelf->rv32e__DOT__bpu__DOT__i);
+    }
+    vlSelf->rv32e__DOT__bpu__DOT__i = 0U;
+    while (VL_GTS_III(32, 0x400U, vlSelf->rv32e__DOT__bpu__DOT__i)) {
+        vlSelf->rv32e__DOT__bpu__DOT__local_pht[(0x3ffU 
+                                                 & vlSelf->rv32e__DOT__bpu__DOT__i)] = 2U;
+        vlSelf->rv32e__DOT__bpu__DOT__global_pht[(0x3ffU 
+                                                  & vlSelf->rv32e__DOT__bpu__DOT__i)] = 2U;
+        vlSelf->rv32e__DOT__bpu__DOT__i = ((IData)(1U) 
+                                           + vlSelf->rv32e__DOT__bpu__DOT__i);
+    }
+    vlSelf->rv32e__DOT__bpu__DOT__global_bhr = 0U;
+    vlSelf->rv32e__DOT__correct_predictions = 0U;
+    vlSelf->rv32e__DOT__total_predictions = 0U;
 }
 
 VL_ATTR_COLD void Vrv32e___024root___eval_final(Vrv32e___024root* vlSelf) {
@@ -104,9 +130,8 @@ VL_ATTR_COLD void Vrv32e___024root___stl_sequent__TOP__0(Vrv32e___024root* vlSel
     Vrv32e__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vrv32e___024root___stl_sequent__TOP__0\n"); );
     // Body
-    if ((0x100073U == vlSelf->rv32e__DOT__ex_lsu_inst)) {
-        Vrv32e___024root____Vdpiimwrap_rv32e__DOT__ebreak_TOP(1U, vlSelf->rv32e__DOT__ex_lsu_inst);
-    }
+    vlSelf->rv32e__DOT__ex_bpu_update = 0U;
+    vlSelf->rv32e__DOT__ex_bpu_pc = 0U;
     vlSelf->rv32e__DOT__lsu__DOT__rd_data = ((IData)(vlSelf->rv32e__DOT__lsu__DOT__l_load)
                                               ? ((0U 
                                                   == (IData)(vlSelf->rv32e__DOT__lsu__DOT__l_MemLen))
@@ -157,6 +182,40 @@ VL_ATTR_COLD void Vrv32e___024root___stl_sequent__TOP__0(Vrv32e___024root* vlSel
                                                     & (~ (IData)(vlSelf->rv32e__DOT__ex_lsu_csr_mret)))
                                                     ? vlSelf->rv32e__DOT__ex_lsu_csr_rdata
                                                     : vlSelf->rv32e__DOT__ex_lsu_process_result))));
+    vlSelf->rv32e__DOT__bpu__DOT__bht_index = (0x3ffU 
+                                               & (vlSelf->rv32e__DOT__IF_ID_pc 
+                                                  >> 2U));
+    vlSelf->rv32e__DOT__bpu__DOT__local_pht_index = 
+        (0x3ffU & (vlSelf->rv32e__DOT__bpu__DOT__local_bht
+                   [vlSelf->rv32e__DOT__bpu__DOT__bht_index] 
+                   ^ (vlSelf->rv32e__DOT__IF_ID_pc 
+                      >> 2U)));
+    vlSelf->rv32e__DOT__bpu__DOT__global_pht_index 
+        = (0x3ffU & ((IData)(vlSelf->rv32e__DOT__bpu__DOT__global_bhr) 
+                     ^ (vlSelf->rv32e__DOT__IF_ID_pc 
+                        >> 2U)));
+    vlSelf->rv32e__DOT__bpu__DOT__local_predict = (1U 
+                                                   & (vlSelf->rv32e__DOT__bpu__DOT__local_pht
+                                                      [vlSelf->rv32e__DOT__bpu__DOT__local_pht_index] 
+                                                      >> 1U));
+    vlSelf->rv32e__DOT__bpu__DOT__global_predict = 
+        (1U & (vlSelf->rv32e__DOT__bpu__DOT__global_pht
+               [vlSelf->rv32e__DOT__bpu__DOT__global_pht_index] 
+               >> 1U));
+    vlSelf->rv32e__DOT__predict_taken = ((2U > vlSelf->rv32e__DOT__bpu__DOT__cpht
+                                          [vlSelf->rv32e__DOT__bpu__DOT__bht_index])
+                                          ? ((IData)(vlSelf->rv32e__DOT__bpu__DOT__local_predict) 
+                                             & vlSelf->rv32e__DOT__bpu__DOT__valid
+                                             [vlSelf->rv32e__DOT__bpu__DOT__bht_index])
+                                          : ((IData)(vlSelf->rv32e__DOT__bpu__DOT__global_predict) 
+                                             & vlSelf->rv32e__DOT__bpu__DOT__valid
+                                             [vlSelf->rv32e__DOT__bpu__DOT__bht_index]));
+    vlSelf->rv32e__DOT__predict_target = (vlSelf->rv32e__DOT__bpu__DOT__valid
+                                          [vlSelf->rv32e__DOT__bpu__DOT__bht_index]
+                                           ? vlSelf->rv32e__DOT__bpu__DOT__btb
+                                          [vlSelf->rv32e__DOT__bpu__DOT__bht_index]
+                                           : ((IData)(4U) 
+                                              + vlSelf->rv32e__DOT__IF_ID_pc));
     vlSelf->rv32e__DOT__wb_ex_csr_num1 = vlSelf->rv32e__DOT__wbu__DOT__CSR
         [vlSelf->rv32e__DOT__id_wb_csr_addr1];
     vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h804502ec__0 
@@ -304,6 +363,23 @@ VL_ATTR_COLD void Vrv32e___024root___stl_sequent__TOP__0(Vrv32e___024root* vlSel
                                                    == (IData)(vlSelf->rv32e__DOT__id_ex_alu_op)) 
                                                   & (vlSelf->rv32e__DOT__exu__DOT__ex_num1 
                                                      < vlSelf->rv32e__DOT__exu__DOT__ex_num2)));
+    if (vlSelf->rv32e__DOT__id_ex_jal) {
+        vlSelf->rv32e__DOT__ex_bpu_update = 1U;
+        vlSelf->rv32e__DOT__ex_bpu_pc = vlSelf->rv32e__DOT__id_ex_pc;
+    } else if (vlSelf->rv32e__DOT__id_ex_jalr) {
+        vlSelf->rv32e__DOT__ex_bpu_update = 1U;
+        vlSelf->rv32e__DOT__ex_bpu_pc = vlSelf->rv32e__DOT__id_ex_pc;
+    } else if ((1U & (~ (IData)(vlSelf->rv32e__DOT__id_ex_csr_ecall)))) {
+        if ((1U & (~ (IData)(vlSelf->rv32e__DOT__id_ex_csr_mret)))) {
+            if ((0x63U == (IData)(vlSelf->rv32e__DOT__id_ex_opcode))) {
+                vlSelf->rv32e__DOT__ex_bpu_update = 1U;
+                vlSelf->rv32e__DOT__ex_bpu_pc = vlSelf->rv32e__DOT__id_ex_pc;
+            } else {
+                vlSelf->rv32e__DOT__ex_bpu_update = 0U;
+                vlSelf->rv32e__DOT__ex_bpu_pc = 0U;
+            }
+        }
+    }
     if ((8U & (IData)(vlSelf->rv32e__DOT__id_ex_alu_op))) {
         if ((4U & (IData)(vlSelf->rv32e__DOT__id_ex_alu_op))) {
             vlSelf->rv32e__DOT__exu__DOT__process_result = 0U;
@@ -346,11 +422,6 @@ VL_ATTR_COLD void Vrv32e___024root___stl_sequent__TOP__0(Vrv32e___024root* vlSel
                            + vlSelf->rv32e__DOT__exu__DOT__ex_num2))));
     }
     vlSelf->rv32e__DOT__exu__DOT__alu_zero = (0U == vlSelf->rv32e__DOT__exu__DOT__process_result);
-    vlSelf->rv32e__DOT__exu__DOT__jal_target = (vlSelf->rv32e__DOT__id_ex_pc 
-                                                + vlSelf->rv32e__DOT__id_ex_imm);
-    vlSelf->rv32e__DOT__exu__DOT__jalr_target = (0xfffffffeU 
-                                                 & (vlSelf->rv32e__DOT__exu__DOT__src1 
-                                                    + vlSelf->rv32e__DOT__id_ex_imm));
     vlSelf->rv32e__DOT__exu__DOT__take_branch = ((0x63U 
                                                   == (IData)(vlSelf->rv32e__DOT__id_ex_opcode)) 
                                                  & (((((((1U 
@@ -371,25 +442,47 @@ VL_ATTR_COLD void Vrv32e___024root___stl_sequent__TOP__0(Vrv32e___024root* vlSel
                                                     | ((7U 
                                                         == (IData)(vlSelf->rv32e__DOT__id_ex_func3)) 
                                                        & (~ (IData)(vlSelf->rv32e__DOT__exu__DOT__alu_less)))));
+    vlSelf->rv32e__DOT__ex_flush = 0U;
+    vlSelf->rv32e__DOT__ex_flush_pc = 0U;
+    vlSelf->rv32e__DOT__ex_bpu_taken = 0U;
+    vlSelf->rv32e__DOT__ex_bpu_target = 0U;
+    vlSelf->rv32e__DOT__ex_bpu_correct = 0U;
+    vlSelf->rv32e__DOT__exu__DOT__actual_target = 0U;
     if (vlSelf->rv32e__DOT__id_ex_jal) {
-        vlSelf->rv32e__DOT__ex_flush = ((IData)(vlSelf->rv32e__DOT__exu__DOT__ex_flush_condition) 
-                                        & (~ (IData)(
-                                                     (0U 
-                                                      != (IData)(vlSelf->rv32e__DOT__exu__DOT__load_use_flag)))));
-        vlSelf->rv32e__DOT__ex_flush_pc = vlSelf->rv32e__DOT__exu__DOT__jal_target;
-    } else if (vlSelf->rv32e__DOT__id_ex_jalr) {
-        vlSelf->rv32e__DOT__ex_flush = ((IData)(vlSelf->rv32e__DOT__exu__DOT__ex_flush_condition) 
-                                        & (~ (IData)(
-                                                     (0U 
-                                                      != (IData)(vlSelf->rv32e__DOT__exu__DOT__load_use_flag)))));
-        vlSelf->rv32e__DOT__ex_flush_pc = vlSelf->rv32e__DOT__exu__DOT__jalr_target;
-    } else if (vlSelf->rv32e__DOT__exu__DOT__take_branch) {
-        vlSelf->rv32e__DOT__ex_flush = ((IData)(vlSelf->rv32e__DOT__exu__DOT__ex_flush_condition) 
+        vlSelf->rv32e__DOT__ex_bpu_correct = ((IData)(vlSelf->rv32e__DOT__id_ex_predict_taken) 
+                                              & (vlSelf->rv32e__DOT__id_ex_predict_target 
+                                                 == 
+                                                 (vlSelf->rv32e__DOT__id_ex_pc 
+                                                  + vlSelf->rv32e__DOT__id_ex_imm)));
+        vlSelf->rv32e__DOT__ex_bpu_taken = 1U;
+        vlSelf->rv32e__DOT__ex_bpu_target = (vlSelf->rv32e__DOT__id_ex_pc 
+                                             + vlSelf->rv32e__DOT__id_ex_imm);
+        vlSelf->rv32e__DOT__ex_flush = (((~ (IData)(vlSelf->rv32e__DOT__ex_bpu_correct)) 
+                                         & (IData)(vlSelf->rv32e__DOT__exu__DOT__ex_flush_condition)) 
                                         & (~ (IData)(
                                                      (0U 
                                                       != (IData)(vlSelf->rv32e__DOT__exu__DOT__load_use_flag)))));
         vlSelf->rv32e__DOT__ex_flush_pc = (vlSelf->rv32e__DOT__id_ex_pc 
                                            + vlSelf->rv32e__DOT__id_ex_imm);
+    } else if (vlSelf->rv32e__DOT__id_ex_jalr) {
+        vlSelf->rv32e__DOT__ex_bpu_correct = ((IData)(vlSelf->rv32e__DOT__id_ex_predict_taken) 
+                                              & (vlSelf->rv32e__DOT__id_ex_predict_target 
+                                                 == 
+                                                 (0xfffffffeU 
+                                                  & (vlSelf->rv32e__DOT__exu__DOT__src1 
+                                                     + vlSelf->rv32e__DOT__id_ex_imm))));
+        vlSelf->rv32e__DOT__ex_bpu_taken = 1U;
+        vlSelf->rv32e__DOT__ex_bpu_target = (0xfffffffeU 
+                                             & (vlSelf->rv32e__DOT__exu__DOT__src1 
+                                                + vlSelf->rv32e__DOT__id_ex_imm));
+        vlSelf->rv32e__DOT__ex_flush = (((~ (IData)(vlSelf->rv32e__DOT__ex_bpu_correct)) 
+                                         & (IData)(vlSelf->rv32e__DOT__exu__DOT__ex_flush_condition)) 
+                                        & (~ (IData)(
+                                                     (0U 
+                                                      != (IData)(vlSelf->rv32e__DOT__exu__DOT__load_use_flag)))));
+        vlSelf->rv32e__DOT__ex_flush_pc = (0xfffffffeU 
+                                           & (vlSelf->rv32e__DOT__exu__DOT__src1 
+                                              + vlSelf->rv32e__DOT__id_ex_imm));
     } else if (vlSelf->rv32e__DOT__id_ex_csr_ecall) {
         vlSelf->rv32e__DOT__ex_flush = ((IData)(vlSelf->rv32e__DOT__exu__DOT__ex_flush_condition) 
                                         & (~ (IData)(
@@ -403,7 +496,36 @@ VL_ATTR_COLD void Vrv32e___024root___stl_sequent__TOP__0(Vrv32e___024root* vlSel
                                                       != (IData)(vlSelf->rv32e__DOT__exu__DOT__load_use_flag)))));
         vlSelf->rv32e__DOT__ex_flush_pc = vlSelf->rv32e__DOT__wbu__DOT__CSR
             [vlSelf->rv32e__DOT__id_wb_csr_addr2];
+    } else if ((0x63U == (IData)(vlSelf->rv32e__DOT__id_ex_opcode))) {
+        if (vlSelf->rv32e__DOT__exu__DOT__take_branch) {
+            vlSelf->rv32e__DOT__exu__DOT__actual_target 
+                = (vlSelf->rv32e__DOT__id_ex_pc + vlSelf->rv32e__DOT__id_ex_imm);
+            vlSelf->rv32e__DOT__ex_bpu_taken = 1U;
+        } else {
+            vlSelf->rv32e__DOT__exu__DOT__actual_target 
+                = vlSelf->rv32e__DOT__id_ex_pc2;
+            vlSelf->rv32e__DOT__ex_bpu_taken = 0U;
+        }
+        vlSelf->rv32e__DOT__ex_bpu_target = (vlSelf->rv32e__DOT__id_ex_pc 
+                                             + vlSelf->rv32e__DOT__id_ex_imm);
+        vlSelf->rv32e__DOT__ex_bpu_correct = (((IData)(vlSelf->rv32e__DOT__exu__DOT__take_branch) 
+                                               == (IData)(vlSelf->rv32e__DOT__id_ex_predict_taken)) 
+                                              & (vlSelf->rv32e__DOT__exu__DOT__actual_target 
+                                                 == vlSelf->rv32e__DOT__id_ex_predict_target));
+        if ((1U & (~ (IData)(vlSelf->rv32e__DOT__ex_bpu_correct)))) {
+            vlSelf->rv32e__DOT__ex_flush = ((IData)(vlSelf->rv32e__DOT__exu__DOT__ex_flush_condition) 
+                                            & (~ (IData)(
+                                                         (0U 
+                                                          != (IData)(vlSelf->rv32e__DOT__exu__DOT__load_use_flag)))));
+            vlSelf->rv32e__DOT__ex_flush_pc = ((IData)(vlSelf->rv32e__DOT__exu__DOT__take_branch)
+                                                ? vlSelf->rv32e__DOT__ex_bpu_target
+                                                : ((IData)(4U) 
+                                                   + vlSelf->rv32e__DOT__id_ex_pc));
+        }
     } else {
+        vlSelf->rv32e__DOT__ex_bpu_taken = 0U;
+        vlSelf->rv32e__DOT__ex_bpu_target = 0U;
+        vlSelf->rv32e__DOT__ex_bpu_correct = 0U;
         vlSelf->rv32e__DOT__ex_flush = 0U;
         vlSelf->rv32e__DOT__ex_flush_pc = 0U;
     }
@@ -537,6 +659,10 @@ VL_ATTR_COLD void Vrv32e___024root___stl_sequent__TOP__0(Vrv32e___024root* vlSel
                                                       & (vlSelf->rv32e__DOT__IF_ID_inst 
                                                          >> 0xfU))
                                                       : 0U)))))));
+    vlSelf->rv32e__DOT__idu__DOT__jalr = (IData)((0x67U 
+                                                  == 
+                                                  (0x707fU 
+                                                   & vlSelf->rv32e__DOT__IF_ID_inst)));
     vlSelf->rv32e__DOT__idu__DOT__csr_ecall = (IData)(
                                                       (0x73U 
                                                        == vlSelf->rv32e__DOT__IF_ID_inst));
@@ -736,10 +862,10 @@ VL_ATTR_COLD void Vrv32e___024root___dump_triggers__act(Vrv32e___024root* vlSelf
         VL_DBG_MSGF("         No triggers active\n");
     }
     if (vlSelf->__VactTriggered.at(0U)) {
-        VL_DBG_MSGF("         'act' region trigger index 0 is active: @(posedge clk or posedge reset)\n");
+        VL_DBG_MSGF("         'act' region trigger index 0 is active: @(posedge clk)\n");
     }
     if (vlSelf->__VactTriggered.at(1U)) {
-        VL_DBG_MSGF("         'act' region trigger index 1 is active: @(posedge clk)\n");
+        VL_DBG_MSGF("         'act' region trigger index 1 is active: @(posedge clk or posedge reset)\n");
     }
 }
 #endif  // VL_DEBUG
@@ -754,10 +880,10 @@ VL_ATTR_COLD void Vrv32e___024root___dump_triggers__nba(Vrv32e___024root* vlSelf
         VL_DBG_MSGF("         No triggers active\n");
     }
     if (vlSelf->__VnbaTriggered.at(0U)) {
-        VL_DBG_MSGF("         'nba' region trigger index 0 is active: @(posedge clk or posedge reset)\n");
+        VL_DBG_MSGF("         'nba' region trigger index 0 is active: @(posedge clk)\n");
     }
     if (vlSelf->__VnbaTriggered.at(1U)) {
-        VL_DBG_MSGF("         'nba' region trigger index 1 is active: @(posedge clk)\n");
+        VL_DBG_MSGF("         'nba' region trigger index 1 is active: @(posedge clk or posedge reset)\n");
     }
 }
 #endif  // VL_DEBUG
@@ -773,7 +899,9 @@ VL_ATTR_COLD void Vrv32e___024root___ctor_var_reset(Vrv32e___024root* vlSelf) {
     vlSelf->rv32e__DOT__IF_ID_inst = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__IF_valid = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__id_ready = VL_RAND_RESET_I(1);
+    vlSelf->rv32e__DOT__IF_ID_pc2 = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__id_ex_pc = VL_RAND_RESET_I(32);
+    vlSelf->rv32e__DOT__id_ex_pc2 = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__id_ex_inst = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__id_valid = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__ex_ready = VL_RAND_RESET_I(1);
@@ -836,9 +964,21 @@ VL_ATTR_COLD void Vrv32e___024root___ctor_var_reset(Vrv32e___024root* vlSelf) {
     vlSelf->rv32e__DOT__lsu_wb_csr_wen2 = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__wb_ex_csr_num1 = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__ex_lsu_forward_las = VL_RAND_RESET_I(1);
+    vlSelf->rv32e__DOT__predict_taken = VL_RAND_RESET_I(1);
+    vlSelf->rv32e__DOT__predict_target = VL_RAND_RESET_I(32);
+    vlSelf->rv32e__DOT__ex_bpu_update = VL_RAND_RESET_I(1);
+    vlSelf->rv32e__DOT__ex_bpu_pc = VL_RAND_RESET_I(32);
+    vlSelf->rv32e__DOT__ex_bpu_taken = VL_RAND_RESET_I(1);
+    vlSelf->rv32e__DOT__ex_bpu_target = VL_RAND_RESET_I(32);
+    vlSelf->rv32e__DOT__ex_bpu_correct = VL_RAND_RESET_I(1);
+    vlSelf->rv32e__DOT__correct_predictions = VL_RAND_RESET_I(32);
+    vlSelf->rv32e__DOT__total_predictions = VL_RAND_RESET_I(32);
+    vlSelf->rv32e__DOT__id_ex_predict_taken = VL_RAND_RESET_I(1);
+    vlSelf->rv32e__DOT__id_ex_predict_target = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__ifu__DOT__check = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__idu__DOT__imm = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__idu__DOT__alu_op = VL_RAND_RESET_I(4);
+    vlSelf->rv32e__DOT__idu__DOT__jalr = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__idu__DOT__csr_ecall = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__idu__DOT__csr_mret = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__idu__DOT____VdfgTmp_h4eb56789__0 = 0;
@@ -853,10 +993,9 @@ VL_ATTR_COLD void Vrv32e___024root___ctor_var_reset(Vrv32e___024root* vlSelf) {
     vlSelf->rv32e__DOT__exu__DOT__process_result = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__exu__DOT__alu_zero = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__exu__DOT__alu_less = VL_RAND_RESET_I(1);
-    vlSelf->rv32e__DOT__exu__DOT__jal_target = VL_RAND_RESET_I(32);
-    vlSelf->rv32e__DOT__exu__DOT__jalr_target = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__exu__DOT__take_branch = VL_RAND_RESET_I(1);
     vlSelf->rv32e__DOT__exu__DOT__ex_flush_condition = VL_RAND_RESET_I(1);
+    vlSelf->rv32e__DOT__exu__DOT__actual_target = VL_RAND_RESET_I(32);
     vlSelf->rv32e__DOT__exu__DOT__load_use_flag = VL_RAND_RESET_I(4);
     vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h0017749a__0 = 0;
     vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_hadc13f7a__0 = 0;
@@ -880,22 +1019,40 @@ VL_ATTR_COLD void Vrv32e___024root___ctor_var_reset(Vrv32e___024root* vlSelf) {
     for (int __Vi0 = 0; __Vi0 < 32; ++__Vi0) {
         vlSelf->rv32e__DOT__wbu__DOT__regs[__Vi0] = VL_RAND_RESET_I(32);
     }
+    for (int __Vi0 = 0; __Vi0 < 1024; ++__Vi0) {
+        vlSelf->rv32e__DOT__bpu__DOT__cpht[__Vi0] = VL_RAND_RESET_I(2);
+    }
+    for (int __Vi0 = 0; __Vi0 < 1024; ++__Vi0) {
+        vlSelf->rv32e__DOT__bpu__DOT__local_bht[__Vi0] = VL_RAND_RESET_I(10);
+    }
+    for (int __Vi0 = 0; __Vi0 < 1024; ++__Vi0) {
+        vlSelf->rv32e__DOT__bpu__DOT__local_pht[__Vi0] = VL_RAND_RESET_I(2);
+    }
+    vlSelf->rv32e__DOT__bpu__DOT__global_bhr = VL_RAND_RESET_I(10);
+    for (int __Vi0 = 0; __Vi0 < 1024; ++__Vi0) {
+        vlSelf->rv32e__DOT__bpu__DOT__global_pht[__Vi0] = VL_RAND_RESET_I(2);
+    }
+    for (int __Vi0 = 0; __Vi0 < 1024; ++__Vi0) {
+        vlSelf->rv32e__DOT__bpu__DOT__btb[__Vi0] = VL_RAND_RESET_I(32);
+    }
+    for (int __Vi0 = 0; __Vi0 < 1024; ++__Vi0) {
+        vlSelf->rv32e__DOT__bpu__DOT__valid[__Vi0] = VL_RAND_RESET_I(1);
+    }
+    vlSelf->rv32e__DOT__bpu__DOT__i = VL_RAND_RESET_I(32);
+    vlSelf->rv32e__DOT__bpu__DOT__bht_index = VL_RAND_RESET_I(10);
+    vlSelf->rv32e__DOT__bpu__DOT__local_pht_index = VL_RAND_RESET_I(10);
+    vlSelf->rv32e__DOT__bpu__DOT__global_pht_index = VL_RAND_RESET_I(10);
+    vlSelf->rv32e__DOT__bpu__DOT__local_predict = VL_RAND_RESET_I(1);
+    vlSelf->rv32e__DOT__bpu__DOT__global_predict = VL_RAND_RESET_I(1);
+    vlSelf->rv32e__DOT__bpu__DOT__ex_bht_index = VL_RAND_RESET_I(10);
+    vlSelf->rv32e__DOT__bpu__DOT__ex_local_pht_index = VL_RAND_RESET_I(10);
+    vlSelf->rv32e__DOT__bpu__DOT__ex_global_pht_index = VL_RAND_RESET_I(10);
+    vlSelf->rv32e__DOT__bpu__DOT__local_correct = VL_RAND_RESET_I(1);
+    vlSelf->rv32e__DOT__bpu__DOT__global_correct = VL_RAND_RESET_I(1);
     vlSelf->__Vfunc_rv32e__DOT__ifu__DOT__pmem_read__1__Vfuncout = 0;
+    vlSelf->__Vdly__rv32e__DOT__id_valid = VL_RAND_RESET_I(1);
+    vlSelf->__Vdly__rv32e__DOT__lsu_ex_ready = VL_RAND_RESET_I(1);
     vlSelf->__Vdly__rv32e__DOT__IF_ID_pc = VL_RAND_RESET_I(32);
-    vlSelf->__Vdly__rv32e__DOT__ex_lsu_valid = VL_RAND_RESET_I(1);
-    vlSelf->__Vdly__rv32e__DOT__ex_lsu_csr_wen1 = VL_RAND_RESET_I(1);
-    vlSelf->__Vdly__rv32e__DOT__ex_lsu_MemLen = VL_RAND_RESET_I(3);
-    vlSelf->__Vdly__rv32e__DOT__ex_lsu_MemWrite = VL_RAND_RESET_I(1);
-    vlSelf->__Vdly__rv32e__DOT__ex_lsu_MemRead = VL_RAND_RESET_I(1);
-    vlSelf->__Vdly__rv32e__DOT__ex_lsu_rd = VL_RAND_RESET_I(5);
-    vlSelf->__Vdly__rv32e__DOT__ex_lsu_RegWrite = VL_RAND_RESET_I(1);
-    vlSelf->__Vdly__rv32e__DOT__ex_lsu_src2 = VL_RAND_RESET_I(32);
-    vlSelf->__Vdly__rv32e__DOT__ex_lsu_process_result = VL_RAND_RESET_I(32);
-    vlSelf->__Vdly__rv32e__DOT__ex_lsu_csr_wen2 = VL_RAND_RESET_I(1);
-    vlSelf->__Vdly__rv32e__DOT__ex_lsu_csr_wr_addr1 = VL_RAND_RESET_I(12);
-    vlSelf->__Vdly__rv32e__DOT__ex_lsu_csr_wr_addr2 = VL_RAND_RESET_I(12);
-    vlSelf->__Vdly__rv32e__DOT__ex_lsu_csr_wr_data1 = VL_RAND_RESET_I(32);
-    vlSelf->__Vdly__rv32e__DOT__ex_lsu_csr_wr_data2 = VL_RAND_RESET_I(32);
     vlSelf->__Vtrigrprev__TOP__clk = VL_RAND_RESET_I(1);
     vlSelf->__Vtrigrprev__TOP__reset = VL_RAND_RESET_I(1);
 }
