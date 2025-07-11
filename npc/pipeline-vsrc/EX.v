@@ -319,6 +319,16 @@ module EX (
             csr_write_data = 32'b0;
         end
     end
+    // wire [31:0] csr_write_data =  
+    //     (id_ex_csr_op == `CSR_CSRRW && id_ex_func3 == `F3_CSRRW) ? src1 :
+    //     (id_ex_csr_op == `CSR_CSRRC && id_ex_func3 == `F3_CSRRC) ? (wb_ex_csr_num1 & ~src1) :
+    //     (id_ex_csr_op == `CSR_CSRRS && id_ex_func3 == `F3_CSRRS) ? (wb_ex_csr_num1 | src1) :
+    //     (id_ex_csr_op == `CSR_CSRRW && id_ex_func3 == `F3_CSRRWI) ? {27'b0, id_ex_zimm} :
+    //     (id_ex_csr_op == `CSR_CSRRC && id_ex_func3 == `F3_CSRRCI) ? wb_ex_csr_num1 & ~({27'b0, id_ex_zimm}) :
+    //     (id_ex_csr_op == `CSR_CSRRS && id_ex_func3 == `F3_CSRRSI) ? wb_ex_csr_num1 | ({27'b0, id_ex_zimm}) :
+    //     (id_ex_csr_ecall) ? 32'd11 : // ecall
+    //     (id_ex_csr_mret) ? mstatus_t : // mret
+    //     32'b0; // 默认值
 
     // 前递信号定义
     wire [1:0] forward_rs1;
@@ -358,7 +368,7 @@ module EX (
             ex_lsu_valid <= 1'b0;
         end
     end
-
+    
     // 输出信号赋值
     always @(posedge clk or posedge reset) begin
         if (reset) begin
@@ -372,6 +382,28 @@ module EX (
             ex_lsu_MemLen         <= 3'b0;
             ex_lsu_process_result <= 32'h0;
             ex_lsu_forward_las    <= 1'b0;
+            ex_lsu_imm            <= 32'h0;
+            ex_lsu_opcode         <= 7'b0;
+        end
+        else if(id_valid && ex_ready) begin
+            ex_lsu_inst           <= id_ex_inst;
+            ex_lsu_pc             <= id_ex_pc;
+            ex_lsu_src2           <= src2;
+            ex_lsu_RegWrite       <= id_ex_RegWrite;
+            ex_lsu_rd             <= id_ex_rd;
+            ex_lsu_MemRead        <= id_ex_MemRead;
+            ex_lsu_MemWrite       <= id_ex_MemWrite;
+            ex_lsu_MemLen         <= id_ex_MemLen;
+            ex_lsu_process_result <= process_result;
+            ex_lsu_forward_las    <= forward_las;
+            ex_lsu_imm            <= id_ex_imm;
+            ex_lsu_opcode         <= id_ex_opcode;
+        end
+    end
+    
+
+    always @(posedge clk or posedge reset) begin
+        if(reset) begin
             ex_lsu_csr            <= 1'b0;
             ex_lsu_csr_wen1       <= 1'b0;
             ex_lsu_csr_wen2       <= 1'b0;
@@ -382,22 +414,8 @@ module EX (
             ex_lsu_csr_rdata      <= 32'h0;
             ex_lsu_csr_ecall      <= 1'b0;
             ex_lsu_csr_mret       <= 1'b0;
-            ex_lsu_imm            <= 32'h0;
-            ex_lsu_opcode         <= 7'b0;
         end
-        else if (id_valid && ex_ready) begin
-            ex_lsu_inst           <= id_ex_inst;
-            ex_lsu_pc             <= id_ex_pc;
-            ex_lsu_src2           <= src2;
-            ex_lsu_RegWrite       <= id_ex_RegWrite;
-            ex_lsu_rd             <= id_ex_rd;
-            ex_lsu_MemRead        <= id_ex_MemRead;
-            ex_lsu_MemWrite       <= id_ex_MemWrite;
-            ex_lsu_MemLen         <= id_ex_MemLen;
-            // 对于JAL/JALR指令，传递链接地址而不是ALU结果
-            // ex_lsu_process_result <= (id_ex_jal || id_ex_jalr) ? link_addr : process_result;
-            ex_lsu_process_result <= process_result;
-            ex_lsu_forward_las    <= forward_las;
+        else if(id_valid && ex_ready) begin
             ex_lsu_csr            <= id_ex_csr;
             ex_lsu_csr_wen1       <= id_ex_csr_wen1;
             ex_lsu_csr_wen2       <= id_ex_csr_wen2;
@@ -408,36 +426,87 @@ module EX (
             ex_lsu_csr_rdata      <= wb_ex_csr_num1;
             ex_lsu_csr_ecall      <= id_ex_csr_ecall;
             ex_lsu_csr_mret       <= id_ex_csr_mret;
-            ex_lsu_imm            <= id_ex_imm;
-            ex_lsu_opcode         <= id_ex_opcode;
-        end
-        else begin
-            ex_lsu_inst           <= ex_lsu_inst;
-            ex_lsu_pc             <= ex_lsu_pc;
-            ex_lsu_src2           <= ex_lsu_src2;
-            ex_lsu_RegWrite       <= ex_lsu_RegWrite;
-            ex_lsu_rd             <= ex_lsu_rd;
-            ex_lsu_MemRead        <= ex_lsu_MemRead;
-            ex_lsu_MemWrite       <= ex_lsu_MemWrite;
-            // ex_lsu_MemRead        <= 1'b0;
-            // ex_lsu_MemWrite       <= 1'b0;
-            ex_lsu_MemLen         <= ex_lsu_MemLen;
-            ex_lsu_process_result <= ex_lsu_process_result;
-            ex_lsu_forward_las    <= ex_lsu_forward_las;
-            ex_lsu_csr            <= ex_lsu_csr;
-            ex_lsu_csr_wen1       <= ex_lsu_csr_wen1;
-            ex_lsu_csr_wen2       <= ex_lsu_csr_wen2;
-            ex_lsu_csr_wr_addr1   <= ex_lsu_csr_wr_addr1;
-            ex_lsu_csr_wr_addr2   <= ex_lsu_csr_wr_addr2;
-            ex_lsu_csr_wr_data1   <= ex_lsu_csr_wr_data1;
-            ex_lsu_csr_wr_data2   <= ex_lsu_csr_wr_data2;
-            ex_lsu_csr_rdata      <= ex_lsu_csr_rdata;
-            ex_lsu_csr_ecall      <= ex_lsu_csr_ecall;
-            ex_lsu_csr_mret       <= ex_lsu_csr_mret;
-            ex_lsu_imm            <= ex_lsu_imm;
-            ex_lsu_opcode         <= ex_lsu_opcode;
         end
     end
+    
+    // always @(posedge clk or posedge reset) begin
+    //     if (reset) begin
+    //         ex_lsu_inst           <= 32'h0;
+    //         ex_lsu_pc             <= 32'h0;
+    //         ex_lsu_src2           <= 32'h0;
+    //         ex_lsu_RegWrite       <= 1'b0;
+    //         ex_lsu_rd             <= 5'b0;
+    //         ex_lsu_MemRead        <= 1'b0;
+    //         ex_lsu_MemWrite       <= 1'b0;
+    //         ex_lsu_MemLen         <= 3'b0;
+    //         ex_lsu_process_result <= 32'h0;
+    //         ex_lsu_forward_las    <= 1'b0;
+    //         ex_lsu_csr            <= 1'b0;
+    //         ex_lsu_csr_wen1       <= 1'b0;
+    //         ex_lsu_csr_wen2       <= 1'b0;
+    //         ex_lsu_csr_wr_addr1   <= 12'b0;
+    //         ex_lsu_csr_wr_addr2   <= 12'b0;
+    //         ex_lsu_csr_wr_data1   <= 32'h0;
+    //         ex_lsu_csr_wr_data2   <= 32'h0;
+    //         ex_lsu_csr_rdata      <= 32'h0;
+    //         ex_lsu_csr_ecall      <= 1'b0;
+    //         ex_lsu_csr_mret       <= 1'b0;
+    //         ex_lsu_imm            <= 32'h0;
+    //         ex_lsu_opcode         <= 7'b0;
+    //     end
+    //     else if (id_valid && ex_ready) begin
+    //         ex_lsu_inst           <= id_ex_inst;
+    //         ex_lsu_pc             <= id_ex_pc;
+    //         ex_lsu_src2           <= src2;
+    //         ex_lsu_RegWrite       <= id_ex_RegWrite;
+    //         ex_lsu_rd             <= id_ex_rd;
+    //         ex_lsu_MemRead        <= id_ex_MemRead;
+    //         ex_lsu_MemWrite       <= id_ex_MemWrite;
+    //         ex_lsu_MemLen         <= id_ex_MemLen;
+    //         // 对于JAL/JALR指令，传递链接地址而不是ALU结果
+    //         // ex_lsu_process_result <= (id_ex_jal || id_ex_jalr) ? link_addr : process_result;
+    //         ex_lsu_process_result <= process_result;
+    //         ex_lsu_forward_las    <= forward_las;
+    //         ex_lsu_csr            <= id_ex_csr;
+    //         ex_lsu_csr_wen1       <= id_ex_csr_wen1;
+    //         ex_lsu_csr_wen2       <= id_ex_csr_wen2;
+    //         ex_lsu_csr_wr_addr1   <= id_ex_csr_wr_addr1;
+    //         ex_lsu_csr_wr_addr2   <= id_ex_csr_wr_addr2;
+    //         ex_lsu_csr_wr_data1   <= csr_write_data;
+    //         ex_lsu_csr_wr_data2   <= csr_write_ecall;
+    //         ex_lsu_csr_rdata      <= wb_ex_csr_num1;
+    //         ex_lsu_csr_ecall      <= id_ex_csr_ecall;
+    //         ex_lsu_csr_mret       <= id_ex_csr_mret;
+    //         ex_lsu_imm            <= id_ex_imm;
+    //         ex_lsu_opcode         <= id_ex_opcode;
+    //     end
+    //     else begin
+    //         ex_lsu_inst           <= ex_lsu_inst;
+    //         ex_lsu_pc             <= ex_lsu_pc;
+    //         ex_lsu_src2           <= ex_lsu_src2;
+    //         ex_lsu_RegWrite       <= ex_lsu_RegWrite;
+    //         ex_lsu_rd             <= ex_lsu_rd;
+    //         ex_lsu_MemRead        <= ex_lsu_MemRead;
+    //         ex_lsu_MemWrite       <= ex_lsu_MemWrite;
+    //         // ex_lsu_MemRead        <= 1'b0;
+    //         // ex_lsu_MemWrite       <= 1'b0;
+    //         ex_lsu_MemLen         <= ex_lsu_MemLen;
+    //         ex_lsu_process_result <= ex_lsu_process_result;
+    //         ex_lsu_forward_las    <= ex_lsu_forward_las;
+    //         ex_lsu_csr            <= ex_lsu_csr;
+    //         ex_lsu_csr_wen1       <= ex_lsu_csr_wen1;
+    //         ex_lsu_csr_wen2       <= ex_lsu_csr_wen2;
+    //         ex_lsu_csr_wr_addr1   <= ex_lsu_csr_wr_addr1;
+    //         ex_lsu_csr_wr_addr2   <= ex_lsu_csr_wr_addr2;
+    //         ex_lsu_csr_wr_data1   <= ex_lsu_csr_wr_data1;
+    //         ex_lsu_csr_wr_data2   <= ex_lsu_csr_wr_data2;
+    //         ex_lsu_csr_rdata      <= ex_lsu_csr_rdata;
+    //         ex_lsu_csr_ecall      <= ex_lsu_csr_ecall;
+    //         ex_lsu_csr_mret       <= ex_lsu_csr_mret;
+    //         ex_lsu_imm            <= ex_lsu_imm;
+    //         ex_lsu_opcode         <= ex_lsu_opcode;
+    //     end
+    // end
 
 // always @(posedge clk) begin
 //     if (id_valid && ex_ready) begin

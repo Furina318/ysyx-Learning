@@ -96,3 +96,7 @@
 `define MTVEC   12'h305
 `define MEPC    12'h341
 `define MCAUSE  12'h342
+
+`define DEVICE 1'b1
+`define OKAY    2'b00
+`define SLVERR  2'b10

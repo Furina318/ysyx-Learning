@@ -3,8 +3,8 @@ MODULE = rv32e
 
 # 源文件路径和定义
 NPC_HOME = /home/furina/ysyx-workbench/npc
-CSRCS = $(shell find $(abspath ./csrc) -name "*.cpp")  # 查找 csrc 目录下所有 .cpp 文件
-VSRCS = $(shell find $(abspath ./pipeline-vsrc) -name "*.v")     # 查找 vsrc 目录下所有 .v 文件
+CSRCS = $(shell find $(abspath ./mul-csrc) -name "*.cpp")  # 查找 csrc 目录下所有 .cpp 文件
+VSRCS = $(shell find $(abspath ./mul-vsrc) -name "*.v")     # 查找 vsrc 目录下所有 .v 文件
 
 INC_PATH = $(NPC_HOME)/include/
 CFLAGS += -I$(INC_PATH)  # 包含路径，确保头文件被找到

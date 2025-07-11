@@ -23,6 +23,8 @@ module IF (
     wire is_branch = (IF_ID_inst[6:0] == 7'b1100011);
     wire is_jal    = (IF_ID_inst[6:0] == 7'b1101111);
     wire is_jalr   = (IF_ID_inst[6:0] == 7'b1100111) && (IF_ID_inst[14:12] == 3'b000);
+    //快速解译jal跳转地址
+    wire [31:0] immJ = {{12{IF_ID_inst[31]}}, IF_ID_inst[19:12], IF_ID_inst[20], IF_ID_inst[30:21], 1'b0};
 
     always @(posedge clk or posedge reset) begin
         if (reset) begin
@@ -41,8 +43,8 @@ module IF (
         end
         else if (IF_valid && ID_ready) begin
             // IF_ID_pc <= IF_ID_pc + 4;
-            IF_ID_pc <= (predict_taken && (is_branch || is_jal || is_jalr)) ? predict_target : (IF_ID_pc + 4);
-            IF_ID_pc2 <= IF_ID_pc + 4; // 用于分支预测
+            IF_ID_pc <= is_jal ? IF_ID_pc + immJ : (predict_taken && (is_branch || is_jalr)) ? predict_target : (IF_ID_pc + 4);
+            IF_ID_pc2 <= IF_ID_pc2 + 4; // 用于分支预测
         end
     end
 

@@ -83,10 +83,10 @@ void mtrace_log(char type,paddr_t addr,word_t data,int len){
   // if(mtrace_thing.filter_en && data!=mtrace_thing.filter_data) return;
   switch (type){
     case 'R':
-        fprintf(mtrace_file,"R 0x%08x 0x%08x %d\n",addr,data,len);
+        fprintf(mtrace_file,"[R] 0x%08x    0x%08x %d\n",addr,data,len);
         break;
     case 'W':
-        fprintf(mtrace_file,"W 0x%08x 0x%08x %d\n",addr,data,len);
+        fprintf(mtrace_file,"[W] 0x%08x    0x%08x %d\n",addr,data,len);
         break;
     default:
         printf("No such type,only R or W enable\n");

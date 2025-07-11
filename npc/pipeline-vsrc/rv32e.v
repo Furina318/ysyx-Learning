@@ -260,7 +260,7 @@ module rv32e (
     // wire        MEM_LSU_write_ready;
     // wire        MEM_LSU_read_ready;
     // MEM（内存访问）模块
-    LSU lsu (
+    LSU_AXI lsu_axi (
         .clk(clk),
         .rst(reset),
         .ex_lsu_imm(ex_lsu_imm),
