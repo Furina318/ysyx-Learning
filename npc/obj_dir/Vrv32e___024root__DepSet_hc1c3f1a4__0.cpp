@@ -22,8 +22,8 @@ VL_INLINE_OPT void Vrv32e___024root____Vdpiimwrap_rv32e__DOT__ebreak_TOP(IData/*
 
 extern "C" unsigned int pmem_read(unsigned int raddr, int len);
 
-VL_INLINE_OPT void Vrv32e___024root____Vdpiimwrap_rv32e__DOT__ifu__DOT__pmem_read_TOP(IData/*31:0*/ raddr, IData/*31:0*/ len, IData/*31:0*/ &pmem_read__Vfuncrtn) {
-    VL_DEBUG_IF(VL_DBG_MSGF("+    Vrv32e___024root____Vdpiimwrap_rv32e__DOT__ifu__DOT__pmem_read_TOP\n"); );
+VL_INLINE_OPT void Vrv32e___024root____Vdpiimwrap_rv32e__DOT__sram__DOT__pmem_read_TOP(IData/*31:0*/ raddr, IData/*31:0*/ len, IData/*31:0*/ &pmem_read__Vfuncrtn) {
+    VL_DEBUG_IF(VL_DBG_MSGF("+    Vrv32e___024root____Vdpiimwrap_rv32e__DOT__sram__DOT__pmem_read_TOP\n"); );
     // Body
     unsigned int raddr__Vcvt;
     for (size_t raddr__Vidx = 0; raddr__Vidx < 1; ++raddr__Vidx) raddr__Vcvt = raddr;
@@ -36,8 +36,8 @@ VL_INLINE_OPT void Vrv32e___024root____Vdpiimwrap_rv32e__DOT__ifu__DOT__pmem_rea
 
 extern "C" void pmem_write(unsigned int waddr, unsigned int wdata, int len);
 
-VL_INLINE_OPT void Vrv32e___024root____Vdpiimwrap_rv32e__DOT__lsu_axi__DOT__mem_sram__DOT__pmem_write_TOP(IData/*31:0*/ waddr, IData/*31:0*/ wdata, IData/*31:0*/ len) {
-    VL_DEBUG_IF(VL_DBG_MSGF("+    Vrv32e___024root____Vdpiimwrap_rv32e__DOT__lsu_axi__DOT__mem_sram__DOT__pmem_write_TOP\n"); );
+VL_INLINE_OPT void Vrv32e___024root____Vdpiimwrap_rv32e__DOT__sram__DOT__pmem_write_TOP(IData/*31:0*/ waddr, IData/*31:0*/ wdata, IData/*31:0*/ len) {
+    VL_DEBUG_IF(VL_DBG_MSGF("+    Vrv32e___024root____Vdpiimwrap_rv32e__DOT__sram__DOT__pmem_write_TOP\n"); );
     // Body
     unsigned int waddr__Vcvt;
     for (size_t waddr__Vidx = 0; waddr__Vidx < 1; ++waddr__Vidx) waddr__Vcvt = waddr;
@@ -46,23 +46,6 @@ VL_INLINE_OPT void Vrv32e___024root____Vdpiimwrap_rv32e__DOT__lsu_axi__DOT__mem_
     int len__Vcvt;
     for (size_t len__Vidx = 0; len__Vidx < 1; ++len__Vidx) len__Vcvt = len;
     pmem_write(waddr__Vcvt, wdata__Vcvt, len__Vcvt);
-}
-
-#ifdef VL_DEBUG
-VL_ATTR_COLD void Vrv32e___024root___dump_triggers__ico(Vrv32e___024root* vlSelf);
-#endif  // VL_DEBUG
-
-void Vrv32e___024root___eval_triggers__ico(Vrv32e___024root* vlSelf) {
-    if (false && vlSelf) {}  // Prevent unused
-    Vrv32e__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
-    VL_DEBUG_IF(VL_DBG_MSGF("+    Vrv32e___024root___eval_triggers__ico\n"); );
-    // Body
-    vlSelf->__VicoTriggered.at(0U) = (0U == vlSelf->__VicoIterCount);
-#ifdef VL_DEBUG
-    if (VL_UNLIKELY(vlSymsp->_vm_contextp__->debug())) {
-        Vrv32e___024root___dump_triggers__ico(vlSelf);
-    }
-#endif
 }
 
 #ifdef VL_DEBUG

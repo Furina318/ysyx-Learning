@@ -1,4 +1,4 @@
-`include "/home/furina/ysyx-workbench/npc/vsrc/defines.v"
+`include "/home/furina/ysyx-workbench/npc/mul-vsrc/defines.v"
 // 寄存器文件
 module RegFile (
     input         clk,

@@ -1,6 +1,6 @@
 
 `timescale 1ns/1ns
-`include "/home/furina/ysyx-workbench/npc/pipeline-vsrc/defines/defines.v"
+`include "/home/furina/ysyx-workbench/npc/Npipeline-vsrc/defines/defines.v"
 
 module LSU_AXI (
     input         clk,

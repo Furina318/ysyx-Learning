@@ -27,7 +27,7 @@ module fpu_tb (
     output fpu_result_valid
 );
 
-    // Instantiate fregs
+    // 实例化 fregs
     fregs freg_inst (
         .clk(clk),
         .reset(reset),
@@ -40,7 +40,7 @@ module fpu_tb (
         .read_data2(freg_read_data2)
     );
 
-    // Instantiate FPU
+    // 实例化 FPU
     fpu fpu_inst (
         .clk(clk),
         .reset(reset),
@@ -60,4 +60,5 @@ module fpu_tb (
         .fpu_result_valid(fpu_result_valid)
     );
 
+   
 endmodule

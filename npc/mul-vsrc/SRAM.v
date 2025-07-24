@@ -1,8 +1,10 @@
-`include "/home/furina/ysyx-workbench/npc/vsrc/defines.v"
+`include "/home/furina/ysyx-workbench/npc/mul-vsrc/defines.v"
 // ====== SRAM接口定义 ======
-module mem_sram #(
+module SRAM #(
     parameter ADDR_WIDTH = 32,
-    parameter DATA_WIDTH = 32
+    parameter DATA_WIDTH = 32,
+    parameter MAX_DELAY  = 4,
+    parameter MIN_DELAY  = 1
 )(
     input  wire                   clk,
     input  wire                   reset,
@@ -36,8 +38,8 @@ module mem_sram #(
     //状态机定义
     typedef enum {IDLE, READ_ADDR, READ_DATA, WRITE_ADDR, WRITE_DATA, WRITE_RESP} state_t;
     state_t sram_state, next_sram_state;
-    reg [1:0] delay_counter;//模拟读延迟计数器
-    parameter [1:0] DELAY_CYCLES = 2;//处理周期
+    reg [31:0] LFSR;//模拟读延迟计数器
+    reg [31:0] random_delay; 
     
     reg [ADDR_WIDTH-1:0] araddr_reg,awaddr_reg;
     reg [DATA_WIDTH-1:0] rdata_reg,wdata_reg;
@@ -58,15 +60,25 @@ module mem_sram #(
                     (awaddr >= 32'h8000_0000 && awaddr <= 32'h8fff_ffff);
         end
     end
+
+    //随机生成延迟
+    // always @(posedge clk) begin
+    //     if(reset) begin
+    //         random_delay <= MIN_DELAY;
+    //     end
+    //     else if(sram_state == IDLE && ((arvalid && arready) || (awvalid && awready))) begin
+    //         random_delay <= ($random % (MAX_DELAY - MIN_DELAY + 1)) + MIN_DELAY;
+    //     end
+    // end
     
-    always @(posedge clk or posedge reset) begin
+    always @(posedge clk) begin
         if(reset) begin
             sram_state <= IDLE;
             arready <= 1'b0;
             rvalid <= 1'b0;
             wready <= 1'b0;
             rdata <= 32'h0;
-            delay_counter <= 2'b00;
+            LFSR <= MIN_DELAY;
             araddr_reg <= 32'h0;
             rdata_reg <= 32'h0;
             rresp <= `OKAY;
@@ -84,11 +96,13 @@ module mem_sram #(
                     awready  <= 1'b1;//初始化时准备好接受写地址
                     rvalid  <= 1'b0;
                     bvalid  <= 1'b0;
-                    delay_counter <= 2'b10;
+                    // LFSR <= ($random % (MAX_DELAY - MIN_DELAY + 1)) + MIN_DELAY;
+                    // LFSR <= $urandom_range(1, 10);//随机生成1~10的读写延迟
+                    LFSR <= MIN_DELAY;
                     if(arvalid && arready) begin//读握手
                         araddr_reg <= araddr;
                         arready <= 1'b0;//接收地址后不再准备
-                        // delay_counter <= DELAY_CYCLES;
+                        // LFSR <= random_delay;
                         next_sram_state <= READ_ADDR;
                     end
                     else if(awvalid && awready) begin//写地址握手
@@ -96,6 +110,7 @@ module mem_sram #(
                         wstrb_reg <= wstrb;
                         awaddr_reg <= awaddr;
                         awready <= 1'b0;
+                        // LFSR <= random_delay;
                         next_sram_state <= WRITE_ADDR;
                     end
                     else begin
@@ -103,9 +118,9 @@ module mem_sram #(
                     end
                 end
                 READ_ADDR:begin
-                    if(delay_counter > 0) begin
+                    if(LFSR > 0) begin
                         // araddr_reg <= araddr;
-                        delay_counter <= delay_counter - 1;
+                        LFSR <= LFSR - 1;
                         next_sram_state <= READ_ADDR;
                     end
                     else begin
@@ -131,8 +146,8 @@ module mem_sram #(
                     else next_sram_state <= READ_DATA;
                 end
                 WRITE_ADDR: begin
-                    if(delay_counter > 0) begin
-                        delay_counter <= delay_counter - 1;
+                    if(LFSR > 0) begin
+                        LFSR <= LFSR - 1;
                         next_sram_state <= WRITE_ADDR;
                     end
                     else begin

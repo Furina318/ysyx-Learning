@@ -96,16 +96,82 @@ module rv32e (
     wire        lsu_ex_forward_MemRead;   // MEM 到 EX：前递读使能
     wire        ex_lsu_forward_las;       // EX 到 MEM：加载后存储前递标志
 
-    // 内存访问信号（暴露在顶层，需外部连接）
-    wire [31:0] addr;             // 内存地址
-    wire [31:0] wdata;            // 内存写数据
-    wire        wen;              // 内存写使能
-    wire [1:0]  mask;             // 内存写掩码
+    // LSU - ARB 的 AXI4-Lite 接口信号
+    wire        lsu_sram_arvalid;
+    wire        sram_lsu_arready;
+    wire [31:0] lsu_sram_araddr;
+    wire [31:0] sram_lsu_rdata;
+    wire        sram_lsu_rvalid;
+    wire        lsu_sram_rready;
+    wire [1:0]  sram_lsu_rresp;
+    wire [31:0] lsu_sram_awaddr;
+    wire        lsu_sram_awvalid;
+    wire        sram_lsu_awready;
+    wire [31:0] lsu_sram_wdata;
+    wire [3:0]  lsu_sram_wstrb;
+    wire        lsu_sram_wvalid;
+    wire        sram_lsu_wready;
+    wire [1:0]  sram_lsu_bresp;
+    wire        sram_lsu_bvalid;
+    wire        lsu_sram_bready;
+    // IF - ARB 的 AXI4-Lite 接口信号
+    wire        if_sram_arvalid;    
+    wire        sram_if_arready;      
+    wire [31:0] if_sram_araddr;      
+    wire [31:0] sram_if_rdata;        
+    wire        sram_if_rvalid;      
+    wire        if_sram_rready;      
+    wire [1:0]  sram_if_rresp;         
 
     // 模块例化
 
+    // SRAM 模块
+    // SRAM sram (
+    //     .clk(clk),
+    //     .rst(reset),
+    //     .sram_arvalid(lsu_sram_arvalid),
+    //     .sram_arready(sram_lsu_arready),
+    //     .sram_araddr(lsu_sram_araddr),
+    //     .sram_rdata(sram_lsu_rdata),
+    //     .sram_rvalid(sram_lsu_rvalid),
+    //     .sram_rready(lsu_sram_rready),
+    //     .sram_rresp(sram_lsu_rresp),
+    //     .sram_awaddr(lsu_sram_awaddr),
+    //     .sram_awvalid(lsu_sram_awvalid),
+    //     .sram_awready(sram_lsu_awready),
+    //     .sram_wdata(lsu_sram_wdata),
+    //     .sram_wstrb(lsu_sram_wstrb),
+    //     .sram_wvalid(lsu_sram_wvalid),
+    //     .sram_wready(sram_lsu_wready),
+    //     .sram_bresp(sram_lsu_bresp),
+    //     .sram_bvalid(sram_lsu_bvalid),
+    //     .sram_bready(lsu_sram_bready)
+    // );
+    SRAM sram (
+        .clk(clk),
+        .rst(reset),
+        .sram_arvalid(if_sram_arvalid),
+        .sram_arready(sram_if_arready),
+        .sram_araddr(if_sram_araddr),
+        .sram_rdata(sram_if_rdata),
+        .sram_rvalid(sram_if_rvalid),
+        .sram_rready(if_sram_rready),
+        .sram_rresp(sram_if_rresp),
+        .sram_awaddr(32'h0),
+        .sram_awvalid(1'b0),
+        .sram_awready(),
+        .sram_wdata(32'h0),
+        .sram_wstrb(4'b0),
+        .sram_wvalid(1'b0),
+        .sram_wready(),
+        .sram_bresp(),
+        .sram_bvalid(),
+        .sram_bready(1'b0)
+    );
+
+
     // IF（指令获取）模块
-    IF ifu (
+    IF_AXI ifu (
         .clk(clk),
         .reset(reset),
         .EX_flush(ex_flush),
@@ -113,6 +179,13 @@ module rv32e (
         .ID_ready(id_ready),
         .IF_valid(IF_valid),
         .IF_ID_pc(IF_ID_pc),
+        .if_sram_arvalid(if_sram_arvalid),
+        .sram_if_arready(sram_if_arready),
+        .if_sram_araddr(if_sram_araddr),
+        .sram_if_rdata(sram_if_rdata),
+        .sram_if_rvalid(sram_if_rvalid),
+        .if_sram_rready(if_sram_rready),
+        .sram_if_rresp(sram_if_rresp),
         .IF_ID_inst(IF_ID_inst)
     );
 
@@ -277,6 +350,23 @@ module rv32e (
         .lsu_wb_csr_wen2(lsu_wb_csr_wen2),
         .lsu_wb_RegWrite(lsu_wb_RegWrite),
         .lsu_wb_rd(lsu_wb_rd),
+        // .lsu_sram_arvalid(lsu_sram_arvalid),
+        // .sram_lsu_arready(sram_lsu_arready),
+        // .lsu_sram_araddr(lsu_sram_araddr),
+        // .sram_lsu_rdata(sram_lsu_rdata),
+        // .sram_lsu_rvalid(sram_lsu_rvalid),
+        // .lsu_sram_rready(lsu_sram_rready),
+        // .sram_lsu_rresp(sram_lsu_rresp),
+        // .lsu_sram_awaddr(lsu_sram_awaddr),
+        // .lsu_sram_awvalid(lsu_sram_awvalid),
+        // .sram_lsu_awready(sram_lsu_awready),
+        // .lsu_sram_wdata(lsu_sram_wdata),
+        // .lsu_sram_wstrb(lsu_sram_wstrb),
+        // .lsu_sram_wvalid(lsu_sram_wvalid),
+        // .sram_lsu_wready(sram_lsu_wready),
+        // .sram_lsu_bresp(sram_lsu_bresp),
+        // .sram_lsu_bvalid(sram_lsu_bvalid),
+        // .lsu_sram_bready(lsu_sram_bready),
         .lsu_wb_write_rd_data(lsu_wb_write_rd_data)
     );
 
@@ -309,17 +399,34 @@ module rv32e (
     // assign MEM_LSU_write_ready = 1;
     // assign MEM_LSU_read_ready = 1;
     // 内存接口赋值
-    assign addr = ex_lsu_process_result; // 从 EX 传入的内存地址
-    assign wdata = ex_lsu_src2;          // 从 EX 传入的内存写数据
-    assign wen = ex_lsu_MemWrite;        // 从 EX 传入的内存写使能
-    assign mask = (ex_lsu_MemLen == 3'b001) ? 2'b00 : // 字节
-                  (ex_lsu_MemLen == 3'b010) ? 2'b01 : // 半字
-                  (ex_lsu_MemLen == 3'b100) ? 2'b11 : // 字
-                  2'b00;                      // 默认
+    // assign addr = ex_lsu_process_result; // 从 EX 传入的内存地址
+    // assign wdata = ex_lsu_src2;          // 从 EX 传入的内存写数据
+    // assign wen = ex_lsu_MemWrite;        // 从 EX 传入的内存写使能
+    // assign mask = (ex_lsu_MemLen == 3'b001) ? 2'b00 : // 字节
+    //               (ex_lsu_MemLen == 3'b010) ? 2'b01 : // 半字
+    //               (ex_lsu_MemLen == 3'b100) ? 2'b11 : // 字
+    //               2'b00;                      // 默认
 
+    reg [31:0] inst_cnt;
+    reg [31:0] cycle_cnt;
+
+    always @(posedge clk) begin
+        if(reset) begin
+            inst_cnt <= 0;
+            cycle_cnt <= 0;
+        end
+        else begin
+            cycle_cnt <= cycle_cnt + 1;
+            if(wb_valid) begin
+                inst_cnt <= inst_cnt + 1;
+            end
+        end
+    end
     // EBREAK 处理
-    always @(*) begin
+    always @(posedge clk) begin
         if (IF_ID_inst == 32'h00100073) begin
+            real IPC = (cycle_cnt == 0) ? 0.0 : real'(inst_cnt) / real'(cycle_cnt);
+            $display("\033[33mIPC = %f\033[0m", IPC);
             // $display("*-------------------*---------------------*---------------------*");
             // $display("| Total predictions | Correct predictions | Prediction accuracy |");
             // $display("| %10d        | %10d          | %10.2f%%         |", 

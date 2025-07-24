@@ -1,22 +1,20 @@
 VERILATOR = verilator
-VERILATOR_FLAGS = -Wall --cc --trace --exe -Wno-EOFNEWLINE
-SOURCES = fpu.v fregs.v fpu_tb.v booth_wallace_multiplier.v
-TOP_MODULE = fpu_tb
-SIM_MAIN = sim_main.cpp
-OBJ_DIR = obj_dir
-EXEC = fpu_sim
+VFLAGS = -Wall --cc --trace --exe -Wno-EOFNEWLINE --top-module fpu_tb
 
-all: $(EXEC)
+all: fpu_sim
 
-$(EXEC): $(SOURCES) $(SIM_MAIN)
-	$(VERILATOR) $(VERILATOR_FLAGS) $(SOURCES) $(SIM_MAIN) -o $(EXEC)
-	make -j -C $(OBJ_DIR) -f Vfpu.mk $(EXEC)
-	mv $(OBJ_DIR)/$(EXEC) .
+fpu_sim: fpu.v fregs.v fpu_tb.v amultiplier.v divider.v sim_main.cpp
+	$(VERILATOR) $(VFLAGS) $^ -o $@
+	make -C obj_dir -f Vfpu_tb.mk fpu_sim
+	mv obj_dir/fpu_sim .
+
+run: fpu_sim
+	./fpu_sim
 
 clean:
-	rm -rf $(OBJ_DIR) $(EXEC) fpu_tb.vcd
+	rm -rf obj_dir fpu_sim fpu_waveform.vcd fpu_test_ops.log fpu_test_vector.hex test
+runc:
+	gcc test.c -o test -lm
+	./test
 
-run: $(EXEC)
-	./$(EXEC)
-
-.PHONY: all clean run
+.PHONY: all run clean

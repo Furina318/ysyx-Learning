@@ -29,7 +29,7 @@ module IF(
     reg [31:0] pc;//始终默认为双发两条指令中执行的第一条指令
     reg [31:0] npc;
 
-    initial pc = 32'h8000_0000;
+    initial pc <= 32'h8000_0000;
 
     always @(posedge clk) begin
         if(rst) begin

@@ -13,8 +13,10 @@ module WBU #(
   input  [ADDR_WIDTH-1:0] waddr,
   input  [ADDR_WIDTH-1:0] rs1,      
   input  [ADDR_WIDTH-1:0] rs2,      
-  output [DATA_WIDTH-1:0] src1,     
-  output [DATA_WIDTH-1:0] src2,     
+//   output reg [DATA_WIDTH-1:0] src1,     
+//   output reg [DATA_WIDTH-1:0] src2, 
+  output [DATA_WIDTH-1:0] src1,
+  output [DATA_WIDTH-1:0] src2,    
   
   output reg              wb_valid,
   input                   lsu_wb_flush,
@@ -28,7 +30,9 @@ module WBU #(
   input  [11:0]           waddr_csr1,
   input  [11:0]           waddr_csr2,
   output [31:0]           rdata_csr1,
-  output [31:0]           rdata_csr2     
+  output [31:0]           rdata_csr2   
+//   output reg [31:0]           rdata_csr1,
+//   output reg [31:0]           rdata_csr2      
 );
 reg [31:0] CSR[2**12-1:0];
 
@@ -67,6 +71,10 @@ end
 
 assign src1 = (rs1 == 5'b0) ? 32'b0 : regs[rs1];
 assign src2 = (rs2 == 5'b0) ? 32'b0 : regs[rs2];
+// always @(*) begin
+//     src1 = (rs1 == 5'b0) ? 32'b0 : regs[rs1];
+//     src2 = (rs2 == 5'b0) ? 32'b0 : regs[rs2];
+// end
 
 
 integer k;
@@ -96,6 +104,10 @@ always @(posedge clk) begin
 end
 assign rdata_csr1 = CSR[raddr_csr1];
 assign rdata_csr2 = CSR[raddr_csr2];
+// always @(*) begin
+//     rdata_csr1 = CSR[raddr_csr1];
+//     rdata_csr2 = CSR[raddr_csr2];
+// end
 endmodule
 
 

@@ -30,33 +30,34 @@ module SRAM(
     import "DPI-C" function int unsigned pmem_read(input int unsigned raddr, input int len);
     import "DPI-C" function void pmem_write(input int unsigned waddr, input int unsigned wdata, input int len);
 
-    //读通道状态
+    // 读通道状态
     reg        ar_handshaked;
     reg [31:0] araddr_reg;
     reg        r_handshaked;
-    //写通道状态
-    reg        aw_handshaked;
+    // 写通道状态
     reg [31:0] awaddr_reg;
-    reg        w_handshaked;
     reg [31:0] wdata_reg;
     reg [3:0]  wstrb_reg;
+    reg        aw_handshaked;
+    reg        w_handshaked;
 
-    //地址检查有效：
+    // 地址检查有效
     wire addr_valid = (araddr_reg >= 32'h8000_0000 && araddr_reg <= 32'h8fff_ffff) || 
                       (awaddr_reg >= 32'h8000_0000 && awaddr_reg <= 32'h8fff_ffff) ||
                       (araddr_reg >= 32'h1000_0000 && araddr_reg <= 32'h1000_0007) || 
                       (awaddr_reg >= 32'h1000_0000 && awaddr_reg <= 32'h1000_0007) ||
                       (awaddr_reg >= 32'h1000_2000 && awaddr_reg <= 32'h1000_2007);
-    //READ
+
+    // 读操作
     always @(posedge clk or posedge rst) begin
-        if(rst) begin
+        if (rst) begin
             arready       <= 1'b1;
             ar_handshaked <= 1'b0;
             rvalid        <= 1'b0;
             rdata         <= 32'b0;
             rresp         <= OKAY;
         end
-        else if(arvalid && arready) begin
+        else if (arvalid && arready) begin
             ar_handshaked <= 1'b1;
             araddr_reg    <= araddr;
             arready       <= 1'b0;
@@ -67,27 +68,26 @@ module SRAM(
     end
 
     always @(posedge clk or posedge rst) begin
-        if(rst) begin
+        if (rst) begin
             rvalid        <= 1'b0;
             rdata         <= 32'b0;
             rresp         <= OKAY;
-            r_handshaked <= 1'b0;
+            r_handshaked  <= 1'b0;
         end
-        else if(rready && rvalid) begin
+        else if (rready && rvalid) begin
             rvalid        <= 1'b0;
             r_handshaked  <= 1'b1;
             arready       <= 1'b1;
         end    
-        else if(~r_handshaked && ar_handshaked) begin
-            if(addr_valid) begin
+        else if (!r_handshaked && ar_handshaked) begin
+            if (addr_valid) begin
                 rdata  <= pmem_read(araddr_reg, 4);
-                // $display("From [0x%08x] read data: 0x%08x", araddr_reg, rdata);
-                // rdata  <= pmem_read(araddr, 4);
+                $display("From [0x%08x] read data: [0x%08x]", araddr_reg, rdata);
                 rresp  <= OKAY;
             end
             else begin
-                rdata <= 32'h0; //地址无效时返回0
-                rresp  <= SLVERR; //返回错误响应
+                rdata <= 32'h0;
+                rresp <= SLVERR;
             end
             rvalid <= 1'b1;
         end
@@ -97,31 +97,35 @@ module SRAM(
         end
     end
 
-    //WRITE
+    // 写操作
     always @(posedge clk or posedge rst) begin
         if (rst) begin
-            awready    <= 1'b1;
-            wready     <= 1'b1;
-            bvalid     <= 1'b0;
-            awaddr_reg <= 32'b0;
-            wdata_reg  <= 32'b0;
-            wstrb_reg  <= 4'b0;
-            bresp      <= OKAY;
+            awready       <= 1'b1;
+            wready        <= 1'b1;
+            bvalid        <= 1'b0;
+            awaddr_reg    <= 32'b0;
+            wdata_reg     <= 32'b0;
+            wstrb_reg     <= 4'b0;
+            bresp         <= OKAY;
+            aw_handshaked <= 1'b0;
+            w_handshaked  <= 1'b0;
         end
         else begin
             // AW 通道
             if (awvalid && awready) begin
-                awready    <= 1'b0;
-                awaddr_reg <= awaddr;
+                awready       <= 1'b0;
+                awaddr_reg    <= awaddr;
+                aw_handshaked <= 1'b1;
             end
             // W 通道
             if (wvalid && wready) begin
-                wready    <= 1'b0;
-                wdata_reg <= wdata;
-                wstrb_reg <= wstrb;
+                wready        <= 1'b0;
+                wdata_reg     <= wdata;
+                wstrb_reg     <= wstrb;
+                w_handshaked  <= 1'b1;
             end
-            // 写响应
-            if (!awready && !wready && !bvalid) begin
+            // 写执行
+            if (aw_handshaked && w_handshaked && ~bvalid) begin
                 if (addr_valid) begin
                     case (wstrb_reg)
                         4'b0001: pmem_write(awaddr_reg, wdata_reg, 1);
@@ -129,7 +133,7 @@ module SRAM(
                         4'b1111: pmem_write(awaddr_reg, wdata_reg, 4);
                         default: pmem_write(awaddr_reg, wdata_reg, 4);
                     endcase
-                    // $display("To [0x%08x] write data: 0x%08x, wstrb: %b", awaddr_reg, wdata_reg, wstrb_reg);
+                    $display("To [0x%08x] write data: [0x%08x], wstrb: %b", awaddr_reg, wdata_reg, wstrb_reg);
                     bresp <= OKAY;
                 end
                 else begin
@@ -137,86 +141,14 @@ module SRAM(
                 end
                 bvalid <= 1'b1;
             end
-            // 握手完成后重置
+            // 写响应完成后重置
             if (bvalid && bready) begin
-                awready <= 1'b1;
-                wready  <= 1'b1;
-                bvalid  <= 1'b0;
+                awready       <= 1'b1;
+                wready        <= 1'b1;
+                bvalid        <= 1'b0;
+                aw_handshaked <= 1'b0;
+                w_handshaked  <= 1'b0;
             end
         end
     end
-    // always @(posedge clk or posedge rst) begin
-    //     if(rst) begin
-    //         awready       <= 1'b1;
-    //         aw_handshaked <= 1'b0;
-    //         awaddr_reg    <= 32'b0;
-    //     end
-    //     else begin
-    //         if(awvalid && awready) begin
-    //             aw_handshaked <= 1'b1;
-    //             awaddr_reg    <= awaddr;
-    //             awready       <= 1'b0;
-    //         end
-    //         else if(bvalid && bready) begin
-    //             awready       <= 1'b1;
-    //             // aw_handshaked <= 1'b0;
-    //         end
-    //         else begin
-    //             awready       <= 1'b1;
-    //             aw_handshaked <= 1'b0;
-    //         end
-    //     end
-    // end
-
-    // always @(posedge clk or posedge rst) begin
-    //     if(rst) begin
-    //         wready        <= 1'b1;
-    //         w_handshaked  <= 1'b0;
-    //         wdata_reg     <= 32'b0;
-    //         wstrb_reg     <= 4'b0;
-    //         bvalid        <= 1'b0;
-    //         bresp         <= OKAY;
-    //     end
-    //     else begin
-    //         if(wvalid && wready) begin
-    //             w_handshaked <= 1'b1;
-    //             wdata_reg    <= wdata;
-    //             wstrb_reg    <= wstrb;
-    //             wready       <= 1'b0;
-    //         end
-    //         else if(bvalid && bready) begin
-    //             bvalid       <= 1'b0;
-    //             // w_handshaked <= 1'b0;
-    //             wready       <= 1'b1;
-    //         end
-    //         else begin
-    //             w_handshaked <= 1'b0;
-    //             wready       <= 1'b1;
-    //         end
-
-    //         if(~w_handshaked && aw_handshaked) begin
-    //             // pmem_write(awaddr_reg, wdata_reg, 4);
-    //             if(addr_valid) begin
-    //                 case(wstrb_reg)
-    //                     4'b0001: pmem_write(awaddr_reg,wdata_reg,1);//sb
-    //                     4'b0011: pmem_write(awaddr_reg,wdata_reg,2);//sh
-    //                     4'b1111: pmem_write(awaddr_reg,wdata_reg,4);//sw
-    //                     default: pmem_write(awaddr_reg,wdata_reg,4);
-    //                 endcase
-    //                 $display("To [0x%08x] write data: 0x%08x, wstrb: %b", awaddr_reg, wdata_reg, wstrb_reg);
-    //                 // case(wstrb)
-    //                 //     4'b0001: pmem_write(awaddr,wdata,1);//sb
-    //                 //     4'b0011: pmem_write(awaddr,wdata,2);//sh
-    //                 //     4'b1111: pmem_write(awaddr,wdata,4);//sw
-    //                 //     default: pmem_write(awaddr,wdata,4);
-    //                 // endcase
-    //                 bresp  <= OKAY;
-    //             end
-    //             else begin
-    //                 bresp  <= SLVERR; //返回错误响应
-    //             end
-    //             bvalid <= 1'b1;
-    //         end
-    //     end
-    // end
 endmodule

@@ -1,4 +1,4 @@
-`include "/home/furina/ysyx-workbench/npc/vsrc/defines.v"
+`include "/home/furina/ysyx-workbench/npc/mul-vsrc/defines.v"
 module WB (
     input              clk,
     input              reset,
@@ -16,8 +16,8 @@ module WB (
     input              alu_less,
     input       [31:0] alu_result,
     input       [31:0] data_out,
-    input              predict_taken,
-    input       [1:0]  ghr,
+    // input              predict_taken,
+    // input       [1:0]  ghr,
     output wire [31:0] rs1_val,
     output wire [31:0] rs2_val,
     output reg         wb_ready,
@@ -27,12 +27,12 @@ module WB (
     output reg         is_jal,
     output reg         is_jalr,
     output reg         take_branch,
-    output reg [31:0]  wb_data,
-    output reg         flush,
-    output reg [31:0]  actual_target,
-    output reg [31:0]  branch_total,   // 总分支次数
-    output reg [31:0]  branch_correct, // 预测正确次数
-    output reg [1:0]   ghr_update
+    output reg [31:0]  wb_data
+    // output reg         flush,
+    // output reg [31:0]  actual_target,
+    // output reg [31:0]  branch_total,   // 总分支次数
+    // output reg [31:0]  branch_correct, // 预测正确次数
+    // output reg [1:0]   ghr_update
 );
     typedef enum {IDLE, STALL} state_t;
     state_t state, next_state;
@@ -67,23 +67,23 @@ module WB (
             is_jalr = 1'b0;
             take_branch = 1'b0;
             wb_data = 32'h0;
-            flush <= 1'b0;
-            actual_target <= 32'h0;
-            branch_total <= 32'h0;
-            branch_correct <= 32'h0;
+            // flush <= 1'b0;
+            // actual_target <= 32'h0;
+            // branch_total <= 32'h0;
+            // branch_correct <= 32'h0;
             for(i = 0; i < 32; i = i + 1) begin
                 regs[i] <= 32'h0;
             end
-            for (i = 0; i < 64; i = i + 1) begin
-                btb_pc[i] <= 32'h0;
-                btb_target[i] <= 32'h0;
-                btb_state[i] <= 2'b00;
-                btb_valid[i] <= 1'b0;
-                btb_type[i] <= 2'b00;
-                for (j = 0; j < 4; j = j + 1) begin
-                    pht_counters[i][j] <= 2'b00;
-                end
-            end
+            // for (i = 0; i < 64; i = i + 1) begin
+            //     btb_pc[i] <= 32'h0;
+            //     btb_target[i] <= 32'h0;
+            //     btb_state[i] <= 2'b00;
+            //     btb_valid[i] <= 1'b0;
+            //     btb_type[i] <= 2'b00;
+            //     for (j = 0; j < 4; j = j + 1) begin
+            //         pht_counters[i][j] <= 2'b00;
+            //     end
+            // end
         end else begin
             state = next_state;
             case (state)
@@ -120,43 +120,43 @@ module WB (
                             regs[rd_wb_pre] <= wb_data;
                         end
 
-                       // BTB、PHT 和分支统计更新
-                        if (opcode == `INST_B) begin
-                            btb_pc[btb_index] <= pc;
-                            btb_target[btb_index] <= pc + imm;
-                            btb_valid[btb_index] <= 1'b1;
-                            btb_state[btb_index] <= take_branch ?
-                                (btb_state[btb_index] == 2'b11 ? 2'b11 : btb_state[btb_index] + 2'b01) :
-                                (btb_state[btb_index] == 2'b00 ? 2'b00 : btb_state[btb_index] - 2'b01);
-                            pht_counters[btb_index][ghr] <= take_branch ?
-                                (pht_counters[btb_index][ghr] == 2'b11 ? 2'b11 : pht_counters[btb_index][ghr] + 2'b01) :
-                                (pht_counters[btb_index][ghr] == 2'b00 ? 2'b00 : pht_counters[btb_index][ghr] - 2'b01);
-                            branch_total <= branch_total + 1;
-                            if (take_branch == predict_taken) begin
-                                branch_correct <= branch_correct + 1;
-                            end
-                            flush <= (take_branch != predict_taken);
-                            actual_target <= take_branch ? (pc + imm) : (pc + 4);
-                            ghr_update <= {ghr[0], take_branch};
-                        end else if (opcode == `INST_JAL) begin
-                            flush <= 1'b1; // jal 不预测，强制冲刷
-                            actual_target <= pc + imm;
-                            ghr_update <= ghr;
-                        end else if (opcode == `INST_JALR && func3 == 3'b000) begin
-                            flush <= 1'b1; // jalr 不预测，强制冲刷
-                            actual_target <= (rs1_val + imm) & ~32'h1;
-                            ghr_update <= ghr;
-                        end else begin
-                            flush <= 1'b0;
-                            actual_target <= pc + 4;
-                            ghr_update <= ghr;
-                        end
+                    //    // BTB、PHT 和分支统计更新
+                    //     if (opcode == `INST_B) begin
+                    //         btb_pc[btb_index] <= pc;
+                    //         btb_target[btb_index] <= pc + imm;
+                    //         btb_valid[btb_index] <= 1'b1;
+                    //         btb_state[btb_index] <= take_branch ?
+                    //             (btb_state[btb_index] == 2'b11 ? 2'b11 : btb_state[btb_index] + 2'b01) :
+                    //             (btb_state[btb_index] == 2'b00 ? 2'b00 : btb_state[btb_index] - 2'b01);
+                    //         pht_counters[btb_index][ghr] <= take_branch ?
+                    //             (pht_counters[btb_index][ghr] == 2'b11 ? 2'b11 : pht_counters[btb_index][ghr] + 2'b01) :
+                    //             (pht_counters[btb_index][ghr] == 2'b00 ? 2'b00 : pht_counters[btb_index][ghr] - 2'b01);
+                    //         branch_total <= branch_total + 1;
+                    //         if (take_branch == predict_taken) begin
+                    //             branch_correct <= branch_correct + 1;
+                    //         end
+                    //         flush <= (take_branch != predict_taken);
+                    //         actual_target <= take_branch ? (pc + imm) : (pc + 4);
+                    //         ghr_update <= {ghr[0], take_branch};
+                    //     end else if (opcode == `INST_JAL) begin
+                    //         flush <= 1'b1; // jal 不预测，强制冲刷
+                    //         actual_target <= pc + imm;
+                    //         ghr_update <= ghr;
+                    //     end else if (opcode == `INST_JALR && func3 == 3'b000) begin
+                    //         flush <= 1'b1; // jalr 不预测，强制冲刷
+                    //         actual_target <= (rs1_val + imm) & ~32'h1;
+                    //         ghr_update <= ghr;
+                    //     end else begin
+                    //         flush <= 1'b0;
+                    //         actual_target <= pc + 4;
+                    //         ghr_update <= ghr;
+                    //     end
 
                         next_state = if_ready ? STALL : IDLE;
                     end else begin
-                        flush <= 1'b0;
-                        actual_target <= pc + 4;
-                        ghr_update <= ghr;
+                        // flush <= 1'b0;
+                        // actual_target <= pc + 4;
+                        // ghr_update <= ghr;
                         next_state = IDLE;
                     end
                 end
@@ -168,8 +168,8 @@ module WB (
                 default: begin
                     wb_ready = 1'b0;
                     wb_valid = 1'b0;
-                    flush <= 1'b0;
-                    actual_target <= 32'h0;
+                    // flush <= 1'b0;
+                    // actual_target <= 32'h0;
                     next_state = IDLE;
                 end
             endcase

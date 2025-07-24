@@ -1,4 +1,4 @@
-`include "/home/furina/ysyx-workbench/npc/vsrc/defines.v"
+`include "/home/furina/ysyx-workbench/npc/mul-vsrc/defines.v"
 // 内存模块
 module MEM (
     input             clk,
@@ -15,7 +15,25 @@ module MEM (
     output reg [31:0] data_out,
     output reg        load_access_fault,//异常访问
     output reg        store_access_fault,//异常写入
-    output reg [31:0] mem_fault_addr//异常地址
+    output reg [31:0] mem_fault_addr,//异常地址
+
+    output reg [31:0] sram_araddr,
+    output reg        sram_arvalid,
+    input wire        sram_arready,
+    input wire [31:0] sram_rdata,
+    input wire        sram_rvalid,
+    output reg        sram_rready,
+    input wire [1:0]  sram_rresp,
+    output reg [31:0] sram_awaddr,
+    output reg        sram_awvalid,
+    input wire        sram_awready,
+    output reg [31:0] sram_wdata,
+    output reg [3:0]  sram_wstrb,
+    output reg        sram_wvalid,
+    input wire        sram_wready,
+    input wire [1:0]  sram_bresp,
+    input wire        sram_bvalid,
+    output reg        sram_bready
 );
     //====状态机定义====//  
     typedef enum {IDLE, READ_ADDR, READ_DATA, 
@@ -25,57 +43,57 @@ module MEM (
     reg [1:0] delay;
     parameter DELAY_CYCLES = 3;//处理周期
     
-    //====SRAM读写接口====//
-    //AR channel
-    reg [31:0]  sram_araddr;//读地址
-    reg         sram_arvalid;//读地址有效
-    wire        sram_arready;//sram读地址准备好
-    //R channel
-    wire [1:0]  sram_rresp;//读响应信号
-    wire [31:0] sram_rdata;//读数据
-    wire        sram_rvalid;//读数据有效
-    reg         sram_rready;//CPU读数据准备好
-    //AW channel
-    reg [31:0]  sram_awaddr;//写地址
-    wire        sram_awready;//sram写地址准备好
-    reg         sram_awvalid;//写地址有效
-    //W channel
-    reg [31:0]  sram_wdata;//写数据
-    reg [3:0]   sram_wstrb;//写掩码
-    reg         sram_wvalid;//写请求有效
-    wire        sram_wready;//sram写请求准备好
-    //B channel
-    wire [1:0]  sram_bresp;//写响应信号
-    wire        sram_bvalid;//写响应有效
-    reg         sram_bready;//写响应准备好
-    //===================//
+    // //====SRAM读写接口====//
+    // //AR channel
+    // reg [31:0]  sram_araddr;//读地址
+    // reg         sram_arvalid;//读地址有效
+    // wire        sram_arready;//sram读地址准备好
+    // //R channel
+    // wire [1:0]  sram_rresp;//读响应信号
+    // wire [31:0] sram_rdata;//读数据
+    // wire        sram_rvalid;//读数据有效
+    // reg         sram_rready;//CPU读数据准备好
+    // //AW channel
+    // reg [31:0]  sram_awaddr;//写地址
+    // wire        sram_awready;//sram写地址准备好
+    // reg         sram_awvalid;//写地址有效
+    // //W channel
+    // reg [31:0]  sram_wdata;//写数据
+    // reg [3:0]   sram_wstrb;//写掩码
+    // reg         sram_wvalid;//写请求有效
+    // wire        sram_wready;//sram写请求准备好
+    // //B channel
+    // wire [1:0]  sram_bresp;//写响应信号
+    // wire        sram_bvalid;//写响应有效
+    // reg         sram_bready;//写响应准备好
+    // //===================//
 
-    mem_sram mem_sram_inst(
-        .clk(clk),
-        .reset(reset),
-        //AR channel
-        .araddr(sram_araddr),
-        .arvalid(sram_arvalid),
-        .arready(sram_arready),
-        //R channel
-        .rdata(sram_rdata),
-        .rresp(sram_rresp),
-        .rvalid(sram_rvalid),
-        .rready(sram_rready),
-        //AW channel
-        .awaddr(sram_awaddr),
-        .awvalid(sram_awvalid),
-        .awready(sram_awready),
-        //W channel
-        .wdata(sram_wdata),
-        .wstrb(sram_wstrb),
-        .wvalid(sram_wvalid),
-        .wready(sram_wready),
-        //B channel
-        .bresp(sram_bresp),
-        .bvalid(sram_bvalid),
-        .bready(sram_bready)
-    );
+    // SRAM msram(
+    //     .clk(clk),
+    //     .reset(reset),
+    //     //AR channel
+    //     .araddr(sram_araddr),
+    //     .arvalid(sram_arvalid),
+    //     .arready(sram_arready),
+    //     //R channel
+    //     .rdata(sram_rdata),
+    //     .rresp(sram_rresp),
+    //     .rvalid(sram_rvalid),
+    //     .rready(sram_rready),
+    //     //AW channel
+    //     .awaddr(sram_awaddr),
+    //     .awvalid(sram_awvalid),
+    //     .awready(sram_awready),
+    //     //W channel
+    //     .wdata(sram_wdata),
+    //     .wstrb(sram_wstrb),
+    //     .wvalid(sram_wvalid),
+    //     .wready(sram_wready),
+    //     //B channel
+    //     .bresp(sram_bresp),
+    //     .bvalid(sram_bvalid),
+    //     .bready(sram_bready)
+    // );
 
     always @(posedge clk or posedge reset) begin
         if(reset) begin

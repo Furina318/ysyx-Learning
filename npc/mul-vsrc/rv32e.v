@@ -23,7 +23,7 @@
 //                    佛祖保佑
 /*********************************************************************/
 
-`include "/home/furina/ysyx-workbench/npc/vsrc/defines.v"
+`include "/home/furina/ysyx-workbench/npc/mul-vsrc/defines.v"
 module rv32e (
     input         clk,
     input         reset
@@ -38,11 +38,29 @@ module rv32e (
     wire         if_access_fault;
     wire [31:0]  if_fault_addr;
     wire [31:0]  trap_pc;
-    wire         predict_taken;
-    wire [31:0]  predict_target;
-    wire         flush;
-    wire [31:0]  actual_target;
-    wire [1:0]   ghr;
+    // wire         predict_taken;
+    // wire [31:0]  predict_target;
+    // wire         flush;
+    // wire [31:0]  actual_target;
+    // wire [1:0]   ghr;
+
+    wire [31:0] ifu_sram_araddr;
+    wire        ifu_sram_arvalid;
+    wire        ifu_sram_arready;
+    wire [31:0] ifu_sram_rdata;
+    wire        ifu_sram_rvalid;
+    wire        ifu_sram_rready;
+    wire [1:0]  ifu_sram_rresp;
+    wire [31:0] ifu_sram_awaddr;
+    wire        ifu_sram_awvalid;
+    wire        ifu_sram_awready;
+    wire [31:0] ifu_sram_wdata;
+    wire [3:0]  ifu_sram_wstrb;
+    wire        ifu_sram_wvalid;
+    wire        ifu_sram_wready;
+    wire [1:0]  ifu_sram_bresp;
+    wire        ifu_sram_bvalid;
+    wire        ifu_sram_bready;
     //===== ID =====//
     wire [6:0]   opcode;
     wire [4:0]   rs1, rs2, rd;
@@ -76,6 +94,24 @@ module rv32e (
     wire         load_access_fault;
     wire         store_access_fault;
     wire [31:0]  mem_fault_addr;
+
+    wire [31:0] mem_sram_araddr;
+    wire        mem_sram_arvalid;
+    wire        mem_sram_arready;
+    wire [31:0] mem_sram_rdata;
+    wire        mem_sram_rvalid;
+    wire        mem_sram_rready;
+    wire [1:0]  mem_sram_rresp;
+    wire [31:0] mem_sram_awaddr;
+    wire        mem_sram_awvalid;
+    wire        mem_sram_awready;
+    wire [31:0] mem_sram_wdata;
+    wire [3:0]  mem_sram_wstrb;
+    wire        mem_sram_wvalid;
+    wire        mem_sram_wready;
+    wire [1:0]  mem_sram_bresp;
+    wire        mem_sram_bvalid;
+    wire        mem_sram_bready;
     //===== WB =====//
     wire [31:0]  wb_data;
     wire [31:0]  jal_target;
@@ -85,20 +121,20 @@ module rv32e (
     wire [31:0]  branch_target;
 
     // 分支预测统计
-    wire [31:0]  branch_total;   // 总分支次数
-    wire [31:0]  branch_correct; // 预测正确次数
-    wire [1:0]   ghr_update;
+    // wire [31:0]  branch_total;   // 总分支次数
+    // wire [31:0]  branch_correct; // 预测正确次数
+    // wire [1:0]   ghr_update;
 
-    reg [1:0] ghr_reg;
-    always @(posedge clk or posedge reset) begin
-        if (reset) begin
-            ghr_reg <= 2'b00;
-        end
-        else if(wb_valid) begin
-            ghr_reg <= ghr_update;
-        end
-    end
-    assign ghr = ghr_reg;
+    // reg [1:0] ghr_reg;
+    // always @(posedge clk or posedge reset) begin
+    //     if (reset) begin
+    //         ghr_reg <= 2'b00;
+    //     end
+    //     else if(wb_valid) begin
+    //         ghr_reg <= ghr_update;
+    //     end
+    // end
+    // assign ghr = ghr_reg;
     // assign branch_target=is_jalr ? jalr_target : jal_target;
     
     wire [4:0]   rd_wb;
@@ -106,6 +142,110 @@ module rv32e (
     wire         wb_MemRead, wb_MemWrite;
     wire [2:0]   wb_MemLen;
     wire [31:0]  wb_addr, wb_data_in;
+
+    //====SRAM读写接口====//
+    //AR channel
+    wire [31:0] sram_araddr;//读地址
+    wire        sram_arvalid;//读地址有效
+    wire        sram_arready;//sram读地址准备好
+    //R channel
+    wire [1:0]  sram_rresp;//读响应信号
+    wire [31:0] sram_rdata;//读数据
+    wire        sram_rvalid;//读数据有效
+    wire        sram_rready;//CPU读数据准备好
+    //AW channel
+    wire [31:0] sram_awaddr;//写地址
+    wire        sram_awready;//sram写地址准备好
+    wire        sram_awvalid;//写地址有效
+    //W channel
+    wire [31:0] sram_wdata;//写数据
+    wire [3:0]  sram_wstrb;//写掩码
+    wire        sram_wvalid;//写请求有效
+    wire        sram_wready;//sram写请求准备好
+    //B channel
+    wire [1:0]  sram_bresp;//写响应信号
+    wire        sram_bvalid;//写响应有效
+    wire        sram_bready;//写响应准备好
+    //===================//
+
+    AXI_ARB axi_arb (
+        .clk(clk),
+        .reset(reset),
+
+        // IFU master
+        .ifu_araddr(ifu_sram_araddr),
+        .ifu_arvalid(ifu_sram_arvalid),
+        .ifu_arready(ifu_sram_arready),
+        .ifu_rdata(ifu_sram_rdata),
+        .ifu_rresp(ifu_sram_rresp),
+        .ifu_rvalid(ifu_sram_rvalid),
+        .ifu_rready(ifu_sram_rready),
+
+        // MEM master
+        .mem_araddr(mem_sram_araddr),
+        .mem_arvalid(mem_sram_arvalid),
+        .mem_arready(mem_sram_arready),
+        .mem_rdata(mem_sram_rdata),
+        .mem_rresp(mem_sram_rresp),
+        .mem_rvalid(mem_sram_rvalid),
+        .mem_rready(mem_sram_rready),
+        .mem_awaddr(mem_sram_awaddr),
+        .mem_awvalid(mem_sram_awvalid),
+        .mem_awready(mem_sram_awready),
+        .mem_wdata(mem_sram_wdata),
+        .mem_wstrb(mem_sram_wstrb),
+        .mem_wvalid(mem_sram_wvalid),
+        .mem_wready(mem_sram_wready),
+        .mem_bresp(mem_sram_bresp),
+        .mem_bvalid(mem_sram_bvalid),
+        .mem_bready(mem_sram_bready),
+
+        // SRAM slave
+        .sram_araddr(sram_araddr),
+        .sram_arvalid(sram_arvalid),
+        .sram_arready(sram_arready),
+        .sram_rdata(sram_rdata),
+        .sram_rresp(sram_rresp),
+        .sram_rvalid(sram_rvalid),
+        .sram_rready(sram_rready),
+        .sram_awaddr(sram_awaddr),
+        .sram_awvalid(sram_awvalid),
+        .sram_awready(sram_awready),
+        .sram_wdata(sram_wdata),
+        .sram_wstrb(sram_wstrb),
+        .sram_wvalid(sram_wvalid),
+        .sram_wready(sram_wready),
+        .sram_bresp(sram_bresp),
+        .sram_bvalid(sram_bvalid),
+        .sram_bready(sram_bready)
+    );
+
+    SRAM sram(
+            .clk(clk),
+            .reset(reset),
+            //AR channel
+            .araddr(sram_araddr),
+            .arvalid(sram_arvalid),
+            .arready(sram_arready),
+            //R channel
+            .rdata(sram_rdata),
+            .rvalid(sram_rvalid),
+            .rready(sram_rready),
+            .rresp(sram_rresp),
+            //AW channel
+            .awaddr(sram_awaddr),
+            .awvalid(sram_awvalid),
+            .awready(sram_awready),
+            //W channel
+            .wdata(sram_wdata),
+            .wstrb(sram_wstrb),
+            .wvalid(sram_wvalid),
+            .wready(sram_wready),
+            //B channel
+            .bresp(sram_bresp),
+            .bvalid(sram_bvalid),
+            .bready(sram_bready)
+    );
 
     // 取指模块
     IF if_stage (
@@ -122,11 +262,28 @@ module rv32e (
         .id_ready(id_ready),
         .if_access_fault(if_access_fault),
         .if_fault_addr(if_fault_addr),
-        .flush(flush),
-        .actual_target(actual_target),
-        .predict_taken(predict_taken),
-        .predict_target(predict_target),
-        .ghr(ghr)
+        // .flush(flush),
+        // .actual_target(actual_target),
+        // .predict_taken(predict_taken),
+        // .predict_target(predict_target),
+        // .ghr(ghr),
+        .sram_araddr(ifu_sram_araddr),
+        .sram_arvalid(ifu_sram_arvalid),
+        .sram_arready(ifu_sram_arready),
+        .sram_rdata(ifu_sram_rdata),
+        .sram_rvalid(ifu_sram_rvalid),
+        .sram_rready(ifu_sram_rready),
+        .sram_rresp(ifu_sram_rresp),
+        .sram_awaddr(ifu_sram_awaddr),
+        .sram_awvalid(ifu_sram_awvalid),
+        .sram_awready(ifu_sram_awready),
+        .sram_wdata(ifu_sram_wdata),
+        .sram_wstrb(ifu_sram_wstrb),
+        .sram_wvalid(ifu_sram_wvalid),
+        .sram_wready(ifu_sram_wready),
+        .sram_bresp(ifu_sram_bresp),
+        .sram_bvalid(ifu_sram_bvalid),
+        .sram_bready(ifu_sram_bready)
     );
 
     // 译码模块
@@ -150,9 +307,9 @@ module rv32e (
         .MemWrite(MemWrite),
         .MemRead(MemRead),
         .alu_op(alu_op),
-        .MemLen(MemLen),
-        .branch_total(branch_total),
-        .branch_correct(branch_correct)
+        .MemLen(MemLen)
+        // .branch_total(branch_total),
+        // .branch_correct(branch_correct)
     );
     
     EX ex_stage(
@@ -187,7 +344,24 @@ module rv32e (
         .data_out(data_out),
         .load_access_fault(load_access_fault),
         .store_access_fault(store_access_fault),
-        .mem_fault_addr(mem_fault_addr)
+        .mem_fault_addr(mem_fault_addr),
+        .sram_araddr(mem_sram_araddr),
+        .sram_arvalid(mem_sram_arvalid),
+        .sram_arready(mem_sram_arready),
+        .sram_rdata(mem_sram_rdata),
+        .sram_rvalid(mem_sram_rvalid),
+        .sram_rready(mem_sram_rready),
+        .sram_rresp(mem_sram_rresp),
+        .sram_awaddr(mem_sram_awaddr),
+        .sram_awvalid(mem_sram_awvalid),
+        .sram_awready(mem_sram_awready),
+        .sram_wdata(mem_sram_wdata),
+        .sram_wstrb(mem_sram_wstrb),
+        .sram_wvalid(mem_sram_wvalid),
+        .sram_wready(mem_sram_wready),
+        .sram_bresp(mem_sram_bresp),
+        .sram_bvalid(mem_sram_bvalid),
+        .sram_bready(mem_sram_bready)
     );
 
     // 写回模块
@@ -221,15 +395,15 @@ module rv32e (
         .take_branch(take_branch),
         .jal_target(jal_target),
         .jalr_target(jalr_target),
-        .wb_data(wb_data),
+        .wb_data(wb_data)
 
-        .predict_taken(predict_taken),
-        .flush(flush),
-        .actual_target(actual_target),
-        .branch_total(branch_total),
-        .branch_correct(branch_correct),
-        .ghr(ghr),
-        .ghr_update(ghr_update)
+        // .predict_taken(predict_taken),
+        // .flush(flush),
+        // .actual_target(actual_target),
+        // .branch_total(branch_total),
+        // .branch_correct(branch_correct),
+        // .ghr(ghr),
+        // .ghr_update(ghr_update)
     );
     assign branch_target = is_jalr ? jalr_target : jal_target;
 

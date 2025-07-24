@@ -1,4 +1,4 @@
-module booth_wallace_multiplier (
+module amultiplier (
     input wire clk,
     input wire rst_n,
     input wire signed [31:0] multiplicand,//X
@@ -11,10 +11,6 @@ module booth_wallace_multiplier (
 wire signed [67:0] multiplicand_ext= is_signed? {{36{multiplicand[31]}}, multiplicand} : {36'd0, multiplicand};//{{36{multiplicand[31]}}, multiplicand}
 wire signed [34:0] multiplier_ext = is_signed ? {{2{multiplier[31]}}, multiplier,1'b0} :  {2'b0, multiplier,1'b0};  //{{2{multiplier[31]}}, multiplier} 
 // Booth两位乘法部分积生成模块
-initial begin
-    $display("multiplicand = %h, multiplier = %h, is_signed = %b", 
-             multiplicand, multiplier, is_signed);
-end
 wire signed [67:0] partial_products [16:0];
 genvar i;
 generate

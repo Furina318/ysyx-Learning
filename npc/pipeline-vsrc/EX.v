@@ -92,21 +92,12 @@ module EX (
     import "DPI-C" function void ebreak(input int station, input int inst);
     
     // 前递后的源寄存器值
-    // wire [31:0] src1 = (forward_rs1[1] ? ex_lsu_process_result : 
-    //                    (forward_rs1[0] | load_use_flag[1]) ? lsu_wb_wdata : 
-    //                    wb_ex_src1);
-    // wire [31:0] src2 = (forward_rs2[1] ? ex_lsu_process_result : 
-    //                    (forward_rs2[0] | load_use_flag[0]) ? lsu_wb_wdata : 
-    //                    wb_ex_src2);
-    wire [31:0] src1 = (forward_rs1[1]) ? ex_lsu_process_result : 
-                    (forward_rs1[0]) ? lsu_wb_wdata : 
-                    (load_use_flag[3]) ? lsu_wb_wdata : 
-                    wb_ex_src1;
-
-    wire [31:0] src2 = (forward_rs2[1]) ? ex_lsu_process_result : 
-                    (forward_rs2[0]) ? lsu_wb_wdata : 
-                    (load_use_flag[2]) ? lsu_wb_wdata : 
-                    wb_ex_src2;
+    wire [31:0] src1 = (forward_rs1[1] ? ex_lsu_process_result : 
+                       (forward_rs1[0] | load_use_flag[1]) ? lsu_wb_wdata : 
+                       wb_ex_src1);
+    wire [31:0] src2 = (forward_rs2[1] ? ex_lsu_process_result : 
+                       (forward_rs2[0] | load_use_flag[0]) ? lsu_wb_wdata : 
+                       wb_ex_src2);
 
     // ALU 操作中间变量
     reg [31:0] ex_num1;
@@ -186,80 +177,128 @@ module EX (
                     (id_ex_func3 == `F3_BLTU && alu_less) || // bltu
                     (id_ex_func3 == `F3_BGEU && !alu_less)   // bgeu
         );
-        // 默认赋值，防止latch
-        ex_flush        = 1'b0;
-        ex_flush_pc     = 32'h0;
-        ex_bpu_update   = 1'b0;
-        ex_bpu_pc       = 32'h0;
-        ex_bpu_taken    = 1'b0;
-        ex_bpu_target   = 32'h0;
-        ex_bpu_correct  = 1'b0;
-        actual_target   = 32'h0;
+        case(1'b1)
+            id_ex_jal: begin
+                ex_flush = 0;
+                ex_flush_pc = 32'h0;
+                ex_bpu_update = 1'b0;
+            end
+            id_ex_jalr: begin
+                ex_bpu_update  = 1'b1;
+                ex_bpu_pc      = id_ex_pc;
+                ex_bpu_taken   = 1'b1;
+                ex_bpu_target  = (src1 + id_ex_imm) & ~32'h1;
+                ex_bpu_correct = (id_ex_predict_taken == 1'b1) && (id_ex_predict_target == ((src1 + id_ex_imm) & ~32'h1));
+                ex_flush = !ex_bpu_correct & ex_flush_condition & (~(|load_use_flag));
+                ex_flush_pc = (src1 + id_ex_imm) & ~32'h1;
+            end
+            id_ex_csr_ecall : begin
+                ex_flush = 1'b1 & ex_flush_condition & (~(|load_use_flag));
+                ex_flush_pc = wb_ex_csr_num1;
+            end
+            id_ex_csr_mret: begin
+                ex_flush = 1'b1 & ex_flush_condition & (~(|load_use_flag));
+                ex_flush_pc = wb_ex_csr_num2;
+            end
+            (id_ex_opcode == `INST_B): begin
+                actual_target = take_branch ? (id_ex_pc + id_ex_imm) : id_ex_pc2;
+                ex_bpu_update = take_branch; 
+                ex_bpu_pc = id_ex_pc;
+                ex_bpu_taken = take_branch;
+                ex_bpu_target = id_ex_pc + id_ex_imm;
+                ex_bpu_correct = (take_branch == id_ex_predict_taken) && (actual_target == id_ex_predict_target);
+                if(!ex_bpu_correct) begin
+                    ex_flush = 1'b1 & ex_flush_condition & (~(|load_use_flag));
+                    ex_flush_pc = take_branch ? ex_bpu_target : (id_ex_pc + 4);    
+                end
+            end
+            default: begin
+                ex_bpu_update = 1'b0; // 非分支指令不需要更新BPU
+                ex_bpu_pc = 32'h0;
+                ex_bpu_taken = 1'b0;
+                ex_bpu_target = 32'h0;
+                ex_bpu_correct = 1'b0;
+                ex_flush = 1'b0; // 非分支指令不需要冲刷
+                ex_flush_pc = 32'h0;
+            end
+        endcase
+        // // 默认赋值，防止latch
+        // ex_flush        = 1'b0;
+        // ex_flush_pc     = 32'h0;
+        // ex_bpu_update   = 1'b0;
+        // ex_bpu_pc       = 32'h0;
+        // ex_bpu_taken    = 1'b0;
+        // ex_bpu_target   = 32'h0;
+        // ex_bpu_correct  = 1'b0;
+        // actual_target   = 32'h0;
 
+        // // if (id_ex_jal) begin
+        // //     ex_flush = 1'b1 & ex_flush_condition & (~(|load_use_flag));
+        // //     ex_flush_pc = jal_target;
+        // // end
+        // // else if (id_ex_jalr) begin
+        // //     ex_flush = 1'b1 & ex_flush_condition & (~(|load_use_flag));
+        // //     ex_flush_pc = jalr_target;
+        // // end
         // if (id_ex_jal) begin
-        //     ex_flush = 1'b1 & ex_flush_condition & (~(|load_use_flag));
-        //     ex_flush_pc = jal_target;
+        //     // ex_bpu_update  = 1'b1;
+        //     // ex_bpu_pc      = id_ex_pc;
+        //     // ex_bpu_taken   = 1'b1;
+        //     // ex_bpu_target  = id_ex_pc + id_ex_imm;
+        //     // ex_bpu_correct = (id_ex_predict_taken == 1'b1) && (id_ex_predict_target == (id_ex_pc + id_ex_imm));
+        //     // ex_flush = !ex_bpu_correct & ex_flush_condition & (~(|load_use_flag));
+        //     // ex_flush_pc = id_ex_pc + id_ex_imm;
+        //     ex_flush = 0;
+        //     ex_flush_pc = 32'h0;
+        //     ex_bpu_update = 1'b0;
         // end
         // else if (id_ex_jalr) begin
-        //     ex_flush = 1'b1 & ex_flush_condition & (~(|load_use_flag));
-        //     ex_flush_pc = jalr_target;
+        //     ex_bpu_update  = 1'b1;
+        //     ex_bpu_pc      = id_ex_pc;
+        //     ex_bpu_taken   = 1'b1;
+        //     ex_bpu_target  = (src1 + id_ex_imm) & ~32'h1;
+        //     ex_bpu_correct = (id_ex_predict_taken == 1'b1) && (id_ex_predict_target == ((src1 + id_ex_imm) & ~32'h1));
+        //     ex_flush = !ex_bpu_correct & ex_flush_condition & (~(|load_use_flag));
+        //     ex_flush_pc = (src1 + id_ex_imm) & ~32'h1;
         // end
-        if (id_ex_jal) begin
-            ex_bpu_update  = 1'b1;
-            ex_bpu_pc      = id_ex_pc;
-            ex_bpu_taken   = 1'b1;
-            ex_bpu_target  = id_ex_pc + id_ex_imm;
-            ex_bpu_correct = (id_ex_predict_taken == 1'b1) && (id_ex_predict_target == (id_ex_pc + id_ex_imm));
-            ex_flush = !ex_bpu_correct & ex_flush_condition & (~(|load_use_flag));
-            ex_flush_pc = id_ex_pc + id_ex_imm;
-        end
-        else if (id_ex_jalr) begin
-            ex_bpu_update  = 1'b1;
-            ex_bpu_pc      = id_ex_pc;
-            ex_bpu_taken   = 1'b1;
-            ex_bpu_target  = (src1 + id_ex_imm) & ~32'h1;
-            ex_bpu_correct = (id_ex_predict_taken == 1'b1) && (id_ex_predict_target == ((src1 + id_ex_imm) & ~32'h1));
-            ex_flush = !ex_bpu_correct & ex_flush_condition & (~(|load_use_flag));
-            ex_flush_pc = (src1 + id_ex_imm) & ~32'h1;
-        end
-        // else if (take_branch) begin
+        // // else if (take_branch) begin
+        // //     ex_flush = 1'b1 & ex_flush_condition & (~(|load_use_flag));
+        // //     ex_flush_pc = id_ex_pc + id_ex_imm;
+        // // end
+        // else if (id_ex_csr_ecall) begin
         //     ex_flush = 1'b1 & ex_flush_condition & (~(|load_use_flag));
-        //     ex_flush_pc = id_ex_pc + id_ex_imm;
+        //     ex_flush_pc = wb_ex_csr_num1;
         // end
-        else if (id_ex_csr_ecall) begin
-            ex_flush = 1'b1 & ex_flush_condition & (~(|load_use_flag));
-            ex_flush_pc = wb_ex_csr_num1;
-        end
-        else if (id_ex_csr_mret) begin
-            ex_flush = 1'b1 & ex_flush_condition & (~(|load_use_flag));
-            ex_flush_pc = wb_ex_csr_num2;
-        end
+        // else if (id_ex_csr_mret) begin
+        //     ex_flush = 1'b1 & ex_flush_condition & (~(|load_use_flag));
+        //     ex_flush_pc = wb_ex_csr_num2;
+        // end
+        // // else begin
+        // //     ex_flush = 1'b0;
+        // //     ex_flush_pc = 32'h0;
+        // // end
+
+        // else if(id_ex_opcode == `INST_B) begin
+        //     actual_target = take_branch ? (id_ex_pc + id_ex_imm) : id_ex_pc2;
+        //     ex_bpu_update = take_branch; 
+        //     ex_bpu_pc = id_ex_pc;
+        //     ex_bpu_taken = take_branch;
+        //     ex_bpu_target = id_ex_pc + id_ex_imm;
+        //     ex_bpu_correct = (take_branch == id_ex_predict_taken) && (actual_target == id_ex_predict_target);
+        //     if(!ex_bpu_correct) begin
+        //         ex_flush = 1'b1 & ex_flush_condition & (~(|load_use_flag));
+        //         ex_flush_pc = take_branch ? ex_bpu_target : (id_ex_pc + 4);    
+        //     end
+        // end
         // else begin
-        //     ex_flush = 1'b0;
+        //     ex_bpu_update = 1'b0; // 非分支指令不需要更新BPU
+        //     ex_bpu_pc = 32'h0;
+        //     ex_bpu_taken = 1'b0;
+        //     ex_bpu_target = 32'h0;
+        //     ex_bpu_correct = 1'b0;
+        //     ex_flush = 1'b0; // 非分支指令不需要冲刷
         //     ex_flush_pc = 32'h0;
         // end
-
-        else if(id_ex_opcode == `INST_B) begin
-            actual_target = take_branch ? (id_ex_pc + id_ex_imm) : id_ex_pc2;
-            ex_bpu_update = 1'b1; // 分支指令需要更新BPU
-            ex_bpu_pc = id_ex_pc;
-            ex_bpu_taken = take_branch;
-            ex_bpu_target = id_ex_pc + id_ex_imm;
-            ex_bpu_correct = (take_branch == id_ex_predict_taken) && (actual_target == id_ex_predict_target);
-            if(!ex_bpu_correct) begin
-                ex_flush = 1'b1 & ex_flush_condition & (~(|load_use_flag));
-                ex_flush_pc = take_branch ? ex_bpu_target : (id_ex_pc + 4);    
-            end
-        end
-        else begin
-            ex_bpu_update = 1'b0; // 非分支指令不需要更新BPU
-            ex_bpu_pc = 32'h0;
-            ex_bpu_taken = 1'b0;
-            ex_bpu_target = 32'h0;
-            ex_bpu_correct = 1'b0;
-            ex_flush = 1'b0; // 非分支指令不需要冲刷
-            ex_flush_pc = 32'h0;
-        end
     end
     
     always @(posedge clk)begin
@@ -291,44 +330,45 @@ module EX (
 
     reg [31:0] csr_write_data;
     always @(*) begin
-        if (id_ex_csr_op == `CSR_CSRRW && id_ex_func3 == `F3_CSRRW) begin
-            csr_write_data = src1;
-        end
-        else if (id_ex_csr_op == `CSR_CSRRC && id_ex_func3 == `F3_CSRRC) begin
-            csr_write_data = (wb_ex_csr_num1 & ~src1);
-        end
-        else if (id_ex_csr_op == `CSR_CSRRS && id_ex_func3 == `F3_CSRRS) begin
-            csr_write_data = (wb_ex_csr_num1 | src1);
-        end
-        else if (id_ex_csr_op == `CSR_CSRRW && id_ex_func3 == `F3_CSRRWI) begin
-            csr_write_data = {27'b0,id_ex_zimm};
-        end
-        else if (id_ex_csr_op == `CSR_CSRRC && id_ex_func3 == `F3_CSRRCI) begin
-            csr_write_data = wb_ex_csr_num1 & ~({27'b0,id_ex_zimm});
-        end
-        else if (id_ex_csr_op == `CSR_CSRRS && id_ex_func3 == `F3_CSRRSI) begin
-            csr_write_data = wb_ex_csr_num1 | ({27'b0,id_ex_zimm});
-        end
-        else if (id_ex_csr_ecall) begin
-            csr_write_data = 32'd11;
-        end
-        else if (id_ex_csr_mret) begin
-            csr_write_data = mstatus_t;
-        end
-        else begin
-            csr_write_data = 32'b0;
-        end
+        case(1'b1)
+            (id_ex_csr_op == `CSR_CSRRW && id_ex_func3 == `F3_CSRRW): csr_write_data = src1;
+            (id_ex_csr_op == `CSR_CSRRC && id_ex_func3 == `F3_CSRRC): csr_write_data = (wb_ex_csr_num1 & ~src1);
+            (id_ex_csr_op == `CSR_CSRRS && id_ex_func3 == `F3_CSRRS): csr_write_data = (wb_ex_csr_num1 | src1);
+            (id_ex_csr_op == `CSR_CSRRW && id_ex_func3 == `F3_CSRRWI):csr_write_data = {27'b0,id_ex_zimm};
+            (id_ex_csr_op == `CSR_CSRRC && id_ex_func3 == `F3_CSRRCI):csr_write_data = wb_ex_csr_num1 & ~({27'b0,id_ex_zimm});
+            (id_ex_csr_op == `CSR_CSRRS && id_ex_func3 == `F3_CSRRSI):csr_write_data = wb_ex_csr_num1 | ({27'b0,id_ex_zimm});
+            (id_ex_csr_ecall):                                        csr_write_data = 32'd11;
+            (id_ex_csr_mret):                                         csr_write_data = mstatus_t;
+            default:                                                  csr_write_data = 32'b0;
+        endcase
+        // if (id_ex_csr_op == `CSR_CSRRW && id_ex_func3 == `F3_CSRRW) begin
+        //     csr_write_data = src1;
+        // end
+        // else if (id_ex_csr_op == `CSR_CSRRC && id_ex_func3 == `F3_CSRRC) begin
+        //     csr_write_data = (wb_ex_csr_num1 & ~src1);
+        // end
+        // else if (id_ex_csr_op == `CSR_CSRRS && id_ex_func3 == `F3_CSRRS) begin
+        //     csr_write_data = (wb_ex_csr_num1 | src1);
+        // end
+        // else if (id_ex_csr_op == `CSR_CSRRW && id_ex_func3 == `F3_CSRRWI) begin
+        //     csr_write_data = {27'b0,id_ex_zimm};
+        // end
+        // else if (id_ex_csr_op == `CSR_CSRRC && id_ex_func3 == `F3_CSRRCI) begin
+        //     csr_write_data = wb_ex_csr_num1 & ~({27'b0,id_ex_zimm});
+        // end
+        // else if (id_ex_csr_op == `CSR_CSRRS && id_ex_func3 == `F3_CSRRSI) begin
+        //     csr_write_data = wb_ex_csr_num1 | ({27'b0,id_ex_zimm});
+        // end
+        // else if (id_ex_csr_ecall) begin
+        //     csr_write_data = 32'd11;
+        // end
+        // else if (id_ex_csr_mret) begin
+        //     csr_write_data = mstatus_t;
+        // end
+        // else begin
+        //     csr_write_data = 32'b0;
+        // end
     end
-    // wire [31:0] csr_write_data =  
-    //     (id_ex_csr_op == `CSR_CSRRW && id_ex_func3 == `F3_CSRRW) ? src1 :
-    //     (id_ex_csr_op == `CSR_CSRRC && id_ex_func3 == `F3_CSRRC) ? (wb_ex_csr_num1 & ~src1) :
-    //     (id_ex_csr_op == `CSR_CSRRS && id_ex_func3 == `F3_CSRRS) ? (wb_ex_csr_num1 | src1) :
-    //     (id_ex_csr_op == `CSR_CSRRW && id_ex_func3 == `F3_CSRRWI) ? {27'b0, id_ex_zimm} :
-    //     (id_ex_csr_op == `CSR_CSRRC && id_ex_func3 == `F3_CSRRCI) ? wb_ex_csr_num1 & ~({27'b0, id_ex_zimm}) :
-    //     (id_ex_csr_op == `CSR_CSRRS && id_ex_func3 == `F3_CSRRSI) ? wb_ex_csr_num1 | ({27'b0, id_ex_zimm}) :
-    //     (id_ex_csr_ecall) ? 32'd11 : // ecall
-    //     (id_ex_csr_mret) ? mstatus_t : // mret
-    //     32'b0; // 默认值
 
     // 前递信号定义
     wire [1:0] forward_rs1;
@@ -347,14 +387,14 @@ module EX (
     assign load_use_flag[3] = lsu_ex_forward_MemRead & lsu_ex_forward_RegWrite & (|lsu_ex_forward_rd) & (lsu_ex_forward_rd == id_wb_rs1);
     assign load_use_flag[2] = lsu_ex_forward_MemRead & lsu_ex_forward_RegWrite & (|lsu_ex_forward_rd) & (lsu_ex_forward_rd == id_wb_rs2);
     assign load_use_flag[1] = ex_lsu_MemRead & ex_lsu_RegWrite & (|ex_lsu_rd) & (ex_lsu_rd == id_wb_rs1) & ex_lsu_valid;
-    assign load_use_flag[0] = ex_lsu_MemRead & ex_lsu_RegWrite & ex_lsu_valid & (|ex_lsu_rd) & (ex_lsu_rd == id_wb_rs2);
+    assign load_use_flag[0] = ex_lsu_MemRead & ex_lsu_RegWrite & (|ex_lsu_rd) & (ex_lsu_rd == id_wb_rs2) & ex_lsu_valid;
 
     // 流水线控制
     always @(*) begin
         ex_ready = (lsu_ready || !ex_lsu_valid) && (load_use_flag == 4'b0);
     end
 
-    always @(posedge clk or posedge reset) begin
+    always @(posedge clk) begin
         if (reset) begin
             ex_lsu_valid <= 1'b0;
         end
@@ -370,7 +410,7 @@ module EX (
     end
     
     // 输出信号赋值
-    always @(posedge clk or posedge reset) begin
+    always @(posedge clk) begin
         if (reset) begin
             ex_lsu_inst           <= 32'h0;
             ex_lsu_pc             <= 32'h0;
@@ -402,7 +442,7 @@ module EX (
     end
     
 
-    always @(posedge clk or posedge reset) begin
+    always @(posedge clk) begin
         if(reset) begin
             ex_lsu_csr            <= 1'b0;
             ex_lsu_csr_wen1       <= 1'b0;

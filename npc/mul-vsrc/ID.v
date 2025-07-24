@@ -1,4 +1,4 @@
-`include "/home/furina/ysyx-workbench/npc/vsrc/defines.v"
+`include "/home/furina/ysyx-workbench/npc/mul-vsrc/defines.v"
 // 译码模块
 module ID (
     input             clk,
@@ -21,9 +21,9 @@ module ID (
     output reg        MemWrite,
     output reg        MemRead,
     output reg [3:0]  alu_op,
-    output reg [2:0]  MemLen,
-    input      [31:0] branch_total,
-    input      [31:0] branch_correct
+    output reg [2:0]  MemLen
+    // input      [31:0] branch_total,
+    // input      [31:0] branch_correct
 );
     import "DPI-C" function void ebreak(input int station, input int inst);
 
@@ -255,14 +255,14 @@ module ID (
                             `INST_TYPE_E: begin
                                 if (instr == `INST_EBREAK) begin
                                     ebreak(`HIT_TRAP, instr);
-                                    // 输出分支预测命中率
-                                    if (branch_total == 0) begin
-                                        $display("\033[32m[npc] Branch Predictor Hit Rate: N/A (no branches)\033[0m");
-                                    end else begin
-                                        $display("\033[32m[npc] Total Branch Predictor Hit Rate: %.2f%% (Correct: %0d, Total: %0d)\033[0m",
-                                                 ((real'(branch_correct) / (branch_total)) * 100),
-                                                    branch_correct, branch_total);
-                                    end
+                                    // // 输出分支预测命中率
+                                    // if (branch_total == 0) begin
+                                    //     $display("\033[32m[npc] Branch Predictor Hit Rate: N/A (no branches)\033[0m");
+                                    // end else begin
+                                    //     $display("\033[32m[npc] Total Branch Predictor Hit Rate: %.2f%% (Correct: %0d, Total: %0d)\033[0m",
+                                    //              ((real'(branch_correct) / (branch_total)) * 100),
+                                    //                 branch_correct, branch_total);
+                                    // end
                                 end
                             end
 
