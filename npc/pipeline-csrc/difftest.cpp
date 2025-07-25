@@ -25,8 +25,8 @@ void (*ref_difftest_regcpy)(void *dut, bool direction) = NULL;
 void (*ref_difftest_exec)(uint64_t n) = NULL;
 
 void difftest_skip_ref() {
+//   skip_cnt_ref++;
     skip_flag = true;
-    // skip_cnt_ref++;
 }
 
 const char *ref_regs[] = {
@@ -47,7 +47,7 @@ void update_cpu_state(CPU_state *cpu)
 
 void init_difftest(char *ref_so_file, long img_size, int port) 
 {
-    // update_cpu_state(&cpu);
+    update_cpu_state(&cpu);
     // printf("%s\n",ref_so_file);
     assert(ref_so_file != NULL);
     // printf("%s\n",ref_so_file);
@@ -80,7 +80,7 @@ void init_difftest(char *ref_so_file, long img_size, int port)
 
     ref_difftest_init(port);
     ref_difftest_memcpy(RESET_VECTOR, guest_to_host(RESET_VECTOR), img_size, DIFFTEST_TO_REF);
-    ref_difftest_regcpy(&cpu, DIFFTEST_TO_REF);
+    // ref_difftest_regcpy(&cpu, DIFFTEST_TO_REF);
 }
 
 
@@ -125,20 +125,20 @@ static void checkregs(CPU_state *ref, vaddr_t pc, vaddr_t npc)
 
 void difftest_step(vaddr_t pc, vaddr_t npc) 
 {
-    CPU_state ref_r;
-    update_cpu_state(&ref_r);
+    // CPU_state ref_r;
+    update_cpu_state(&cpu);
     if(rst_flag == true){
         rst_flag = false;
     }else{
         if(skip_flag){
-            ref_difftest_regcpy(&ref_r, DIFFTEST_TO_REF);
+            ref_difftest_regcpy(&cpu, DIFFTEST_TO_REF);
             skip_flag = false;
             return;
         }
         ref_difftest_exec(1);
-        ref_difftest_regcpy(&ref_r, DIFFTEST_TO_DUT);
+        ref_difftest_regcpy(&cpu, DIFFTEST_TO_DUT);
 
-        checkregs(&ref_r, pc, npc);
+        checkregs(&cpu, pc, npc);
     }
 }
 

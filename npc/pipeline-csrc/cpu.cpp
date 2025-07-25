@@ -240,83 +240,86 @@ static void trace_and_difftest() {
     vaddr_t ex_flush_pc = top->rootp->rv32e__DOT__ex_flush_pc; // EX 冲刷目标 PC
     vaddr_t wb_inst = top->rootp->rv32e__DOT__lsu_wb_inst;  // WB 阶段指令
 
-    // 处理流水线冲刷
-    if (ex_flush) {
-        // 记录冲刷状态，在下一个周期处理
-        prev_ex_flush = true;
-        prev_ex_flush_pc = ex_flush_pc;
-
-        // 如果当前 WB 阶段有有效指令，先处理它
-        if (wb_valid && run_time >= start_time) {
-            vaddr_t npc = ex_flush_pc; // 冲刷后 NPC 为冲刷目标 PC
-            difftest_step(wb_pc, npc);
-            difftest_skip_ref();       // 跳过参考模型执行，避免状态冲突
-            // if(first_step){
-            //   difftest_skip_ref();
-            //   first_step = false; // 只在第一次执行时跳过参考模型
-            // }
-            if (g_print_step) {
-                printf("difftest: pc: 0x%08x | npc: 0x%08x (flush to 0x%08x)\n",
-                       wb_pc, npc, ex_flush_pc);
-            }
-        }
-        return;
+    if(wb_valid){
+      difftest_step(PCSet.pc, PCSet.next_pc);
     }
+    // // 处理流水线冲刷
+    // if (ex_flush) {
+    //     // 记录冲刷状态，在下一个周期处理
+    //     prev_ex_flush = true;
+    //     prev_ex_flush_pc = ex_flush_pc;
 
-    // 处理前一个周期的冲刷
-    if (prev_ex_flush) {
-        CPU_state ref_r;
-        update_cpu_state(&ref_r);
-        ref_r.pc = prev_ex_flush_pc; // 同步参考模型 PC 到冲刷目标
-        ref_difftest_regcpy(&ref_r, DIFFTEST_TO_REF); // 同步寄存器状态
-        if (g_print_step) {
-            printf("flush: sync to ref pc: 0x%08x\n", prev_ex_flush_pc);
-        }
-        prev_ex_flush = false;
-        return;
-    }
-
-    // else if(wb_valid) {
-    //     // 如果当前 WB 阶段有有效指令，处理它
-    //     vaddr_t npc = wb_pc + 4; // 默认顺序执行
-    //     uint32_t opcode = wb_inst & 0x7F;
-    //     if (g_print_step) {
-    //         printf("difftest: pc: 0x%08x | npc: 0x%08x\n", wb_pc, npc);
+    //     // 如果当前 WB 阶段有有效指令，先处理它
+    //     if (wb_valid && run_time >= start_time) {
+    //         vaddr_t npc = ex_flush_pc; // 冲刷后 NPC 为冲刷目标 PC
+    //         difftest_step(wb_pc, npc);
+    //         difftest_skip_ref();       // 跳过参考模型执行，避免状态冲突
+    //         // if(first_step){
+    //         //   difftest_skip_ref();
+    //         //   first_step = false; // 只在第一次执行时跳过参考模型
+    //         // }
+    //         if (g_print_step) {
+    //             printf("difftest: pc: 0x%08x | npc: 0x%08x (flush to 0x%08x)\n",
+    //                    wb_pc, npc, ex_flush_pc);
+    //         }
     //     }
-    //     difftest_step(wb_pc, npc);
-    // } else {
-    //     // 如果没有有效的 WB 指令，跳过参考模型执行
-    //     difftest_skip_ref();
+    //     return;
     // }
-    // 处理延迟的 WB 指令
-    if (wb_valid_delayed) {
-        vaddr_t npc = wb_pc_delayed + 4; // 默认顺序执行
-        uint32_t opcode = wb_inst_delayed & 0x7F;
 
-        // 根据指令类型确定实际的下一个 PC
-        if (opcode == 0x6F || opcode == 0x67) { // JAL 或 JALR
-            npc = wb_valid ? wb_pc : top->rootp->rv32e__DOT__IF_ID_pc; // 跳转目标
-        } else if (opcode == 0x63) { // 分支指令 (B-type)
-            bool take_branch = top->rootp->rv32e__DOT__exu__DOT__take_branch;
-            if (take_branch) {
-                npc = wb_valid ? wb_pc : top->rootp->rv32e__DOT__IF_ID_pc;
-            }
-        }
+    // // 处理前一个周期的冲刷
+    // if (prev_ex_flush) {
+    //     CPU_state ref_r;
+    //     update_cpu_state(&ref_r);
+    //     ref_r.pc = prev_ex_flush_pc; // 同步参考模型 PC 到冲刷目标
+    //     ref_difftest_regcpy(&ref_r, DIFFTEST_TO_REF); // 同步寄存器状态
+    //     if (g_print_step) {
+    //         printf("flush: sync to ref pc: 0x%08x\n", prev_ex_flush_pc);
+    //     }
+    //     prev_ex_flush = false;
+    //     return;
+    // }
 
-        if (g_print_step) {
-            printf("difftest (delayed): pc: 0x%08x | npc: 0x%08x\n", wb_pc_delayed, npc);
-        }
-        difftest_step(wb_pc_delayed, npc);
-        wb_valid_delayed = false;
-    }
+    // // else if(wb_valid) {
+    // //     // 如果当前 WB 阶段有有效指令，处理它
+    // //     vaddr_t npc = wb_pc + 4; // 默认顺序执行
+    // //     uint32_t opcode = wb_inst & 0x7F;
+    // //     if (g_print_step) {
+    // //         printf("difftest: pc: 0x%08x | npc: 0x%08x\n", wb_pc, npc);
+    // //     }
+    // //     difftest_step(wb_pc, npc);
+    // // } else {
+    // //     // 如果没有有效的 WB 指令，跳过参考模型执行
+    // //     difftest_skip_ref();
+    // // }
+    // // 处理延迟的 WB 指令
+    // if (wb_valid_delayed) {
+    //     vaddr_t npc = wb_pc_delayed + 4; // 默认顺序执行
+    //     uint32_t opcode = wb_inst_delayed & 0x7F;
 
-    // 处理当前 WB 阶段的有效指令
-    if (wb_valid && run_time >= start_time) {
-        // 延迟处理当前指令，等到下一周期确定 npc
-        wb_valid_delayed = true;
-        wb_pc_delayed = wb_pc;
-        wb_inst_delayed = wb_inst;
-    }
+    //     // 根据指令类型确定实际的下一个 PC
+    //     if (opcode == 0x6F || opcode == 0x67) { // JAL 或 JALR
+    //         npc = wb_valid ? wb_pc : top->rootp->rv32e__DOT__IF_ID_pc; // 跳转目标
+    //     } else if (opcode == 0x63) { // 分支指令 (B-type)
+    //         bool take_branch = top->rootp->rv32e__DOT__exu__DOT__take_branch;
+    //         if (take_branch) {
+    //             npc = wb_valid ? wb_pc : top->rootp->rv32e__DOT__IF_ID_pc;
+    //         }
+    //     }
+
+    //     if (g_print_step) {
+    //         printf("difftest (delayed): pc: 0x%08x | npc: 0x%08x\n", wb_pc_delayed, npc);
+    //     }
+    //     difftest_step(wb_pc_delayed, npc);
+    //     wb_valid_delayed = false;
+    // }
+
+    // // 处理当前 WB 阶段的有效指令
+    // if (wb_valid && run_time >= start_time) {
+    //     // 延迟处理当前指令，等到下一周期确定 npc
+    //     wb_valid_delayed = true;
+    //     wb_pc_delayed = wb_pc;
+    //     wb_inst_delayed = wb_inst;
+    // }
 #endif
 }
 
