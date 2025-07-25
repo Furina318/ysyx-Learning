@@ -97,8 +97,8 @@ module SRAM #(
                     rvalid  <= 1'b0;
                     bvalid  <= 1'b0;
                     // LFSR <= ($random % (MAX_DELAY - MIN_DELAY + 1)) + MIN_DELAY;
-                    // LFSR <= $urandom_range(1, 10);//随机生成1~10的读写延迟
-                    LFSR <= MIN_DELAY;
+                    LFSR <= $urandom_range(1, 10);//随机生成1~10的读写延迟
+                    // LFSR <= MIN_DELAY;
                     if(arvalid && arready) begin//读握手
                         araddr_reg <= araddr;
                         arready <= 1'b0;//接收地址后不再准备
@@ -180,10 +180,13 @@ module SRAM #(
                 WRITE_RESP: begin
                     if(bvalid && bready) begin
                         // wready <= 1'b1;
-                        awready <= 1'b1;
-                        bvalid <= 1'b0;
-                        next_sram_state <= IDLE;
+                        // awready <= 1'b1;
+                        // bvalid <= 1'b0;
+                        // next_sram_state <= IDLE;
                     end
+                    awready <= 1'b1;
+                    bvalid <= 1'b0;
+                    next_sram_state <= IDLE;
                     // else begin
                     //     next_sram_state <= WRITE_RESP;
                     // end
