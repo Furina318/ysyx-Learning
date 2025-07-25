@@ -143,7 +143,7 @@ module LSU (
         else if ((ex_lsu_valid & lsu_ex_ready) & (ex_lsu_MemRead & ~ex_lsu_MemWrite)) begin
             read_valid <= 1;
             // read_mem_data = pmem_read(addr, 4);
-            case (l_MemLen)
+            case (ex_lsu_MemLen)
                 `Mem_UBit:  begin
                     read_lsu_data = pmem_read(addr, 1);
                 end

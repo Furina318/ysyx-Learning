@@ -247,6 +247,60 @@ module rv32e (
             .bready(sram_bready)
     );
 
+    // SRAM isram(
+    //         .clk(clk),
+    //         .reset(reset),
+    //         //AR channel
+    //         .araddr(ifu_sram_araddr),
+    //         .arvalid(ifu_sram_arvalid),
+    //         .arready(ifu_sram_arready),
+    //         //R channel
+    //         .rdata(ifu_sram_rdata),
+    //         .rvalid(ifu_sram_rvalid),
+    //         .rready(ifu_sram_rready),
+    //         .rresp(ifu_sram_rresp),
+    //         //AW channel
+    //         .awaddr(ifu_sram_awaddr),
+    //         .awvalid(ifu_sram_awvalid),
+    //         .awready(ifu_sram_awready),
+    //         //W channel
+    //         .wdata(ifu_sram_wdata),
+    //         .wstrb(ifu_sram_wstrb),
+    //         .wvalid(ifu_sram_wvalid),
+    //         .wready(ifu_sram_wready),
+    //         //B channel
+    //         .bresp(ifu_sram_bresp),
+    //         .bvalid(ifu_sram_bvalid),
+    //         .bready(ifu_sram_bready)
+    // );
+
+    // SRAM msram(
+    //         .clk(clk),
+    //         .reset(reset),
+    //         //AR channel
+    //         .araddr(mem_sram_araddr),
+    //         .arvalid(mem_sram_arvalid),
+    //         .arready(mem_sram_arready),
+    //         //R channel
+    //         .rdata(mem_sram_rdata),
+    //         .rvalid(mem_sram_rvalid),
+    //         .rready(mem_sram_rready),
+    //         .rresp(mem_sram_rresp),
+    //         //AW channel
+    //         .awaddr(mem_sram_awaddr),
+    //         .awvalid(mem_sram_awvalid),
+    //         .awready(mem_sram_awready),
+    //         //W channel
+    //         .wdata(mem_sram_wdata),
+    //         .wstrb(mem_sram_wstrb),
+    //         .wvalid(mem_sram_wvalid),
+    //         .wready(mem_sram_wready),
+    //         //B channel
+    //         .bresp(mem_sram_bresp),
+    //         .bvalid(mem_sram_bvalid),
+    //         .bready(mem_sram_bready)
+    // );
+
     // 取指模块
     IF if_stage (
         .clk(clk),

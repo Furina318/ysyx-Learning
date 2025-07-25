@@ -27,95 +27,70 @@ module IF_AXI (
 
     import "DPI-C" function void ebreak(input int station, input int inst);
 
-    parameter OKAY = 2'b00;
+    reg [1:0] state;
+    localparam IDLE = 2'b00;
+    localparam AR_WAIT = 2'b01;
+    localparam R_WAIT  = 2'b10;
 
-    // 内部寄存器
-    reg        read_pending;      // 读请求等待标志
-    reg        read_valid;        // 读事务完成标志
-
-    // 程序计数器更新逻辑
-    // always @(posedge clk) begin
-    //     if (reset) begin
-    //         IF_ID_pc   <= 32'h8000_0000;
-    //     end
-    //     else if (EX_flush) begin
-    //         IF_ID_pc   <= EX_flush_pc;
-    //     end 
-    //     else if (IF_valid && ID_ready) begin
-    //         IF_ID_pc  <= IF_ID_pc + 4;
-    //     end 
-    //     // else begin
-    //     //     IF_ID_pc   <= IF_ID_pc;
-    //     // end
-    // end
-
-    // 读通道控制
     reg [31:0] next_pc;
+    reg once;
+
     always @(posedge clk or posedge reset) begin
         if (reset) begin
-            if_sram_arvalid <= 0;
-            if_sram_araddr  <= 32'h0;
-            if_sram_rready  <= 0;
-            IF_ID_inst      <= 32'h0;
-            IF_valid        <= 0;
-            read_pending    <= 0;
-            read_valid      <= 0;
-
             IF_ID_pc <= 32'h8000_0000;
-            next_pc <= 32'h8000_0000;
-        end 
+            next_pc  <= 32'h8000_0000;
+            if_sram_arvalid  <= 0;
+            if_sram_araddr   <= 0;
+            if_sram_rready   <= 0;
+            IF_ID_inst <= 0;
+            IF_valid <= 0;
+            state    <= IDLE;
+            once <= 1;
+        end
         else begin
-            if (EX_flush) begin
-                // IF_valid        <= ID_ready && EX_flush;
-                // IF_ID_inst      <= 32'h0;
-                if_sram_araddr  <= EX_flush_pc;
-                if_sram_arvalid <= 1;
-                // if_sram_rready  <= 0;
-                read_pending    <= 1;
-                read_valid      <= 0;
-                // IF_valid        <= ID_ready;
-
-                next_pc <= EX_flush_pc;
-            end
-            
-            // 发起读请求
-            if (!EX_flush && !read_pending) begin
-                if_sram_arvalid <= 1;
-                if_sram_araddr  <= next_pc;
-                if_sram_rready  <= 0;
-                read_pending    <= 1;
-                read_valid      <= 0;
-                IF_valid        <= 0;
-            end
-            // 接受读地址响应
-            if (if_sram_arvalid && sram_if_arready) begin
-                if_sram_arvalid <= 0;
-                if_sram_rready  <= 1;
-            end
-            // 接受读数据
-            if (sram_if_rvalid && if_sram_rready) begin
-                if_sram_rready  <= 0;
-                read_pending    <= 0;
-                read_valid      <= 1;
-                IF_ID_inst      <= sram_if_rdata;
-                IF_valid        <= 1;
-
-                next_pc <= next_pc + 4;
-                IF_ID_pc <= next_pc;
-                if (sram_if_rresp != OKAY) begin
-                    ebreak(`ABORT, 32'hdead_beef);
-                    $display("\033[31mIF_AXI: Read access fault at address %h, rresp %b\033[0m", IF_ID_pc, sram_if_rresp);
+            case (state)
+                IDLE: begin
+                    // IF_valid <= 0;
+                    if (EX_flush) begin
+                        IF_valid <= 0;
+                        next_pc <= EX_flush_pc;
+                        if_sram_arvalid <= 1;
+                        if_sram_araddr  <= EX_flush_pc;
+                        // IF_ID_inst <= 32'h0;
+                        // IF_valid <= ID_ready;
+                        state   <= AR_WAIT;
+                    end
+                    else if ((IF_valid && ID_ready) || once) begin
+                        once <= 0;
+                        IF_valid <= 0;
+                        if_sram_arvalid <= 1;
+                        if_sram_araddr  <= next_pc;
+                        state   <= AR_WAIT;
+                    end
                 end
-            end  
-            else if (!read_valid && !EX_flush) begin
-                IF_valid <= 0;
-            end
-                // IF_ID_inst      <= IF_ID_inst;
-                // if_sram_arvalid <= if_sram_arvalid;
-                // if_sram_rready  <= if_sram_rready;
-                // read_pending    <= read_pending;
-                // read_valid      <= 0;
-           
+
+                AR_WAIT: begin
+                    if (sram_if_arready && if_sram_arvalid) begin
+                        if_sram_arvalid <= 0;
+                        if_sram_rready  <= 1;
+                        IF_valid <= 0;
+                        state   <= R_WAIT;
+                    end
+                end
+
+                R_WAIT: begin
+                    if (sram_if_rvalid && if_sram_rready) begin
+                        if_sram_rready <= 0;
+                        IF_ID_inst <= sram_if_rdata;
+                        IF_ID_pc   <= next_pc;
+                        IF_valid   <= 1;
+                        next_pc    <= next_pc + 4;
+                        state      <= IDLE;
+                    end
+                end
+
+                default: state <= IDLE;
+            endcase
         end
     end
 

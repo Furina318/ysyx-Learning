@@ -14,30 +14,58 @@ void Vrv32e___024root___eval_act(Vrv32e___024root* vlSelf) {
 }
 
 void Vrv32e___024root____Vdpiimwrap_rv32e__DOT__ebreak_TOP(IData/*31:0*/ station, IData/*31:0*/ inst);
-void Vrv32e___024root____Vdpiimwrap_rv32e__DOT__sram__DOT__pmem_write_TOP(IData/*31:0*/ waddr, IData/*31:0*/ wdata, IData/*31:0*/ len);
-void Vrv32e___024root____Vdpiimwrap_rv32e__DOT__sram__DOT__pmem_read_TOP(IData/*31:0*/ raddr, IData/*31:0*/ len, IData/*31:0*/ &pmem_read__Vfuncrtn);
+void Vrv32e___024root____Vdpiimwrap_rv32e__DOT__msram__DOT__pmem_write_TOP(IData/*31:0*/ waddr, IData/*31:0*/ wdata, IData/*31:0*/ len);
+void Vrv32e___024root____Vdpiimwrap_rv32e__DOT__msram__DOT__pmem_read_TOP(IData/*31:0*/ raddr, IData/*31:0*/ len, IData/*31:0*/ &pmem_read__Vfuncrtn);
 
 VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__0(Vrv32e___024root* vlSelf) {
     if (false && vlSelf) {}  // Prevent unused
     Vrv32e__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vrv32e___024root___nba_sequent__TOP__0\n"); );
     // Init
-    IData/*31:0*/ __Vfunc_rv32e__DOT__lsu__DOT__pmem_read__11__Vfuncout;
-    __Vfunc_rv32e__DOT__lsu__DOT__pmem_read__11__Vfuncout = 0;
-    IData/*31:0*/ __Vfunc_rv32e__DOT__lsu__DOT__pmem_read__12__Vfuncout;
-    __Vfunc_rv32e__DOT__lsu__DOT__pmem_read__12__Vfuncout = 0;
-    IData/*31:0*/ __Vfunc_rv32e__DOT__lsu__DOT__pmem_read__13__Vfuncout;
-    __Vfunc_rv32e__DOT__lsu__DOT__pmem_read__13__Vfuncout = 0;
-    IData/*31:0*/ __Vfunc_rv32e__DOT__lsu__DOT__pmem_read__14__Vfuncout;
-    __Vfunc_rv32e__DOT__lsu__DOT__pmem_read__14__Vfuncout = 0;
-    IData/*31:0*/ __Vfunc_rv32e__DOT__lsu__DOT__pmem_read__15__Vfuncout;
-    __Vfunc_rv32e__DOT__lsu__DOT__pmem_read__15__Vfuncout = 0;
+    IData/*31:0*/ __Vfunc_rv32e__DOT__msram__DOT__pmem_read__1__Vfuncout;
+    __Vfunc_rv32e__DOT__msram__DOT__pmem_read__1__Vfuncout = 0;
+    IData/*31:0*/ __Vfunc_rv32e__DOT__isram__DOT__pmem_read__6__Vfuncout;
+    __Vfunc_rv32e__DOT__isram__DOT__pmem_read__6__Vfuncout = 0;
     IData/*31:0*/ __Vdly__rv32e__DOT__inst_cnt;
     __Vdly__rv32e__DOT__inst_cnt = 0;
-    CData/*0:0*/ __Vdly__rv32e__DOT__sram__DOT__write_addr_valid;
-    __Vdly__rv32e__DOT__sram__DOT__write_addr_valid = 0;
-    CData/*0:0*/ __Vdly__rv32e__DOT__sram__DOT__write_data_valid;
-    __Vdly__rv32e__DOT__sram__DOT__write_data_valid = 0;
+    CData/*0:0*/ __Vdly__rv32e__DOT__sram_lsu_arready;
+    __Vdly__rv32e__DOT__sram_lsu_arready = 0;
+    CData/*0:0*/ __Vdly__rv32e__DOT__sram_lsu_rvalid;
+    __Vdly__rv32e__DOT__sram_lsu_rvalid = 0;
+    CData/*0:0*/ __Vdly__rv32e__DOT__msram__DOT__read_pending;
+    __Vdly__rv32e__DOT__msram__DOT__read_pending = 0;
+    IData/*31:0*/ __Vdly__rv32e__DOT__msram__DOT__LFSR;
+    __Vdly__rv32e__DOT__msram__DOT__LFSR = 0;
+    IData/*31:0*/ __Vdly__rv32e__DOT__msram__DOT__read_addr;
+    __Vdly__rv32e__DOT__msram__DOT__read_addr = 0;
+    CData/*0:0*/ __Vdly__rv32e__DOT__sram_lsu_awready;
+    __Vdly__rv32e__DOT__sram_lsu_awready = 0;
+    CData/*0:0*/ __Vdly__rv32e__DOT__sram_lsu_wready;
+    __Vdly__rv32e__DOT__sram_lsu_wready = 0;
+    CData/*0:0*/ __Vdly__rv32e__DOT__sram_lsu_bvalid;
+    __Vdly__rv32e__DOT__sram_lsu_bvalid = 0;
+    CData/*1:0*/ __Vdly__rv32e__DOT__sram_lsu_bresp;
+    __Vdly__rv32e__DOT__sram_lsu_bresp = 0;
+    CData/*0:0*/ __Vdly__rv32e__DOT__msram__DOT__write_addr_valid;
+    __Vdly__rv32e__DOT__msram__DOT__write_addr_valid = 0;
+    CData/*0:0*/ __Vdly__rv32e__DOT__msram__DOT__write_data_valid;
+    __Vdly__rv32e__DOT__msram__DOT__write_data_valid = 0;
+    IData/*31:0*/ __Vdly__rv32e__DOT__msram__DOT__write_addr;
+    __Vdly__rv32e__DOT__msram__DOT__write_addr = 0;
+    IData/*31:0*/ __Vdly__rv32e__DOT__msram__DOT__write_data;
+    __Vdly__rv32e__DOT__msram__DOT__write_data = 0;
+    CData/*3:0*/ __Vdly__rv32e__DOT__msram__DOT__write_strb;
+    __Vdly__rv32e__DOT__msram__DOT__write_strb = 0;
+    CData/*0:0*/ __Vdly__rv32e__DOT__isram__DOT__read_pending;
+    __Vdly__rv32e__DOT__isram__DOT__read_pending = 0;
+    IData/*31:0*/ __Vdly__rv32e__DOT__isram__DOT__LFSR;
+    __Vdly__rv32e__DOT__isram__DOT__LFSR = 0;
+    IData/*31:0*/ __Vdly__rv32e__DOT__isram__DOT__read_addr;
+    __Vdly__rv32e__DOT__isram__DOT__read_addr = 0;
+    CData/*0:0*/ __Vdly__rv32e__DOT__isram__DOT__write_addr_valid;
+    __Vdly__rv32e__DOT__isram__DOT__write_addr_valid = 0;
+    CData/*0:0*/ __Vdly__rv32e__DOT__isram__DOT__write_data_valid;
+    __Vdly__rv32e__DOT__isram__DOT__write_data_valid = 0;
     CData/*0:0*/ __Vdly__rv32e__DOT__lsu__DOT__l_rd_en;
     __Vdly__rv32e__DOT__lsu__DOT__l_rd_en = 0;
     CData/*4:0*/ __Vdly__rv32e__DOT__lsu__DOT__l_rd_addr;
@@ -50,6 +78,22 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__0(Vrv32e___024root* vlSe
     __Vdly__rv32e__DOT__lsu__DOT__l_pc = 0;
     CData/*2:0*/ __Vdly__rv32e__DOT__lsu__DOT__l_MemLen;
     __Vdly__rv32e__DOT__lsu__DOT__l_MemLen = 0;
+    CData/*0:0*/ __Vdly__rv32e__DOT__lsu_sram_arvalid;
+    __Vdly__rv32e__DOT__lsu_sram_arvalid = 0;
+    IData/*31:0*/ __Vdly__rv32e__DOT__lsu_sram_araddr;
+    __Vdly__rv32e__DOT__lsu_sram_araddr = 0;
+    CData/*0:0*/ __Vdly__rv32e__DOT__lsu_sram_rready;
+    __Vdly__rv32e__DOT__lsu_sram_rready = 0;
+    CData/*0:0*/ __Vdly__rv32e__DOT__lsu__DOT__read_pending;
+    __Vdly__rv32e__DOT__lsu__DOT__read_pending = 0;
+    CData/*0:0*/ __Vdly__rv32e__DOT__lsu_sram_awvalid;
+    __Vdly__rv32e__DOT__lsu_sram_awvalid = 0;
+    CData/*0:0*/ __Vdly__rv32e__DOT__lsu_sram_wvalid;
+    __Vdly__rv32e__DOT__lsu_sram_wvalid = 0;
+    CData/*0:0*/ __Vdly__rv32e__DOT__lsu_sram_bready;
+    __Vdly__rv32e__DOT__lsu_sram_bready = 0;
+    CData/*0:0*/ __Vdly__rv32e__DOT__lsu__DOT__write_pending;
+    __Vdly__rv32e__DOT__lsu__DOT__write_pending = 0;
     CData/*0:0*/ __Vdly__rv32e__DOT__lsu_wb_valid;
     __Vdly__rv32e__DOT__lsu_wb_valid = 0;
     CData/*0:0*/ __Vdlyvset__rv32e__DOT__wbu__DOT__regs__v0;
@@ -79,31 +123,54 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__0(Vrv32e___024root* vlSe
     CData/*0:0*/ __Vdlyvset__rv32e__DOT__wbu__DOT__CSR__v3;
     __Vdlyvset__rv32e__DOT__wbu__DOT__CSR__v3 = 0;
     // Body
-    __Vdly__rv32e__DOT__sram__DOT__write_data_valid 
-        = vlSelf->rv32e__DOT__sram__DOT__write_data_valid;
-    __Vdly__rv32e__DOT__sram__DOT__write_addr_valid 
-        = vlSelf->rv32e__DOT__sram__DOT__write_addr_valid;
-    vlSelf->__Vdly__rv32e__DOT__sram__DOT__read_addr 
-        = vlSelf->rv32e__DOT__sram__DOT__read_addr;
-    vlSelf->__Vdly__rv32e__DOT__sram__DOT__read_pending 
-        = vlSelf->rv32e__DOT__sram__DOT__read_pending;
+    __Vdly__rv32e__DOT__isram__DOT__write_data_valid 
+        = vlSelf->rv32e__DOT__isram__DOT__write_data_valid;
+    __Vdly__rv32e__DOT__isram__DOT__write_addr_valid 
+        = vlSelf->rv32e__DOT__isram__DOT__write_addr_valid;
+    __Vdly__rv32e__DOT__msram__DOT__read_addr = vlSelf->rv32e__DOT__msram__DOT__read_addr;
+    __Vdly__rv32e__DOT__msram__DOT__read_pending = vlSelf->rv32e__DOT__msram__DOT__read_pending;
+    __Vdly__rv32e__DOT__sram_lsu_rvalid = vlSelf->rv32e__DOT__sram_lsu_rvalid;
+    __Vdly__rv32e__DOT__sram_lsu_arready = vlSelf->rv32e__DOT__sram_lsu_arready;
+    vlSelf->__Vdly__rv32e__DOT__id_valid = vlSelf->rv32e__DOT__id_valid;
+    __Vdly__rv32e__DOT__isram__DOT__read_addr = vlSelf->rv32e__DOT__isram__DOT__read_addr;
+    __Vdly__rv32e__DOT__isram__DOT__read_pending = vlSelf->rv32e__DOT__isram__DOT__read_pending;
+    vlSelf->__Vdly__rv32e__DOT__sram_if_rdata = vlSelf->rv32e__DOT__sram_if_rdata;
     vlSelf->__Vdly__rv32e__DOT__sram_if_rvalid = vlSelf->rv32e__DOT__sram_if_rvalid;
     vlSelf->__Vdly__rv32e__DOT__sram_if_arready = vlSelf->rv32e__DOT__sram_if_arready;
-    vlSelf->__Vdly__rv32e__DOT__sram__DOT__LFSR = vlSelf->rv32e__DOT__sram__DOT__LFSR;
     __Vdly__rv32e__DOT__inst_cnt = vlSelf->rv32e__DOT__inst_cnt;
+    __Vdly__rv32e__DOT__isram__DOT__LFSR = vlSelf->rv32e__DOT__isram__DOT__LFSR;
     __Vdly__rv32e__DOT__lsu__DOT__l_pc = vlSelf->rv32e__DOT__lsu__DOT__l_pc;
     vlSelf->__Vdly__rv32e__DOT__lsu_ex_ready = vlSelf->rv32e__DOT__lsu_ex_ready;
     __Vdly__rv32e__DOT__lsu__DOT__l_opcode = vlSelf->rv32e__DOT__lsu__DOT__l_opcode;
     __Vdly__rv32e__DOT__lsu__DOT__l_inst = vlSelf->rv32e__DOT__lsu__DOT__l_inst;
     __Vdly__rv32e__DOT__lsu__DOT__l_MemLen = vlSelf->rv32e__DOT__lsu__DOT__l_MemLen;
+    __Vdly__rv32e__DOT__lsu__DOT__write_pending = vlSelf->rv32e__DOT__lsu__DOT__write_pending;
+    __Vdly__rv32e__DOT__lsu_sram_bready = vlSelf->rv32e__DOT__lsu_sram_bready;
+    __Vdly__rv32e__DOT__lsu_sram_wvalid = vlSelf->rv32e__DOT__lsu_sram_wvalid;
+    __Vdly__rv32e__DOT__lsu_sram_awvalid = vlSelf->rv32e__DOT__lsu_sram_awvalid;
     __Vdlyvset__rv32e__DOT__wbu__DOT__CSR__v0 = 0U;
     __Vdlyvset__rv32e__DOT__wbu__DOT__CSR__v1 = 0U;
     __Vdlyvset__rv32e__DOT__wbu__DOT__CSR__v3 = 0U;
-    vlSelf->__Vdly__rv32e__DOT__id_valid = vlSelf->rv32e__DOT__id_valid;
+    __Vdly__rv32e__DOT__lsu__DOT__read_pending = vlSelf->rv32e__DOT__lsu__DOT__read_pending;
+    __Vdly__rv32e__DOT__lsu_sram_rready = vlSelf->rv32e__DOT__lsu_sram_rready;
+    __Vdly__rv32e__DOT__lsu_sram_araddr = vlSelf->rv32e__DOT__lsu_sram_araddr;
+    __Vdly__rv32e__DOT__lsu_sram_arvalid = vlSelf->rv32e__DOT__lsu_sram_arvalid;
     __Vdly__rv32e__DOT__lsu__DOT__l_rd_en = vlSelf->rv32e__DOT__lsu__DOT__l_rd_en;
     __Vdlyvset__rv32e__DOT__wbu__DOT__regs__v0 = 0U;
     __Vdlyvset__rv32e__DOT__wbu__DOT__regs__v32 = 0U;
     __Vdly__rv32e__DOT__lsu__DOT__l_rd_addr = vlSelf->rv32e__DOT__lsu__DOT__l_rd_addr;
+    __Vdly__rv32e__DOT__msram__DOT__write_strb = vlSelf->rv32e__DOT__msram__DOT__write_strb;
+    __Vdly__rv32e__DOT__msram__DOT__write_data = vlSelf->rv32e__DOT__msram__DOT__write_data;
+    __Vdly__rv32e__DOT__msram__DOT__write_addr = vlSelf->rv32e__DOT__msram__DOT__write_addr;
+    __Vdly__rv32e__DOT__msram__DOT__write_data_valid 
+        = vlSelf->rv32e__DOT__msram__DOT__write_data_valid;
+    __Vdly__rv32e__DOT__msram__DOT__write_addr_valid 
+        = vlSelf->rv32e__DOT__msram__DOT__write_addr_valid;
+    __Vdly__rv32e__DOT__sram_lsu_bresp = vlSelf->rv32e__DOT__sram_lsu_bresp;
+    __Vdly__rv32e__DOT__sram_lsu_bvalid = vlSelf->rv32e__DOT__sram_lsu_bvalid;
+    __Vdly__rv32e__DOT__sram_lsu_wready = vlSelf->rv32e__DOT__sram_lsu_wready;
+    __Vdly__rv32e__DOT__sram_lsu_awready = vlSelf->rv32e__DOT__sram_lsu_awready;
+    __Vdly__rv32e__DOT__msram__DOT__LFSR = vlSelf->rv32e__DOT__msram__DOT__LFSR;
     __Vdly__rv32e__DOT__lsu_wb_valid = vlSelf->rv32e__DOT__lsu_wb_valid;
     if (vlSelf->reset) {
         vlSelf->rv32e__DOT__wbu__DOT__i = 0x20U;
@@ -149,6 +216,7 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__0(Vrv32e___024root* vlSe
                                                    : (IData)(vlSelf->rv32e__DOT__lsu__DOT__l_rd_en)))));
     if (vlSelf->reset) {
         vlSelf->rv32e__DOT__cycle_cnt = 0U;
+        vlSelf->__Vdly__rv32e__DOT__id_valid = 0U;
         __Vdly__rv32e__DOT__inst_cnt = 0U;
         __Vdly__rv32e__DOT__lsu__DOT__l_pc = 0U;
         __Vdly__rv32e__DOT__lsu__DOT__l_inst = 0U;
@@ -158,6 +226,16 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__0(Vrv32e___024root* vlSe
     } else {
         vlSelf->rv32e__DOT__cycle_cnt = ((IData)(1U) 
                                          + vlSelf->rv32e__DOT__cycle_cnt);
+        if ((((IData)(vlSelf->rv32e__DOT__IF_valid) 
+              & (IData)(vlSelf->rv32e__DOT__id_ready)) 
+             & ((IData)(vlSelf->rv32e__DOT__ex_ready) 
+                | (~ (IData)(vlSelf->rv32e__DOT__id_valid))))) {
+            vlSelf->__Vdly__rv32e__DOT__id_valid = 1U;
+        } else if (((~ ((IData)(vlSelf->rv32e__DOT__IF_valid) 
+                        & (IData)(vlSelf->rv32e__DOT__id_ready))) 
+                    & (IData)(vlSelf->rv32e__DOT__ex_ready))) {
+            vlSelf->__Vdly__rv32e__DOT__id_valid = 0U;
+        }
         if (vlSelf->rv32e__DOT__wb_valid) {
             __Vdly__rv32e__DOT__inst_cnt = ((IData)(1U) 
                                             + vlSelf->rv32e__DOT__inst_cnt);
@@ -218,58 +296,39 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__0(Vrv32e___024root* vlSe
         }
     }
     vlSelf->rv32e__DOT__lsu_wb_csr_wen1 = ((~ (IData)(vlSelf->reset)) 
-                                           & ((IData)(vlSelf->rv32e__DOT__lsu__DOT__write_valid)
+                                           & (((IData)(vlSelf->rv32e__DOT__lsu__DOT__write_valid) 
+                                               | (IData)(vlSelf->rv32e__DOT__lsu__DOT__read_valid))
                                                ? (IData)(vlSelf->rv32e__DOT__ex_lsu_csr_wen1)
-                                               : ((IData)(vlSelf->rv32e__DOT__lsu__DOT__read_valid)
-                                                   ? (IData)(vlSelf->rv32e__DOT__ex_lsu_csr_wen1)
-                                                   : 
-                                                  ((((IData)(vlSelf->rv32e__DOT__ex_lsu_valid) 
-                                                     & (IData)(vlSelf->rv32e__DOT__lsu_ex_ready)) 
-                                                    & (~ 
-                                                       ((IData)(vlSelf->rv32e__DOT__ex_lsu_MemRead) 
-                                                        | (IData)(vlSelf->rv32e__DOT__ex_lsu_MemWrite))))
-                                                    ? (IData)(vlSelf->rv32e__DOT__ex_lsu_csr_wen1)
-                                                    : (IData)(vlSelf->rv32e__DOT__lsu_wb_csr_wen1)))));
-    vlSelf->rv32e__DOT__lsu_wb_csr_wen2 = ((~ (IData)(vlSelf->reset)) 
-                                           & ((IData)(vlSelf->rv32e__DOT__lsu__DOT__write_valid)
-                                               ? (IData)(vlSelf->rv32e__DOT__ex_lsu_csr_wen2)
-                                               : ((IData)(vlSelf->rv32e__DOT__lsu__DOT__read_valid)
-                                                   ? (IData)(vlSelf->rv32e__DOT__ex_lsu_csr_wen2)
-                                                   : 
-                                                  ((((IData)(vlSelf->rv32e__DOT__ex_lsu_valid) 
-                                                     & (IData)(vlSelf->rv32e__DOT__lsu_ex_ready)) 
-                                                    & (~ 
-                                                       ((IData)(vlSelf->rv32e__DOT__ex_lsu_MemRead) 
-                                                        | (IData)(vlSelf->rv32e__DOT__ex_lsu_MemWrite))))
-                                                    ? (IData)(vlSelf->rv32e__DOT__ex_lsu_csr_wen2)
-                                                    : (IData)(vlSelf->rv32e__DOT__lsu_wb_csr_wen2)))));
-    __Vdly__rv32e__DOT__lsu_wb_valid = ((~ (IData)(vlSelf->reset)) 
-                                        & ((((IData)(vlSelf->rv32e__DOT__ex_lsu_valid) 
-                                             & (IData)(vlSelf->rv32e__DOT__lsu_ex_ready)) 
-                                            & (~ ((IData)(vlSelf->rv32e__DOT__ex_lsu_MemRead) 
-                                                  | (IData)(vlSelf->rv32e__DOT__ex_lsu_MemWrite)))) 
-                                           | (((IData)(vlSelf->rv32e__DOT__lsu__DOT__read_valid) 
-                                               | (IData)(vlSelf->rv32e__DOT__lsu__DOT__write_valid)) 
-                                              | ((~ 
-                                                  (((IData)(vlSelf->rv32e__DOT__ex_lsu_valid) 
+                                               : ((
+                                                   ((IData)(vlSelf->rv32e__DOT__ex_lsu_valid) 
                                                     & (IData)(vlSelf->rv32e__DOT__lsu_ex_ready)) 
-                                                   & ((IData)(vlSelf->rv32e__DOT__ex_lsu_MemRead) 
-                                                      | (IData)(vlSelf->rv32e__DOT__ex_lsu_MemWrite)))) 
-                                                 & (IData)(vlSelf->rv32e__DOT__lsu_wb_valid)))));
+                                                   & (~ 
+                                                      ((IData)(vlSelf->rv32e__DOT__ex_lsu_MemRead) 
+                                                       | (IData)(vlSelf->rv32e__DOT__ex_lsu_MemWrite))))
+                                                   ? (IData)(vlSelf->rv32e__DOT__ex_lsu_csr_wen1)
+                                                   : (IData)(vlSelf->rv32e__DOT__lsu_wb_csr_wen1))));
+    vlSelf->rv32e__DOT__lsu_wb_csr_wen2 = ((~ (IData)(vlSelf->reset)) 
+                                           & (((IData)(vlSelf->rv32e__DOT__lsu__DOT__write_valid) 
+                                               | (IData)(vlSelf->rv32e__DOT__lsu__DOT__read_valid))
+                                               ? (IData)(vlSelf->rv32e__DOT__ex_lsu_csr_wen2)
+                                               : ((
+                                                   ((IData)(vlSelf->rv32e__DOT__ex_lsu_valid) 
+                                                    & (IData)(vlSelf->rv32e__DOT__lsu_ex_ready)) 
+                                                   & (~ 
+                                                      ((IData)(vlSelf->rv32e__DOT__ex_lsu_MemRead) 
+                                                       | (IData)(vlSelf->rv32e__DOT__ex_lsu_MemWrite))))
+                                                   ? (IData)(vlSelf->rv32e__DOT__ex_lsu_csr_wen2)
+                                                   : (IData)(vlSelf->rv32e__DOT__lsu_wb_csr_wen2))));
     if (vlSelf->reset) {
-        vlSelf->__Vdly__rv32e__DOT__id_valid = 0U;
         __Vdlyvset__rv32e__DOT__wbu__DOT__regs__v0 = 1U;
+        __Vdly__rv32e__DOT__lsu__DOT__l_rd_addr = 0U;
+        vlSelf->rv32e__DOT__lsu_wb_csr_wr_addr2 = 0U;
+        vlSelf->rv32e__DOT__lsu_wb_csr_wr_addr1 = 0U;
+        vlSelf->rv32e__DOT__lsu_wb_csr_wr_data1 = 0U;
+        vlSelf->rv32e__DOT__lsu_wb_csr_wr_data2 = 0U;
+        vlSelf->rv32e__DOT__lsu_wb_pc = 0U;
+        vlSelf->rv32e__DOT__lsu_wb_inst = 0U;
     } else {
-        if ((((IData)(vlSelf->rv32e__DOT__IF_valid) 
-              & (IData)(vlSelf->rv32e__DOT__id_ready)) 
-             & ((IData)(vlSelf->rv32e__DOT__ex_ready) 
-                | (~ (IData)(vlSelf->rv32e__DOT__id_valid))))) {
-            vlSelf->__Vdly__rv32e__DOT__id_valid = 1U;
-        } else if (((~ ((IData)(vlSelf->rv32e__DOT__IF_valid) 
-                        & (IData)(vlSelf->rv32e__DOT__id_ready))) 
-                    & (IData)(vlSelf->rv32e__DOT__ex_ready))) {
-            vlSelf->__Vdly__rv32e__DOT__id_valid = 0U;
-        }
         if ((((IData)(vlSelf->rv32e__DOT__lsu_wb_valid) 
               & (IData)(vlSelf->rv32e__DOT__lsu_wb_RegWrite)) 
              & (0U != (IData)(vlSelf->rv32e__DOT__lsu_wb_rd)))) {
@@ -278,91 +337,6 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__0(Vrv32e___024root* vlSe
             __Vdlyvset__rv32e__DOT__wbu__DOT__regs__v32 = 1U;
             __Vdlyvdim0__rv32e__DOT__wbu__DOT__regs__v32 
                 = vlSelf->rv32e__DOT__lsu_wb_rd;
-        }
-    }
-    vlSelf->rv32e__DOT__lsu_wb_RegWrite = ((~ (IData)(vlSelf->reset)) 
-                                           & ((IData)(vlSelf->rv32e__DOT__lsu__DOT__write_valid)
-                                               ? (IData)(vlSelf->rv32e__DOT__lsu__DOT__l_rd_en)
-                                               : ((IData)(vlSelf->rv32e__DOT__lsu__DOT__read_valid)
-                                                   ? (IData)(vlSelf->rv32e__DOT__lsu__DOT__l_rd_en)
-                                                   : 
-                                                  ((((IData)(vlSelf->rv32e__DOT__ex_lsu_valid) 
-                                                     & (IData)(vlSelf->rv32e__DOT__lsu_ex_ready)) 
-                                                    & (~ 
-                                                       ((IData)(vlSelf->rv32e__DOT__ex_lsu_MemRead) 
-                                                        | (IData)(vlSelf->rv32e__DOT__ex_lsu_MemWrite))))
-                                                    ? (IData)(vlSelf->rv32e__DOT__ex_lsu_RegWrite)
-                                                    : (IData)(vlSelf->rv32e__DOT__lsu_wb_RegWrite)))));
-    if (vlSelf->reset) {
-        vlSelf->rv32e__DOT__lsu_wb_csr_wr_addr2 = 0U;
-        vlSelf->rv32e__DOT__lsu_wb_csr_wr_addr1 = 0U;
-        vlSelf->rv32e__DOT__lsu_wb_csr_wr_data1 = 0U;
-        vlSelf->rv32e__DOT__lsu_wb_csr_wr_data2 = 0U;
-        vlSelf->rv32e__DOT__lsu_wb_pc = 0U;
-        vlSelf->rv32e__DOT__lsu_wb_inst = 0U;
-        __Vdly__rv32e__DOT__lsu__DOT__l_rd_addr = 0U;
-        vlSelf->rv32e__DOT__lsu_wb_write_rd_data = 0U;
-        vlSelf->rv32e__DOT__lsu_wb_rd = 0U;
-    } else {
-        if (vlSelf->rv32e__DOT__lsu__DOT__write_valid) {
-            vlSelf->rv32e__DOT__lsu_wb_csr_wr_addr2 
-                = vlSelf->rv32e__DOT__ex_lsu_csr_wr_addr2;
-            vlSelf->rv32e__DOT__lsu_wb_csr_wr_addr1 
-                = vlSelf->rv32e__DOT__ex_lsu_csr_wr_addr1;
-            vlSelf->rv32e__DOT__lsu_wb_csr_wr_data1 
-                = vlSelf->rv32e__DOT__ex_lsu_csr_wr_data1;
-            vlSelf->rv32e__DOT__lsu_wb_csr_wr_data2 
-                = vlSelf->rv32e__DOT__ex_lsu_csr_wr_data2;
-            vlSelf->rv32e__DOT__lsu_wb_pc = vlSelf->rv32e__DOT__lsu__DOT__l_pc;
-            vlSelf->rv32e__DOT__lsu_wb_inst = vlSelf->rv32e__DOT__lsu__DOT__l_inst;
-            vlSelf->rv32e__DOT__lsu_wb_write_rd_data 
-                = vlSelf->rv32e__DOT__lsu__DOT__rd_data;
-            vlSelf->rv32e__DOT__lsu_wb_rd = vlSelf->rv32e__DOT__lsu__DOT__l_rd_addr;
-        } else if (vlSelf->rv32e__DOT__lsu__DOT__read_valid) {
-            vlSelf->rv32e__DOT__lsu_wb_csr_wr_addr2 
-                = vlSelf->rv32e__DOT__ex_lsu_csr_wr_addr2;
-            vlSelf->rv32e__DOT__lsu_wb_csr_wr_addr1 
-                = vlSelf->rv32e__DOT__ex_lsu_csr_wr_addr1;
-            vlSelf->rv32e__DOT__lsu_wb_csr_wr_data1 
-                = vlSelf->rv32e__DOT__ex_lsu_csr_wr_data1;
-            vlSelf->rv32e__DOT__lsu_wb_csr_wr_data2 
-                = vlSelf->rv32e__DOT__ex_lsu_csr_wr_data2;
-            vlSelf->rv32e__DOT__lsu_wb_pc = vlSelf->rv32e__DOT__lsu__DOT__l_pc;
-            vlSelf->rv32e__DOT__lsu_wb_inst = vlSelf->rv32e__DOT__lsu__DOT__l_inst;
-            vlSelf->rv32e__DOT__lsu_wb_write_rd_data 
-                = vlSelf->rv32e__DOT__lsu__DOT__rd_data;
-            vlSelf->rv32e__DOT__lsu_wb_rd = vlSelf->rv32e__DOT__lsu__DOT__l_rd_addr;
-        } else if ((((IData)(vlSelf->rv32e__DOT__ex_lsu_valid) 
-                     & (IData)(vlSelf->rv32e__DOT__lsu_ex_ready)) 
-                    & (~ ((IData)(vlSelf->rv32e__DOT__ex_lsu_MemRead) 
-                          | (IData)(vlSelf->rv32e__DOT__ex_lsu_MemWrite))))) {
-            vlSelf->rv32e__DOT__lsu_wb_csr_wr_addr2 
-                = vlSelf->rv32e__DOT__ex_lsu_csr_wr_addr2;
-            vlSelf->rv32e__DOT__lsu_wb_csr_wr_addr1 
-                = vlSelf->rv32e__DOT__ex_lsu_csr_wr_addr1;
-            vlSelf->rv32e__DOT__lsu_wb_csr_wr_data1 
-                = vlSelf->rv32e__DOT__ex_lsu_csr_wr_data1;
-            vlSelf->rv32e__DOT__lsu_wb_csr_wr_data2 
-                = vlSelf->rv32e__DOT__ex_lsu_csr_wr_data2;
-            vlSelf->rv32e__DOT__lsu_wb_pc = vlSelf->rv32e__DOT__ex_lsu_pc;
-            vlSelf->rv32e__DOT__lsu_wb_inst = vlSelf->rv32e__DOT__ex_lsu_inst;
-            vlSelf->rv32e__DOT__lsu_wb_write_rd_data 
-                = vlSelf->rv32e__DOT__lsu__DOT__rd_data;
-            vlSelf->rv32e__DOT__lsu_wb_rd = vlSelf->rv32e__DOT__ex_lsu_rd;
-        } else {
-            vlSelf->rv32e__DOT__lsu_wb_csr_wr_addr2 
-                = vlSelf->rv32e__DOT__lsu_wb_csr_wr_addr2;
-            vlSelf->rv32e__DOT__lsu_wb_csr_wr_addr1 
-                = vlSelf->rv32e__DOT__lsu_wb_csr_wr_addr1;
-            vlSelf->rv32e__DOT__lsu_wb_csr_wr_data1 
-                = vlSelf->rv32e__DOT__lsu_wb_csr_wr_data1;
-            vlSelf->rv32e__DOT__lsu_wb_csr_wr_data2 
-                = vlSelf->rv32e__DOT__lsu_wb_csr_wr_data2;
-            vlSelf->rv32e__DOT__lsu_wb_pc = vlSelf->rv32e__DOT__lsu_wb_pc;
-            vlSelf->rv32e__DOT__lsu_wb_inst = vlSelf->rv32e__DOT__lsu_wb_inst;
-            vlSelf->rv32e__DOT__lsu_wb_write_rd_data 
-                = vlSelf->rv32e__DOT__lsu_wb_write_rd_data;
-            vlSelf->rv32e__DOT__lsu_wb_rd = vlSelf->rv32e__DOT__lsu_wb_rd;
         }
         __Vdly__rv32e__DOT__lsu__DOT__l_rd_addr = (
                                                    (((IData)(vlSelf->rv32e__DOT__ex_lsu_valid) 
@@ -378,36 +352,231 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__0(Vrv32e___024root* vlSe
                                                       & (IData)(vlSelf->rv32e__DOT__lsu_ex_ready))
                                                       ? (IData)(vlSelf->rv32e__DOT__ex_lsu_rd)
                                                       : (IData)(vlSelf->rv32e__DOT__lsu__DOT__l_rd_addr))));
+        if (((IData)(vlSelf->rv32e__DOT__lsu__DOT__write_valid) 
+             | (IData)(vlSelf->rv32e__DOT__lsu__DOT__read_valid))) {
+            vlSelf->rv32e__DOT__lsu_wb_csr_wr_addr2 
+                = vlSelf->rv32e__DOT__ex_lsu_csr_wr_addr2;
+            vlSelf->rv32e__DOT__lsu_wb_csr_wr_addr1 
+                = vlSelf->rv32e__DOT__ex_lsu_csr_wr_addr1;
+            vlSelf->rv32e__DOT__lsu_wb_csr_wr_data1 
+                = vlSelf->rv32e__DOT__ex_lsu_csr_wr_data1;
+            vlSelf->rv32e__DOT__lsu_wb_csr_wr_data2 
+                = vlSelf->rv32e__DOT__ex_lsu_csr_wr_data2;
+            vlSelf->rv32e__DOT__lsu_wb_pc = vlSelf->rv32e__DOT__lsu__DOT__l_pc;
+            vlSelf->rv32e__DOT__lsu_wb_inst = vlSelf->rv32e__DOT__lsu__DOT__l_inst;
+        } else if ((((IData)(vlSelf->rv32e__DOT__ex_lsu_valid) 
+                     & (IData)(vlSelf->rv32e__DOT__lsu_ex_ready)) 
+                    & (~ ((IData)(vlSelf->rv32e__DOT__ex_lsu_MemRead) 
+                          | (IData)(vlSelf->rv32e__DOT__ex_lsu_MemWrite))))) {
+            vlSelf->rv32e__DOT__lsu_wb_csr_wr_addr2 
+                = vlSelf->rv32e__DOT__ex_lsu_csr_wr_addr2;
+            vlSelf->rv32e__DOT__lsu_wb_csr_wr_addr1 
+                = vlSelf->rv32e__DOT__ex_lsu_csr_wr_addr1;
+            vlSelf->rv32e__DOT__lsu_wb_csr_wr_data1 
+                = vlSelf->rv32e__DOT__ex_lsu_csr_wr_data1;
+            vlSelf->rv32e__DOT__lsu_wb_csr_wr_data2 
+                = vlSelf->rv32e__DOT__ex_lsu_csr_wr_data2;
+            vlSelf->rv32e__DOT__lsu_wb_pc = vlSelf->rv32e__DOT__ex_lsu_pc;
+            vlSelf->rv32e__DOT__lsu_wb_inst = vlSelf->rv32e__DOT__ex_lsu_inst;
+        } else {
+            vlSelf->rv32e__DOT__lsu_wb_csr_wr_addr2 
+                = vlSelf->rv32e__DOT__lsu_wb_csr_wr_addr2;
+            vlSelf->rv32e__DOT__lsu_wb_csr_wr_addr1 
+                = vlSelf->rv32e__DOT__lsu_wb_csr_wr_addr1;
+            vlSelf->rv32e__DOT__lsu_wb_csr_wr_data1 
+                = vlSelf->rv32e__DOT__lsu_wb_csr_wr_data1;
+            vlSelf->rv32e__DOT__lsu_wb_csr_wr_data2 
+                = vlSelf->rv32e__DOT__lsu_wb_csr_wr_data2;
+            vlSelf->rv32e__DOT__lsu_wb_pc = vlSelf->rv32e__DOT__lsu_wb_pc;
+            vlSelf->rv32e__DOT__lsu_wb_inst = vlSelf->rv32e__DOT__lsu_wb_inst;
+        }
     }
     if (vlSelf->reset) {
-        vlSelf->rv32e__DOT__sram__DOT__sram_awready = 1U;
-        vlSelf->rv32e__DOT__sram__DOT__sram_wready = 1U;
-        vlSelf->rv32e__DOT__sram__DOT__sram_bvalid = 0U;
-        vlSelf->rv32e__DOT__sram__DOT__sram_bresp = 0U;
-        __Vdly__rv32e__DOT__sram__DOT__write_addr_valid = 0U;
-        __Vdly__rv32e__DOT__sram__DOT__write_data_valid = 0U;
-    } else if (((IData)(vlSelf->rv32e__DOT__sram__DOT__write_addr_valid) 
-                & (IData)(vlSelf->rv32e__DOT__sram__DOT__write_data_valid))) {
-        if ((0U < vlSelf->rv32e__DOT__sram__DOT__LFSR)) {
-            vlSelf->__Vdly__rv32e__DOT__sram__DOT__LFSR 
-                = (vlSelf->rv32e__DOT__sram__DOT__LFSR 
-                   - (IData)(1U));
-        } else {
-            if ((1U == (IData)(vlSelf->rv32e__DOT__sram__DOT__write_strb))) {
-                Vrv32e___024root____Vdpiimwrap_rv32e__DOT__sram__DOT__pmem_write_TOP(vlSelf->rv32e__DOT__sram__DOT__write_addr, vlSelf->rv32e__DOT__sram__DOT__write_data, 1U);
-            } else if ((3U == (IData)(vlSelf->rv32e__DOT__sram__DOT__write_strb))) {
-                Vrv32e___024root____Vdpiimwrap_rv32e__DOT__sram__DOT__pmem_write_TOP(vlSelf->rv32e__DOT__sram__DOT__write_addr, vlSelf->rv32e__DOT__sram__DOT__write_data, 2U);
-            } else if ((0xfU == (IData)(vlSelf->rv32e__DOT__sram__DOT__write_strb))) {
-                Vrv32e___024root____Vdpiimwrap_rv32e__DOT__sram__DOT__pmem_write_TOP(vlSelf->rv32e__DOT__sram__DOT__write_addr, vlSelf->rv32e__DOT__sram__DOT__write_data, 4U);
+        __Vdly__rv32e__DOT__sram_lsu_awready = 1U;
+        __Vdly__rv32e__DOT__sram_lsu_wready = 1U;
+        __Vdly__rv32e__DOT__sram_lsu_bvalid = 0U;
+        __Vdly__rv32e__DOT__sram_lsu_bresp = 0U;
+        __Vdly__rv32e__DOT__msram__DOT__write_addr_valid = 0U;
+        __Vdly__rv32e__DOT__msram__DOT__write_data_valid = 0U;
+    } else {
+        if (((IData)(vlSelf->rv32e__DOT__lsu_sram_awvalid) 
+             & (IData)(vlSelf->rv32e__DOT__sram_lsu_awready))) {
+            __Vdly__rv32e__DOT__msram__DOT__write_addr 
+                = vlSelf->rv32e__DOT__lsu_sram_awaddr;
+            __Vdly__rv32e__DOT__msram__DOT__write_addr_valid = 1U;
+            __Vdly__rv32e__DOT__sram_lsu_awready = 0U;
+            __Vdly__rv32e__DOT__msram__DOT__LFSR = 1U;
+        }
+        if (((IData)(vlSelf->rv32e__DOT__lsu_sram_wvalid) 
+             & (IData)(vlSelf->rv32e__DOT__sram_lsu_wready))) {
+            __Vdly__rv32e__DOT__msram__DOT__write_data 
+                = vlSelf->rv32e__DOT__lsu_sram_wdata;
+            __Vdly__rv32e__DOT__msram__DOT__write_strb 
+                = vlSelf->rv32e__DOT__lsu_sram_wstrb;
+            __Vdly__rv32e__DOT__msram__DOT__write_data_valid = 1U;
+            __Vdly__rv32e__DOT__sram_lsu_wready = 0U;
+        }
+        if (((IData)(vlSelf->rv32e__DOT__msram__DOT__write_addr_valid) 
+             & (IData)(vlSelf->rv32e__DOT__msram__DOT__write_data_valid))) {
+            if ((0U < vlSelf->rv32e__DOT__msram__DOT__LFSR)) {
+                __Vdly__rv32e__DOT__msram__DOT__LFSR 
+                    = (vlSelf->rv32e__DOT__msram__DOT__LFSR 
+                       - (IData)(1U));
             } else {
-                Vrv32e___024root____Vdpiimwrap_rv32e__DOT__sram__DOT__pmem_write_TOP(vlSelf->rv32e__DOT__sram__DOT__write_addr, vlSelf->rv32e__DOT__sram__DOT__write_data, 4U);
+                if ((1U == (IData)(vlSelf->rv32e__DOT__msram__DOT__write_strb))) {
+                    Vrv32e___024root____Vdpiimwrap_rv32e__DOT__msram__DOT__pmem_write_TOP(vlSelf->rv32e__DOT__msram__DOT__write_addr, vlSelf->rv32e__DOT__msram__DOT__write_data, 1U);
+                } else if ((3U == (IData)(vlSelf->rv32e__DOT__msram__DOT__write_strb))) {
+                    Vrv32e___024root____Vdpiimwrap_rv32e__DOT__msram__DOT__pmem_write_TOP(vlSelf->rv32e__DOT__msram__DOT__write_addr, vlSelf->rv32e__DOT__msram__DOT__write_data, 2U);
+                } else if ((0xfU == (IData)(vlSelf->rv32e__DOT__msram__DOT__write_strb))) {
+                    Vrv32e___024root____Vdpiimwrap_rv32e__DOT__msram__DOT__pmem_write_TOP(vlSelf->rv32e__DOT__msram__DOT__write_addr, vlSelf->rv32e__DOT__msram__DOT__write_data, 4U);
+                } else {
+                    Vrv32e___024root____Vdpiimwrap_rv32e__DOT__msram__DOT__pmem_write_TOP(vlSelf->rv32e__DOT__msram__DOT__write_addr, vlSelf->rv32e__DOT__msram__DOT__write_data, 4U);
+                }
+                __Vdly__rv32e__DOT__sram_lsu_bvalid = 1U;
+                __Vdly__rv32e__DOT__sram_lsu_bresp = 0U;
+                __Vdly__rv32e__DOT__msram__DOT__write_addr_valid = 0U;
+                __Vdly__rv32e__DOT__msram__DOT__write_data_valid = 0U;
+                __Vdly__rv32e__DOT__sram_lsu_awready = 1U;
+                __Vdly__rv32e__DOT__sram_lsu_wready = 1U;
             }
-            vlSelf->rv32e__DOT__sram__DOT__sram_bvalid = 1U;
-            vlSelf->rv32e__DOT__sram__DOT__sram_bresp = 0U;
-            __Vdly__rv32e__DOT__sram__DOT__write_addr_valid = 0U;
-            __Vdly__rv32e__DOT__sram__DOT__write_data_valid = 0U;
-            vlSelf->rv32e__DOT__sram__DOT__sram_awready = 1U;
-            vlSelf->rv32e__DOT__sram__DOT__sram_wready = 1U;
+        }
+        if (((IData)(vlSelf->rv32e__DOT__sram_lsu_bvalid) 
+             & (IData)(vlSelf->rv32e__DOT__lsu_sram_bready))) {
+            __Vdly__rv32e__DOT__sram_lsu_bvalid = 0U;
+        }
+    }
+    __Vdly__rv32e__DOT__lsu_wb_valid = ((~ (IData)(vlSelf->reset)) 
+                                        & ((((IData)(vlSelf->rv32e__DOT__ex_lsu_valid) 
+                                             & (IData)(vlSelf->rv32e__DOT__lsu_ex_ready)) 
+                                            & (~ ((IData)(vlSelf->rv32e__DOT__ex_lsu_MemRead) 
+                                                  | (IData)(vlSelf->rv32e__DOT__ex_lsu_MemWrite)))) 
+                                           | (((IData)(vlSelf->rv32e__DOT__lsu__DOT__read_valid) 
+                                               | (IData)(vlSelf->rv32e__DOT__lsu__DOT__write_valid)) 
+                                              | ((~ 
+                                                  (((IData)(vlSelf->rv32e__DOT__ex_lsu_valid) 
+                                                    & (IData)(vlSelf->rv32e__DOT__lsu_ex_ready)) 
+                                                   & ((IData)(vlSelf->rv32e__DOT__ex_lsu_MemRead) 
+                                                      | (IData)(vlSelf->rv32e__DOT__ex_lsu_MemWrite)))) 
+                                                 & (IData)(vlSelf->rv32e__DOT__lsu_wb_valid)))));
+    vlSelf->rv32e__DOT__lsu_wb_RegWrite = ((~ (IData)(vlSelf->reset)) 
+                                           & (((IData)(vlSelf->rv32e__DOT__lsu__DOT__write_valid) 
+                                               | (IData)(vlSelf->rv32e__DOT__lsu__DOT__read_valid))
+                                               ? (IData)(vlSelf->rv32e__DOT__lsu__DOT__l_rd_en)
+                                               : ((
+                                                   ((IData)(vlSelf->rv32e__DOT__ex_lsu_valid) 
+                                                    & (IData)(vlSelf->rv32e__DOT__lsu_ex_ready)) 
+                                                   & (~ 
+                                                      ((IData)(vlSelf->rv32e__DOT__ex_lsu_MemRead) 
+                                                       | (IData)(vlSelf->rv32e__DOT__ex_lsu_MemWrite))))
+                                                   ? (IData)(vlSelf->rv32e__DOT__ex_lsu_RegWrite)
+                                                   : (IData)(vlSelf->rv32e__DOT__lsu_wb_RegWrite))));
+    if (vlSelf->reset) {
+        vlSelf->rv32e__DOT__lsu_wb_write_rd_data = 0U;
+        vlSelf->rv32e__DOT__lsu_wb_rd = 0U;
+    } else if (((IData)(vlSelf->rv32e__DOT__lsu__DOT__write_valid) 
+                | (IData)(vlSelf->rv32e__DOT__lsu__DOT__read_valid))) {
+        vlSelf->rv32e__DOT__lsu_wb_write_rd_data = vlSelf->rv32e__DOT__lsu__DOT__rd_data;
+        vlSelf->rv32e__DOT__lsu_wb_rd = vlSelf->rv32e__DOT__lsu__DOT__l_rd_addr;
+    } else if ((((IData)(vlSelf->rv32e__DOT__ex_lsu_valid) 
+                 & (IData)(vlSelf->rv32e__DOT__lsu_ex_ready)) 
+                & (~ ((IData)(vlSelf->rv32e__DOT__ex_lsu_MemRead) 
+                      | (IData)(vlSelf->rv32e__DOT__ex_lsu_MemWrite))))) {
+        vlSelf->rv32e__DOT__lsu_wb_write_rd_data = vlSelf->rv32e__DOT__lsu__DOT__rd_data;
+        vlSelf->rv32e__DOT__lsu_wb_rd = vlSelf->rv32e__DOT__ex_lsu_rd;
+    } else {
+        vlSelf->rv32e__DOT__lsu_wb_write_rd_data = vlSelf->rv32e__DOT__lsu_wb_write_rd_data;
+        vlSelf->rv32e__DOT__lsu_wb_rd = vlSelf->rv32e__DOT__lsu_wb_rd;
+    }
+    if (vlSelf->reset) {
+        vlSelf->rv32e__DOT__isram__DOT__sram_awready = 1U;
+        vlSelf->rv32e__DOT__isram__DOT__sram_wready = 1U;
+        vlSelf->rv32e__DOT__isram__DOT__sram_bvalid = 0U;
+        vlSelf->rv32e__DOT__isram__DOT__sram_bresp = 0U;
+        __Vdly__rv32e__DOT__isram__DOT__write_addr_valid = 0U;
+        __Vdly__rv32e__DOT__isram__DOT__write_data_valid = 0U;
+    } else if (((IData)(vlSelf->rv32e__DOT__isram__DOT__write_addr_valid) 
+                & (IData)(vlSelf->rv32e__DOT__isram__DOT__write_data_valid))) {
+        if ((0U < vlSelf->rv32e__DOT__isram__DOT__LFSR)) {
+            __Vdly__rv32e__DOT__isram__DOT__LFSR = 
+                (vlSelf->rv32e__DOT__isram__DOT__LFSR 
+                 - (IData)(1U));
+        } else {
+            if ((1U == (IData)(vlSelf->rv32e__DOT__isram__DOT__write_strb))) {
+                Vrv32e___024root____Vdpiimwrap_rv32e__DOT__msram__DOT__pmem_write_TOP(vlSelf->rv32e__DOT__isram__DOT__write_addr, vlSelf->rv32e__DOT__isram__DOT__write_data, 1U);
+            } else if ((3U == (IData)(vlSelf->rv32e__DOT__isram__DOT__write_strb))) {
+                Vrv32e___024root____Vdpiimwrap_rv32e__DOT__msram__DOT__pmem_write_TOP(vlSelf->rv32e__DOT__isram__DOT__write_addr, vlSelf->rv32e__DOT__isram__DOT__write_data, 2U);
+            } else if ((0xfU == (IData)(vlSelf->rv32e__DOT__isram__DOT__write_strb))) {
+                Vrv32e___024root____Vdpiimwrap_rv32e__DOT__msram__DOT__pmem_write_TOP(vlSelf->rv32e__DOT__isram__DOT__write_addr, vlSelf->rv32e__DOT__isram__DOT__write_data, 4U);
+            } else {
+                Vrv32e___024root____Vdpiimwrap_rv32e__DOT__msram__DOT__pmem_write_TOP(vlSelf->rv32e__DOT__isram__DOT__write_addr, vlSelf->rv32e__DOT__isram__DOT__write_data, 4U);
+            }
+            vlSelf->rv32e__DOT__isram__DOT__sram_bvalid = 1U;
+            vlSelf->rv32e__DOT__isram__DOT__sram_bresp = 0U;
+            __Vdly__rv32e__DOT__isram__DOT__write_addr_valid = 0U;
+            __Vdly__rv32e__DOT__isram__DOT__write_data_valid = 0U;
+            vlSelf->rv32e__DOT__isram__DOT__sram_awready = 1U;
+            vlSelf->rv32e__DOT__isram__DOT__sram_wready = 1U;
+        }
+    }
+    if (vlSelf->reset) {
+        vlSelf->rv32e__DOT__exu__DOT__ex_flush_condition = 1U;
+        vlSelf->rv32e__DOT__id_wb_csr_addr2 = 0U;
+        vlSelf->rv32e__DOT__id_wb_csr_addr1 = 0U;
+        vlSelf->rv32e__DOT__id_ex_alu_op = 0U;
+    } else {
+        if (vlSelf->rv32e__DOT__ex_flush) {
+            vlSelf->rv32e__DOT__exu__DOT__ex_flush_condition = 0U;
+        } else if (vlSelf->rv32e__DOT__id_ready) {
+            vlSelf->rv32e__DOT__exu__DOT__ex_flush_condition = 1U;
+        }
+        if (((IData)(vlSelf->rv32e__DOT__IF_valid) 
+             & (IData)(vlSelf->rv32e__DOT__id_ready))) {
+            if (vlSelf->rv32e__DOT__idu__DOT__csr_mret) {
+                vlSelf->rv32e__DOT__id_wb_csr_addr2 = 0x341U;
+                vlSelf->rv32e__DOT__id_wb_csr_addr1 = 0x300U;
+            } else {
+                vlSelf->rv32e__DOT__id_wb_csr_addr2 = 0U;
+                vlSelf->rv32e__DOT__id_wb_csr_addr1 
+                    = ((IData)(vlSelf->rv32e__DOT__idu__DOT__csr_ecall)
+                        ? 0x305U : (IData)(vlSelf->rv32e__DOT__idu__DOT____VdfgTmp_hf81b0dad__0));
+            }
+            vlSelf->rv32e__DOT__id_ex_alu_op = vlSelf->rv32e__DOT__idu__DOT__alu_op;
+        }
+    }
+    if (vlSelf->reset) {
+        vlSelf->__Vdly__rv32e__DOT__sram_if_arready = 1U;
+        vlSelf->__Vdly__rv32e__DOT__sram_if_rvalid = 0U;
+        vlSelf->__Vdly__rv32e__DOT__sram_if_rdata = 0U;
+        vlSelf->rv32e__DOT__sram_if_rresp = 0U;
+        __Vdly__rv32e__DOT__isram__DOT__read_pending = 0U;
+        __Vdly__rv32e__DOT__isram__DOT__LFSR = 1U;
+    } else {
+        if (((IData)(vlSelf->rv32e__DOT__if_sram_arvalid) 
+             & (IData)(vlSelf->rv32e__DOT__sram_if_arready))) {
+            __Vdly__rv32e__DOT__isram__DOT__read_addr 
+                = vlSelf->rv32e__DOT__if_sram_araddr;
+            __Vdly__rv32e__DOT__isram__DOT__read_pending = 1U;
+            vlSelf->__Vdly__rv32e__DOT__sram_if_arready = 0U;
+            __Vdly__rv32e__DOT__isram__DOT__LFSR = 1U;
+        }
+        if (vlSelf->rv32e__DOT__isram__DOT__read_pending) {
+            if ((0U < vlSelf->rv32e__DOT__isram__DOT__LFSR)) {
+                __Vdly__rv32e__DOT__isram__DOT__LFSR 
+                    = (vlSelf->rv32e__DOT__isram__DOT__LFSR 
+                       - (IData)(1U));
+            } else {
+                Vrv32e___024root____Vdpiimwrap_rv32e__DOT__msram__DOT__pmem_read_TOP(vlSelf->rv32e__DOT__isram__DOT__read_addr, 4U, __Vfunc_rv32e__DOT__isram__DOT__pmem_read__6__Vfuncout);
+                vlSelf->__Vdly__rv32e__DOT__sram_if_rdata 
+                    = __Vfunc_rv32e__DOT__isram__DOT__pmem_read__6__Vfuncout;
+                vlSelf->__Vdly__rv32e__DOT__sram_if_rvalid = 1U;
+                vlSelf->rv32e__DOT__sram_if_rresp = 0U;
+            }
+        }
+        if (((IData)(vlSelf->rv32e__DOT__sram_if_rvalid) 
+             & (IData)(vlSelf->rv32e__DOT__if_sram_rready))) {
+            vlSelf->__Vdly__rv32e__DOT__sram_if_rvalid = 0U;
+            __Vdly__rv32e__DOT__isram__DOT__read_pending = 0U;
+            vlSelf->__Vdly__rv32e__DOT__sram_if_arready = 1U;
         }
     }
     vlSelf->rv32e__DOT__inst_cnt = __Vdly__rv32e__DOT__inst_cnt;
@@ -465,12 +634,22 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__0(Vrv32e___024root* vlSe
     }
     vlSelf->rv32e__DOT__lsu__DOT__l_pc = __Vdly__rv32e__DOT__lsu__DOT__l_pc;
     vlSelf->rv32e__DOT__lsu__DOT__l_inst = __Vdly__rv32e__DOT__lsu__DOT__l_inst;
+    vlSelf->rv32e__DOT__msram__DOT__write_addr_valid 
+        = __Vdly__rv32e__DOT__msram__DOT__write_addr_valid;
+    vlSelf->rv32e__DOT__msram__DOT__write_data_valid 
+        = __Vdly__rv32e__DOT__msram__DOT__write_data_valid;
+    vlSelf->rv32e__DOT__msram__DOT__write_addr = __Vdly__rv32e__DOT__msram__DOT__write_addr;
+    vlSelf->rv32e__DOT__msram__DOT__write_data = __Vdly__rv32e__DOT__msram__DOT__write_data;
+    vlSelf->rv32e__DOT__msram__DOT__write_strb = __Vdly__rv32e__DOT__msram__DOT__write_strb;
     vlSelf->rv32e__DOT__lsu__DOT__l_rd_en = __Vdly__rv32e__DOT__lsu__DOT__l_rd_en;
     vlSelf->rv32e__DOT__lsu__DOT__l_rd_addr = __Vdly__rv32e__DOT__lsu__DOT__l_rd_addr;
-    vlSelf->rv32e__DOT__sram__DOT__write_addr_valid 
-        = __Vdly__rv32e__DOT__sram__DOT__write_addr_valid;
-    vlSelf->rv32e__DOT__sram__DOT__write_data_valid 
-        = __Vdly__rv32e__DOT__sram__DOT__write_data_valid;
+    vlSelf->rv32e__DOT__isram__DOT__write_addr_valid 
+        = __Vdly__rv32e__DOT__isram__DOT__write_addr_valid;
+    vlSelf->rv32e__DOT__isram__DOT__write_data_valid 
+        = __Vdly__rv32e__DOT__isram__DOT__write_data_valid;
+    vlSelf->rv32e__DOT__isram__DOT__read_pending = __Vdly__rv32e__DOT__isram__DOT__read_pending;
+    vlSelf->rv32e__DOT__isram__DOT__read_addr = __Vdly__rv32e__DOT__isram__DOT__read_addr;
+    vlSelf->rv32e__DOT__isram__DOT__LFSR = __Vdly__rv32e__DOT__isram__DOT__LFSR;
     vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h384f4e33__0 
         = ((IData)(vlSelf->rv32e__DOT__lsu_wb_RegWrite) 
            & (0U != (IData)(vlSelf->rv32e__DOT__lsu_wb_rd)));
@@ -479,33 +658,14 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__0(Vrv32e___024root* vlSe
            & ((IData)(vlSelf->rv32e__DOT__lsu__DOT__l_rd_en) 
               & (0U != (IData)(vlSelf->rv32e__DOT__lsu__DOT__l_rd_addr))));
     if (vlSelf->reset) {
-        vlSelf->rv32e__DOT__exu__DOT__ex_flush_condition = 1U;
-        vlSelf->rv32e__DOT__id_wb_csr_addr2 = 0U;
-        vlSelf->rv32e__DOT__id_wb_csr_addr1 = 0U;
-        vlSelf->rv32e__DOT__id_ex_alu_op = 0U;
         vlSelf->rv32e__DOT__id_ex_shamt = 0U;
         vlSelf->rv32e__DOT__id_ex_jalr = 0U;
         vlSelf->rv32e__DOT__id_ex_jal = 0U;
         vlSelf->rv32e__DOT__id_wb_rs2 = 0U;
         vlSelf->rv32e__DOT__wb_valid = 0U;
     } else {
-        if (vlSelf->rv32e__DOT__ex_flush) {
-            vlSelf->rv32e__DOT__exu__DOT__ex_flush_condition = 0U;
-        } else if (vlSelf->rv32e__DOT__id_ready) {
-            vlSelf->rv32e__DOT__exu__DOT__ex_flush_condition = 1U;
-        }
         if (((IData)(vlSelf->rv32e__DOT__IF_valid) 
              & (IData)(vlSelf->rv32e__DOT__id_ready))) {
-            if (vlSelf->rv32e__DOT__idu__DOT__csr_mret) {
-                vlSelf->rv32e__DOT__id_wb_csr_addr2 = 0x341U;
-                vlSelf->rv32e__DOT__id_wb_csr_addr1 = 0x300U;
-            } else {
-                vlSelf->rv32e__DOT__id_wb_csr_addr2 = 0U;
-                vlSelf->rv32e__DOT__id_wb_csr_addr1 
-                    = ((IData)(vlSelf->rv32e__DOT__idu__DOT__csr_ecall)
-                        ? 0x305U : (IData)(vlSelf->rv32e__DOT__idu__DOT____VdfgTmp_hf81b0dad__0));
-            }
-            vlSelf->rv32e__DOT__id_ex_alu_op = vlSelf->rv32e__DOT__idu__DOT__alu_op;
             vlSelf->rv32e__DOT__id_ex_shamt = (0x3fU 
                                                & (vlSelf->rv32e__DOT__IF_ID_inst 
                                                   >> 0x14U));
@@ -531,78 +691,148 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__0(Vrv32e___024root* vlSe
         }
     }
     if (vlSelf->reset) {
+        __Vdly__rv32e__DOT__lsu_sram_awvalid = 0U;
+        vlSelf->rv32e__DOT__lsu_sram_awaddr = 0U;
+        __Vdly__rv32e__DOT__lsu_sram_wvalid = 0U;
+        vlSelf->rv32e__DOT__lsu_sram_wdata = 0U;
+        vlSelf->rv32e__DOT__lsu_sram_wstrb = 0U;
+        __Vdly__rv32e__DOT__lsu_sram_bready = 0U;
+        __Vdly__rv32e__DOT__lsu__DOT__write_pending = 0U;
         vlSelf->rv32e__DOT__lsu__DOT__write_valid = 0U;
-    } else if (((((IData)(vlSelf->rv32e__DOT__ex_lsu_valid) 
-                  & (IData)(vlSelf->rv32e__DOT__lsu_ex_ready)) 
-                 & (~ (IData)(vlSelf->rv32e__DOT__ex_lsu_MemRead))) 
-                & (IData)(vlSelf->rv32e__DOT__ex_lsu_MemWrite))) {
-        if ((4U == (IData)(vlSelf->rv32e__DOT__ex_lsu_MemLen))) {
-            Vrv32e___024root____Vdpiimwrap_rv32e__DOT__sram__DOT__pmem_write_TOP(vlSelf->rv32e__DOT__ex_lsu_process_result, vlSelf->rv32e__DOT__ex_lsu_src2, 1U);
-        } else if ((1U == (IData)(vlSelf->rv32e__DOT__ex_lsu_MemLen))) {
-            Vrv32e___024root____Vdpiimwrap_rv32e__DOT__sram__DOT__pmem_write_TOP(vlSelf->rv32e__DOT__ex_lsu_process_result, vlSelf->rv32e__DOT__ex_lsu_src2, 2U);
-        } else if (VL_LIKELY((2U == (IData)(vlSelf->rv32e__DOT__ex_lsu_MemLen)))) {
-            Vrv32e___024root____Vdpiimwrap_rv32e__DOT__sram__DOT__pmem_write_TOP(vlSelf->rv32e__DOT__ex_lsu_process_result, vlSelf->rv32e__DOT__ex_lsu_src2, 4U);
-        } else {
-            Vrv32e___024root____Vdpiimwrap_rv32e__DOT__ebreak_TOP(2U, 0xdeadbeefU);
-            VL_WRITEF("\033[32mError: Unsupported memory write length %b at address %x\033[0m\n",
-                      3,vlSelf->rv32e__DOT__ex_lsu_MemLen,
-                      32,vlSelf->rv32e__DOT__ex_lsu_process_result);
-        }
-        vlSelf->rv32e__DOT__lsu__DOT__write_valid = 1U;
     } else {
-        vlSelf->rv32e__DOT__lsu__DOT__write_valid = 0U;
+        if ((((((IData)(vlSelf->rv32e__DOT__ex_lsu_valid) 
+                & (IData)(vlSelf->rv32e__DOT__lsu_ex_ready)) 
+               & (~ (IData)(vlSelf->rv32e__DOT__ex_lsu_MemRead))) 
+              & (IData)(vlSelf->rv32e__DOT__ex_lsu_MemWrite)) 
+             & (~ (IData)(vlSelf->rv32e__DOT__lsu__DOT__write_pending)))) {
+            __Vdly__rv32e__DOT__lsu_sram_awvalid = 1U;
+            vlSelf->rv32e__DOT__lsu_sram_awaddr = vlSelf->rv32e__DOT__ex_lsu_process_result;
+            __Vdly__rv32e__DOT__lsu_sram_wvalid = 1U;
+            vlSelf->rv32e__DOT__lsu_sram_wdata = vlSelf->rv32e__DOT__ex_lsu_src2;
+            __Vdly__rv32e__DOT__lsu_sram_bready = 1U;
+            if ((4U == (IData)(vlSelf->rv32e__DOT__ex_lsu_MemLen))) {
+                vlSelf->rv32e__DOT__lsu_sram_wstrb = 1U;
+            } else if ((1U == (IData)(vlSelf->rv32e__DOT__ex_lsu_MemLen))) {
+                vlSelf->rv32e__DOT__lsu_sram_wstrb = 3U;
+            } else if (VL_LIKELY((2U == (IData)(vlSelf->rv32e__DOT__ex_lsu_MemLen)))) {
+                vlSelf->rv32e__DOT__lsu_sram_wstrb = 0xfU;
+            } else {
+                Vrv32e___024root____Vdpiimwrap_rv32e__DOT__ebreak_TOP(2U, 0xdeadbeefU);
+                vlSelf->rv32e__DOT__lsu_sram_wstrb = 0xfU;
+                VL_WRITEF("\033[31mLSU_AXI: Unsupported memory write length %b at address %x\033[0m\n",
+                          3,vlSelf->rv32e__DOT__ex_lsu_MemLen,
+                          32,vlSelf->rv32e__DOT__ex_lsu_process_result);
+            }
+            __Vdly__rv32e__DOT__lsu__DOT__write_pending = 1U;
+            vlSelf->rv32e__DOT__lsu__DOT__write_valid = 0U;
+        }
+        if (((IData)(vlSelf->rv32e__DOT__lsu_sram_awvalid) 
+             & (IData)(vlSelf->rv32e__DOT__sram_lsu_awready))) {
+            __Vdly__rv32e__DOT__lsu_sram_awvalid = 0U;
+        }
+        if (((IData)(vlSelf->rv32e__DOT__lsu_sram_wvalid) 
+             & (IData)(vlSelf->rv32e__DOT__sram_lsu_wready))) {
+            __Vdly__rv32e__DOT__lsu_sram_wvalid = 0U;
+        }
+        if (((IData)(vlSelf->rv32e__DOT__sram_lsu_bvalid) 
+             & (IData)(vlSelf->rv32e__DOT__lsu_sram_bready))) {
+            if (VL_UNLIKELY((0U != (IData)(vlSelf->rv32e__DOT__sram_lsu_bresp)))) {
+                Vrv32e___024root____Vdpiimwrap_rv32e__DOT__ebreak_TOP(2U, 0xdeadbeefU);
+                VL_WRITEF("\033[31mLSU_AXI: Write access fault at address %x, bresp %b\033[0m\n",
+                          32,vlSelf->rv32e__DOT__ex_lsu_process_result,
+                          2,(IData)(vlSelf->rv32e__DOT__sram_lsu_bresp));
+            }
+            __Vdly__rv32e__DOT__lsu_sram_bready = 0U;
+            __Vdly__rv32e__DOT__lsu__DOT__write_pending = 0U;
+            vlSelf->rv32e__DOT__lsu__DOT__write_valid = 1U;
+        } else {
+            vlSelf->rv32e__DOT__lsu__DOT__write_valid = 0U;
+        }
     }
     if (vlSelf->reset) {
+        __Vdly__rv32e__DOT__lsu_sram_arvalid = 0U;
+        __Vdly__rv32e__DOT__lsu_sram_araddr = 0U;
+        __Vdly__rv32e__DOT__lsu_sram_rready = 0U;
+        __Vdly__rv32e__DOT__lsu__DOT__read_pending = 0U;
+        vlSelf->rv32e__DOT__lsu__DOT__read_valid = 0U;
         vlSelf->rv32e__DOT__lsu__DOT__read_lsu_data = 0U;
-        vlSelf->rv32e__DOT__lsu__DOT__read_valid = 0U;
-    } else if ((((IData)(vlSelf->rv32e__DOT__ex_lsu_valid) 
-                 & (IData)(vlSelf->rv32e__DOT__lsu_ex_ready)) 
-                & ((IData)(vlSelf->rv32e__DOT__ex_lsu_MemRead) 
-                   & (~ (IData)(vlSelf->rv32e__DOT__ex_lsu_MemWrite))))) {
-        if ((4U & (IData)(vlSelf->rv32e__DOT__lsu__DOT__l_MemLen))) {
-            if (VL_UNLIKELY((2U & (IData)(vlSelf->rv32e__DOT__lsu__DOT__l_MemLen)))) {
-                Vrv32e___024root____Vdpiimwrap_rv32e__DOT__ebreak_TOP(2U, 0xdeadbeefU);
-                VL_WRITEF("\033[32mError: Unsupported memory read length %b at address %x\033[0m\n",
-                          3,vlSelf->rv32e__DOT__lsu__DOT__l_MemLen,
-                          32,vlSelf->rv32e__DOT__ex_lsu_process_result);
-            } else if (VL_UNLIKELY((1U & (IData)(vlSelf->rv32e__DOT__lsu__DOT__l_MemLen)))) {
-                Vrv32e___024root____Vdpiimwrap_rv32e__DOT__ebreak_TOP(2U, 0xdeadbeefU);
-                VL_WRITEF("\033[32mError: Unsupported memory read length %b at address %x\033[0m\n",
-                          3,vlSelf->rv32e__DOT__lsu__DOT__l_MemLen,
-                          32,vlSelf->rv32e__DOT__ex_lsu_process_result);
-            } else {
-                Vrv32e___024root____Vdpiimwrap_rv32e__DOT__sram__DOT__pmem_read_TOP(vlSelf->rv32e__DOT__ex_lsu_process_result, 1U, __Vfunc_rv32e__DOT__lsu__DOT__pmem_read__11__Vfuncout);
-                vlSelf->rv32e__DOT__lsu__DOT__read_lsu_data 
-                    = __Vfunc_rv32e__DOT__lsu__DOT__pmem_read__11__Vfuncout;
-            }
-        } else if ((2U & (IData)(vlSelf->rv32e__DOT__lsu__DOT__l_MemLen))) {
-            if ((1U & (IData)(vlSelf->rv32e__DOT__lsu__DOT__l_MemLen))) {
-                Vrv32e___024root____Vdpiimwrap_rv32e__DOT__sram__DOT__pmem_read_TOP(vlSelf->rv32e__DOT__ex_lsu_process_result, 2U, __Vfunc_rv32e__DOT__lsu__DOT__pmem_read__12__Vfuncout);
-                vlSelf->rv32e__DOT__lsu__DOT__read_lsu_data 
-                    = __Vfunc_rv32e__DOT__lsu__DOT__pmem_read__12__Vfuncout;
-            } else {
-                Vrv32e___024root____Vdpiimwrap_rv32e__DOT__sram__DOT__pmem_read_TOP(vlSelf->rv32e__DOT__ex_lsu_process_result, 4U, __Vfunc_rv32e__DOT__lsu__DOT__pmem_read__13__Vfuncout);
-                vlSelf->rv32e__DOT__lsu__DOT__read_lsu_data 
-                    = __Vfunc_rv32e__DOT__lsu__DOT__pmem_read__13__Vfuncout;
-            }
-        } else if ((1U & (IData)(vlSelf->rv32e__DOT__lsu__DOT__l_MemLen))) {
-            Vrv32e___024root____Vdpiimwrap_rv32e__DOT__sram__DOT__pmem_read_TOP(vlSelf->rv32e__DOT__ex_lsu_process_result, 2U, __Vfunc_rv32e__DOT__lsu__DOT__pmem_read__14__Vfuncout);
-            vlSelf->rv32e__DOT__lsu__DOT__read_lsu_data 
-                = __Vfunc_rv32e__DOT__lsu__DOT__pmem_read__14__Vfuncout;
-        } else {
-            Vrv32e___024root____Vdpiimwrap_rv32e__DOT__sram__DOT__pmem_read_TOP(vlSelf->rv32e__DOT__ex_lsu_process_result, 1U, __Vfunc_rv32e__DOT__lsu__DOT__pmem_read__15__Vfuncout);
-            vlSelf->rv32e__DOT__lsu__DOT__read_lsu_data 
-                = __Vfunc_rv32e__DOT__lsu__DOT__pmem_read__15__Vfuncout;
-        }
-        vlSelf->rv32e__DOT__lsu__DOT__read_valid = 1U;
     } else {
-        vlSelf->rv32e__DOT__lsu__DOT__read_valid = 0U;
+        if ((((((IData)(vlSelf->rv32e__DOT__ex_lsu_valid) 
+                & (IData)(vlSelf->rv32e__DOT__lsu_ex_ready)) 
+               & (IData)(vlSelf->rv32e__DOT__ex_lsu_MemRead)) 
+              & (~ (IData)(vlSelf->rv32e__DOT__ex_lsu_MemWrite))) 
+             & (~ (IData)(vlSelf->rv32e__DOT__lsu__DOT__read_pending)))) {
+            __Vdly__rv32e__DOT__lsu_sram_arvalid = 1U;
+            __Vdly__rv32e__DOT__lsu_sram_araddr = vlSelf->rv32e__DOT__ex_lsu_process_result;
+            __Vdly__rv32e__DOT__lsu_sram_rready = 1U;
+            __Vdly__rv32e__DOT__lsu__DOT__read_pending = 1U;
+            vlSelf->rv32e__DOT__lsu__DOT__read_valid = 0U;
+        }
+        if (((IData)(vlSelf->rv32e__DOT__lsu_sram_arvalid) 
+             & (IData)(vlSelf->rv32e__DOT__sram_lsu_arready))) {
+            __Vdly__rv32e__DOT__lsu_sram_arvalid = 0U;
+        }
+        if (((IData)(vlSelf->rv32e__DOT__sram_lsu_rvalid) 
+             & (IData)(vlSelf->rv32e__DOT__lsu_sram_rready))) {
+            __Vdly__rv32e__DOT__lsu_sram_rready = 0U;
+            __Vdly__rv32e__DOT__lsu__DOT__read_pending = 0U;
+            vlSelf->rv32e__DOT__lsu__DOT__read_valid = 1U;
+            if ((4U & (IData)(vlSelf->rv32e__DOT__lsu__DOT__l_MemLen))) {
+                if (VL_UNLIKELY((2U & (IData)(vlSelf->rv32e__DOT__lsu__DOT__l_MemLen)))) {
+                    Vrv32e___024root____Vdpiimwrap_rv32e__DOT__ebreak_TOP(2U, 0xdeadbeefU);
+                    vlSelf->rv32e__DOT__lsu__DOT__read_lsu_data = 0U;
+                    VL_WRITEF("\033[31mLSU_AXI: Unsupported memory read length %b at address %x\033[0m\n",
+                              3,vlSelf->rv32e__DOT__lsu__DOT__l_MemLen,
+                              32,vlSelf->rv32e__DOT__ex_lsu_process_result);
+                } else if (VL_UNLIKELY((1U & (IData)(vlSelf->rv32e__DOT__lsu__DOT__l_MemLen)))) {
+                    Vrv32e___024root____Vdpiimwrap_rv32e__DOT__ebreak_TOP(2U, 0xdeadbeefU);
+                    vlSelf->rv32e__DOT__lsu__DOT__read_lsu_data = 0U;
+                    VL_WRITEF("\033[31mLSU_AXI: Unsupported memory read length %b at address %x\033[0m\n",
+                              3,vlSelf->rv32e__DOT__lsu__DOT__l_MemLen,
+                              32,vlSelf->rv32e__DOT__ex_lsu_process_result);
+                } else {
+                    vlSelf->rv32e__DOT__lsu__DOT__read_lsu_data 
+                        = (((- (IData)((1U & (vlSelf->rv32e__DOT__sram_lsu_rdata 
+                                              >> 7U)))) 
+                            << 8U) | (0xffU & vlSelf->rv32e__DOT__sram_lsu_rdata));
+                }
+            } else {
+                vlSelf->rv32e__DOT__lsu__DOT__read_lsu_data 
+                    = ((2U & (IData)(vlSelf->rv32e__DOT__lsu__DOT__l_MemLen))
+                        ? ((1U & (IData)(vlSelf->rv32e__DOT__lsu__DOT__l_MemLen))
+                            ? (0xffffU & vlSelf->rv32e__DOT__sram_lsu_rdata)
+                            : vlSelf->rv32e__DOT__sram_lsu_rdata)
+                        : ((1U & (IData)(vlSelf->rv32e__DOT__lsu__DOT__l_MemLen))
+                            ? (((- (IData)((1U & (vlSelf->rv32e__DOT__sram_lsu_rdata 
+                                                  >> 0xfU)))) 
+                                << 0x10U) | (0xffffU 
+                                             & vlSelf->rv32e__DOT__sram_lsu_rdata))
+                            : (0xffU & vlSelf->rv32e__DOT__sram_lsu_rdata)));
+            }
+            if (VL_UNLIKELY((0U != (IData)(vlSelf->rv32e__DOT__sram_lsu_rresp)))) {
+                Vrv32e___024root____Vdpiimwrap_rv32e__DOT__ebreak_TOP(2U, 0xdeadbeefU);
+                VL_WRITEF("\033[31mLSU_AXI: Read access fault at address %x, rresp %b\033[0m\n",
+                          32,vlSelf->rv32e__DOT__ex_lsu_process_result,
+                          2,(IData)(vlSelf->rv32e__DOT__sram_lsu_rresp));
+            }
+        } else {
+            vlSelf->rv32e__DOT__lsu__DOT__read_valid = 0U;
+        }
     }
     vlSelf->rv32e__DOT__lsu_wb_valid = __Vdly__rv32e__DOT__lsu_wb_valid;
     vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_hadc13f7a__0 
         = ((IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_hb53dc38f__0) 
            & ((IData)(vlSelf->rv32e__DOT__id_wb_rs2) 
               == (IData)(vlSelf->rv32e__DOT__lsu__DOT__l_rd_addr)));
+    vlSelf->rv32e__DOT__sram_lsu_bresp = __Vdly__rv32e__DOT__sram_lsu_bresp;
+    vlSelf->rv32e__DOT__lsu__DOT__write_pending = __Vdly__rv32e__DOT__lsu__DOT__write_pending;
+    vlSelf->rv32e__DOT__lsu_sram_awvalid = __Vdly__rv32e__DOT__lsu_sram_awvalid;
+    vlSelf->rv32e__DOT__sram_lsu_awready = __Vdly__rv32e__DOT__sram_lsu_awready;
+    vlSelf->rv32e__DOT__lsu_sram_wvalid = __Vdly__rv32e__DOT__lsu_sram_wvalid;
+    vlSelf->rv32e__DOT__sram_lsu_wready = __Vdly__rv32e__DOT__sram_lsu_wready;
+    vlSelf->rv32e__DOT__sram_lsu_bvalid = __Vdly__rv32e__DOT__sram_lsu_bvalid;
+    vlSelf->rv32e__DOT__lsu_sram_bready = __Vdly__rv32e__DOT__lsu_sram_bready;
+    vlSelf->rv32e__DOT__lsu__DOT__read_pending = __Vdly__rv32e__DOT__lsu__DOT__read_pending;
     vlSelf->rv32e__DOT__lsu__DOT__l_MemLen = __Vdly__rv32e__DOT__lsu__DOT__l_MemLen;
     vlSelf->rv32e__DOT__lsu_wb_flush = ((~ (IData)(vlSelf->reset)) 
                                         & (IData)(vlSelf->rv32e__DOT__ex_flush));
@@ -611,6 +841,50 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__0(Vrv32e___024root* vlSe
            & (((IData)(vlSelf->rv32e__DOT__id_wb_rs2) 
                == (IData)(vlSelf->rv32e__DOT__lsu_wb_rd)) 
               & (IData)(vlSelf->rv32e__DOT__lsu_wb_valid)));
+    if (vlSelf->reset) {
+        __Vdly__rv32e__DOT__sram_lsu_arready = 1U;
+        __Vdly__rv32e__DOT__sram_lsu_rvalid = 0U;
+        vlSelf->rv32e__DOT__sram_lsu_rdata = 0U;
+        vlSelf->rv32e__DOT__sram_lsu_rresp = 0U;
+        __Vdly__rv32e__DOT__msram__DOT__read_pending = 0U;
+        __Vdly__rv32e__DOT__msram__DOT__LFSR = 1U;
+    } else {
+        if (((IData)(vlSelf->rv32e__DOT__lsu_sram_arvalid) 
+             & (IData)(vlSelf->rv32e__DOT__sram_lsu_arready))) {
+            __Vdly__rv32e__DOT__msram__DOT__read_addr 
+                = vlSelf->rv32e__DOT__lsu_sram_araddr;
+            __Vdly__rv32e__DOT__msram__DOT__read_pending = 1U;
+            __Vdly__rv32e__DOT__sram_lsu_arready = 0U;
+            __Vdly__rv32e__DOT__msram__DOT__LFSR = 1U;
+        }
+        if (vlSelf->rv32e__DOT__msram__DOT__read_pending) {
+            if ((0U < vlSelf->rv32e__DOT__msram__DOT__LFSR)) {
+                __Vdly__rv32e__DOT__msram__DOT__LFSR 
+                    = (vlSelf->rv32e__DOT__msram__DOT__LFSR 
+                       - (IData)(1U));
+            } else {
+                Vrv32e___024root____Vdpiimwrap_rv32e__DOT__msram__DOT__pmem_read_TOP(vlSelf->rv32e__DOT__msram__DOT__read_addr, 4U, __Vfunc_rv32e__DOT__msram__DOT__pmem_read__1__Vfuncout);
+                vlSelf->rv32e__DOT__sram_lsu_rdata 
+                    = __Vfunc_rv32e__DOT__msram__DOT__pmem_read__1__Vfuncout;
+                __Vdly__rv32e__DOT__sram_lsu_rvalid = 1U;
+                vlSelf->rv32e__DOT__sram_lsu_rresp = 0U;
+            }
+        }
+        if (((IData)(vlSelf->rv32e__DOT__sram_lsu_rvalid) 
+             & (IData)(vlSelf->rv32e__DOT__lsu_sram_rready))) {
+            __Vdly__rv32e__DOT__sram_lsu_rvalid = 0U;
+            __Vdly__rv32e__DOT__msram__DOT__read_pending = 0U;
+            __Vdly__rv32e__DOT__sram_lsu_arready = 1U;
+        }
+    }
+    vlSelf->rv32e__DOT__lsu_sram_araddr = __Vdly__rv32e__DOT__lsu_sram_araddr;
+    vlSelf->rv32e__DOT__msram__DOT__read_pending = __Vdly__rv32e__DOT__msram__DOT__read_pending;
+    vlSelf->rv32e__DOT__lsu_sram_arvalid = __Vdly__rv32e__DOT__lsu_sram_arvalid;
+    vlSelf->rv32e__DOT__sram_lsu_arready = __Vdly__rv32e__DOT__sram_lsu_arready;
+    vlSelf->rv32e__DOT__msram__DOT__read_addr = __Vdly__rv32e__DOT__msram__DOT__read_addr;
+    vlSelf->rv32e__DOT__sram_lsu_rvalid = __Vdly__rv32e__DOT__sram_lsu_rvalid;
+    vlSelf->rv32e__DOT__lsu_sram_rready = __Vdly__rv32e__DOT__lsu_sram_rready;
+    vlSelf->rv32e__DOT__msram__DOT__LFSR = __Vdly__rv32e__DOT__msram__DOT__LFSR;
 }
 
 VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSelf) {
@@ -628,15 +902,12 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSe
     __Vdly__rv32e__DOT__ex_lsu_RegWrite = 0;
     IData/*31:0*/ __Vtemp_heb90a236__0;
     // Body
-    vlSelf->__Vdly__rv32e__DOT__ifu__DOT__next_pc = vlSelf->rv32e__DOT__ifu__DOT__next_pc;
-    vlSelf->__Vdly__rv32e__DOT__IF_ID_pc = vlSelf->rv32e__DOT__IF_ID_pc;
-    vlSelf->__Vdly__rv32e__DOT__ifu__DOT__read_valid 
-        = vlSelf->rv32e__DOT__ifu__DOT__read_valid;
-    vlSelf->__Vdly__rv32e__DOT__ifu__DOT__read_pending 
-        = vlSelf->rv32e__DOT__ifu__DOT__read_pending;
+    vlSelf->__Vdly__rv32e__DOT__ifu__DOT__once = vlSelf->rv32e__DOT__ifu__DOT__once;
+    vlSelf->__Vdly__rv32e__DOT__ifu__DOT__state = vlSelf->rv32e__DOT__ifu__DOT__state;
+    vlSelf->__Vdly__rv32e__DOT__IF_valid = vlSelf->rv32e__DOT__IF_valid;
     vlSelf->__Vdly__rv32e__DOT__if_sram_rready = vlSelf->rv32e__DOT__if_sram_rready;
-    vlSelf->__Vdly__rv32e__DOT__if_sram_araddr = vlSelf->rv32e__DOT__if_sram_araddr;
     vlSelf->__Vdly__rv32e__DOT__if_sram_arvalid = vlSelf->rv32e__DOT__if_sram_arvalid;
+    vlSelf->__Vdly__rv32e__DOT__ifu__DOT__next_pc = vlSelf->rv32e__DOT__ifu__DOT__next_pc;
     __Vdly__rv32e__DOT__ex_lsu_valid = vlSelf->rv32e__DOT__ex_lsu_valid;
     __Vdly__rv32e__DOT__ex_lsu_MemRead = vlSelf->rv32e__DOT__ex_lsu_MemRead;
     __Vdly__rv32e__DOT__ex_lsu_RegWrite = vlSelf->rv32e__DOT__ex_lsu_RegWrite;
@@ -644,14 +915,14 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSe
     if (vlSelf->reset) {
         vlSelf->rv32e__DOT__ex_lsu_csr_rdata = 0U;
         vlSelf->rv32e__DOT__ex_lsu_src2 = 0U;
-        vlSelf->rv32e__DOT__ex_lsu_process_result = 0U;
-        __Vdly__rv32e__DOT__ex_lsu_valid = 0U;
         vlSelf->rv32e__DOT__ex_lsu_csr_wr_addr2 = 0U;
         vlSelf->rv32e__DOT__ex_lsu_csr_wr_addr1 = 0U;
-        vlSelf->rv32e__DOT__ex_lsu_pc = 0U;
+        vlSelf->rv32e__DOT__ex_lsu_process_result = 0U;
         vlSelf->rv32e__DOT__ex_lsu_imm = 0U;
         vlSelf->rv32e__DOT__ex_lsu_inst = 0U;
         vlSelf->rv32e__DOT__ex_lsu_MemLen = 0U;
+        __Vdly__rv32e__DOT__ex_lsu_valid = 0U;
+        vlSelf->rv32e__DOT__ex_lsu_pc = 0U;
         vlSelf->rv32e__DOT__ex_lsu_opcode = 0U;
         vlSelf->rv32e__DOT__ex_lsu_csr_wr_data2 = 0U;
         __Vdly__rv32e__DOT__ex_lsu_rd = 0U;
@@ -661,16 +932,16 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSe
              & (IData)(vlSelf->rv32e__DOT__ex_ready))) {
             vlSelf->rv32e__DOT__ex_lsu_csr_rdata = vlSelf->rv32e__DOT__wb_ex_csr_num1;
             vlSelf->rv32e__DOT__ex_lsu_src2 = vlSelf->rv32e__DOT__exu__DOT__src2;
-            vlSelf->rv32e__DOT__ex_lsu_process_result 
-                = vlSelf->rv32e__DOT__exu__DOT__process_result;
             vlSelf->rv32e__DOT__ex_lsu_csr_wr_addr2 
                 = vlSelf->rv32e__DOT__id_ex_csr_wr_addr2;
             vlSelf->rv32e__DOT__ex_lsu_csr_wr_addr1 
                 = vlSelf->rv32e__DOT__id_ex_csr_wr_addr1;
-            vlSelf->rv32e__DOT__ex_lsu_pc = vlSelf->rv32e__DOT__id_ex_pc;
+            vlSelf->rv32e__DOT__ex_lsu_process_result 
+                = vlSelf->rv32e__DOT__exu__DOT__process_result;
             vlSelf->rv32e__DOT__ex_lsu_imm = vlSelf->rv32e__DOT__id_ex_imm;
             vlSelf->rv32e__DOT__ex_lsu_inst = vlSelf->rv32e__DOT__id_ex_inst;
             vlSelf->rv32e__DOT__ex_lsu_MemLen = vlSelf->rv32e__DOT__id_ex_MemLen;
+            vlSelf->rv32e__DOT__ex_lsu_pc = vlSelf->rv32e__DOT__id_ex_pc;
             vlSelf->rv32e__DOT__ex_lsu_opcode = vlSelf->rv32e__DOT__id_ex_opcode;
             vlSelf->rv32e__DOT__ex_lsu_csr_wr_data2 
                 = ((IData)(vlSelf->rv32e__DOT__id_ex_csr_ecall)
@@ -725,16 +996,16 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSe
         } else {
             vlSelf->rv32e__DOT__ex_lsu_csr_rdata = vlSelf->rv32e__DOT__ex_lsu_csr_rdata;
             vlSelf->rv32e__DOT__ex_lsu_src2 = vlSelf->rv32e__DOT__ex_lsu_src2;
-            vlSelf->rv32e__DOT__ex_lsu_process_result 
-                = vlSelf->rv32e__DOT__ex_lsu_process_result;
             vlSelf->rv32e__DOT__ex_lsu_csr_wr_addr2 
                 = vlSelf->rv32e__DOT__ex_lsu_csr_wr_addr2;
             vlSelf->rv32e__DOT__ex_lsu_csr_wr_addr1 
                 = vlSelf->rv32e__DOT__ex_lsu_csr_wr_addr1;
-            vlSelf->rv32e__DOT__ex_lsu_pc = vlSelf->rv32e__DOT__ex_lsu_pc;
+            vlSelf->rv32e__DOT__ex_lsu_process_result 
+                = vlSelf->rv32e__DOT__ex_lsu_process_result;
             vlSelf->rv32e__DOT__ex_lsu_imm = vlSelf->rv32e__DOT__ex_lsu_imm;
             vlSelf->rv32e__DOT__ex_lsu_inst = vlSelf->rv32e__DOT__ex_lsu_inst;
             vlSelf->rv32e__DOT__ex_lsu_MemLen = vlSelf->rv32e__DOT__ex_lsu_MemLen;
+            vlSelf->rv32e__DOT__ex_lsu_pc = vlSelf->rv32e__DOT__ex_lsu_pc;
             vlSelf->rv32e__DOT__ex_lsu_opcode = vlSelf->rv32e__DOT__ex_lsu_opcode;
             vlSelf->rv32e__DOT__ex_lsu_csr_wr_data2 
                 = vlSelf->rv32e__DOT__ex_lsu_csr_wr_data2;
@@ -792,6 +1063,7 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSe
                                                & (IData)(vlSelf->rv32e__DOT__ex_ready))
                                                ? (IData)(vlSelf->rv32e__DOT__id_ex_RegWrite)
                                                : (IData)(vlSelf->rv32e__DOT__ex_lsu_RegWrite)));
+    vlSelf->rv32e__DOT__ex_lsu_csr_wr_data1 = __Vtemp_heb90a236__0;
     vlSelf->rv32e__DOT__ex_lsu_forward_las = ((~ (IData)(vlSelf->reset)) 
                                               & (((IData)(vlSelf->rv32e__DOT__id_valid) 
                                                   & (IData)(vlSelf->rv32e__DOT__ex_ready))
@@ -806,7 +1078,6 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__1(Vrv32e___024root* vlSe
                                                                   != (IData)(vlSelf->rv32e__DOT__id_wb_rs1)) 
                                                                  & (IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_he5bf04e5__0)))))))
                                                   : (IData)(vlSelf->rv32e__DOT__ex_lsu_forward_las)));
-    vlSelf->rv32e__DOT__ex_lsu_csr_wr_data1 = __Vtemp_heb90a236__0;
     vlSelf->rv32e__DOT__ex_lsu_RegWrite = __Vdly__rv32e__DOT__ex_lsu_RegWrite;
     vlSelf->rv32e__DOT__ex_lsu_rd = __Vdly__rv32e__DOT__ex_lsu_rd;
     vlSelf->rv32e__DOT__ex_lsu_MemRead = __Vdly__rv32e__DOT__ex_lsu_MemRead;
@@ -825,9 +1096,9 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__2(Vrv32e___024root* vlSe
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vrv32e___024root___nba_sequent__TOP__2\n"); );
     // Body
     vlSelf->rv32e__DOT__lsu_ex_ready = vlSelf->__Vdly__rv32e__DOT__lsu_ex_ready;
-    vlSelf->rv32e__DOT__id_valid = vlSelf->__Vdly__rv32e__DOT__id_valid;
     vlSelf->rv32e__DOT__wb_ex_csr_num1 = vlSelf->rv32e__DOT__wbu__DOT__CSR
         [vlSelf->rv32e__DOT__id_wb_csr_addr1];
+    vlSelf->rv32e__DOT__id_valid = vlSelf->__Vdly__rv32e__DOT__id_valid;
     if (vlSelf->reset) {
         vlSelf->rv32e__DOT__id_ex_csr_wr_addr2 = 0U;
         vlSelf->rv32e__DOT__id_ex_csr_wen2 = 0U;
@@ -842,13 +1113,13 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__2(Vrv32e___024root* vlSe
         vlSelf->rv32e__DOT__id_ex_MemRead = 0U;
         vlSelf->rv32e__DOT__id_ex_RegWrite = 0U;
         vlSelf->rv32e__DOT__id_ex_rd = 0U;
-        vlSelf->rv32e__DOT__id_ex_MemWrite = 0U;
-        vlSelf->rv32e__DOT__id_wb_rs1 = 0U;
         vlSelf->rv32e__DOT__id_ex_csr_mret = 0U;
         vlSelf->rv32e__DOT__id_ex_csr_ecall = 0U;
         vlSelf->rv32e__DOT__id_ex_csr_op = 0U;
         vlSelf->rv32e__DOT__id_ex_zimm = 0U;
         vlSelf->rv32e__DOT__id_ex_func3 = 0U;
+        vlSelf->rv32e__DOT__id_ex_MemWrite = 0U;
+        vlSelf->rv32e__DOT__id_wb_rs1 = 0U;
     } else if (((IData)(vlSelf->rv32e__DOT__IF_valid) 
                 & (IData)(vlSelf->rv32e__DOT__id_ready))) {
         if (vlSelf->rv32e__DOT__idu__DOT__csr_ecall) {
@@ -982,12 +1253,6 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__2(Vrv32e___024root* vlSe
                                                                        & vlSelf->rv32e__DOT__IF_ID_inst))))))))));
         vlSelf->rv32e__DOT__id_ex_rd = (0x1fU & (vlSelf->rv32e__DOT__IF_ID_inst 
                                                  >> 7U));
-        vlSelf->rv32e__DOT__id_ex_MemWrite = (8U == 
-                                              (0x1fU 
-                                               & (vlSelf->rv32e__DOT__IF_ID_inst 
-                                                  >> 2U)));
-        vlSelf->rv32e__DOT__id_wb_rs1 = (0x1fU & (vlSelf->rv32e__DOT__IF_ID_inst 
-                                                  >> 0xfU));
         vlSelf->rv32e__DOT__id_ex_csr_mret = vlSelf->rv32e__DOT__idu__DOT__csr_mret;
         vlSelf->rv32e__DOT__id_ex_csr_ecall = vlSelf->rv32e__DOT__idu__DOT__csr_ecall;
         vlSelf->rv32e__DOT__id_ex_csr_op = (((0x73U 
@@ -1038,6 +1303,12 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__2(Vrv32e___024root* vlSe
                                                    >> 0xfU));
         vlSelf->rv32e__DOT__id_ex_func3 = (7U & (vlSelf->rv32e__DOT__IF_ID_inst 
                                                  >> 0xcU));
+        vlSelf->rv32e__DOT__id_ex_MemWrite = (8U == 
+                                              (0x1fU 
+                                               & (vlSelf->rv32e__DOT__IF_ID_inst 
+                                                  >> 2U)));
+        vlSelf->rv32e__DOT__id_wb_rs1 = (0x1fU & (vlSelf->rv32e__DOT__IF_ID_inst 
+                                                  >> 0xfU));
     }
     vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h666fa1ae__0 
         = ((IData)(vlSelf->rv32e__DOT__exu__DOT____VdfgTmp_h384f4e33__0) 
@@ -1277,65 +1548,60 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__3(Vrv32e___024root* vlSe
     VL_DEBUG_IF(VL_DBG_MSGF("+    Vrv32e___024root___nba_sequent__TOP__3\n"); );
     // Body
     if (vlSelf->reset) {
+        vlSelf->rv32e__DOT__IF_ID_pc = 0x80000000U;
+        vlSelf->__Vdly__rv32e__DOT__ifu__DOT__next_pc = 0x80000000U;
         vlSelf->__Vdly__rv32e__DOT__if_sram_arvalid = 0U;
-        vlSelf->__Vdly__rv32e__DOT__if_sram_araddr = 0U;
+        vlSelf->rv32e__DOT__if_sram_araddr = 0U;
         vlSelf->__Vdly__rv32e__DOT__if_sram_rready = 0U;
         vlSelf->rv32e__DOT__IF_ID_inst = 0U;
-        vlSelf->rv32e__DOT__IF_valid = 0U;
-        vlSelf->__Vdly__rv32e__DOT__ifu__DOT__read_pending = 0U;
-        vlSelf->__Vdly__rv32e__DOT__ifu__DOT__read_valid = 0U;
-        vlSelf->__Vdly__rv32e__DOT__IF_ID_pc = 0x80000000U;
-        vlSelf->__Vdly__rv32e__DOT__ifu__DOT__next_pc = 0x80000000U;
-    } else {
+        vlSelf->__Vdly__rv32e__DOT__IF_valid = 0U;
+        vlSelf->__Vdly__rv32e__DOT__ifu__DOT__state = 0U;
+        vlSelf->__Vdly__rv32e__DOT__ifu__DOT__once = 1U;
+    } else if ((0U == (IData)(vlSelf->rv32e__DOT__ifu__DOT__state))) {
         if (vlSelf->rv32e__DOT__ex_flush) {
-            vlSelf->__Vdly__rv32e__DOT__if_sram_araddr 
-                = vlSelf->rv32e__DOT__ex_flush_pc;
-            vlSelf->__Vdly__rv32e__DOT__if_sram_arvalid = 1U;
-            vlSelf->__Vdly__rv32e__DOT__ifu__DOT__read_pending = 1U;
-            vlSelf->__Vdly__rv32e__DOT__ifu__DOT__read_valid = 0U;
+            vlSelf->__Vdly__rv32e__DOT__IF_valid = 0U;
             vlSelf->__Vdly__rv32e__DOT__ifu__DOT__next_pc 
                 = vlSelf->rv32e__DOT__ex_flush_pc;
-        }
-        if ((1U & ((~ (IData)(vlSelf->rv32e__DOT__ex_flush)) 
-                   & (~ (IData)(vlSelf->rv32e__DOT__ifu__DOT__read_pending))))) {
             vlSelf->__Vdly__rv32e__DOT__if_sram_arvalid = 1U;
-            vlSelf->__Vdly__rv32e__DOT__if_sram_araddr 
-                = vlSelf->rv32e__DOT__ifu__DOT__next_pc;
-            vlSelf->__Vdly__rv32e__DOT__if_sram_rready = 0U;
-            vlSelf->__Vdly__rv32e__DOT__ifu__DOT__read_pending = 1U;
-            vlSelf->__Vdly__rv32e__DOT__ifu__DOT__read_valid = 0U;
-            vlSelf->rv32e__DOT__IF_valid = 0U;
+            vlSelf->rv32e__DOT__if_sram_araddr = vlSelf->rv32e__DOT__ex_flush_pc;
+            vlSelf->__Vdly__rv32e__DOT__ifu__DOT__state = 1U;
+        } else if ((((IData)(vlSelf->rv32e__DOT__IF_valid) 
+                     & (IData)(vlSelf->rv32e__DOT__id_ready)) 
+                    | (IData)(vlSelf->rv32e__DOT__ifu__DOT__once))) {
+            vlSelf->__Vdly__rv32e__DOT__ifu__DOT__once = 0U;
+            vlSelf->__Vdly__rv32e__DOT__IF_valid = 0U;
+            vlSelf->__Vdly__rv32e__DOT__if_sram_arvalid = 1U;
+            vlSelf->rv32e__DOT__if_sram_araddr = vlSelf->rv32e__DOT__ifu__DOT__next_pc;
+            vlSelf->__Vdly__rv32e__DOT__ifu__DOT__state = 1U;
         }
-        if (((IData)(vlSelf->rv32e__DOT__if_sram_arvalid) 
-             & (IData)(vlSelf->rv32e__DOT__sram_if_arready))) {
+    } else if ((1U == (IData)(vlSelf->rv32e__DOT__ifu__DOT__state))) {
+        if (((IData)(vlSelf->rv32e__DOT__sram_if_arready) 
+             & (IData)(vlSelf->rv32e__DOT__if_sram_arvalid))) {
             vlSelf->__Vdly__rv32e__DOT__if_sram_arvalid = 0U;
             vlSelf->__Vdly__rv32e__DOT__if_sram_rready = 1U;
+            vlSelf->__Vdly__rv32e__DOT__IF_valid = 0U;
+            vlSelf->__Vdly__rv32e__DOT__ifu__DOT__state = 2U;
         }
+    } else if ((2U == (IData)(vlSelf->rv32e__DOT__ifu__DOT__state))) {
         if (((IData)(vlSelf->rv32e__DOT__sram_if_rvalid) 
              & (IData)(vlSelf->rv32e__DOT__if_sram_rready))) {
+            vlSelf->__Vdly__rv32e__DOT__if_sram_rready = 0U;
+            vlSelf->rv32e__DOT__IF_ID_inst = vlSelf->rv32e__DOT__sram_if_rdata;
+            vlSelf->rv32e__DOT__IF_ID_pc = vlSelf->rv32e__DOT__ifu__DOT__next_pc;
+            vlSelf->__Vdly__rv32e__DOT__IF_valid = 1U;
+            vlSelf->__Vdly__rv32e__DOT__ifu__DOT__state = 0U;
             vlSelf->__Vdly__rv32e__DOT__ifu__DOT__next_pc 
                 = ((IData)(4U) + vlSelf->rv32e__DOT__ifu__DOT__next_pc);
-            if (VL_UNLIKELY((0U != (IData)(vlSelf->rv32e__DOT__sram_if_rresp)))) {
-                Vrv32e___024root____Vdpiimwrap_rv32e__DOT__ebreak_TOP(2U, 0xdeadbeefU);
-                VL_WRITEF("\033[31mIF_AXI: Read access fault at address %x, rresp %b\033[0m\n",
-                          32,vlSelf->rv32e__DOT__IF_ID_pc,
-                          2,(IData)(vlSelf->rv32e__DOT__sram_if_rresp));
-            }
-            vlSelf->__Vdly__rv32e__DOT__if_sram_rready = 0U;
-            vlSelf->__Vdly__rv32e__DOT__ifu__DOT__read_pending = 0U;
-            vlSelf->__Vdly__rv32e__DOT__ifu__DOT__read_valid = 1U;
-            vlSelf->rv32e__DOT__IF_ID_inst = vlSelf->rv32e__DOT__sram_if_rdata;
-            vlSelf->rv32e__DOT__IF_valid = 1U;
-            vlSelf->__Vdly__rv32e__DOT__IF_ID_pc = vlSelf->rv32e__DOT__ifu__DOT__next_pc;
-        } else if ((1U & ((~ (IData)(vlSelf->rv32e__DOT__ifu__DOT__read_valid)) 
-                          & (~ (IData)(vlSelf->rv32e__DOT__ex_flush))))) {
-            vlSelf->rv32e__DOT__IF_valid = 0U;
         }
+    } else {
+        vlSelf->__Vdly__rv32e__DOT__ifu__DOT__state = 0U;
     }
-    vlSelf->rv32e__DOT__ifu__DOT__read_pending = vlSelf->__Vdly__rv32e__DOT__ifu__DOT__read_pending;
-    vlSelf->rv32e__DOT__ifu__DOT__read_valid = vlSelf->__Vdly__rv32e__DOT__ifu__DOT__read_valid;
     vlSelf->rv32e__DOT__ifu__DOT__next_pc = vlSelf->__Vdly__rv32e__DOT__ifu__DOT__next_pc;
-    vlSelf->rv32e__DOT__IF_ID_pc = vlSelf->__Vdly__rv32e__DOT__IF_ID_pc;
+    vlSelf->rv32e__DOT__ifu__DOT__state = vlSelf->__Vdly__rv32e__DOT__ifu__DOT__state;
+    vlSelf->rv32e__DOT__ifu__DOT__once = vlSelf->__Vdly__rv32e__DOT__ifu__DOT__once;
+    vlSelf->rv32e__DOT__if_sram_arvalid = vlSelf->__Vdly__rv32e__DOT__if_sram_arvalid;
+    vlSelf->rv32e__DOT__if_sram_rready = vlSelf->__Vdly__rv32e__DOT__if_sram_rready;
+    vlSelf->rv32e__DOT__IF_valid = vlSelf->__Vdly__rv32e__DOT__IF_valid;
     vlSelf->rv32e__DOT__idu__DOT__imm = (((5U == (0x1fU 
                                                   & (vlSelf->rv32e__DOT__IF_ID_inst 
                                                      >> 2U))) 
@@ -1616,6 +1882,16 @@ VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__3(Vrv32e___024root* vlSe
                                                                : 0U))))))))))))))));
 }
 
+VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__4(Vrv32e___024root* vlSelf) {
+    if (false && vlSelf) {}  // Prevent unused
+    Vrv32e__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
+    VL_DEBUG_IF(VL_DBG_MSGF("+    Vrv32e___024root___nba_sequent__TOP__4\n"); );
+    // Body
+    vlSelf->rv32e__DOT__sram_if_rdata = vlSelf->__Vdly__rv32e__DOT__sram_if_rdata;
+    vlSelf->rv32e__DOT__sram_if_arready = vlSelf->__Vdly__rv32e__DOT__sram_if_arready;
+    vlSelf->rv32e__DOT__sram_if_rvalid = vlSelf->__Vdly__rv32e__DOT__sram_if_rvalid;
+}
+
 VL_INLINE_OPT void Vrv32e___024root___nba_comb__TOP__1(Vrv32e___024root* vlSelf) {
     if (false && vlSelf) {}  // Prevent unused
     Vrv32e__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
@@ -1687,66 +1963,6 @@ VL_INLINE_OPT void Vrv32e___024root___nba_comb__TOP__1(Vrv32e___024root* vlSelf)
                                              | (IData)(vlSelf->rv32e__DOT__ex_ready))));
 }
 
-VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__4(Vrv32e___024root* vlSelf) {
-    if (false && vlSelf) {}  // Prevent unused
-    Vrv32e__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
-    VL_DEBUG_IF(VL_DBG_MSGF("+    Vrv32e___024root___nba_sequent__TOP__4\n"); );
-    // Init
-    IData/*31:0*/ __Vfunc_rv32e__DOT__sram__DOT__pmem_read__1__Vfuncout;
-    __Vfunc_rv32e__DOT__sram__DOT__pmem_read__1__Vfuncout = 0;
-    // Body
-    if (vlSelf->reset) {
-        vlSelf->__Vdly__rv32e__DOT__sram_if_arready = 1U;
-        vlSelf->__Vdly__rv32e__DOT__sram_if_rvalid = 0U;
-        vlSelf->rv32e__DOT__sram_if_rdata = 0U;
-        vlSelf->rv32e__DOT__sram_if_rresp = 0U;
-        vlSelf->__Vdly__rv32e__DOT__sram__DOT__read_pending = 0U;
-        vlSelf->__Vdly__rv32e__DOT__sram__DOT__LFSR = 1U;
-    } else {
-        if (((IData)(vlSelf->rv32e__DOT__if_sram_arvalid) 
-             & (IData)(vlSelf->rv32e__DOT__sram_if_arready))) {
-            vlSelf->__Vdly__rv32e__DOT__sram__DOT__read_addr 
-                = vlSelf->rv32e__DOT__if_sram_araddr;
-            vlSelf->__Vdly__rv32e__DOT__sram__DOT__read_pending = 1U;
-            vlSelf->__Vdly__rv32e__DOT__sram_if_arready = 0U;
-            vlSelf->__Vdly__rv32e__DOT__sram__DOT__LFSR = 1U;
-        }
-        if (vlSelf->rv32e__DOT__sram__DOT__read_pending) {
-            if ((0U < vlSelf->rv32e__DOT__sram__DOT__LFSR)) {
-                vlSelf->__Vdly__rv32e__DOT__sram__DOT__LFSR 
-                    = (vlSelf->rv32e__DOT__sram__DOT__LFSR 
-                       - (IData)(1U));
-            } else {
-                Vrv32e___024root____Vdpiimwrap_rv32e__DOT__sram__DOT__pmem_read_TOP(vlSelf->rv32e__DOT__sram__DOT__read_addr, 4U, __Vfunc_rv32e__DOT__sram__DOT__pmem_read__1__Vfuncout);
-                vlSelf->rv32e__DOT__sram_if_rdata = __Vfunc_rv32e__DOT__sram__DOT__pmem_read__1__Vfuncout;
-                vlSelf->__Vdly__rv32e__DOT__sram_if_rvalid = 1U;
-                vlSelf->rv32e__DOT__sram_if_rresp = 0U;
-            }
-        }
-        if (((IData)(vlSelf->rv32e__DOT__sram_if_rvalid) 
-             & (IData)(vlSelf->rv32e__DOT__if_sram_rready))) {
-            vlSelf->__Vdly__rv32e__DOT__sram_if_rvalid = 0U;
-            vlSelf->__Vdly__rv32e__DOT__sram__DOT__read_pending = 0U;
-            vlSelf->__Vdly__rv32e__DOT__sram_if_arready = 1U;
-        }
-    }
-    vlSelf->rv32e__DOT__sram__DOT__read_pending = vlSelf->__Vdly__rv32e__DOT__sram__DOT__read_pending;
-    vlSelf->rv32e__DOT__sram_if_arready = vlSelf->__Vdly__rv32e__DOT__sram_if_arready;
-    vlSelf->rv32e__DOT__sram__DOT__read_addr = vlSelf->__Vdly__rv32e__DOT__sram__DOT__read_addr;
-    vlSelf->rv32e__DOT__sram_if_rvalid = vlSelf->__Vdly__rv32e__DOT__sram_if_rvalid;
-    vlSelf->rv32e__DOT__sram__DOT__LFSR = vlSelf->__Vdly__rv32e__DOT__sram__DOT__LFSR;
-}
-
-VL_INLINE_OPT void Vrv32e___024root___nba_sequent__TOP__5(Vrv32e___024root* vlSelf) {
-    if (false && vlSelf) {}  // Prevent unused
-    Vrv32e__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
-    VL_DEBUG_IF(VL_DBG_MSGF("+    Vrv32e___024root___nba_sequent__TOP__5\n"); );
-    // Body
-    vlSelf->rv32e__DOT__if_sram_araddr = vlSelf->__Vdly__rv32e__DOT__if_sram_araddr;
-    vlSelf->rv32e__DOT__if_sram_arvalid = vlSelf->__Vdly__rv32e__DOT__if_sram_arvalid;
-    vlSelf->rv32e__DOT__if_sram_rready = vlSelf->__Vdly__rv32e__DOT__if_sram_rready;
-}
-
 void Vrv32e___024root___eval_nba(Vrv32e___024root* vlSelf) {
     if (false && vlSelf) {}  // Prevent unused
     Vrv32e__Syms* const __restrict vlSymsp VL_ATTR_UNUSED = vlSelf->vlSymsp;
@@ -1772,17 +1988,13 @@ void Vrv32e___024root___eval_nba(Vrv32e___024root* vlSelf) {
         Vrv32e___024root___nba_sequent__TOP__3(vlSelf);
         vlSelf->__Vm_traceActivity[5U] = 1U;
     }
-    if ((vlSelf->__VnbaTriggered.at(0U) | vlSelf->__VnbaTriggered.at(1U))) {
-        Vrv32e___024root___nba_comb__TOP__1(vlSelf);
-        vlSelf->__Vm_traceActivity[6U] = 1U;
-    }
     if (vlSelf->__VnbaTriggered.at(0U)) {
         Vrv32e___024root___nba_sequent__TOP__4(vlSelf);
-        vlSelf->__Vm_traceActivity[7U] = 1U;
+        vlSelf->__Vm_traceActivity[6U] = 1U;
     }
-    if (vlSelf->__VnbaTriggered.at(1U)) {
-        Vrv32e___024root___nba_sequent__TOP__5(vlSelf);
-        vlSelf->__Vm_traceActivity[8U] = 1U;
+    if ((vlSelf->__VnbaTriggered.at(0U) | vlSelf->__VnbaTriggered.at(1U))) {
+        Vrv32e___024root___nba_comb__TOP__1(vlSelf);
+        vlSelf->__Vm_traceActivity[7U] = 1U;
     }
 }
 

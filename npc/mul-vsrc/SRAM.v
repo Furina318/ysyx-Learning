@@ -113,9 +113,9 @@ module SRAM #(
                         // LFSR <= random_delay;
                         next_sram_state <= WRITE_ADDR;
                     end
-                    else begin
-                        next_sram_state <= IDLE;
-                    end
+                    // else begin
+                    //     next_sram_state <= IDLE;
+                    // end
                 end
                 READ_ADDR:begin
                     if(LFSR > 0) begin
@@ -184,9 +184,9 @@ module SRAM #(
                         bvalid <= 1'b0;
                         next_sram_state <= IDLE;
                     end
-                    else begin
-                        next_sram_state <= WRITE_RESP;
-                    end
+                    // else begin
+                    //     next_sram_state <= WRITE_RESP;
+                    // end
                 end
                 default: begin
                     next_sram_state <= IDLE;
