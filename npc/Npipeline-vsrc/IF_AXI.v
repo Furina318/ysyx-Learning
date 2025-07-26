@@ -70,9 +70,6 @@ module IF_AXI (
                 end
 
                 AR_WAIT: begin
-                    if(EX_flush) begin
-                        next_pc <= EX_flush_pc;
-                    end
                     if (sram_if_arready && if_sram_arvalid) begin
                         if_sram_arvalid <= 0;
                         if_sram_rready  <= 1;
@@ -82,9 +79,6 @@ module IF_AXI (
                 end
 
                 R_WAIT: begin
-                    if(EX_flush) begin
-                        next_pc <= EX_flush_pc;
-                    end
                     if (sram_if_rvalid && if_sram_rready) begin
                         if_sram_rready <= 0;
                         IF_ID_inst <= sram_if_rdata;

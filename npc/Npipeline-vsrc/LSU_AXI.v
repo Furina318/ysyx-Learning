@@ -222,7 +222,7 @@ module LSU_AXI (
             if (ex_lsu_valid & lsu_ex_ready & ~ex_lsu_MemRead & ex_lsu_MemWrite & ~write_pending) begin
                 lsu_sram_awvalid <= 1;
                 lsu_sram_awaddr  <= addr;
-                // lsu_sram_wvalid  <= 1;
+                lsu_sram_wvalid  <= 1;
                 lsu_sram_wdata   <= data_in;
                 lsu_sram_bready  <= 1;
                 case (ex_lsu_MemLen)
@@ -240,7 +240,6 @@ module LSU_AXI (
             end
             // 接受写地址响应
             if (lsu_sram_awvalid && sram_lsu_awready) begin
-                lsu_sram_wvalid  <= 1;
                 lsu_sram_awvalid <= 0;
             end
             // 接受写数据响应

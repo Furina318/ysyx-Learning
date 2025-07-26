@@ -63,9 +63,9 @@ VM_USER_CLASSES = \
 
 # User .cpp directories (from .cpp's on Verilator command line)
 VM_USER_DIR = \
-	/home/furina/ysyx-workbench/npc/single-csrc \
-	/home/furina/ysyx-workbench/npc/single-csrc/device \
-	/home/furina/ysyx-workbench/npc/single-csrc/device/io \
+	/home/furina/ysyx-workbench/npc/mul-csrc \
+	/home/furina/ysyx-workbench/npc/mul-csrc/device \
+	/home/furina/ysyx-workbench/npc/mul-csrc/device/io \
 
 
 ### Default rules...
@@ -77,43 +77,43 @@ include $(VERILATOR_ROOT)/include/verilated.mk
 ### Executable rules... (from --exe)
 VPATH += $(VM_USER_DIR)
 
-cpu.o: /home/furina/ysyx-workbench/npc/single-csrc/cpu.cpp
+cpu.o: /home/furina/ysyx-workbench/npc/mul-csrc/cpu.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
-alarm.o: /home/furina/ysyx-workbench/npc/single-csrc/device/alarm.cpp
+alarm.o: /home/furina/ysyx-workbench/npc/mul-csrc/device/alarm.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
-device.o: /home/furina/ysyx-workbench/npc/single-csrc/device/device.cpp
+device.o: /home/furina/ysyx-workbench/npc/mul-csrc/device/device.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
-map.o: /home/furina/ysyx-workbench/npc/single-csrc/device/io/map.cpp
+map.o: /home/furina/ysyx-workbench/npc/mul-csrc/device/io/map.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
-mmio.o: /home/furina/ysyx-workbench/npc/single-csrc/device/io/mmio.cpp
+mmio.o: /home/furina/ysyx-workbench/npc/mul-csrc/device/io/mmio.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
-port-io.o: /home/furina/ysyx-workbench/npc/single-csrc/device/io/port-io.cpp
+port-io.o: /home/furina/ysyx-workbench/npc/mul-csrc/device/io/port-io.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
-keyboard.o: /home/furina/ysyx-workbench/npc/single-csrc/device/keyboard.cpp
+keyboard.o: /home/furina/ysyx-workbench/npc/mul-csrc/device/keyboard.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
-rtc.o: /home/furina/ysyx-workbench/npc/single-csrc/device/rtc.cpp
+rtc.o: /home/furina/ysyx-workbench/npc/mul-csrc/device/rtc.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
-serial.o: /home/furina/ysyx-workbench/npc/single-csrc/device/serial.cpp
+serial.o: /home/furina/ysyx-workbench/npc/mul-csrc/device/serial.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
-timer.o: /home/furina/ysyx-workbench/npc/single-csrc/device/timer.cpp
+timer.o: /home/furina/ysyx-workbench/npc/mul-csrc/device/timer.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
-vga.o: /home/furina/ysyx-workbench/npc/single-csrc/device/vga.cpp
+vga.o: /home/furina/ysyx-workbench/npc/mul-csrc/device/vga.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
-difftest.o: /home/furina/ysyx-workbench/npc/single-csrc/difftest.cpp
+difftest.o: /home/furina/ysyx-workbench/npc/mul-csrc/difftest.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
-expr.o: /home/furina/ysyx-workbench/npc/single-csrc/expr.cpp
+expr.o: /home/furina/ysyx-workbench/npc/mul-csrc/expr.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
-monitor.o: /home/furina/ysyx-workbench/npc/single-csrc/monitor.cpp
+monitor.o: /home/furina/ysyx-workbench/npc/mul-csrc/monitor.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
-paddr.o: /home/furina/ysyx-workbench/npc/single-csrc/paddr.cpp
+paddr.o: /home/furina/ysyx-workbench/npc/mul-csrc/paddr.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
-reg.o: /home/furina/ysyx-workbench/npc/single-csrc/reg.cpp
+reg.o: /home/furina/ysyx-workbench/npc/mul-csrc/reg.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
-rv32e.o: /home/furina/ysyx-workbench/npc/single-csrc/rv32e.cpp
+rv32e.o: /home/furina/ysyx-workbench/npc/mul-csrc/rv32e.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
-sdb.o: /home/furina/ysyx-workbench/npc/single-csrc/sdb.cpp
+sdb.o: /home/furina/ysyx-workbench/npc/mul-csrc/sdb.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
-trace.o: /home/furina/ysyx-workbench/npc/single-csrc/trace.cpp
+trace.o: /home/furina/ysyx-workbench/npc/mul-csrc/trace.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
 
 ### Link rules... (from --exe)

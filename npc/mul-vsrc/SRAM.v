@@ -51,9 +51,9 @@ module SRAM #(
         if(`DEVICE) begin
             addr_valid = (araddr >= 32'h8000_0000 && araddr <= 32'h8fff_ffff) ||
                     (awaddr >= 32'h8000_0000 && awaddr <= 32'h8fff_ffff) ||
-                    (araddr >= 32'h1000_0000 && araddr <= 32'h1000_0007) ||
-                    (awaddr >= 32'h1000_0000 && awaddr <= 32'h1000_0007) ||
-                    (awaddr >= 32'h1000_2000 && awaddr <= 32'h1000_2007);
+                    (araddr >= 32'ha000_0000 && araddr <= 32'ha000_0007) ||
+                    (awaddr >= 32'ha000_1000 && awaddr <= 32'ha000_1003) ||
+                    (awaddr >= 32'ha000_2000 && awaddr <= 32'ha000_2007);
         end
         else begin
             addr_valid = (araddr >= 32'h8000_0000 && araddr <= 32'h8fff_ffff) ||
@@ -166,6 +166,7 @@ module SRAM #(
                                 default: pmem_write(awaddr_reg,wdata_reg,4);
                             endcase
                             bresp <= `OKAY;
+                            wready <= 1'b0;
                         end
                         else begin
                             bresp <= `SLVERR;
@@ -173,9 +174,9 @@ module SRAM #(
                         bvalid <= 1'b1;
                         next_sram_state <= WRITE_RESP;
                     end
-                    else begin
-                        next_sram_state <= WRITE_DATA;
-                    end
+                    // else begin
+                    //     next_sram_state <= WRITE_DATA;
+                    // end
                 end
                 WRITE_RESP: begin
                     if(bvalid && bready) begin

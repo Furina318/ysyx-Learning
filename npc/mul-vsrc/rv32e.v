@@ -166,7 +166,31 @@ module rv32e (
     wire [1:0]  sram_bresp;//写响应信号
     wire        sram_bvalid;//写响应有效
     wire        sram_bready;//写响应准备好
-    //===================//
+
+    //====== UART =======//
+    //AR channel
+    wire [31:0] uart_araddr;//读地址
+    wire        uart_arvalid;//读地址有效
+    wire        uart_arready;//uart读地址准备好
+    //R channel
+    wire [1:0]  uart_rresp;//读响应信号
+    wire [31:0] uart_rdata;//读数据
+    wire        uart_rvalid;//读数据有效
+    wire        uart_rready;//CPU读数据准备好
+    //AW channel
+    wire [31:0] uart_awaddr;//写地址
+    wire        uart_awready;//uart写地址准备好
+    wire        uart_awvalid;//写地址有效
+    //W channel
+    wire [31:0] uart_wdata;//写数据
+    wire [3:0]  uart_wstrb;//写掩码
+    wire        uart_wvalid;//写请求有效
+    wire        uart_wready;//uart写请求准备好
+    //B channel
+    wire [1:0]  uart_bresp;//写响应信号
+    wire        uart_bvalid;//写响应有效
+    wire        uart_bready;//写响应准备好
+
 
     AXI_ARB axi_arb (
         .clk(clk),
@@ -200,7 +224,26 @@ module rv32e (
         .mem_bvalid(mem_sram_bvalid),
         .mem_bready(mem_sram_bready),
 
-        // SRAM slave
+        // UART从设备
+        .uart_araddr(uart_araddr),
+        .uart_arvalid(uart_arvalid),
+        .uart_arready(uart_arready),
+        .uart_rdata(uart_rdata),
+        .uart_rresp(uart_rresp),
+        .uart_rvalid(uart_rvalid),
+        .uart_rready(uart_rready),
+        .uart_awaddr(uart_awaddr),
+        .uart_awvalid(uart_awvalid),
+        .uart_awready(uart_awready),
+        .uart_wdata(uart_wdata),
+        .uart_wstrb(uart_wstrb),
+        .uart_wvalid(uart_wvalid),
+        .uart_wready(uart_wready),
+        .uart_bresp(uart_bresp),
+        .uart_bvalid(uart_bvalid),
+        .uart_bready(uart_bready),
+
+        // SRAM 从设备
         .sram_araddr(sram_araddr),
         .sram_arvalid(sram_arvalid),
         .sram_arready(sram_arready),
@@ -218,6 +261,29 @@ module rv32e (
         .sram_bresp(sram_bresp),
         .sram_bvalid(sram_bvalid),
         .sram_bready(sram_bready)
+    );
+
+    // UART模块
+    UART uart (
+        .clk(clk),
+        .reset(reset),
+        .awvalid(uart_awvalid),
+        .awready(uart_awready),
+        .awaddr(uart_awaddr),
+        .wdata(uart_wdata),
+        .wstrb(uart_wstrb),
+        .wvalid(uart_wvalid),
+        .wready(uart_wready),
+        .bresp(uart_bresp),
+        .bvalid(uart_bvalid),
+        .bready(uart_bready),
+        .arvalid(uart_arvalid),
+        .araddr(uart_araddr),
+        .arready(uart_arready),
+        .rready(uart_rready),
+        .rvalid(uart_rvalid),
+        .rresp(uart_rresp),
+        .rdata(uart_rdata)
     );
 
     SRAM sram(

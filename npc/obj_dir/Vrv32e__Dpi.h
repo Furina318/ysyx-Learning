@@ -16,11 +16,11 @@ extern "C" {
 
 
     // DPI IMPORTS
-    // DPI import at /home/furina/ysyx-workbench/npc/single-vsrc/ID.v:22:34
+    // DPI import at /home/furina/ysyx-workbench/npc/mul-vsrc/ID.v:28:34
     extern void ebreak(int station, int inst);
-    // DPI import at /home/furina/ysyx-workbench/npc/single-vsrc/IF.v:12:42
+    // DPI import at /home/furina/ysyx-workbench/npc/mul-vsrc/SRAM.v:35:42
     extern unsigned int pmem_read(unsigned int raddr, int len);
-    // DPI import at /home/furina/ysyx-workbench/npc/single-vsrc/MEM.v:14:34
+    // DPI import at /home/furina/ysyx-workbench/npc/mul-vsrc/SRAM.v:36:34
     extern void pmem_write(unsigned int waddr, unsigned int wdata, int len);
 
 #ifdef __cplusplus
