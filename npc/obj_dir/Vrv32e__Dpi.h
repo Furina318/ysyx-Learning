@@ -16,7 +16,7 @@ extern "C" {
 
 
     // DPI IMPORTS
-    // DPI import at /home/furina/ysyx-workbench/npc/mul-vsrc/ID.v:28:34
+    // DPI import at /home/furina/ysyx-workbench/npc/mul-vsrc/CLINT.v:39:34
     extern void ebreak(int station, int inst);
     // DPI import at /home/furina/ysyx-workbench/npc/mul-vsrc/SRAM.v:35:42
     extern unsigned int pmem_read(unsigned int raddr, int len);

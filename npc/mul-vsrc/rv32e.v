@@ -191,6 +191,30 @@ module rv32e (
     wire        uart_bvalid;//写响应有效
     wire        uart_bready;//写响应准备好
 
+    //====== CLINT =======//
+    //AR channel
+    wire [31:0] clint_araddr;//读地址
+    wire        clint_arvalid;//读地址有效
+    wire        clint_arready;//clint读地址准备好
+    //R channel
+    wire [1:0]  clint_rresp;//读响应信号
+    wire [31:0] clint_rdata;//读数据
+    wire        clint_rvalid;//读数据有效
+    wire        clint_rready;//CPU读数据准备好
+    //AW channel
+    wire [31:0] clint_awaddr;//写地址
+    wire        clint_awready;//clint写地址准备好
+    wire        clint_awvalid;//写地址有效
+    //W channel
+    wire [31:0] clint_wdata;//写数据
+    wire [3:0]  clint_wstrb;//写掩码
+    wire        clint_wvalid;//写请求有效
+    wire        clint_wready;//clint写请求准备好
+    //B channel
+    wire [1:0]  clint_bresp;//写响应信号
+    wire        clint_bvalid;//写响应有效
+    wire        clint_bready;//写响应准备好
+
 
     AXI_ARB axi_arb (
         .clk(clk),
@@ -243,6 +267,25 @@ module rv32e (
         .uart_bvalid(uart_bvalid),
         .uart_bready(uart_bready),
 
+        // CLINT从设备
+        .clint_araddr(clint_araddr),
+        .clint_arvalid(clint_arvalid),
+        .clint_arready(clint_arready),
+        .clint_rdata(clint_rdata),
+        .clint_rresp(clint_rresp),
+        .clint_rvalid(clint_rvalid),
+        .clint_rready(clint_rready),
+        .clint_awaddr(clint_awaddr),
+        .clint_awvalid(clint_awvalid),
+        .clint_awready(clint_awready),
+        .clint_wdata(clint_wdata),
+        .clint_wstrb(clint_wstrb),
+        .clint_wvalid(clint_wvalid),
+        .clint_wready(clint_wready),
+        .clint_bresp(clint_bresp),
+        .clint_bvalid(clint_bvalid),
+        .clint_bready(clint_bready),
+
         // SRAM 从设备
         .sram_araddr(sram_araddr),
         .sram_arvalid(sram_arvalid),
@@ -261,6 +304,29 @@ module rv32e (
         .sram_bresp(sram_bresp),
         .sram_bvalid(sram_bvalid),
         .sram_bready(sram_bready)
+    );
+
+    // CLINT模块
+    CLINT clint (
+        .clk(clk),
+        .reset(reset),
+        .awvalid(clint_awvalid),
+        .awready(clint_awready),
+        .awaddr(clint_awaddr),
+        .wdata(clint_wdata),
+        .wstrb(clint_wstrb),
+        .wvalid(clint_wvalid),
+        .wready(clint_wready),
+        .bresp(clint_bresp),
+        .bvalid(clint_bvalid),
+        .bready(clint_bready),
+        .arvalid(clint_arvalid),
+        .araddr(clint_araddr),
+        .arready(clint_arready),
+        .rready(clint_rready),
+        .rvalid(clint_rvalid),
+        .rresp(clint_rresp),
+        .rdata(clint_rdata)
     );
 
     // UART模块
