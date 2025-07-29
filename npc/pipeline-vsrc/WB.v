@@ -59,7 +59,7 @@ always @(posedge clk) begin
     if (rst) begin
         wb_valid <= 1'b0;
     end
-    else if (lsu_wb_valid && !flush) begin
+    else if (lsu_wb_valid && wb_lsu_ready) begin
         wb_valid <= 1'b1;
         flush <= lsu_wb_flush;
     end

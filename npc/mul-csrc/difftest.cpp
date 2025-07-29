@@ -3,18 +3,18 @@
 #include "../include/difftest.h"
 #include "../include/utils.h"
 #include <dlfcn.h>
-#include "Vrv32e.h"
-#include "../obj_dir/Vrv32e___024root.h"
+#include "Vysyx_25010030.h"
+#include "../obj_dir/Vysyx_25010030___024root.h"
 
 /********extern functions or variables********/
-extern Vrv32e *top;
+extern Vysyx_25010030 *top;
 extern NPCState npc_state;
 extern uint8_t* guest_to_host(paddr_t paddr);
 /*********************************************/
 
 #ifdef CONFIG_DIFFTEST
 
-#define top_regs top->rootp->rv32e__DOT__wb_stage__DOT__regs
+#define top_regs top->rootp->ysyx_25010030__DOT__wb_stage__DOT__regs
 CPU_state cpu;
 static int skip_cnt_ref = 0;   // the amount to skip the ref
 static bool skip_flag = false; // the flag   to skip the ref 
@@ -39,7 +39,7 @@ const char *ref_regs[] = {
 
 static void update_cpu_state(CPU_state *cpu)
 {
-    cpu->pc = top->rootp->rv32e__DOT__pc;
+    cpu->pc = top->rootp->ysyx_25010030__DOT__pc;
     for(int i = 0; i < 32; i++)
         cpu->gpr[i] = top_regs[i];
 }

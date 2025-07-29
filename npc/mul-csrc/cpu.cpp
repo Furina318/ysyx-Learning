@@ -5,9 +5,9 @@
 #include "../include/conf.h"
 #include "../include/paddr.h"
 #include "../include/difftest.h"
-#include "Vrv32e.h"
-#include "Vrv32e__Dpi.h"
-#include "../obj_dir/Vrv32e___024root.h"
+#include "Vysyx_25010030.h"
+#include "Vysyx_25010030__Dpi.h"
+#include "../obj_dir/Vysyx_25010030___024root.h"
 #include "svdpi.h"
 #include "verilated_vcd_c.h"
 // #include "../include/reg.h"
@@ -16,7 +16,7 @@
 
 extern void single_cycle(void);
 // extern NPCState npc_state;
-extern Vrv32e *top;
+extern Vysyx_25010030 *top;
 extern VerilatedVcdC *tfp;
 extern vluint64_t main_time;
 extern void die();
@@ -127,13 +127,13 @@ const char *get_func_name(vaddr_t addr){
 #ifdef CONFIG_FTRACE
 static void ftrace_handle() {
     // 获取当前流水线级信号
-    uint32_t pc = top->rootp->rv32e__DOT__pc;
-    uint32_t instr = top->rootp->rv32e__DOT__instr;
+    uint32_t pc = top->rootp->ysyx_25010030__DOT__pc;
+    uint32_t instr = top->rootp->ysyx_25010030__DOT__instr;
     uint32_t opcode = instr & 0x7F;
     
     // 获取译码阶段信号
-    uint32_t imm = top->rootp->rv32e__DOT__imm;
-    uint32_t rs1_val = top->rootp->rv32e__DOT__rs1_val;
+    uint32_t imm = top->rootp->ysyx_25010030__DOT__imm;
+    uint32_t rs1_val = top->rootp->ysyx_25010030__DOT__rs1_val;
 
     // 计算真实跳转目标
     if (opcode == 0x6F) { // JAL
@@ -184,8 +184,8 @@ static void statistic() {
 }
 
 static void execute_once() {
-    PCSet.pc = top->rootp->rv32e__DOT__pc;
-    PCSet.inst = top->rootp->rv32e__DOT__instr;
+    PCSet.pc = top->rootp->ysyx_25010030__DOT__pc;
+    PCSet.inst = top->rootp->ysyx_25010030__DOT__instr;
 
     single_cycle();
     single_cycle(); // 执行一个时钟周期
@@ -194,8 +194,8 @@ static void execute_once() {
   ftrace_handle();
 #endif 
 
-    PCSet.next_pc = top->rootp->rv32e__DOT__pc;
-    PCSet.ninst = top->rootp->rv32e__DOT__instr;
+    PCSet.next_pc = top->rootp->ysyx_25010030__DOT__pc;
+    PCSet.ninst = top->rootp->ysyx_25010030__DOT__instr;
 
 #ifdef CONFIG_ITRACE
     char *p = logbuf;
@@ -214,7 +214,7 @@ static void trace_and_difftest(){
     IFDEF(CONFIG_ITRACE,puts(logbuf));
   }
   #ifdef CONFIG_DIFFTEST
-  if(top->rootp->rv32e__DOT__wb_valid){
+  if(top->rootp->ysyx_25010030__DOT__wb_valid){
     // printf("pc=0x%08x | inst=0x%08x\n",PCSet.pc,PCSet.inst);
     // printf("next_pc=0x%08x | next_inst=0x%08x\n\n",PCSet.next_pc,PCSet.ninst);
     difftest_step(PCSet.pc,PCSet.next_pc);

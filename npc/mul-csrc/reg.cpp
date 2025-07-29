@@ -1,14 +1,14 @@
 #include "../include/common.h"
 #include "../include/debug.h"
-#include "Vrv32e.h"
-#include "Vrv32e___024root.h" 
+#include "Vysyx_25010030.h"
+#include "Vysyx_25010030___024root.h" 
 
 /********extern functions or variables********/
-extern Vrv32e *top;
+extern Vysyx_25010030 *top;
 /*********************************************/
 
 
-#define gpr top->rootp->rv32e__DOT__wb_stage__DOT__regs
+#define gpr top->rootp->ysyx_25010030__DOT__wb_stage__DOT__regs
 
 static const char *regs[] = {
     "$0", "ra", "sp", "gp", "tp", "t0", "t1", "t2",
@@ -27,7 +27,7 @@ void regs_display()
     }
     puts("");
     _Log(ANSI_FG_YELLOW "$%s\t" ANSI_NONE " 0x%08x\t %010u\n", "pc", 
-        top->rootp->rv32e__DOT__pc, top->rootp->rv32e__DOT__pc);
+        top->rootp->ysyx_25010030__DOT__pc, top->rootp->ysyx_25010030__DOT__pc);
 }
 
 word_t single_reg_display(char *reg_name) 
@@ -39,8 +39,8 @@ word_t single_reg_display(char *reg_name)
     if(strcmp(reg_name, "pc") == 0)
     {
         _Log(ANSI_FG_YELLOW "$%s\t" ANSI_NONE " 0x%08x\t %010u %010d\n", "pc", 
-             top->rootp->rv32e__DOT__pc, top->rootp->rv32e__DOT__pc, top->rootp->rv32e__DOT__pc);
-        return top->rootp->rv32e__DOT__pc;
+             top->rootp->ysyx_25010030__DOT__pc, top->rootp->ysyx_25010030__DOT__pc, top->rootp->ysyx_25010030__DOT__pc);
+        return top->rootp->ysyx_25010030__DOT__pc;
     }
 
     //others
@@ -61,7 +61,7 @@ word_t reg_str2val(const char *s, bool *success)
     int i;
     //pc
     if(strcmp(s, "pc") == 0)
-        return top->rootp->rv32e__DOT__pc; 
+        return top->rootp->ysyx_25010030__DOT__pc; 
         
     //reg $0
     if(strcmp(s, regs[0]) == 0)

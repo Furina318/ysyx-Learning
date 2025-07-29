@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-#include "Vrv32e.h"
+#include "Vysyx_25010030.h"
 // #include "verilated_vcd_c.h"
-#include "../obj_dir/Vrv32e___024root.h"
-#include "Vrv32e__Dpi.h"
+#include "../obj_dir/Vysyx_25010030___024root.h"
+#include "Vysyx_25010030__Dpi.h"
 #include "svdpi.h"
 #include "../include/common.h"
 #include "../include/utils.h"
@@ -27,7 +27,7 @@ extern void pmem_w(paddr_t addr, int len, word_t data);
 
 /* **************** */
 // VerilatedVcdC *tfp = new VerilatedVcdC(); // 导出vcd波形
-Vrv32e *top = new Vrv32e("top");
+Vysyx_25010030 *top = new Vysyx_25010030("top");
 vluint64_t main_time = 0; // 仿真时间
 
 extern "C" void ebreak(int station, int inst) {
@@ -35,8 +35,8 @@ extern "C" void ebreak(int station, int inst) {
         if (Verilated::gotFinish())
             return;
 
-        npc_state.halt_ret = top->rootp->rv32e__DOT__wb_stage__DOT__regs[10]; // a0
-        npc_state.halt_pc = top->rootp->rv32e__DOT__pc;
+        npc_state.halt_ret = top->rootp->ysyx_25010030__DOT__wb_stage__DOT__regs[10]; // a0
+        npc_state.halt_pc = top->rootp->ysyx_25010030__DOT__pc;
 
         switch (station) {
             case HIT_TRAP:
@@ -46,7 +46,7 @@ extern "C" void ebreak(int station, int inst) {
 
             case ABORT:
             default:
-                Log("maintime = %ld, pc = 0x%08x, inst = 0x%08x", main_time, top->rootp->rv32e__DOT__pc, top->rootp->rv32e__DOT__instr);
+                Log("maintime = %ld, pc = 0x%08x, inst = 0x%08x", main_time, top->rootp->ysyx_25010030__DOT__pc, top->rootp->ysyx_25010030__DOT__instr);
                 npc_state.state = NPC_ABORT;
                 // _Log(ANSI_FG_RED "HIT BAD TRAP\n" ANSI_NONE);
                 break;
@@ -73,7 +73,7 @@ int is_exit_status_bad() {
 
 void single_cycle(void) {
     if (!Verilated::gotFinish()) {
-        top->clk = !top->clk; // 翻转时钟信号
+        top->clock = !top->clock; // 翻转时钟信号
 
         if (main_time == start_time) {
             top->reset = 0; // 在指定时间释放复位

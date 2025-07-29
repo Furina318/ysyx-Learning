@@ -2,15 +2,15 @@
 #include "../../../include/debug.h"
 #include "../../../include/paddr.h"
 #include "../../../include/device/map.h"
-#include "Vrv32e.h"
-#include "Vrv32e__Dpi.h"
-#include "../obj_dir/Vrv32e___024root.h"
+#include "Vysyx_25010030.h"
+#include "Vysyx_25010030__Dpi.h"
+#include "../obj_dir/Vysyx_25010030___024root.h"
 
 #define IO_SPACE_MAX (2 * 1024 * 1024)
 
 extern word_t host_read(void *addr, int len);
 extern void host_write(void *addr, int len, word_t data);
-extern Vrv32e *top;
+extern Vysyx_25010030 *top;
 
 static uint8_t *io_space = NULL;
 static uint8_t *p_space = NULL;
@@ -26,11 +26,11 @@ uint8_t* new_space(int size) {
 
 static void check_bound(IOMap *map, paddr_t addr) {
   if (map == NULL) {
-    Assert(map != NULL, "address (" FMT_PADDR ") is out of bound at pc = " FMT_WORD, addr, top->rootp->rv32e__DOT__pc);
+    Assert(map != NULL, "address (" FMT_PADDR ") is out of bound at pc = " FMT_WORD, addr, top->rootp->ysyx_25010030__DOT__pc);
   } else {
     Assert(addr <= map->high && addr >= map->low,
         "address (" FMT_PADDR ") is out of bound {%s} [" FMT_PADDR ", " FMT_PADDR "] at pc = " FMT_WORD,
-        addr, map->name, map->low, map->high, top->rootp->rv32e__DOT__pc);
+        addr, map->name, map->low, map->high, top->rootp->ysyx_25010030__DOT__pc);
   }
 }
 
