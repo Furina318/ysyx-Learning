@@ -5,8 +5,6 @@
 
 extern char _heap_start;
 
-extern char _data, _edata, _data_load;
-extern char _bss_start, _ebss;
 int main(const char *args);
 
 extern char _pmem_start;
@@ -26,10 +24,6 @@ void halt(int code) {
 }
 
 void _trm_init() {
-  size_t data_len = (size_t)(&_edata - &_data);
-  memcpy(&_data, &_data_load, data_len);
-  size_t bss_len = (size_t)(&_ebss - &_bss_start);
-  memcpy(&_bss_start, 0, bss_len);
   int ret = main(mainargs);
   halt(ret);
 }

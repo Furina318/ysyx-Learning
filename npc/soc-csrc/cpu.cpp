@@ -205,7 +205,7 @@ static void execute_once() {
 #endif
 
 }
-
+int reset_flag = 10;
 static void trace_and_difftest(){
   #ifdef CONFIG_ITRACE
     log_write("%s\n",logbuf);
@@ -214,10 +214,13 @@ static void trace_and_difftest(){
     IFDEF(CONFIG_ITRACE,puts(logbuf));
   }
   #ifdef CONFIG_DIFFTEST
-  if(top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__wb_valid){
+  if(top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__wb_valid && !reset_flag){
     // printf("pc=0x%08x | inst=0x%08x\n",PCSet.pc,PCSet.inst);
     // printf("next_pc=0x%08x | next_inst=0x%08x\n\n",PCSet.next_pc,PCSet.ninst);
     difftest_step(PCSet.pc,PCSet.next_pc);
+  }
+  else if(reset_flag > 0){
+    reset_flag -= 1;
   }
   // IFDEF(CONFIG_DIFFTEST,difftest_step(PCSet.pc,PCSet.next_pc));
   #endif

@@ -9,7 +9,7 @@
 /********extern functions or variables********/
 extern VysyxSoCFull *top;
 extern NPCState npc_state;
-extern uint8_t* guest_to_host(paddr_t paddr);
+extern uint8_t* soc_guest_to_host(paddr_t paddr);
 /*********************************************/
 
 #ifdef CONFIG_DIFFTEST
@@ -37,7 +37,7 @@ const char *ref_regs[] = {
 };
 
 
-static void update_cpu_state(CPU_state *cpu)
+void update_cpu_state(CPU_state *cpu)
 {
     cpu->pc = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__pc;
     for(int i = 0; i < 32; i++)
@@ -121,21 +121,25 @@ static void checkregs(CPU_state *ref, vaddr_t pc, vaddr_t npc)
 
 void difftest_step(vaddr_t pc, vaddr_t npc) 
 {
-    // CPU_state ref_r;
-    update_cpu_state(&cpu);
-    if(rst_flag == true){
-        rst_flag = false;
-    }else{
-        if(skip_flag){
-            ref_difftest_regcpy(&cpu, DIFFTEST_TO_REF);
-            skip_flag = false;
-            return;
-        }
-        ref_difftest_exec(1);
-        ref_difftest_regcpy(&cpu, DIFFTEST_TO_DUT);
+    CPU_state ref_r;
+    update_cpu_state(&ref_r);
+    // if(rst_flag == true){
+    //     rst_flag = false;
+    // }else{
+    //     if(skip_flag){
+    //         ref_difftest_regcpy(&cpu, DIFFTEST_TO_REF);
+    //         skip_flag = false;
+    //         return;
+    //     }
+    //     ref_difftest_exec(1);
+    //     ref_difftest_regcpy(&cpu, DIFFTEST_TO_DUT);
 
-        checkregs(&cpu, pc, npc);
-    }
+    //     checkregs(&cpu, pc, npc);
+    // }
+    ref_difftest_exec(1);
+    ref_difftest_regcpy(&ref_r, DIFFTEST_TO_DUT);
+
+    checkregs(&ref_r, pc, npc);
 }
 
 
