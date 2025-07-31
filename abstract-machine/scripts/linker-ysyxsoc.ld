@@ -10,7 +10,7 @@ SECTIONS {
   _sram_end = _sram_start + LENGTH(sram);
   _mrom_start = ORIGIN(mrom);
   _mrom_end = _mrom_start + LENGTH(mrom);
-
+/* 当前计数器指向mrom起始地址 */
   . = _mrom_start;
 
   .text : ALIGN(4) {
@@ -87,3 +87,21 @@ SECTIONS {
     _stack_pointer = .;
   } > sram
 }
+/* +-------------------+ 0x20000000 (mrom 开始)
+   | .text             |
+   | .bl.f             |
+   | .rodata           |
+   | .bl.s (存储映像)   |
+   | .data (初始值)     |
+   +-------------------+ 
+   |                   | 
+   |                   | 
+   +-------------------+ 0x0f000000 (sram 开始)
+   | .bl.s (运行时)     |
+   | .data (运行时)     |
+   | .bss              |
+   | 堆 (heap)         |
+   | ...               |
+   | 栈 (stack)        | <- _stack_pointer
+   |                   |
+   +-------------------+ 0x0f001FFF (sram 结束) */

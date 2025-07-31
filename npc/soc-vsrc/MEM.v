@@ -43,57 +43,124 @@ module MEM (
     reg [1:0] delay;
     parameter DELAY_CYCLES = 3;//处理周期
     
-    // //====SRAM读写接口====//
-    // //AR channel
-    // reg [31:0]  sram_araddr;//读地址
-    // reg         sram_arvalid;//读地址有效
-    // wire        sram_arready;//sram读地址准备好
-    // //R channel
-    // wire [1:0]  sram_rresp;//读响应信号
-    // wire [31:0] sram_rdata;//读数据
-    // wire        sram_rvalid;//读数据有效
-    // reg         sram_rready;//CPU读数据准备好
-    // //AW channel
-    // reg [31:0]  sram_awaddr;//写地址
-    // wire        sram_awready;//sram写地址准备好
-    // reg         sram_awvalid;//写地址有效
-    // //W channel
-    // reg [31:0]  sram_wdata;//写数据
-    // reg [3:0]   sram_wstrb;//写掩码
-    // reg         sram_wvalid;//写请求有效
-    // wire        sram_wready;//sram写请求准备好
-    // //B channel
-    // wire [1:0]  sram_bresp;//写响应信号
-    // wire        sram_bvalid;//写响应有效
-    // reg         sram_bready;//写响应准备好
-    // //===================//
+    function [3:0] generate_aligned_wstrb;
+        input [2:0] mem_len;
+        input [1:0] addr_low;
+        begin
+            case (mem_len)
+                `Mem_Bit: begin
+                    // 字节访问：根据地址低2位选择对应字节
+                    case (addr_low)
+                        2'b00: generate_aligned_wstrb = 4'b0001;
+                        2'b01: generate_aligned_wstrb = 4'b0010;
+                        2'b10: generate_aligned_wstrb = 4'b0100;
+                        2'b11: generate_aligned_wstrb = 4'b1000;
+                        default: generate_aligned_wstrb = 4'b0001;
+                    endcase
+                end
+                `Mem_Half, `Mem_UHalf: begin
+                    // 半字访问：地址必须对齐到2字节边界
+                    case (addr_low)
+                        2'b00: generate_aligned_wstrb = 4'b0011; // 低16位
+                        2'b10: generate_aligned_wstrb = 4'b1100; // 高16位
+                        default: generate_aligned_wstrb = 4'b0000; // 非对齐访问
+                    endcase
+                end
+                `Mem_Word: begin
+                    // 字访问：地址必须对齐到4字节边界
+                    if (addr_low == 2'b00)
+                        generate_aligned_wstrb = 4'b1111; // 全32位
+                    else
+                        generate_aligned_wstrb = 4'b0000; // 非对齐访问
+                end
+                default: generate_aligned_wstrb = 4'b1111;
+            endcase
+        end
+    endfunction
 
-    // SRAM msram(
-    //     .clk(clk),
-    //     .reset(reset),
-    //     //AR channel
-    //     .araddr(sram_araddr),
-    //     .arvalid(sram_arvalid),
-    //     .arready(sram_arready),
-    //     //R channel
-    //     .rdata(sram_rdata),
-    //     .rresp(sram_rresp),
-    //     .rvalid(sram_rvalid),
-    //     .rready(sram_rready),
-    //     //AW channel
-    //     .awaddr(sram_awaddr),
-    //     .awvalid(sram_awvalid),
-    //     .awready(sram_awready),
-    //     //W channel
-    //     .wdata(sram_wdata),
-    //     .wstrb(sram_wstrb),
-    //     .wvalid(sram_wvalid),
-    //     .wready(sram_wready),
-    //     //B channel
-    //     .bresp(sram_bresp),
-    //     .bvalid(sram_bvalid),
-    //     .bready(sram_bready)
-    // );
+    function [31:0] align_write_data;
+        input [2:0] mem_len;
+        input [1:0] addr_low;
+        input [31:0] data_in;
+        begin
+            case (mem_len)
+                `Mem_Bit: begin
+                    // 字节访问：将数据移动到对应位置
+                    case (addr_low)
+                        2'b00: align_write_data = {24'b0, data_in[7:0]};
+                        2'b01: align_write_data = {16'b0, data_in[7:0], 8'b0};
+                        2'b10: align_write_data = {8'b0, data_in[7:0], 16'b0};
+                        2'b11: align_write_data = {data_in[7:0], 24'b0};
+                        default: align_write_data = data_in;
+                    endcase
+                end
+                `Mem_Half, `Mem_UHalf: begin
+                    // 半字访问：将数据移动到对应位置
+                    case (addr_low)
+                        2'b00: align_write_data = {16'b0, data_in[15:0]}; // 低16位
+                        2'b10: align_write_data = {data_in[15:0], 16'b0};  // 高16位
+                        default: align_write_data = data_in; // 非对齐访问保持原样
+                    endcase
+                end
+                `Mem_Word: begin
+                    // 字访问：数据不需要移动
+                    align_write_data = data_in;
+                end
+                default: align_write_data = data_in;
+            endcase
+        end
+    endfunction
+
+    function [31:0] extract_read_data;
+    input [2:0] mem_len;
+    input [1:0] addr_low;
+    input [31:0] rdata;
+    begin
+        case (mem_len)
+            `Mem_Bit: begin
+                // 有符号字节：提取对应字节并进行符号扩展
+                case (addr_low)
+                    2'b00: extract_read_data = {{24{rdata[7]}}, rdata[7:0]};
+                    2'b01: extract_read_data = {{24{rdata[15]}}, rdata[15:8]};
+                    2'b10: extract_read_data = {{24{rdata[23]}}, rdata[23:16]};
+                    2'b11: extract_read_data = {{24{rdata[31]}}, rdata[31:24]};
+                    default: extract_read_data = {{24{rdata[7]}}, rdata[7:0]};
+                endcase
+            end
+            `Mem_UBit: begin
+                // 无符号字节：提取对应字节并进行零扩展
+                case (addr_low)
+                    2'b00: extract_read_data = {24'b0, rdata[7:0]};
+                    2'b01: extract_read_data = {24'b0, rdata[15:8]};
+                    2'b10: extract_read_data = {24'b0, rdata[23:16]};
+                    2'b11: extract_read_data = {24'b0, rdata[31:24]};
+                    default: extract_read_data = {24'b0, rdata[7:0]};
+                endcase
+            end
+            `Mem_Half: begin
+                // 有符号半字：提取对应半字并进行符号扩展
+                case (addr_low)
+                    2'b00: extract_read_data = {{16{rdata[15]}}, rdata[15:0]};
+                    2'b10: extract_read_data = {{16{rdata[31]}}, rdata[31:16]};
+                    default: extract_read_data = {{16{rdata[15]}}, rdata[15:0]}; // 非对齐使用低半字
+                endcase
+            end
+            `Mem_UHalf: begin
+                // 无符号半字：提取对应半字并进行零扩展
+                case (addr_low)
+                    2'b00: extract_read_data = {16'b0, rdata[15:0]};
+                    2'b10: extract_read_data = {16'b0, rdata[31:16]};
+                    default: extract_read_data = {16'b0, rdata[15:0]}; // 非对齐使用低半字
+                endcase
+            end
+            `Mem_Word: begin
+                // 字访问：直接使用全部数据
+                extract_read_data = rdata;
+            end
+            default: extract_read_data = rdata;
+        endcase
+    end
+endfunction
 
     always @(posedge clk or posedge reset) begin
         if(reset) begin
@@ -138,14 +205,16 @@ module MEM (
                         else if(MemWrite) begin
                             sram_awaddr <= addr;
                             sram_awvalid <= 1'b1;//发送sram写地址请求
-                            sram_wdata <= data_in;
+                            // sram_wdata <= data_in;
+                            sram_wdata <= align_write_data(MemLen, addr[1:0], data_in);
                             // sram_wvalid <= 1'b1;//发送sram写请求
-                            case(MemLen)
-                                `Mem_Bit:  sram_wstrb <= 4'b0001;//sb
-                                `Mem_Half: sram_wstrb <= 4'b0011;//sh
-                                `Mem_Word: sram_wstrb <= 4'b1111;//sw
-                                default:   sram_wstrb <= 4'b1111;
-                            endcase
+                            // case(MemLen)
+                            //     `Mem_Bit:  sram_wstrb <= 4'b0001;//sb
+                            //     `Mem_Half: sram_wstrb <= 4'b0011;//sh
+                            //     `Mem_Word: sram_wstrb <= 4'b1111;//sw
+                            //     default:   sram_wstrb <= 4'b1111;
+                            // endcase
+                            sram_wstrb <= generate_aligned_wstrb(MemLen, addr[1:0]);
                             next_state = WRITE_ADDR;
                         end
                         else begin
@@ -161,10 +230,10 @@ module MEM (
                     mem_ready <= 1'b0;
                     mem_valid <= 1'b0;
                     // sram_arvalid <= 1'b1;//发送sram读请求
-                    if(sram_arready && sram_arvalid) begin//读地址有效且sram准备好读取数据
-                        // sram_arvalid <= 1'b0;//地址被接受，撤销读地址请求
+                    if(sram_arready && sram_arvalid) begin
+                        sram_arvalid <= 1'b0;
                         //  $display("\033[31m[MEM]: READ_ADDR状态握手成功\033[0m");
-                        // sram_rready <= 1'b1;//准备接受数据
+                        sram_rready <= 1'b1;
                         next_state = READ_DATA;
                     end
                     else begin
@@ -175,21 +244,21 @@ module MEM (
                 READ_DATA: begin
                     mem_ready <= 1'b0;
                     mem_valid <= 1'b0;
-                    sram_rready <= 1'b1;//准备接受数据
+                    // sram_rready <= 1'b1;//准备接受数据
                     // $display("FUCKING ERROR IS HERE");
-                    if(sram_rvalid && sram_rready) begin//当读数据有效且cpu准备接受读数据
-                        sram_arvalid <= 1'b0;//撤掉arvalid地址有效信号
-                        // sram_rready <= 1'b0;//数据被接受，撤销rready接受读数据信号
+                    if(sram_rvalid && sram_rready) begin
+                        // sram_arvalid <= 1'b0;
+                        sram_rready <= 1'b0;
                         // $display("\033[31m[MEM]: READ_DATA状态握手成功\033[0m");
-                        // $display("\n************FUCKING ERROR IS HERE*************\n");
-                        case(MemLen)
-                            `Mem_Bit:   data_out <= {{24{sram_rdata[7]}},sram_rdata[7:0]}; 
-                            `Mem_UBit:  data_out <= {24'b0,sram_rdata[7:0]};
-                            `Mem_UHalf: data_out <= {16'b0,sram_rdata[15:0]};
-                            `Mem_Half:  data_out <= {{16{sram_rdata[15]}},sram_rdata[15:0]};
-                            `Mem_Word:  data_out <= sram_rdata;
-                            default:    data_out <= 32'h0;
-                        endcase
+                        data_out <= extract_read_data(MemLen, addr[1:0], sram_rdata);
+                        // case(MemLen)
+                        //     `Mem_Bit:   data_out <= {{24{sram_rdata[7]}},sram_rdata[7:0]}; 
+                        //     `Mem_UBit:  data_out <= {24'b0,sram_rdata[7:0]};
+                        //     `Mem_UHalf: data_out <= {16'b0,sram_rdata[15:0]};
+                        //     `Mem_Half:  data_out <= {{16{sram_rdata[15]}},sram_rdata[15:0]};
+                        //     `Mem_Word:  data_out <= sram_rdata;
+                        //     default:    data_out <= 32'h0;
+                        // endcase
                         if(sram_rresp != `OKAY) begin
                             load_access_fault <= 1'b1;
                             mem_fault_addr <= sram_araddr;
@@ -209,7 +278,7 @@ module MEM (
                     mem_ready <= 1'b0;
                     mem_valid <= 1'b0;
                     if(sram_awready && sram_awvalid) begin
-                        // sram_awvalid <= 1'b0;//地址被接受，撤销awvalid信号
+                        sram_awvalid <= 1'b0;//地址被接受，撤销awvalid信号
                         // $display("\033[31m[MEM]: WRITE_ADDR状态握手成功\033[0m");
                         sram_wvalid <= 1'b1;//发送写请求
                         next_state = WRITE_DATA;
@@ -225,7 +294,7 @@ module MEM (
                     // sram_wvalid <= 1'b1;//发送写请求
                     if(sram_wready && sram_wvalid) begin
                         sram_wvalid <= 1'b0;
-                        sram_awvalid <= 1'b0;
+                        // sram_awvalid <= 1'b0;
                         sram_bready <= 1'b1;//准备接受写响应
                         // mem_valid <= 1'b1;
                         

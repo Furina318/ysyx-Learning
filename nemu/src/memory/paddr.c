@@ -27,6 +27,7 @@ static uint8_t pmem[CONFIG_MSIZE] PG_ALIGN = {};
 #define MTRACE_LOG_FILE "mtrace.log"
 static FILE *mtrace_file=NULL;
 
+#ifndef CONFIG_TARGET_SHARE
 void init_mtrace(){
   mtrace_file=fopen(MTRACE_LOG_FILE,"w");
   if(mtrace_file==NULL){
@@ -132,16 +133,71 @@ void paddr_write(paddr_t addr, int len, word_t data) {
   if (likely(in_pmem(addr))) { pmem_write(addr, len, data); return; }
   IFDEF(CONFIG_DEVICE, mmio_write(addr, len, data); return);
   out_of_bound(addr);
-  // if (likely(in_pmem(addr))) {
-  //   pmem_write(addr, len, data);
-  // } 
-  // else IFDEF(CONFIG_DEVICE, {
-  //   mmio_write(addr, len, data);
-  // })
-  // else {
-  //   out_of_bound(addr);
-  //   return;
-  // }
-  // // 记录写操作到 mtrace
-  // mtrace_log('W', addr, data, len);
 }
+
+#else
+
+#define MROM_SIZE 0xffff
+#define SRAM_SIZE 0x1fff
+
+static uint8_t mrom[MROM_SIZE] PG_ALIGN = {};
+static uint8_t sram[SRAM_SIZE] PG_ALIGN = {};
+
+uint8_t* guest_to_host(paddr_t paddr) { 
+  if(paddr >= MROM_BASE && paddr < MROM_BASE + MROM_SIZE) {
+    return mrom + (paddr - MROM_BASE);
+  } else if(paddr >= SRAM_BASE && paddr < SRAM_BASE + SRAM_SIZE) {
+    return sram + (paddr - SRAM_BASE);
+  } else {
+    return 0; // Fallback to pmem
+  }
+ }
+paddr_t host_to_guest(uint8_t *haddr) { 
+  if(haddr >= mrom && haddr < mrom + MROM_SIZE) {
+    return MROM_BASE + (haddr - mrom);
+  } else if(haddr >= sram && haddr < sram + SRAM_SIZE) {
+    return SRAM_BASE + (haddr - sram);
+  } else {
+    return 0; // Fallback to pmem
+  }
+ }
+
+static word_t pmem_read(paddr_t addr, int len) {
+  word_t ret = host_read(guest_to_host(addr), len);
+  return ret;
+}
+
+static void pmem_write(paddr_t addr, int len, word_t data) {
+  host_write(guest_to_host(addr), len, data);
+}
+
+static void out_of_bound(paddr_t addr) {
+  panic("address = " FMT_PADDR " is out of bound of pmem [" FMT_PADDR ", " FMT_PADDR "] at pc = " FMT_WORD,
+      addr, PMEM_LEFT, PMEM_RIGHT, cpu.pc);
+}
+
+void init_mem() {
+  memset(mrom, 0, MROM_SIZE);
+  memset(sram, 0, SRAM_SIZE);
+  Log("MROM area [" FMT_PADDR ", " FMT_PADDR "]", MROM_BASE, MROM_BASE + MROM_SIZE - 1);
+  Log("SRAM area [" FMT_PADDR ", " FMT_PADDR "]", SRAM_BASE, SRAM_BASE + SRAM_SIZE - 1);
+}
+
+static inline bool in_mem(paddr_t addr) {
+  return (addr >= MROM_BASE && addr < MROM_BASE + MROM_SIZE) ||
+         (addr >= SRAM_BASE && addr < SRAM_BASE + SRAM_SIZE);
+}
+
+word_t paddr_read(paddr_t addr, int len) {
+  if (likely(in_mem(addr)))return pmem_read(addr, len);
+  out_of_bound(addr);
+  return 0;
+}
+
+void paddr_write(paddr_t addr, int len, word_t data) {
+  if (likely(in_mem(addr))) { pmem_write(addr, len, data); return; }
+  out_of_bound(addr);
+}
+
+
+#endif
