@@ -18,6 +18,8 @@
 #include <device/mmio.h>
 #include <isa.h>
 
+#ifndef CONFIG_TARGET_SHARE
+
 #if   defined(CONFIG_PMEM_MALLOC)
 static uint8_t *pmem = NULL;
 #else // CONFIG_PMEM_GARRAY
@@ -27,7 +29,6 @@ static uint8_t pmem[CONFIG_MSIZE] PG_ALIGN = {};
 #define MTRACE_LOG_FILE "mtrace.log"
 static FILE *mtrace_file=NULL;
 
-#ifndef CONFIG_TARGET_SHARE
 void init_mtrace(){
   mtrace_file=fopen(MTRACE_LOG_FILE,"w");
   if(mtrace_file==NULL){
