@@ -28,7 +28,7 @@ static const uint32_t img [] = {
 
 static void restart() {
   /* Set the initial program counter. */
-#ifndef CONFIG_TARGET_SHARE
+#ifndef CONFIG_TARGET_SOC_SHARE
   cpu.pc = RESET_VECTOR;
 #else
   cpu.pc = MROM_BASE;
@@ -42,7 +42,7 @@ static void restart() {
 
 void init_isa() {
   /* Load built-in image. */
-#ifndef CONFIG_TARGET_SHARE
+#ifndef CONFIG_TARGET_SOC_SHARE
   memcpy(guest_to_host(RESET_VECTOR), img, sizeof(img));
 #else
   memcpy(guest_to_host(MROM_BASE), img, sizeof(img));

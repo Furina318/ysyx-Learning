@@ -18,7 +18,7 @@
 #include <device/mmio.h>
 #include <isa.h>
 
-#ifndef CONFIG_TARGET_SHARE
+#ifndef CONFIG_TARGET_SOC_SHARE
 
 #if   defined(CONFIG_PMEM_MALLOC)
 static uint8_t *pmem = NULL;
