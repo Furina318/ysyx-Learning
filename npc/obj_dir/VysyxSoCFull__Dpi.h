@@ -26,6 +26,10 @@ extern "C" {
     extern unsigned int pmem_read(unsigned int raddr, int len);
     // DPI import at /home/furina/ysyx-workbench/npc/soc-vsrc/SRAM.v:36:34
     extern void pmem_write(unsigned int waddr, unsigned int wdata, int len);
+    // DPI import at /home/furina/ysyx-workbench/ysyxSoC/perip/psram/psram.v:8:32
+    extern void psram_read(int addr, int* data);
+    // DPI import at /home/furina/ysyx-workbench/ysyxSoC/perip/psram/psram.v:9:32
+    extern void psram_write(int addr, int data, int mask);
 
 #ifdef __cplusplus
 }

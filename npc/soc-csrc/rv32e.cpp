@@ -79,7 +79,7 @@ extern "C" void psram_write(int32_t addr, int32_t data, int32_t mask) {
     if((addr >= CONFIG_SOC_PSRAM_BASE) && (addr <= CONFIG_SOC_PSRAM_BASE + CONFIG_SOC_PSRAM_SIZE)) {
         uint32_t wdata = data >> ((8 - mask) * 4);
         host_write(soc_psram_guest_to_host(addr), mask/2, wdata);
-        printf("[psram_write]addr: 0x%08x   data: 0x%08x\n", addr, *data);
+        printf("[psram_write]addr: 0x%08x   data: 0x%08x\n", addr, data);
     }
 }
 
