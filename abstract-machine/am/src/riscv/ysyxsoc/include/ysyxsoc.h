@@ -18,6 +18,14 @@
 #define FB_ADDR         (MMIO_BASE   + 0x1000000)
 #define AUDIO_SBUF_ADDR (MMIO_BASE   + 0x1200000)
 
+#define UART_BASE		(0x10000000)
+#define UART_TX			(UART_BASE + 0x00)
+#define UART_RX			(UART_BASE + 0x00)
+#define UART_LCR		(UART_BASE + 0x03)
+#define UART_LSR		(UART_BASE + 0x05)
+#define UART_LSB		(UART_BASE + 0x00)
+#define UART_MSB		(UART_BASE + 0x01)
+
 extern char _pmem_start;
 #define PMEM_SIZE (128 * 1024 * 1024)
 #define PMEM_END  ((uintptr_t)&_pmem_start + PMEM_SIZE)

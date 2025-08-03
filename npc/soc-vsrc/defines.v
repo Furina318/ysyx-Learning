@@ -76,4 +76,6 @@
 //Device
 `define DEVICE 1'b1
 
-`define RESET_PC 32'h2000_0000
+`define RESET_PC       32'h8000_0000
+`define RESET_MROM_PC  32'h2000_0000
+`define RESET_FLASH_PC 32'h3000_0000

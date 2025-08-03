@@ -9,7 +9,7 @@
 /********extern functions or variables********/
 extern VysyxSoCFull *top;
 extern NPCState npc_state;
-extern uint8_t* soc_guest_to_host(paddr_t paddr);
+extern uint8_t* soc_mrom_guest_to_host(paddr_t paddr);
 /*********************************************/
 
 #ifdef CONFIG_DIFFTEST
@@ -79,7 +79,7 @@ void init_difftest(char *ref_so_file, long img_size, int port)
         "This will help you a lot for debugging, but also significantly reduce the performance. ", ref_so_file);
 
     ref_difftest_init(port);
-    ref_difftest_memcpy(CONFIG_SOC_MROM_BASE, soc_guest_to_host(CONFIG_SOC_MROM_BASE), img_size, DIFFTEST_TO_REF);
+    ref_difftest_memcpy(CONFIG_SOC_MROM_BASE, soc_mrom_guest_to_host(CONFIG_SOC_MROM_BASE), img_size, DIFFTEST_TO_REF);
     // ref_difftest_regcpy(&cpu, DIFFTEST_TO_REF);
 }
 

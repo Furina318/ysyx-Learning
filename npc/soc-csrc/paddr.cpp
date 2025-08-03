@@ -119,7 +119,11 @@ void mtrace_filter_output(paddr_t start_addr, paddr_t end_addr, bool filter_en, 
 uint8_t* guest_to_host(paddr_t paddr) { return pmem + paddr - CONFIG_MBASE; }   //0x8000_0000 -> pmem[0]
 paddr_t host_to_guest(uint8_t *haddr) { return haddr - pmem + CONFIG_MBASE; }
 
-uint8_t* soc_guest_to_host(paddr_t paddr) { return pmem + paddr - CONFIG_SOC_MROM_BASE; }
+// uint8_t mrom[CONFIG_SOC_MROM_SIZE] PG_ALIGN = {}; // 4KB MROM
+// uint8_t flash[CONFIG_SOC_FLASH_SIZE] PG_ALIGN = {}; // 16MB Flash
+uint8_t* soc_mrom_guest_to_host(paddr_t paddr) { return pmem + paddr - CONFIG_SOC_MROM_BASE; }
+uint8_t* soc_flash_guest_to_host(paddr_t paddr) { return pmem + paddr - CONFIG_SOC_FLASH_BASE; }
+uint8_t* soc_psram_guest_to_host(paddr_t paddr) { return pmem + paddr - CONFIG_SOC_PSRAM_BASE; }
 
 word_t host_read(void *addr, int len) 
 {
@@ -185,10 +189,16 @@ void pmem_w(paddr_t addr, int len, word_t data)
 void init_mem(void) 
 {
   memset(pmem, 0, CONFIG_MSIZE);
-  Log("physical memory area [0x%08x, 0x%08x]", PMEM_LEFT, PMEM_RIGHT);
-  Log("SoC MROM area [0x%08x, 0x%08x]", CONFIG_SOC_MROM_BASE, CONFIG_SOC_MROM_BASE + 0xfff);
+  // Log("physical memory area [0x%08x, 0x%08x]", PMEM_LEFT, PMEM_RIGHT);
+  Log("SoC MROM area [0x%08x, 0x%08x]", CONFIG_SOC_MROM_BASE, CONFIG_SOC_MROM_BASE + CONFIG_SOC_MROM_SIZE);
+  Log("SoC FLASH area [0x%08x, 0x%08x]", CONFIG_SOC_FLASH_BASE, CONFIG_SOC_FLASH_BASE + CONFIG_SOC_FLASH_SIZE);
+  Log("SoC PSRAM area [0x%08x, 0x%08x]", CONFIG_SOC_PSRAM_BASE, CONFIG_SOC_PSRAM_BASE + CONFIG_SOC_PSRAM_SIZE);
 
   /* Load built-in image. */
   // memcpy(guest_to_host(RESET_VECTOR), img, sizeof(img));
-  memcpy(soc_guest_to_host(CONFIG_SOC_MROM_BASE), img, sizeof(img));
+
+  // memset(mrom, 0, CONFIG_SOC_MROM_SIZE);
+  // memcpy(soc_mrom_guest_to_host(CONFIG_SOC_MROM_BASE), img, sizeof(img));
+  // memset(flash, 0, CONFIG_SOC_FLASH_SIZE);
+  memcpy(soc_flash_guest_to_host(CONFIG_SOC_FLASH_BASE), img, sizeof(img));
 }

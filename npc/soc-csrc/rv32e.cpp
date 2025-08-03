@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "VysyxSoCFull.h"
-// #include "verilated_vcd_c.h"
+#include "verilated_vcd_c.h"
 #include "../obj_dir/VysyxSoCFull___024root.h"
 #include "VysyxSoCFull__Dpi.h"
 #include "svdpi.h"
@@ -22,13 +22,19 @@ extern void init_monitor(int argc, char *argv[]);
 extern void init_monitor(int, char *[]);
 extern void sdb_mainloop();
 extern int is_exit_status_bad();
+
 extern word_t pmem_r(paddr_t addr, int len);
 extern void pmem_w(paddr_t addr, int len, word_t data);
+
 extern word_t host_read(void *addr, int len);
-extern uint8_t* soc_guest_to_host(paddr_t paddr);
+extern void host_write(void *addr, int len, word_t data);
+
+extern uint8_t* soc_mrom_guest_to_host(paddr_t paddr);
+extern uint8_t* soc_flash_guest_to_host(paddr_t paddr);
+extern uint8_t* soc_psram_guest_to_host(paddr_t paddr);
 
 /* **************** */
-// VerilatedVcdC *tfp = new VerilatedVcdC(); // 导出vcd波形
+VerilatedVcdC *tfp = new VerilatedVcdC(); // 导出vcd波形
 VysyxSoCFull *top = new VysyxSoCFull("top");
 vluint64_t main_time = 0; // 仿真时间
 
@@ -56,9 +62,28 @@ extern "C" void ebreak(int station, int inst) {
     }      
 }
 
-extern "C" void flash_read(int32_t addr, int32_t *data) { assert(0); }
+extern "C" void flash_read(int32_t addr, int32_t *data) { 
+    addr += CONFIG_SOC_FLASH_BASE; 
+    // *data = host_read(soc_flash_guest_to_host(addr), 4); 
+    uint32_t temp = host_read(soc_flash_guest_to_host(addr), 4);
+    *data = ((temp & 0x000000ff) << 24) + ((temp & 0x0000ff00) << 8) + ((temp & 0x00ff0000) >> 8) + ((temp & 0xff000000) >> 24);
+}
 
-extern "C" void mrom_read(int32_t addr, int32_t *data) { *data = host_read(soc_guest_to_host(addr), 4); }
+extern "C" void psram_read(int32_t addr, int32_t *data) {
+    addr += CONFIG_SOC_PSRAM_BASE;
+    *data = host_read(soc_flash_guest_to_host(addr), 4);
+}
+
+extern "C" void psram_write(int32_t addr, int32_t data, int32_t mask) {
+    addr += CONFIG_SOC_PSRAM_BASE;
+    if((addr >= CONFIG_SOC_PSRAM_BASE) && (addr <= CONFIG_SOC_PSRAM_BASE + CONFIG_SOC_PSRAM_SIZE)) {
+        uint32_t wdata = data >> ((8 - mask) * 4);
+        host_write(soc_psram_guest_to_host(addr), mask/2, wdata);
+        printf("[psram_write]addr: 0x%08x   data: 0x%08x\n", addr, *data);
+    }
+}
+
+extern "C" void mrom_read(int32_t addr, int32_t *data) { *data = host_read(soc_mrom_guest_to_host(addr), 4); }
 
 extern "C" word_t pmem_read(paddr_t raddr, int len) {
     if(main_time >= 1) return pmem_r(raddr,len);
@@ -86,7 +111,7 @@ void single_cycle(void) {
         }
 
         top->eval(); // 执行仿真
-        // tfp->dump(main_time); // 记录波形
+        tfp->dump(main_time); // 记录波形
         main_time++; // 推进仿真时间
     }
 }
@@ -99,17 +124,17 @@ void reset(void) {
 }
 
 void init_verilator(void) {
-    // Verilated::traceEverOn(true); // 启用波形跟踪
+    Verilated::traceEverOn(true); // 启用波形跟踪
 
-    // top->trace(tfp, 0);
-    // tfp->open("wave.vcd"); // 打开波形文件
+    top->trace(tfp, 0);
+    tfp->open("wave.vcd"); // 打开波形文件
 
     reset(); // 执行复位
 }
 
 void die(){
     top->final();
-    // tfp->close();
+    tfp->close();
     delete top;
     Verilated::gotFinish(true);
 }
@@ -127,7 +152,7 @@ int main(int argc, char *argv[]) {
 
     /* End the simulation */
     top->final();
-    // tfp->close();
+    tfp->close();
     delete top;
 
     return is_exit_status_bad();

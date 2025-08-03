@@ -101,13 +101,13 @@ module IF (
 
     always @(posedge clk or posedge reset) begin
         if (reset) begin
-            pc <= `RESET_PC;
-            sram_araddr <= `RESET_PC;
+            pc <= `RESET_FLASH_PC;
+            sram_araddr <= `RESET_FLASH_PC;
 
             if_valid <= 1'b0;
             if_ready <= 1'b1;
-            state = READ_ADDR;
-            next_state = READ_ADDR;
+            state <= READ_ADDR;
+            // next_state = READ_ADDR;
             // delay_counter <= 2'b00;
             sram_arvalid <= 1'b1;
 
@@ -115,7 +115,7 @@ module IF (
             if_access_fault <= 1'b0;
             if_fault_addr <= 32'h0;
         end else begin
-            state = next_state;
+            // state = next_state;
             case (state)
                 IDLE: begin
                     if_ready <= 1'b1;
@@ -127,10 +127,10 @@ module IF (
                         pc <= pc_src ? branch_target : pc + 4;
                         sram_araddr <= pc_src ? branch_target : pc + 4;
                         sram_arvalid <= 1'b1;
-                        next_state = READ_ADDR;
+                        state <= READ_ADDR;
                     end
                     else begin
-                        next_state = IDLE;
+                        state <= IDLE;
                     end
                 end
                 READ_ADDR: begin
@@ -139,10 +139,10 @@ module IF (
                     if(sram_arready && sram_arvalid) begin
                         sram_arvalid <= 1'b0;
                         sram_rready <= 1'b1;
-                        next_state  = READ_DATA;
+                        state  <= READ_DATA;
                     end 
                     else begin
-                        next_state = READ_ADDR;
+                        state <= READ_ADDR;
                     end
                 end
                 READ_DATA: begin
@@ -160,10 +160,10 @@ module IF (
                             if_access_fault <= 1'b0;
                             if_fault_addr <= 32'h0;
                         end
-                        next_state = STALL;
+                        state <= STALL;
                     end 
                     else begin
-                        next_state = READ_DATA;
+                        state <= READ_DATA;
                     end
                 end
                 STALL: begin
@@ -171,10 +171,10 @@ module IF (
                     if_valid <= 1'b1; 
                     sram_arvalid <= 1'b0;
                     if(id_ready) begin
-                        next_state = IDLE;
+                        state <= IDLE;
                     end 
                     else begin
-                        next_state = STALL;
+                        state <= STALL;
                     end
                 end
                 default: begin
@@ -182,7 +182,7 @@ module IF (
                     if_valid <= 1'b0;
                     sram_arvalid <= 1'b0;
                     sram_rready <= 1'b0;
-                    next_state = IDLE;
+                    state <= IDLE;
                 end
             endcase
         end

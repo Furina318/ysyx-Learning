@@ -3,6 +3,7 @@ ENTRY(_start)
 MEMORY {
   mrom  (r x) : ORIGIN = 0x20000000, LENGTH = 4K
   sram  (rwx) : ORIGIN = 0x0f000000, LENGTH = 8K
+  flash (r x) : ORIGIN = 0x30000000, LENGTH = 16M
 }
 
 SECTIONS {
@@ -10,43 +11,60 @@ SECTIONS {
   _sram_end = _sram_start + LENGTH(sram);
   _mrom_start = ORIGIN(mrom);
   _mrom_end = _mrom_start + LENGTH(mrom);
+  _flash_start = ORIGIN(flash);
+  _flash_end = _flash_start + LENGTH(flash);
 
-  . = _mrom_start;
+  /* . = _mrom_start; */
+  . = _flash_start;
 
   .text : ALIGN(4) {
     _text = .;
-
     *(entry)
     *(.text*)
+    _etext = .;
+    . = ALIGN(4);
+  } > flash AT> flash
+  _text_lma = LOADADDR(.text);
+  _text_size = _etext - _text;
 
-  } > mrom AT> mrom
 
-  .rodata : {
-
+  .rodata : ALIGN(4) {
+    _rodata = .;
     *(.rodata*)
     *(.srodata*)
-
-  } > mrom
+    _erodata = .;
+    . = ALIGN(4);
+  } > flash
+  _rodata_lma = LOADADDR(.rodata);
+  _rodata_size = _erodata - _rodata;
 
   .data : ALIGN(4) {
-  _data_start = .;
+   _data = .;
     *(.data*)
     *(.sdata*)
-  _data_end = .;
-  } > sram AT> mrom
-
-  _data_start_lma = LOADADDR(.data);
+   _edata = .;
+  } > sram AT> flash
+  _data_lma = LOADADDR(.data);
+  _data_size = _edata - _data;
 
   .bss : ALIGN(4) {
-    _bss_start = .;
+    _bss = .;
     *(.bss*)
     *(.sbss*)
     *(.scommon)
-    _bss_end = .;
+    _ebss = .;
   } > sram
+  _bss_lma = LOADADDR(.bss);
+  _bss_size = _ebss - _bss;
 
-_heap_start = ALIGN(_bss_end, 8);
+  _heap_start = ALIGN(_ebss, 8);
+  /* _heap_start = ALIGN(0x1000);
+  _heap_end = ORIGIN(sram) + LENGTH(sram);
 
+  _stack_top = ORIGIN(sram);
+  . = _stack_top + LENGTH(sram);
+  _stack_pointer = .;
+  _stack_end = .; */
   .stack (NOLOAD) : ALIGN(8) {
     . = ORIGIN(sram) + LENGTH(sram) - _stack_size;
     . = ALIGN(8);
