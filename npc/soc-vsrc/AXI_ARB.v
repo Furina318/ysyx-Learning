@@ -155,275 +155,290 @@ module AXI_ARB (
 
     // 读地址通道处理
     always @(*) begin
-        io_master_araddr  = 32'h0;
-        io_master_arvalid = 1'b0;
-        clint_araddr      = 32'h0; 
-        clint_arvalid     = 1'b0;  
-        ifu_arready       = 1'b0;
-        mem_arready       = 1'b0;
-
-        case (current_master)
-            IFU: begin
-                case (decode_address(ifu_araddr))
-                    CLINT: begin 
-                        clint_araddr      = ifu_araddr;
-                        clint_arvalid     = ifu_arvalid;
-                        ifu_arready       = clint_arready;
-                        mem_arready       = 1'b0;
-                        io_master_araddr  = 32'h0;
-                        io_master_arvalid = 1'b0;
-                    end
-                    default: begin
-                        io_master_araddr  = ifu_araddr;
-                        io_master_arvalid = ifu_arvalid;
-                        ifu_arready       = io_master_arready;
-                        clint_araddr      = 32'h0;
-                        clint_arvalid     = 1'b0;
-                        mem_arready       = 1'b0;
-                    end 
-                endcase
-            end
-            MEM_READ: begin
-                case (decode_address(mem_araddr))
-                    CLINT: begin 
-                        clint_araddr      = mem_araddr;
-                        clint_arvalid     = mem_arvalid;
-                        mem_arready       = clint_arready;
-                        ifu_arready       = 1'b0;
-                        io_master_araddr  = 32'h0;
-                        io_master_arvalid = 1'b0;
-                    end
-                    default: begin
-                        io_master_araddr  = mem_araddr;
-                        io_master_arvalid = mem_arvalid;
-                        mem_arready       = io_master_arready;
-                        clint_araddr      = 32'h0;
-                        clint_arvalid     = 1'b0;
-                        ifu_arready       = 1'b0;
-                    end
-                endcase
-            end
-            ERROR: begin
-                ifu_arready       = ifu_arvalid;
-                mem_arready       = mem_arvalid;
-                io_master_araddr  = 32'h0;
-                io_master_arvalid = 1'b0;
-                clint_araddr      = 32'h0;
-                clint_arvalid     = 1'b0;
-            end
-            default: begin
-                io_master_araddr  = 32'h0;
-                io_master_arvalid = 1'b0;
-                clint_araddr      = 32'h0;
-                clint_arvalid     = 1'b0;
-                ifu_arready       = 1'b0;
-                mem_arready       = 1'b0;
-            end
-        endcase
+        if(reset) begin
+            io_master_araddr  = 32'h0;
+            io_master_arvalid = 1'b0;
+            clint_araddr      = 32'h0; 
+            clint_arvalid     = 1'b0;  
+            ifu_arready       = 1'b0;
+            mem_arready       = 1'b0;
+        end
+        else begin
+            case (current_master)
+                IFU: begin
+                    case (decode_address(ifu_araddr))
+                        CLINT: begin 
+                            clint_araddr      = ifu_araddr;
+                            clint_arvalid     = ifu_arvalid;
+                            ifu_arready       = clint_arready;
+                            mem_arready       = 1'b0;
+                            io_master_araddr  = 32'h0;
+                            io_master_arvalid = 1'b0;
+                        end
+                        default: begin
+                            io_master_araddr  = ifu_araddr;
+                            io_master_arvalid = ifu_arvalid;
+                            ifu_arready       = io_master_arready;
+                            clint_araddr      = 32'h0;
+                            clint_arvalid     = 1'b0;
+                            mem_arready       = 1'b0;
+                        end 
+                    endcase
+                end
+                MEM_READ: begin
+                    case (decode_address(mem_araddr))
+                        CLINT: begin 
+                            clint_araddr      = mem_araddr;
+                            clint_arvalid     = mem_arvalid;
+                            mem_arready       = clint_arready;
+                            ifu_arready       = 1'b0;
+                            io_master_araddr  = 32'h0;
+                            io_master_arvalid = 1'b0;
+                        end
+                        default: begin
+                            io_master_araddr  = mem_araddr;
+                            io_master_arvalid = mem_arvalid;
+                            mem_arready       = io_master_arready;
+                            clint_araddr      = 32'h0;
+                            clint_arvalid     = 1'b0;
+                            ifu_arready       = 1'b0;
+                        end
+                    endcase
+                end
+                ERROR: begin
+                    ifu_arready       = ifu_arvalid;
+                    mem_arready       = mem_arvalid;
+                    io_master_araddr  = 32'h0;
+                    io_master_arvalid = 1'b0;
+                    clint_araddr      = 32'h0;
+                    clint_arvalid     = 1'b0;
+                end
+                default: begin
+                    io_master_araddr  = 32'h0;
+                    io_master_arvalid = 1'b0;
+                    clint_araddr      = 32'h0;
+                    clint_arvalid     = 1'b0;
+                    ifu_arready       = 1'b0;
+                    mem_arready       = 1'b0;
+                end
+            endcase
+        end
     end
 
     // 写地址通道处理
     always @(*) begin
-        io_master_awaddr  = 32'h0;
-        io_master_awvalid = 1'b0;
-        clint_awaddr      = 32'h0; 
-        clint_awvalid     = 1'b0;  
-        mem_awready       = 1'b0;
-
-        case (current_master)
-            MEM_WRITE: begin
-                case (decode_address(mem_awaddr))
-                    CLINT: begin 
-                        clint_awaddr      = mem_awaddr;
-                        clint_awvalid     = mem_awvalid;
-                        mem_awready       = clint_awready;
-                        io_master_awaddr  = 32'h0;
-                        io_master_awvalid = 1'b0;
-                    end
-                    default: begin
-                        io_master_awaddr  = mem_awaddr;
-                        io_master_awvalid = mem_awvalid;
-                        mem_awready       = io_master_arready;
-                        clint_awaddr      = 32'h0;
-                        clint_awvalid     = 1'b0;
-                    end
-                endcase
-            end
-            ERROR: begin
-                mem_awready       = mem_awvalid;
-                io_master_awaddr  = 32'h0;
-                io_master_awvalid = 1'b0;
-                clint_awaddr      = 32'h0;
-                clint_awvalid     = 1'b0;
-            end
-            default: begin
-                io_master_awaddr  = 32'h0;
-                io_master_awvalid = 1'b0;
-                clint_awaddr      = 32'h0;
-                clint_awvalid     = 1'b0;
-                mem_awready       = 1'b0;
-            end
-        endcase
+        if(reset) begin
+            io_master_awaddr  = 32'h0;
+            io_master_awvalid = 1'b0;
+            clint_awaddr      = 32'h0; 
+            clint_awvalid     = 1'b0;  
+            mem_awready       = 1'b0;
+        end
+        else begin
+            case (current_master)
+                MEM_WRITE: begin
+                    case (decode_address(mem_awaddr))
+                        CLINT: begin 
+                            clint_awaddr      = mem_awaddr;
+                            clint_awvalid     = mem_awvalid;
+                            mem_awready       = clint_awready;
+                            io_master_awaddr  = 32'h0;
+                            io_master_awvalid = 1'b0;
+                        end
+                        default: begin
+                            io_master_awaddr  = mem_awaddr;
+                            io_master_awvalid = mem_awvalid;
+                            mem_awready       = io_master_arready;
+                            clint_awaddr      = 32'h0;
+                            clint_awvalid     = 1'b0;
+                        end
+                    endcase
+                end
+                ERROR: begin
+                    mem_awready       = mem_awvalid;
+                    io_master_awaddr  = 32'h0;
+                    io_master_awvalid = 1'b0;
+                    clint_awaddr      = 32'h0;
+                    clint_awvalid     = 1'b0;
+                end
+                default: begin
+                    io_master_awaddr  = 32'h0;
+                    io_master_awvalid = 1'b0;
+                    clint_awaddr      = 32'h0;
+                    clint_awvalid     = 1'b0;
+                    mem_awready       = 1'b0;
+                end
+            endcase
+        end
     end
 
     // 写数据通道处理
     always @(*) begin
-        io_master_wdata  = 32'h0;
-        io_master_wstrb  = 4'b0;
-        io_master_wvalid = 1'b0;
-        clint_wdata      = 32'h0; 
-        clint_wstrb      = 4'b0;  
-        clint_wvalid     = 1'b0;   
-        mem_wready       = 1'b0;
-
-        case (current_master)
-            MEM_WRITE: begin
-                case (decode_address(mem_awaddr))
-                    CLINT: begin 
-                        clint_wdata      = mem_wdata;
-                        clint_wstrb      = mem_wstrb;
-                        clint_wvalid     = mem_wvalid;
-                        mem_wready       = clint_wready;
-                        io_master_wdata  = 32'h0;
-                        io_master_wstrb  = 4'b0;
-                        io_master_wvalid = 1'b0;
-                    end
-                    default: begin
-                        io_master_wdata  = mem_wdata;
-                        io_master_wstrb  = mem_wstrb;
-                        io_master_wvalid = mem_wvalid;
-                        mem_wready       = io_master_wready;
-                        clint_wdata      = 32'h0;
-                        clint_wstrb      = 4'b0;
-                        clint_wvalid     = 1'b0;
-                    end
-                endcase
-            end
-            default: begin
-                io_master_wdata  = 32'h0;
-                io_master_wstrb  = 4'b0;
-                io_master_wvalid = 1'b0;
-                clint_wdata  = 32'h0;
-                clint_wstrb  = 4'b0;
-                clint_wvalid = 1'b0;
-                mem_wready   = 1'b0;
-            end
-        endcase
+        if(reset) begin
+            io_master_wdata  = 32'h0;
+            io_master_wstrb  = 4'b0;
+            io_master_wvalid = 1'b0;
+            clint_wdata      = 32'h0; 
+            clint_wstrb      = 4'b0;  
+            clint_wvalid     = 1'b0;   
+            mem_wready       = 1'b0;
+        end
+        else begin
+            case (current_master)
+                MEM_WRITE: begin
+                    case (decode_address(mem_awaddr))
+                        CLINT: begin 
+                            clint_wdata      = mem_wdata;
+                            clint_wstrb      = mem_wstrb;
+                            clint_wvalid     = mem_wvalid;
+                            mem_wready       = clint_wready;
+                            io_master_wdata  = 32'h0;
+                            io_master_wstrb  = 4'b0;
+                            io_master_wvalid = 1'b0;
+                        end
+                        default: begin
+                            io_master_wdata  = mem_wdata;
+                            io_master_wstrb  = mem_wstrb;
+                            io_master_wvalid = mem_wvalid;
+                            mem_wready       = io_master_wready;
+                            clint_wdata      = 32'h0;
+                            clint_wstrb      = 4'b0;
+                            clint_wvalid     = 1'b0;
+                        end
+                    endcase
+                end
+                default: begin
+                    io_master_wdata  = 32'h0;
+                    io_master_wstrb  = 4'b0;
+                    io_master_wvalid = 1'b0;
+                    clint_wdata  = 32'h0;
+                    clint_wstrb  = 4'b0;
+                    clint_wvalid = 1'b0;
+                    mem_wready   = 1'b0;
+                end
+            endcase
+        end
     end
 
     // 读数据通道处理
     always @(*) begin
-        io_master_rready = 1'b0;
-        clint_rready     = 1'b0;
-        ifu_rdata        = 32'h0;
-        ifu_rvalid       = 1'b0;
-        ifu_rresp        = OKAY;
-        mem_rdata        = 32'h0;
-        mem_rvalid       = 1'b0;
-        mem_rresp        = OKAY;
-
-        case (current_master)
-            IFU: begin
-                case (decode_address(ifu_araddr))
-                    CLINT: begin 
-                        ifu_rdata        = clint_rdata;
-                        ifu_rvalid       = clint_rvalid;
-                        ifu_rresp        = clint_rresp;
-                        clint_rready     = ifu_rready;
-                        io_master_rready = 1'b0;
-                    end
-                    default: begin
-                        ifu_rdata        = io_master_rdata;
-                        ifu_rvalid       = io_master_rvalid;
-                        ifu_rresp        = io_master_rresp;
-                        io_master_rready = ifu_rready;
-                        clint_rready     = 1'b0;
-                    end
-                endcase
-            end
-            MEM_READ: begin
-                case (decode_address(mem_araddr))
-                    CLINT: begin 
-                        mem_rdata        = clint_rdata;
-                        mem_rvalid       = clint_rvalid;
-                        mem_rresp        = clint_rresp;
-                        clint_rready     = mem_rready;
-                        io_master_rready = 1'b0;
-                    end
-                    default: begin
-                        mem_rdata        = io_master_rdata;
-                        mem_rvalid       = io_master_rvalid;
-                        mem_rresp        = io_master_rresp;
-                        io_master_rready = mem_rready;
-                        clint_rready     = 1'b0;
-                    end
-                endcase
-            end
-            ERROR: begin
-                if (ifu_arvalid) begin
-                    ifu_rdata    = 32'h0;
-                    ifu_rvalid   = 1'b1;
-                    ifu_rresp    = DECERR; // DECERR
-                end else if (mem_arvalid) begin
-                    mem_rdata    = 32'h0;
-                    mem_rvalid   = 1'b1;
-                    mem_rresp    = DECERR; // DECERR
+        if(reset) begin
+            io_master_rready = 1'b0;
+            clint_rready     = 1'b0;
+            ifu_rdata        = 32'h0;
+            ifu_rvalid       = 1'b0;
+            ifu_rresp        = OKAY;
+            mem_rdata        = 32'h0;
+            mem_rvalid       = 1'b0;
+            mem_rresp        = OKAY;
+        end
+        else begin
+            case (current_master)
+                IFU: begin
+                    case (decode_address(ifu_araddr))
+                        CLINT: begin 
+                            ifu_rdata        = clint_rdata;
+                            ifu_rvalid       = clint_rvalid;
+                            ifu_rresp        = clint_rresp;
+                            clint_rready     = ifu_rready;
+                            io_master_rready = 1'b0;
+                        end
+                        default: begin
+                            ifu_rdata        = io_master_rdata;
+                            ifu_rvalid       = io_master_rvalid;
+                            ifu_rresp        = io_master_rresp;
+                            io_master_rready = ifu_rready;
+                            clint_rready     = 1'b0;
+                        end
+                    endcase
                 end
-                io_master_rready = 1'b0;
-                clint_rready = 1'b0;
-            end
-            default: begin
-                io_master_rready = 1'b0;
-                clint_rready = 1'b0;
-                ifu_rdata    = 32'h0;
-                ifu_rvalid   = 1'b0;
-                ifu_rresp    = OKAY;
-                mem_rdata    = 32'h0;
-                mem_rvalid   = 1'b0;
-                mem_rresp    = OKAY;
-            end
-        endcase
+                MEM_READ: begin
+                    case (decode_address(mem_araddr))
+                        CLINT: begin 
+                            mem_rdata        = clint_rdata;
+                            mem_rvalid       = clint_rvalid;
+                            mem_rresp        = clint_rresp;
+                            clint_rready     = mem_rready;
+                            io_master_rready = 1'b0;
+                        end
+                        default: begin
+                            mem_rdata        = io_master_rdata;
+                            mem_rvalid       = io_master_rvalid;
+                            mem_rresp        = io_master_rresp;
+                            io_master_rready = mem_rready;
+                            clint_rready     = 1'b0;
+                        end
+                    endcase
+                end
+                ERROR: begin
+                    if (ifu_arvalid) begin
+                        ifu_rdata    = 32'h0;
+                        ifu_rvalid   = 1'b1;
+                        ifu_rresp    = DECERR; // DECERR
+                    end else if (mem_arvalid) begin
+                        mem_rdata    = 32'h0;
+                        mem_rvalid   = 1'b1;
+                        mem_rresp    = DECERR; // DECERR
+                    end
+                    io_master_rready = 1'b0;
+                    clint_rready = 1'b0;
+                end
+                default: begin
+                    io_master_rready = 1'b0;
+                    clint_rready = 1'b0;
+                    ifu_rdata    = 32'h0;
+                    ifu_rvalid   = 1'b0;
+                    ifu_rresp    = OKAY;
+                    mem_rdata    = 32'h0;
+                    mem_rvalid   = 1'b0;
+                    mem_rresp    = OKAY;
+                end
+            endcase
+        end
     end
 
     // 写响应通道处理
     always @(*) begin
-        io_master_bready = 1'b0;
-        clint_bready     = 1'b0; 
-        mem_bresp        = OKAY;
-        mem_bvalid       = 1'b0;
-
-        case (current_master)
-            MEM_WRITE: begin
-                case (decode_address(mem_awaddr))
-                    CLINT: begin 
-                        mem_bresp        = clint_bresp;
-                        mem_bvalid       = clint_bvalid;
-                        clint_bready     = mem_bready;
-                        io_master_bready = 1'b0;
-                    end
-                    default: begin
-                        mem_bresp        = io_master_bresp;
-                        mem_bvalid       = io_master_bvalid;
-                        io_master_bready = mem_bready;
-                        clint_bready     = 1'b0;
-                    end
-                endcase
-            end
-            ERROR: begin
-                if (mem_awvalid) begin
-                    mem_bresp    = DECERR; // DECERR
-                    mem_bvalid   = 1'b1;
+        if(reset) begin
+            io_master_bready = 1'b0;
+            clint_bready     = 1'b0; 
+            mem_bresp        = OKAY;
+            mem_bvalid       = 1'b0;
+        end
+        else begin
+            case (current_master)
+                MEM_WRITE: begin
+                    case (decode_address(mem_awaddr))
+                        CLINT: begin 
+                            mem_bresp        = clint_bresp;
+                            mem_bvalid       = clint_bvalid;
+                            clint_bready     = mem_bready;
+                            io_master_bready = 1'b0;
+                        end
+                        default: begin
+                            mem_bresp        = io_master_bresp;
+                            mem_bvalid       = io_master_bvalid;
+                            io_master_bready = mem_bready;
+                            clint_bready     = 1'b0;
+                        end
+                    endcase
                 end
-                io_master_bready = 1'b0;
-                clint_bready     = 1'b0;
-            end
-            default: begin
-                io_master_bready = 1'b0;
-                clint_bready     = 1'b0;
-                mem_bresp        = OKAY;
-                mem_bvalid       = 1'b0;
-            end
-        endcase
+                ERROR: begin
+                    if (mem_awvalid) begin
+                        mem_bresp    = DECERR; // DECERR
+                        mem_bvalid   = 1'b1;
+                    end
+                    io_master_bready = 1'b0;
+                    clint_bready     = 1'b0;
+                end
+                default: begin
+                    io_master_bready = 1'b0;
+                    clint_bready     = 1'b0;
+                    mem_bresp        = OKAY;
+                    mem_bvalid       = 1'b0;
+                end
+            endcase
+        end
     end
 
 endmodule

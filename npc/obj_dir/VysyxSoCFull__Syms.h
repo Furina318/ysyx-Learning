@@ -40,7 +40,6 @@ class VysyxSoCFull__Syms final : public VerilatedSyms {
     VerilatedScope __Vscope_ysyxSoCFull__asic__axi4yank;
     VerilatedScope __Vscope_ysyxSoCFull__asic__axi4yank__unnamedblk1;
     VerilatedScope __Vscope_ysyxSoCFull__asic__lmrom;
-    VerilatedScope __Vscope_ysyxSoCFull__asic__lspi__mspi__flash_cmd_i;
     VerilatedScope __Vscope_ysyxSoCFull__flash;
     VerilatedScope __Vscope_ysyxSoCFull__flash__flash_cmd_i;
 

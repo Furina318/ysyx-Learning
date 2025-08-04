@@ -38,58 +38,7 @@ module IF (
 );
     typedef enum {IDLE, READ_ADDR, READ_DATA, STALL} state_t;
     state_t state, next_state;
-    // wire [1:0] rresp;
-
-    // // IFU SRAM 接口
-    // //AR channel
-    // reg  [31:0] sram_araddr;
-    // reg         sram_arvalid;
-    // wire        sram_arready;
-    // //R channel
-    // wire [31:0] sram_rdata;
-    // wire        sram_rvalid;
-    // reg         sram_rready;
-    // wire [1:0]  sram_rresp;
-    // //AW channel(not used)仅声明
-    // reg  [31:0] sram_awaddr;
-    // reg         sram_awvalid;
-    // wire        sram_awready;
-    // //W channel(not used)仅声明
-    // reg  [31:0] sram_wdata;
-    // reg  [3:0]  sram_wstrb;
-    // reg         sram_wvalid;
-    // wire        sram_wready;
-    // //B channel(not used)仅声明
-    // wire [1:0]  sram_bresp;
-    // wire        sram_bvalid;
-    // reg         sram_bready;
-
-    // SRAM isram(
-    //             .clk(clk),
-    //             .reset(reset),
-    //             //AR channel
-    //             .araddr(sram_araddr),
-    //             .arvalid(sram_arvalid),
-    //             .arready(sram_arready),
-    //             //R channel
-    //             .rdata(sram_rdata),
-    //             .rvalid(sram_rvalid),
-    //             .rready(sram_rready),
-    //             .rresp(sram_rresp),
-    //             //AW channel(not used)仅声明
-    //             .awaddr(32'h0),
-    //             .awvalid(1'b0),
-    //             .awready(),
-    //             //W channel(not used)仅声明
-    //             .wdata(32'h0),
-    //             .wstrb(4'b0),
-    //             .wvalid(1'b0),
-    //             .wready(),
-    //             //B channel(not used)仅声明
-    //             .bresp(),
-    //             .bvalid(),
-    //             .bready(1'b0)
-    // );
+    
     always @(posedge clk) begin
         sram_awaddr <= 0;
         sram_awvalid <= 0;

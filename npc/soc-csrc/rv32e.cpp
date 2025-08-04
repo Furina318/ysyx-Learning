@@ -13,7 +13,7 @@
 
 #define HIT_TRAP 1
 #define ABORT 2
-#define start_time 10
+#define start_time 20
 
 /* **************** */
 
@@ -64,9 +64,9 @@ extern "C" void ebreak(int station, int inst) {
 
 extern "C" void flash_read(int32_t addr, int32_t *data) { 
     addr += CONFIG_SOC_FLASH_BASE; 
-    *data = host_read(soc_flash_guest_to_host(addr), 4); 
-    // uint32_t temp = host_read(soc_flash_guest_to_host(addr), 4);
-    // *data = ((temp & 0x000000ff) << 24) + ((temp & 0x0000ff00) << 8) + ((temp & 0x00ff0000) >> 8) + ((temp & 0xff000000) >> 24);
+    // *data = host_read(soc_flash_guest_to_host(addr), 4); 
+    uint32_t temp = host_read(soc_flash_guest_to_host(addr), 4);
+    *data = ((temp & 0x000000ff) << 24) + ((temp & 0x0000ff00) << 8) + ((temp & 0x00ff0000) >> 8) + ((temp & 0xff000000) >> 24);
 }
 
 extern "C" void psram_read(int32_t addr, int32_t *data) {

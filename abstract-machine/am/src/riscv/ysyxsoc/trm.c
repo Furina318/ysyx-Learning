@@ -37,12 +37,15 @@ static void uart_init(){
 	outb(UART_MSB, 0xff & (divisor >> 8));//写入分频系数
 	outb(UART_LSB, 0xff & divisor); 
 	outb(UART_LCR, lcr); //恢复LCR寄存器的值，关闭分频系数寄存器，可正常收发数据
-  // uint32_t divisor = (uint32_t)(50000000 / (baud_rate * 16));
-	// outb(UART_LCR, 0x80 | inb(UART_LCR)); // enable divisor latch
-	// outb(UART_MSB, 0xff & (divisor >> 8));
-	// outb(UART_LSB, 0xff & divisor); 
-	// outb(UART_LCR, inb(UART_LCR) & 0x7f); // resume	
 }
+
+// static void uart_init(uint32_t baud_rate) {
+// 	uint32_t divisor = (uint32_t)(50000000 / (baud_rate * 16));
+// 	outb(UART_LCR, 0x80 | inb(UART_LCR)); // enable divisor latch
+// 	outb(UART_MSB, 0xff & (divisor >> 8));
+// 	outb(UART_LSB, 0xff & divisor); 
+// 	outb(UART_LCR, inb(UART_LCR) & 0x7f); // resume	
+// }
 
 void halt(int code) {
   ysyxsoc_trap(code);
@@ -71,6 +74,7 @@ void ysyx_show(){
 }
 
 void _trm_init() {
+//   uart_init(115200);
   uart_init();
 
 //   bootloader();
