@@ -5,6 +5,7 @@
 
 extern char _heap_start;
 
+extern char _ssbl_lma, _ssbl, _essbl;
 extern char _text_lma, _text, _etext;
 extern char _rodata_lma, _rodata, _erodata;
 extern char _data_lma, _data, _edata;
@@ -69,7 +70,16 @@ void ysyx_show(){
 	putch('\n');
 }
 
-void bootloader(){
+void _trm_init() {
+  uart_init();
+
+//   bootloader();
+
+  int ret = main(mainargs);
+  halt(ret);
+}
+
+void __attribute__((section(".ssbl")))_bootloader(void){
 	//flash .data --> psram .data(用于初始化psram)
 
 	// flash是只读的，变量运行时需要在RAM中可读写
@@ -78,13 +88,15 @@ void bootloader(){
 	char *dst = &_data;
 	while(dst < &_edata)
 		*dst++ = *src++;
+
+	_trm_init();
 }
 
-void _trm_init() {
-  uart_init();
+void __attribute((section(".fsbl")))_fsbl_init(void) {
+	char *src = &_ssbl_lma;
+	char *dst = &_ssbl;
+	while(dst < &_essbl)
+		*dst++ = *src++;
 
-  bootloader();
-
-  int ret = main(mainargs);
-  halt(ret);
+	_bootloader();
 }

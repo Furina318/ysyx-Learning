@@ -23,6 +23,24 @@ SECTIONS {
   /* . = _mrom_start; */
   . = _flash_start;
 
+  .fsbl : {
+		. = ALIGN(8);
+    *(entry)
+		*(.fsbl*)
+		. = ALIGN(8);
+	} > flash AT> flash
+
+  .ssbl : {
+		. = ALIGN(8);
+		_ssbl = .;
+		*(.ssbl*)
+		_essbl = .;
+		. = ALIGN(8);
+	} > psram AT> flash
+	_ssbl_lma = LOADADDR(.ssbl);
+	_ssbl_size = _essbl - _ssbl;
+
+
   .text : ALIGN(4) {
     _text = .;
     *(entry)
