@@ -119,11 +119,12 @@ void mtrace_filter_output(paddr_t start_addr, paddr_t end_addr, bool filter_en, 
 uint8_t* guest_to_host(paddr_t paddr) { return pmem + paddr - CONFIG_MBASE; }   //0x8000_0000 -> pmem[0]
 paddr_t host_to_guest(uint8_t *haddr) { return haddr - pmem + CONFIG_MBASE; }
 
-// uint8_t mrom[CONFIG_SOC_MROM_SIZE] PG_ALIGN = {}; // 4KB MROM
-// uint8_t flash[CONFIG_SOC_FLASH_SIZE] PG_ALIGN = {}; // 16MB Flash
-uint8_t* soc_mrom_guest_to_host(paddr_t paddr) { return pmem + paddr - CONFIG_SOC_MROM_BASE; }
-uint8_t* soc_flash_guest_to_host(paddr_t paddr) { return pmem + paddr - CONFIG_SOC_FLASH_BASE; }
-uint8_t* soc_psram_guest_to_host(paddr_t paddr) { return pmem + paddr - CONFIG_SOC_PSRAM_BASE; }
+uint8_t mrom[CONFIG_SOC_MROM_SIZE] PG_ALIGN = {}; // 4KB MROM
+uint8_t flash[CONFIG_SOC_FLASH_SIZE] PG_ALIGN = {}; // 16MB Flash
+uint8_t psram[CONFIG_SOC_PSRAM_SIZE] PG_ALIGN = {};
+uint8_t* soc_mrom_guest_to_host(paddr_t paddr) { return mrom + paddr - CONFIG_SOC_MROM_BASE; }
+uint8_t* soc_flash_guest_to_host(paddr_t paddr) { return flash + paddr - CONFIG_SOC_FLASH_BASE; }
+uint8_t* soc_psram_guest_to_host(paddr_t paddr) { return psram + paddr - CONFIG_SOC_PSRAM_BASE; }
 
 word_t host_read(void *addr, int len) 
 {
@@ -199,6 +200,6 @@ void init_mem(void)
 
   // memset(mrom, 0, CONFIG_SOC_MROM_SIZE);
   // memcpy(soc_mrom_guest_to_host(CONFIG_SOC_MROM_BASE), img, sizeof(img));
-  // memset(flash, 0, CONFIG_SOC_FLASH_SIZE);
+  memset(flash, 0, CONFIG_SOC_FLASH_SIZE);
   memcpy(soc_flash_guest_to_host(CONFIG_SOC_FLASH_BASE), img, sizeof(img));
 }

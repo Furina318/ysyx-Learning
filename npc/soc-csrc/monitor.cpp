@@ -16,6 +16,7 @@ void init_log(const char *log_file);
 void init_mem();
 void init_sdb();
 void init_device();
+extern uint8_t* soc_flash_guest_to_host(paddr_t paddr);
 
 unsigned char npc_logo[] = {
   0x0a, 0x20, 0x20, 0x20, 0x20, 0x20, 0x5f, 0x5f, 0x5f, 0x20, 0x20, 0x20,
@@ -142,7 +143,7 @@ static long load_img() {//load_img函数用于加载镜像文件
   Log("The image is %s, size = %ld", img_file, size);
 
   fseek(fp, 0, SEEK_SET);
-  int ret = fread(guest_to_host(RESET_VECTOR), size, 1, fp);
+  int ret = fread(soc_flash_guest_to_host(CONFIG_SOC_FLASH_BASE), size, 1, fp);
   assert(ret == 1);
 
   fclose(fp);
