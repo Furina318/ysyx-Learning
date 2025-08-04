@@ -4,6 +4,8 @@ MEMORY {
   mrom  (r x) : ORIGIN = 0x20000000, LENGTH = 4K
   sram  (rwx) : ORIGIN = 0x0f000000, LENGTH = 8K
   flash (r x) : ORIGIN = 0x30000000, LENGTH = 16M
+  psram (rwx) : ORIGIN = 0x80000000, LENGTH = 4M
+  sdram (rwx) : ORIGIN = 0xa0000000, LENGTH = 64M
 }
 
 SECTIONS {
@@ -13,6 +15,10 @@ SECTIONS {
   _mrom_end = _mrom_start + LENGTH(mrom);
   _flash_start = ORIGIN(flash);
   _flash_end = _flash_start + LENGTH(flash);
+  _psram_start = ORIGIN(psram);
+  _psram_end = _psram_start + LENGTH(psram);
+  _sdram_start = ORIGIN(sdram);
+  _sdram_end = _sdram_start + LENGTH(sdram);
 
   /* . = _mrom_start; */
   . = _flash_start;
