@@ -49,7 +49,7 @@ SECTIONS {
     *(.data*)
     *(.sdata*)
    _edata = .;
-  } > sram AT> flash
+  } > psram AT> flash
   _data_lma = LOADADDR(.data);
   _data_size = _edata - _data;
 
@@ -59,7 +59,7 @@ SECTIONS {
     *(.sbss*)
     *(.scommon)
     _ebss = .;
-  } > sram
+  } > psram
   _bss_lma = LOADADDR(.bss);
   _bss_size = _ebss - _bss;
 
@@ -72,10 +72,10 @@ SECTIONS {
   _stack_pointer = .;
   _stack_end = .; */
   .stack (NOLOAD) : ALIGN(8) {
-    . = ORIGIN(sram) + LENGTH(sram) - _stack_size;
+    . = ORIGIN(psram) + LENGTH(psram) - _stack_size;
     . = ALIGN(8);
     _stack_top = .;
     . += _stack_size;
     _stack_pointer = .;
-  } > sram
+  } > psram
 }
