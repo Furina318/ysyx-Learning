@@ -50,8 +50,8 @@ module CLINT #(
     reg addr_valid;
 
     // 检查地址是否有效
-    wire addr_valid = (araddr >= 32'ha000_2000 && araddr <= 32'ha000_2007) ||
-                      (awaddr >= 32'ha000_2000 && awaddr <= 32'ha000_2007);
+    wire addr_valid = (araddr >= 32'h0200_0000 && araddr <= 32'h0200_0007) ||
+                      (awaddr >= 32'h0200_0000 && awaddr <= 32'h0200_0007);
     reg  [63:0] mtime;//时间寄存器
     wire [31:0] mtime_low = mtime[31:0];
     wire [31:0] mtime_high = mtime[63:32];
@@ -113,8 +113,8 @@ module CLINT #(
                     else begin
                         if (addr_valid) begin
                             case(araddr_reg)
-                                32'ha000_2000: rdata_reg <= mtime_low;//低32位
-                                32'ha000_2004: rdata_reg <= mtime_high;//高32位
+                                32'h0200_0000: rdata_reg <= mtime_low;//低32位
+                                32'h0200_0004: rdata_reg <= mtime_high;//高32位
                                 default: begin
                                     rdata <= 32'h0;
                                     rresp <= `SLVERR;

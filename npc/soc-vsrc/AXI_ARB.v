@@ -87,7 +87,7 @@ module AXI_ARB (
 
     // 地址解码函数
     function [1:0] decode_address(input [31:0] addr);
-        if (addr >= 32'ha000_2000 && addr <= 32'ha000_2007) begin
+        if (addr >= 32'h0200_0000 && addr <= 32'h0200_0007) begin
             decode_address = CLINT;
         end
         else begin
