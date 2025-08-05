@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "VysyxSoCFull.h"
-// #include "verilated_vcd_c.h"
 #include "../obj_dir/VysyxSoCFull___024root.h"
 #include "VysyxSoCFull__Dpi.h"
 #include "svdpi.h"
@@ -34,7 +33,11 @@ extern uint8_t* soc_flash_guest_to_host(paddr_t paddr);
 extern uint8_t* soc_psram_guest_to_host(paddr_t paddr);
 
 /* **************** */
-// VerilatedVcdC *tfp = new VerilatedVcdC(); // 导出vcd波形
+#ifdef CONFIG_WAVE
+#include "verilated_vcd_c.h"
+VerilatedVcdC *tfp = new VerilatedVcdC(); // 导出vcd波形
+#endif
+
 VysyxSoCFull *top = new VysyxSoCFull("top");
 vluint64_t main_time = 0; // 仿真时间
 
@@ -111,7 +114,9 @@ void single_cycle(void) {
         }
 
         top->eval(); // 执行仿真
-        // tfp->dump(main_time); // 记录波形
+#ifdef CONFIG_WAVE
+        tfp->dump(main_time); // 记录波形
+#endif
         main_time++; // 推进仿真时间
     }
 }
@@ -124,17 +129,21 @@ void reset(void) {
 }
 
 void init_verilator(void) {
-    // Verilated::traceEverOn(true); // 启用波形跟踪
+#ifdef CONFIG_WAVE
+    Verilated::traceEverOn(true); // 启用波形跟踪
 
-    // top->trace(tfp, 0);
-    // tfp->open("wave.vcd"); // 打开波形文件
+    top->trace(tfp, 0);
+    tfp->open("wave.vcd"); // 打开波形文件
+#endif
 
     reset(); // 执行复位
 }
 
 void die(){
     top->final();
-    // tfp->close();
+#ifdef CONFIG_WAVE
+    tfp->close();
+#endif
     delete top;
     Verilated::gotFinish(true);
 }

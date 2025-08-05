@@ -77,7 +77,7 @@ SECTIONS {
     *(.sbss*)
     *(.scommon)
     _ebss = .;
-  } > psram
+  } > psram AT> flash
   _bss_lma = LOADADDR(.bss);
   _bss_size = _ebss - _bss;
 
