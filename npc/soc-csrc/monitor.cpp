@@ -17,6 +17,7 @@ void init_mem();
 void init_sdb();
 void init_device();
 extern uint8_t* soc_flash_guest_to_host(paddr_t paddr);
+extern uint8_t* soc_sdram_guest_to_host(paddr_t paddr);
 
 unsigned char npc_logo[] = {
   0x0a, 0x20, 0x20, 0x20, 0x20, 0x20, 0x5f, 0x5f, 0x5f, 0x20, 0x20, 0x20,

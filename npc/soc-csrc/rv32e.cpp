@@ -31,6 +31,7 @@ extern void host_write(void *addr, int len, word_t data);
 extern uint8_t* soc_mrom_guest_to_host(paddr_t paddr);
 extern uint8_t* soc_flash_guest_to_host(paddr_t paddr);
 extern uint8_t* soc_psram_guest_to_host(paddr_t paddr);
+extern uint8_t* soc_sdram_guest_to_host(paddr_t paddr);
 
 /* **************** */
 #ifdef CONFIG_WAVE
