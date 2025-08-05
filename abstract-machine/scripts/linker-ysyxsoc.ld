@@ -36,7 +36,7 @@ SECTIONS {
 		*(.ssbl*)
 		_essbl = .;
 		. = ALIGN(8);
-	} > psram AT> flash
+	} > sdram AT> flash
 	_ssbl_lma = LOADADDR(.ssbl);
 	_ssbl_size = _essbl - _ssbl;
 
@@ -67,7 +67,7 @@ SECTIONS {
     *(.data*)
     *(.sdata*)
    _edata = .;
-  } > psram AT> flash
+  } > sdram AT> flash
   _data_lma = LOADADDR(.data);
   _data_size = _edata - _data;
 
@@ -77,7 +77,7 @@ SECTIONS {
     *(.sbss*)
     *(.scommon)
     _ebss = .;
-  } > psram AT> flash
+  } > sdram AT> flash
   _bss_lma = LOADADDR(.bss);
   _bss_size = _ebss - _bss;
 
@@ -90,10 +90,10 @@ SECTIONS {
   _stack_pointer = .;
   _stack_end = .; */
   .stack (NOLOAD) : ALIGN(8) {
-    . = ORIGIN(psram) + LENGTH(psram) - _stack_size;
+    . = ORIGIN(sdram) + LENGTH(sdram) - _stack_size;
     . = ALIGN(8);
     _stack_top = .;
     . += _stack_size;
     _stack_pointer = .;
-  } > psram
+  } > sdram
 }

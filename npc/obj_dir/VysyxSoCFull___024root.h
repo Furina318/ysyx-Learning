@@ -790,10 +790,10 @@ class VysyxSoCFull___024root final : public VerilatedModule {
         CData/*0:0*/ ysyxSoCFull__DOT__psram__DOT____VdfgTmp_h3ca0fe2e__0;
         CData/*2:0*/ ysyxSoCFull__DOT__sdram__DOT__CAS_latency;
         CData/*2:0*/ ysyxSoCFull__DOT__sdram__DOT__brust_len;
-        CData/*1:0*/ ysyxSoCFull__DOT__sdram__DOT__l_Bank;
+        CData/*1:0*/ ysyxSoCFull__DOT__sdram__DOT__L_Bank;
         CData/*1:0*/ ysyxSoCFull__DOT__sdram__DOT__dqm_buf;
-        CData/*3:0*/ ysyxSoCFull__DOT__sdram__DOT__R_cnt;
-        CData/*3:0*/ ysyxSoCFull__DOT__sdram__DOT__W_cnt;
+        CData/*3:0*/ ysyxSoCFull__DOT__sdram__DOT__r_cnt;
+        CData/*3:0*/ ysyxSoCFull__DOT__sdram__DOT__w_cnt;
         CData/*0:0*/ ysyxSoCFull__DOT__sdram__DOT__read_flag;
         CData/*3:0*/ ysyxSoCFull__DOT__sdram__DOT__Length;
         CData/*3:0*/ __VdfgTmp_h7fb30c92__0;
@@ -852,9 +852,9 @@ class VysyxSoCFull___024root final : public VerilatedModule {
         SData/*15:0*/ ysyxSoCFull__DOT__asic__DOT__axi4frag__DOT__unnamedblk1__DOT__unnamedblk2__DOT___GEN_2;
         SData/*15:0*/ ysyxSoCFull__DOT__sdram__DOT__din;
         SData/*15:0*/ ysyxSoCFull__DOT__sdram__DOT__dout;
-        SData/*8:0*/ ysyxSoCFull__DOT__sdram__DOT__R_address;
-        SData/*8:0*/ ysyxSoCFull__DOT__sdram__DOT__W_address;
-        SData/*15:0*/ ysyxSoCFull__DOT__sdram__DOT__W_data;
+        SData/*8:0*/ ysyxSoCFull__DOT__sdram__DOT__r_addr;
+        SData/*8:0*/ ysyxSoCFull__DOT__sdram__DOT__w_addr;
+        SData/*15:0*/ ysyxSoCFull__DOT__sdram__DOT__w_data;
         SData/*15:0*/ ysyxSoCFull__DOT__sdram__DOT__dq__out__strong__out0;
         SData/*15:0*/ ysyxSoCFull__DOT__sdram__DOT__dq__out__strong__out1;
         SData/*15:0*/ ysyxSoCFull__DOT__sdram__DOT__dq__out__strong__out2;
@@ -871,7 +871,7 @@ class VysyxSoCFull___024root final : public VerilatedModule {
         SData/*15:0*/ ysyxSoCFull__DOT__sdram__DOT__dq__out__strong__out13;
         SData/*15:0*/ ysyxSoCFull__DOT__sdram__DOT__dq__out__strong__out14;
         SData/*15:0*/ ysyxSoCFull__DOT__sdram__DOT__dq__out__strong__out15;
-        SData/*12:0*/ ysyxSoCFull__DOT__sdram__DOT____VdfgTmp_h07589b59__0;
+        SData/*12:0*/ ysyxSoCFull__DOT__sdram__DOT____VdfgTmp_hc582324d__0;
         IData/*31:0*/ ysyxSoCFull__DOT__asic__DOT___axi4frag_auto_in_rdata;
         IData/*31:0*/ ysyxSoCFull__DOT__asic__DOT___axi4frag_auto_out_awaddr;
         IData/*31:0*/ ysyxSoCFull__DOT__asic__DOT___axi4frag_auto_out_wdata;
