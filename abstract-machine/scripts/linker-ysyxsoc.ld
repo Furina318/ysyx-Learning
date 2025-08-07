@@ -36,7 +36,7 @@ SECTIONS {
 		*(.ssbl*)
 		_essbl = .;
 		. = ALIGN(8);
-	} > sdram AT> flash
+	} > sram AT> flash
 	_ssbl_lma = LOADADDR(.ssbl);
 	_ssbl_size = _essbl - _ssbl;
 
@@ -90,10 +90,10 @@ SECTIONS {
   _stack_pointer = .;
   _stack_end = .; */
   .stack (NOLOAD) : ALIGN(8) {
-    . = ORIGIN(sdram) + LENGTH(sdram) - _stack_size;
+    . = ORIGIN(sram) + LENGTH(sram) - _stack_size;
     . = ALIGN(8);
     _stack_top = .;
     . += _stack_size;
     _stack_pointer = .;
-  } > sdram
+  } > sram
 }

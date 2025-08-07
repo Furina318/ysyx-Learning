@@ -11,13 +11,14 @@ extern char _rodata_lma, _rodata, _erodata;
 extern char _data_lma, _data, _edata;
 extern char _bss, _ebss;
 extern char _stack_top;
+extern char _sdram_start, _sdram_end;
 int main(const char *args);
 
 extern char _sram_start;
 #define SRAM_SIZE (8 * 1024)
 #define SRAM_END  ((uintptr_t)&_sram_start + SRAM_SIZE)
 
-Area heap = RANGE(&_heap_start, SRAM_END);
+Area heap = RANGE(&_heap_start, &_sdram_end);
 static const char mainargs[MAINARGS_MAX_LEN] = MAINARGS_PLACEHOLDER; // defined in CFLAGS
 
 void putch(char ch) {

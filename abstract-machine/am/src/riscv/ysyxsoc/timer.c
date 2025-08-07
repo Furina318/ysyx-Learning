@@ -3,8 +3,8 @@
 #include "../riscv.h"
 
 void __am_timer_init() {
-  outl(RTC_ADDR,0);//将计时器的低 32 位和高 32 位清零
-  outl(RTC_ADDR + 4,0);
+  // outl(RTC_ADDR,0);//将计时器的低 32 位和高 32 位清零
+  // outl(RTC_ADDR + 4,0);
 }
 
 void __am_timer_uptime(AM_TIMER_UPTIME_T *uptime) {

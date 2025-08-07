@@ -48,5 +48,5 @@
 // #define CONFIG_DIFFTEST 1
 // #define CONFIG_ITRACE 1
 // #define CONFIG_TARGET_AM 1
-#define CONFIG_WAVE 1
+// #define CONFIG_WAVE 1
 #endif
