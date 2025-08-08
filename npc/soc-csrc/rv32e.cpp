@@ -39,12 +39,13 @@ extern uint8_t* soc_sdram_guest_to_host(paddr_t paddr);
 VerilatedVcdC *tfp = new VerilatedVcdC(); // 导出vcd波形
 #endif
 
-#ifdef CONFIG_NVBOARD
-#include <nvboard.h>
-#endif
-
 VysyxSoCFull *top = new VysyxSoCFull("top");
 vluint64_t main_time = 0; // 仿真时间
+
+#ifdef NVBOARD
+#include <nvboard.h>
+extern void nvboard_bind_all_pins(VysyxSoCFull* top);
+#endif
 
 //=========================================== DPI-C ==========================================//
 extern "C" void ebreak(int station, int inst) {
@@ -156,6 +157,17 @@ void die(){
 }
 
 int main(int argc, char *argv[]) {
+#ifdef NVBOARD
+    nvboard_bind_all_pins(top);
+    nvboard_init();
+
+    reset();
+    init_monitor(argc, argv);
+    while(1) {
+        nvboard_update();
+        single_cycle();
+    }
+#else
     Verilated::commandArgs(argc, argv); // 处理命令行参数
     /* Initialize the monitor. */
     init_monitor(argc, argv);
@@ -172,4 +184,5 @@ int main(int argc, char *argv[]) {
     delete top;
 
     return is_exit_status_bad();
+#endif
 }

@@ -4,7 +4,7 @@
 # Execute this makefile from the object directory:
 #    make -f VysyxSoCFull.mk
 
-default: VysyxSoCFull
+default: /home/furina/ysyx-workbench/npc/obj_dir/VysyxSoCFull
 
 ### Constants...
 # Perl executable (from $PERL)
@@ -35,12 +35,29 @@ VM_PREFIX = VysyxSoCFull
 VM_MODPREFIX = VysyxSoCFull
 # User CFLAGS (from -CFLAGS on Verilator command line)
 VM_USER_CFLAGS = \
+	-DYSYXSOC \
+	-I/home/furina/ysyx-workbench/npc/include/ \
+	-I/home/furina/ysyx-workbench/nvboard/usr/include \
+	-DTOP_NAME="VysyxSoCFull" \
+	-DNVBOARD \
+	-MMD \
+	-O3 \
+	-I/usr/include/SDL2 \
+	-D_REENTRANT \
 
 # User LDLIBS (from -LDFLAGS on Verilator command line)
 VM_USER_LDLIBS = \
+	/home/furina/ysyx-workbench/nvboard/build/nvboard.a \
+	-lreadline \
+	-ldl \
+	-lSDL2 \
+	-lSDL2 \
+	-lSDL2_image \
+	-lSDL2_ttf \
 
 # User .cpp files (from .cpp's on Verilator command line)
 VM_USER_CLASSES = \
+	auto_bind \
 	cpu \
 	alarm \
 	device \
@@ -63,6 +80,7 @@ VM_USER_CLASSES = \
 
 # User .cpp directories (from .cpp's on Verilator command line)
 VM_USER_DIR = \
+	/home/furina/ysyx-workbench/npc/obj_dir \
 	/home/furina/ysyx-workbench/npc/soc-csrc \
 	/home/furina/ysyx-workbench/npc/soc-csrc/device \
 	/home/furina/ysyx-workbench/npc/soc-csrc/device/io \
@@ -77,6 +95,8 @@ include $(VERILATOR_ROOT)/include/verilated.mk
 ### Executable rules... (from --exe)
 VPATH += $(VM_USER_DIR)
 
+auto_bind.o: /home/furina/ysyx-workbench/npc/obj_dir/auto_bind.cpp
+	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
 cpu.o: /home/furina/ysyx-workbench/npc/soc-csrc/cpu.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
 alarm.o: /home/furina/ysyx-workbench/npc/soc-csrc/device/alarm.cpp
@@ -117,10 +137,8 @@ trace.o: /home/furina/ysyx-workbench/npc/soc-csrc/trace.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
 
 ### Link rules... (from --exe)
-VysyxSoCFull: $(VK_USER_OBJS) $(VK_GLOBAL_OBJS) $(VM_PREFIX)__ALL.a $(VM_HIER_LIBS)
+/home/furina/ysyx-workbench/npc/obj_dir/VysyxSoCFull: $(VK_USER_OBJS) $(VK_GLOBAL_OBJS) $(VM_PREFIX)__ALL.a $(VM_HIER_LIBS)
 	$(LINK) $(LDFLAGS) $^ $(LOADLIBES) $(LDLIBS) $(LIBS) $(SC_LIBS) -o $@
 
 
 # Verilated -*- Makefile -*-
-LIBS += -lreadline   -ldl        -lSDL2     
-CXXFLAGS += -I/home/furina/ysyx-workbench/npc/include/

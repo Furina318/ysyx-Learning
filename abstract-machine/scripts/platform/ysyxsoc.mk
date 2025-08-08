@@ -5,6 +5,7 @@ AM_SRCS := riscv/ysyxsoc/start.S \
            riscv/ysyxsoc/input.c \
            riscv/ysyxsoc/cte.c \
            riscv/ysyxsoc/trap.S \
+           riscv/ysyxsoc/uart.c \
            platform/dummy/vme.c \
            platform/dummy/mpe.c
 
@@ -17,7 +18,7 @@ LDFLAGS   += --defsym=_stack_size=1K --defsym=_entry_offset=0x0
 LDFLAGS   += --gc-sections -e _start
 NPCFLAGS += -l $(shell dirname $(IMAGE).elf)/ysyxsoc-log.txt
 NPCFLAGS += -e $(IMAGE).elf
-# NPCFLAGS += -b
+NPCFLAGS += -b
 NPCFLAGS += -d $(NEMU_HOME)/build/riscv32-nemu-interpreter-so 
 
 MAINARGS_MAX_LEN = 64
