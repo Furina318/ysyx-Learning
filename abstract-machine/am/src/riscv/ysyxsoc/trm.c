@@ -85,12 +85,18 @@ void _trm_init() {
 }
 
 void __attribute__((section(".ssbl")))_bootloader(void){
-	//flash .data --> psram .data(用于初始化psram)
+	//flash .text --> RAM .text
+	char *src = &_text_lma;
+	char *dst = &_text;
+	while(dst < &_etext)
+		*dst++ = *src++;
+
+	//flash .data --> RAM .data(用于初始化RAM)
 
 	// flash是只读的，变量运行时需要在RAM中可读写
 	// linker-ysyxsoc.ld只负责把初值放在flash，运行时需要手动搬运到RAM
-	char *src = &_data_lma;
-	char *dst = &_data;
+	src = &_data_lma;
+	dst = &_data;
 	while(dst < &_edata)
 		*dst++ = *src++;
 

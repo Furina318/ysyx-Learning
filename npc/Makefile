@@ -1,28 +1,41 @@
 # 项目模块名称
+ARCH = riscv32e-npc
+ifeq ($(ARCH), riscv32e-ysyxsoc)
 TOP_MODULE = ysyxSoCFull
 MODULE = ysyx_25010030
+else ifeq ($(ARCH), riscv32e-npc)
+TOP_MODULE = rv32e
+MODULE = rv32e
+else
+$(error 不支持的架构：$(ARCH).支持的架构: riscv32e-ysyxsoc, riscv32e-npc)
+endif
 
 # 源文件路径和定义
 NPC_HOME = /home/furina/ysyx-workbench/npc
+ifeq ($(ARCH), riscv32e-ysyxsoc)
 CSRCS = $(shell find $(abspath ./soc-csrc) -name "*.cpp")  # 查找 csrc 目录下所有 .cpp 文件
 VSRCS = $(shell find $(abspath ./soc-vsrc) -name "*.v") \
 $(shell find $(abspath ../ysyxSoC/perip) -name "*.v") \
 ../ysyxSoC/build/ysyxSoCFull.v 
-	
+
+else
+ifeq ($(ARCH), riscv32e-npc)
+CSRCS = $(shell find $(abspath ./pipeline-csrc) -name "*.cpp")  # 查找 csrc 目录下所有 .cpp 文件
+VSRCS = $(shell find $(abspath ./pipeline-vsrc) -name "*.v")     # 查找 vsrc 目录下所有 .v 文件
+endif
+endif
 
 INC_PATH = $(NPC_HOME)/include/
 CFLAGS += -I$(INC_PATH)  # 包含路径，确保头文件被找到
 
 # 链接的库
-LIBS = -lreadline  # 链接 readline 库
-LIBS += -ldl       # 链接 dlfcn 库
-LIBS += -lSDL2     # 添加 SDL2 库链接
+LIBS = -lreadline  # 链接 readline 库, 命令行交互库
+LIBS += -ldl       # 链接 dlfcn 库, 动态链接库
+LIBS += -lSDL2     # 添加 SDL2 库链接, 图形显示库
 
 # 可执行文件目标
 BINARY = ./obj_dir/V$(TOP_MODULE)
 
-# DIFFTEST 配置（如果启用）
-# CONFIG_DIFFTEST = 1
 # ifdef CONFIG_DIFFTEST
 DIFF_REF_PATH = /home/furina/ysyx-workbench/nemu/build
 DIFF_REF_SO = $(DIFF_REF_PATH)/riscv32-nemu-interpreter-so
@@ -104,8 +117,7 @@ verilate: .stamp.verilate
 	@echo
 	@echo "### VERILATING ###"
 	verilator -Wno-STMTDLY -Wno-MODDUP --trace --top-module $(TOP_MODULE) \
-	-I../ysyxSoC/perip/uart16550/rtl -I../ysyxSoC/perip/spi/rtl \
-	--timescale "1ns/1ns" --no-timing \
+	$(if $(filter riscv32e-ysyxsoc,$(ARCH)),-I../ysyxSoC/perip/uart16550/rtl -I../ysyxSoC/perip/spi/rtl --timescale "1ns/1ns" --no-timing) \
 	-cc $(VSRCS) --exe $(CSRCS) -I$(INC_PATH) $(CFLAGS)
 # verilator -Wno-STMTDLY -Wno-MODDUP --top-module $(MODULE) -cc $(VSRCS) --exe $(CSRCS) -I$(INC_PATH) $(CFLAGS)
 	@echo "LIBS += $(LIBS)" >> ./obj_dir/V$(TOP_MODULE).mk    # 添加链接库

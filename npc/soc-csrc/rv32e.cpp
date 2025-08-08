@@ -39,9 +39,14 @@ extern uint8_t* soc_sdram_guest_to_host(paddr_t paddr);
 VerilatedVcdC *tfp = new VerilatedVcdC(); // 导出vcd波形
 #endif
 
+#ifdef CONFIG_NVBOARD
+#include <nvboard.h>
+#endif
+
 VysyxSoCFull *top = new VysyxSoCFull("top");
 vluint64_t main_time = 0; // 仿真时间
 
+//=========================================== DPI-C ==========================================//
 extern "C" void ebreak(int station, int inst) {
     if(main_time>=start_time){
         if (Verilated::gotFinish())
@@ -97,6 +102,7 @@ extern "C" word_t pmem_read(paddr_t raddr, int len) {
 extern "C" void pmem_write(paddr_t waddr, word_t wdata, int len) {
     if (main_time >= start_time) pmem_w(waddr, len, wdata); // 复位结束后才写入
 }
+//============================================================================================//
 
 NPCState npc_state = { .state = NPC_STOP };
 

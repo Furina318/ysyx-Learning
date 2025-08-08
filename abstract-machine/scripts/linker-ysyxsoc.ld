@@ -43,11 +43,11 @@ SECTIONS {
 
   .text : ALIGN(4) {
     _text = .;
-    *(entry)
+    /* *(entry) */
     *(.text*)
     _etext = .;
     . = ALIGN(4);
-  } > flash AT> flash
+  } > sdram AT> flash
   _text_lma = LOADADDR(.text);
   _text_size = _etext - _text;
 
