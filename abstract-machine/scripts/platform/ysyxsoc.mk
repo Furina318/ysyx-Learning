@@ -6,6 +6,7 @@ AM_SRCS := riscv/ysyxsoc/start.S \
            riscv/ysyxsoc/cte.c \
            riscv/ysyxsoc/trap.S \
            riscv/ysyxsoc/uart.c \
+           riscv/ysyxsoc/gpu.c \
            platform/dummy/vme.c \
            platform/dummy/mpe.c
 

@@ -12,6 +12,14 @@ void nvboard_bind_all_pins(VysyxSoCFull* top) {
 	nvboard_bind_pin( &top->externalPins_gpio_seg_5, 8, SEG5A, SEG5B, SEG5C, SEG5D, SEG5E, SEG5F, SEG5G, DEC5P);
 	nvboard_bind_pin( &top->externalPins_gpio_seg_6, 8, SEG6A, SEG6B, SEG6C, SEG6D, SEG6E, SEG6F, SEG6G, DEC6P);
 	nvboard_bind_pin( &top->externalPins_gpio_seg_7, 8, SEG7A, SEG7B, SEG7C, SEG7D, SEG7E, SEG7F, SEG7G, DEC7P);
+	nvboard_bind_pin( &top->externalPins_uart_tx, 1, UART_TX);
+	nvboard_bind_pin( &top->externalPins_uart_rx, 1, UART_RX);
 	nvboard_bind_pin( &top->externalPins_ps2_clk, 1, PS2_CLK);
 	nvboard_bind_pin( &top->externalPins_ps2_data, 1, PS2_DAT);
+	nvboard_bind_pin( &top->externalPins_vga_r, 8, VGA_R7, VGA_R6, VGA_R5, VGA_R4, VGA_R3, VGA_R2, VGA_R1, VGA_R0);
+	nvboard_bind_pin( &top->externalPins_vga_g, 8, VGA_G7, VGA_G6, VGA_G5, VGA_G4, VGA_G3, VGA_G2, VGA_G1, VGA_G0);
+	nvboard_bind_pin( &top->externalPins_vga_b, 8, VGA_B7, VGA_B6, VGA_B5, VGA_B4, VGA_B3, VGA_B2, VGA_B1, VGA_B0);
+	nvboard_bind_pin( &top->externalPins_vga_hsync, 1, VGA_HSYNC);
+	nvboard_bind_pin( &top->externalPins_vga_vsync, 1, VGA_VSYNC);
+	nvboard_bind_pin( &top->externalPins_vga_valid, 1, VGA_BLANK_N);
 }

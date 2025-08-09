@@ -31,7 +31,7 @@ void putch(char ch) {
 }
 
 // static void uart_init(){
-//   unsigned int divisor = 1;
+//   	unsigned int divisor = 1;
 // 	uint32_t lcr = 0x03;//8位数据位，无校验
 
 // 	outb(UART_LCR, 0x80 | lcr); //LCR寄存器最高位，使能分频系数寄存器
