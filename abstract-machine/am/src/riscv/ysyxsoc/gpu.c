@@ -36,9 +36,9 @@ void __am_gpu_fbdraw(AM_GPU_FBDRAW_T *ctl) {
   uint32_t *pixels = (uint32_t *)ctl->pixels;
   uint32_t *fb = (uint32_t *)VGA_FB_ADDR;
   // memset(fb + (y*SCREEN_WIDTH + x), (int)pixels, h*w*4);
-  for (int i = 0; i < h; i ++){
-    for(int j = 0; j < w; j++){
-      fb[(i+y)*SCREEN_WIDTH + x + j] = pixels[i*w + j];
+  for (int i = y; i < y+h; i ++){
+    for(int j = x; j < x+w; j++){
+      fb[i*SCREEN_WIDTH + j] = pixels[(i-y)*w+(j-x)];
     }
   }
 }
