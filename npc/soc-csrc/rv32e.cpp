@@ -160,7 +160,9 @@ int main(int argc, char *argv[]) {
 #ifdef NVBOARD
     nvboard_bind_all_pins(top);
     nvboard_init();
-
+#ifdef CONFIG_WAVE
+    init_verilator();
+#endif
     reset();
     init_monitor(argc, argv);
     while(1) {
