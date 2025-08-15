@@ -48,6 +48,30 @@ extern void nvboard_bind_all_pins(VysyxSoCFull* top);
 #endif
 
 //=========================================== DPI-C ==========================================//
+extern uint64_t R_inst, I_inst, J_inst, R_inst, L_inst, B_inst, S_inst, CSR_inst;
+extern uint64_t ifu_get;
+extern uint64_t lsu_get;
+extern uint64_t exu_done;
+extern uint64_t total_cycles[7];
+extern "C" void counter(int inst_type, int cycles, int ifu_inc, int lsu_inc, int exu_inc) {
+    ifu_get  += ifu_inc;
+    lsu_get  += lsu_inc;
+    exu_done += exu_inc;
+    switch (inst_type) {
+        case 0: R_inst++; break;  // R 类型
+        case 1: I_inst++; break;  // I 类型 (包括 LUI/AUIPC)
+        case 2: J_inst++; break;  // J 类型 (JAL/JALR)
+        case 3: L_inst++; break;  // L 类型 (假设第二个 R_inst 为 L_inst)
+        case 4: B_inst++; break;  // B 类型
+        case 5: S_inst++; break;  // S 类型
+        case 6: CSR_inst++; break; // CSR 类型
+        default: break;  // 无效类型，不递增
+    }
+    if(inst_type >= 0 && inst_type < 7) {
+        total_cycles[inst_type] += cycles;
+    }
+}
+
 extern "C" void ebreak(int station, int inst) {
     if(main_time>=start_time){
         if (Verilated::gotFinish())
@@ -168,6 +192,7 @@ int main(int argc, char *argv[]) {
     while(1) {
         nvboard_update();
         single_cycle();
+        // if(top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__pc == 0xa0000074) break;
     }
 #else
     Verilated::commandArgs(argc, argv); // 处理命令行参数

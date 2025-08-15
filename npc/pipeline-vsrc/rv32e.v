@@ -360,26 +360,26 @@ module rv32e (
                   (ex_lsu_MemLen == 3'b100) ? 2'b11 : // 字
                   2'b00;                      // 默认
 
-    reg [31:0] inst_cnt;
-    reg [31:0] cycle_cnt;
-    always @(posedge clk) begin
-        if(reset) begin
-            inst_cnt <= 0;
-            cycle_cnt <= 0;
-        end
-        else begin
-            cycle_cnt <= cycle_cnt + 1;
-            if(wb_valid) begin
-                inst_cnt <= inst_cnt + 1;
-            end
-        end
-    end
+    // reg [31:0] inst_cnt;
+    // reg [31:0] cycle_cnt;
+    // always @(posedge clk) begin
+    //     if(reset) begin
+    //         inst_cnt <= 0;
+    //         cycle_cnt <= 0;
+    //     end
+    //     else begin
+    //         cycle_cnt <= cycle_cnt + 1;
+    //         if(wb_valid) begin
+    //             inst_cnt <= inst_cnt + 1;
+    //         end
+    //     end
+    // end
 
     // EBREAK 处理
     always @(posedge clk) begin
         if (IF_ID_inst == 32'h00100073) begin
-            real IPC = (cycle_cnt == 0) ? 0.0 : real'(inst_cnt) / real'(cycle_cnt);
-            $display("\033[33mIPC = %f\033[0m", IPC);
+            // real IPC = (cycle_cnt == 0) ? 0.0 : real'(inst_cnt) / real'(cycle_cnt);
+            // $display("\033[33mIPC = %f\033[0m", IPC);
             $display("+-------------------+---------------------+---------------------+");
             $display("| Total predictions | Correct predictions | Prediction accuracy |");
             $display("| %10d        | %10d          | %10.2f%%         |", 

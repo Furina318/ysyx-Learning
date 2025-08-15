@@ -177,8 +177,40 @@ static struct {
     word_t ninst;
 } PCSet = {0, 0, 0, 0};
 
+//==================================== 统计与性能计数 =============================//
+uint64_t R_inst, I_inst, J_inst, B_inst, L_inst, S_inst, CSR_inst;
+uint64_t ifu_get;
+uint64_t lsu_get;
+uint64_t exu_done;
+uint64_t cycle_sum;
 static void statistic() {
     Log("total guest instructions = %lu", g_nr_guest_inst);
+    uint64_t total = g_nr_guest_inst;
+    printf("\033[33mIPC = %lf\033[0m\n", (double)g_nr_guest_inst / cycle_sum);
+    printf("\033[33m平均每条指令执行周期: %lf\033[0m\n", (double)cycle_sum / g_nr_guest_inst);
+    printf("+----------------+------------+-----------+\n");
+    printf("| 指令类型       | 数量       | 占比 (%%)  |\n");
+    printf("+----------------+------------+-----------+\n");
+    printf("| R 类型         | %10" PRIu64 " | %7.2f %% |\n", R_inst, total ? (double)R_inst / total * 100 : 0.0);
+    printf("| I 类型         | %10" PRIu64 " | %7.2f %% |\n", I_inst, total ? (double)I_inst / total * 100 : 0.0);
+    printf("| J 类型         | %10" PRIu64 " | %7.2f %% |\n", J_inst, total ? (double)J_inst / total * 100 : 0.0);
+    printf("| L 类型         | %10" PRIu64 " | %7.2f %% |\n", L_inst, total ? (double)L_inst / total * 100 : 0.0);
+    printf("| S 类型         | %10" PRIu64 " | %7.2f %% |\n", S_inst, total ? (double)S_inst / total * 100 : 0.0);
+    printf("| B 类型         | %10" PRIu64 " | %7.2f %% |\n", B_inst, total ? (double)B_inst / total * 100 : 0.0);
+    printf("| CSR 类型       | %10" PRIu64 " | %7.2f %% |\n", CSR_inst, total ? (double)CSR_inst / total * 100 : 0.0);
+    printf("+----------------+------------+-----------+\n");
+    printf("| 总指令数       | %10" PRIu64 " | %7.2f %% |\n", (R_inst + I_inst + J_inst + L_inst + S_inst + B_inst + CSR_inst), (double)(R_inst + I_inst + J_inst + L_inst + S_inst + B_inst + CSR_inst) / total * 100);
+    printf("+----------------+------------+-----------+\n");
+    printf("+----------------+------------+----------------------+\n");
+    printf("| 模块名称       | 操作总数   | 每指令操作数 (次/条) |\n");
+    printf("+----------------+------------+----------------------+\n");
+    printf("| IFU (取指令)   | %10" PRIu64 " |   %18.2f |\n", 
+           ifu_get, total ? (double)ifu_get / total : 0.0);
+    printf("| LSU (取数据)   | %10" PRIu64 " |   %18.2f |\n", 
+           lsu_get, total ? (double)lsu_get / total : 0.0);
+    printf("| EXU (计算完成) | %10" PRIu64 " |   %18.2f |\n", 
+           exu_done, total ? (double)exu_done / total : 0.0);
+    printf("+----------------+------------+----------------------+\n");
 #ifdef CONFIG_FTRACE
   puts("");
   Log("Function call statistics:");
@@ -187,14 +219,20 @@ static void statistic() {
   }
 #endif
 }
+//===============================================================================//
+
+uint64_t last_pc;
 
 static void execute_once() {
     PCSet.pc = top->rootp->rv32e__DOT__IF_ID_pc;
     PCSet.inst = top->rootp->rv32e__DOT__IF_ID_inst;
     // printf("pc=0x%08x | inst=0x%08x\n",PCSet.pc,PCSet.inst);
-
-    single_cycle();
-    single_cycle(); // 执行一个时钟周期
+    last_pc = top->rootp->rv32e__DOT__IF_ID_pc;
+    do{
+      single_cycle();
+      cycle_sum++;
+    } while (last_pc == top->rootp->rv32e__DOT__IF_ID_pc);
+    if(!top->reset) g_nr_guest_inst++;
 
     if(run_time <= start_time) run_time++;
 
@@ -242,7 +280,7 @@ static void trace_and_difftest() {
 
     int reset_once = 1;
 
-    if(wb_valid && !reset_once){
+    if(wb_valid){
       difftest_step(PCSet.pc, PCSet.next_pc);
     }
     else {
@@ -328,12 +366,12 @@ static void trace_and_difftest() {
 #endif
 }
 
+// word_t last_pc; 
+
 static void execute(uint64_t n) {
     
     for (; n > 0; n--) {
-        
         execute_once();
-        g_nr_guest_inst++;
         trace_and_difftest();
         if (npc_state.state != NPC_RUNNING){
             break;

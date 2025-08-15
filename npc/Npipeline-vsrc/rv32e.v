@@ -141,130 +141,256 @@ module rv32e (
     wire        sram_wready;
     wire [1:0]  sram_bresp;
     wire        sram_bvalid;
-    wire        sram_bready;     
+    wire        sram_bready; 
+
+    //====== UART =======//
+    //AR channel
+    wire [31:0] uart_araddr;
+    wire        uart_arvalid;
+    wire        uart_arready;
+    //R channel
+    wire [1:0]  uart_rresp;
+    wire [31:0] uart_rdata;
+    wire        uart_rvalid;
+    wire        uart_rready;
+    //AW channel
+    wire [31:0] uart_awaddr;
+    wire        uart_awready;
+    wire        uart_awvalid;
+    //W channel
+    wire [31:0] uart_wdata;
+    wire [3:0]  uart_wstrb;
+    wire        uart_wvalid;
+    wire        uart_wready;
+    //B channel
+    wire [1:0]  uart_bresp;
+    wire        uart_bvalid;
+    wire        uart_bready;
+
+    //====== CLINT =======//
+    //AR channel
+    wire [31:0] clint_araddr;
+    wire        clint_arvalid;
+    wire        clint_arready;
+    //R channel
+    wire [1:0]  clint_rresp;
+    wire [31:0] clint_rdata;
+    wire        clint_rvalid;
+    wire        clint_rready;
+    //AW channel
+    wire [31:0] clint_awaddr;
+    wire        clint_awready;
+    wire        clint_awvalid;
+    //W channel
+    wire [31:0] clint_wdata;
+    wire [3:0]  clint_wstrb;
+    wire        clint_wvalid;
+    wire        clint_wready;
+    //B channel
+    wire [1:0]  clint_bresp;
+    wire        clint_bvalid;
+    wire        clint_bready;
 
     // 模块例化
 
     // SRAM 模块
-    SRAM msram (
-        .clk(clk),
-        .rst(reset),
-        .sram_arvalid(lsu_sram_arvalid),
-        .sram_arready(sram_lsu_arready),
-        .sram_araddr(lsu_sram_araddr),
-        .sram_rdata(sram_lsu_rdata),
-        .sram_rvalid(sram_lsu_rvalid),
-        .sram_rready(lsu_sram_rready),
-        .sram_rresp(sram_lsu_rresp),
-        .sram_awaddr(lsu_sram_awaddr),
-        .sram_awvalid(lsu_sram_awvalid),
-        .sram_awready(sram_lsu_awready),
-        .sram_wdata(lsu_sram_wdata),
-        .sram_wstrb(lsu_sram_wstrb),
-        .sram_wvalid(lsu_sram_wvalid),
-        .sram_wready(sram_lsu_wready),
-        .sram_bresp(sram_lsu_bresp),
-        .sram_bvalid(sram_lsu_bvalid),
-        .sram_bready(lsu_sram_bready)
-    );
-
-    SRAM isram (
-        .clk(clk),
-        .rst(reset),
-        .sram_arvalid(if_sram_arvalid),
-        .sram_arready(sram_if_arready),
-        .sram_araddr(if_sram_araddr),
-        .sram_rdata(sram_if_rdata),
-        .sram_rvalid(sram_if_rvalid),
-        .sram_rready(if_sram_rready),
-        .sram_rresp(sram_if_rresp),
-        .sram_awaddr(32'h0),
-        .sram_awvalid(1'b0),
-        .sram_awready(),
-        .sram_wdata(32'h0),
-        .sram_wstrb(4'b0),
-        .sram_wvalid(1'b0),
-        .sram_wready(),
-        .sram_bresp(),
-        .sram_bvalid(),
-        .sram_bready(1'b0)
-    );
-
-    // AXI_ARB axi_arb (
+    // SRAM msram (
     //     .clk(clk),
     //     .rst(reset),
-
-    //     // IFU Read
-    //     .if_arvalid(if_sram_arvalid),
-    //     .ar_if_ready(sram_if_arready),
-    //     .if_araddr(if_sram_araddr),
-    //     .if_rvalid(sram_if_rvalid),
-    //     .r_if_ready(if_sram_rready),
-    //     .if_rdata(sram_if_rdata),
-    //     .if_rresp(sram_if_rresp),
-
-    //     // LSU Read
-    //     .lsu_arvalid(lsu_sram_arvalid),
-    //     .ar_lsu_ready(sram_lsu_arready),
-    //     .lsu_araddr(lsu_sram_araddr),
-    //     .lsu_rvalid(sram_lsu_rvalid),
-    //     .r_lsu_ready(lsu_sram_rready),
-    //     .lsu_rdata(sram_lsu_rdata),
-    //     .lsu_rresp(sram_lsu_rresp),
-
-    //     // LSU Write
-    //     .lsu_awvalid(lsu_sram_awvalid),
-    //     .aw_lsu_ready(sram_lsu_awready),
-    //     .lsu_awaddr(lsu_sram_awaddr),
-    //     .lsu_wvalid(lsu_sram_wvalid),
-    //     .w_lsu_ready(sram_lsu_wready),
-    //     .lsu_wdata(lsu_sram_wdata),
-    //     .lsu_wstrb(lsu_sram_wstrb),
-    //     .lsu_bvalid(sram_lsu_bvalid),
-    //     .b_lsu_ready(lsu_sram_bready),
-    //     .lsu_bresp(sram_lsu_bresp),
-
-    //     // SRAM AXI4-Lite Slave
-    //     .s_arvalid(sram_arvalid),
-    //     .s_arready(sram_arready),
-    //     .s_araddr(sram_araddr),
-    //     .s_rvalid(sram_rvalid),
-    //     .s_rready(sram_rready),
-    //     .s_rdata(sram_rdata),
-    //     .s_rresp(sram_rresp),
-    //     .s_awvalid(sram_awvalid),
-    //     .s_awready(sram_awready),
-    //     .s_awaddr(sram_awaddr),
-    //     .s_wvalid(sram_wvalid),
-    //     .s_wready(sram_wready),
-    //     .s_wdata(sram_wdata),
-    //     .s_wstrb(sram_wstrb),
-    //     .s_bvalid(sram_bvalid),
-    //     .s_bready(sram_bready),
-    //     .s_bresp(sram_bresp)
+    //     .sram_arvalid(lsu_sram_arvalid),
+    //     .sram_arready(sram_lsu_arready),
+    //     .sram_araddr(lsu_sram_araddr),
+    //     .sram_rdata(sram_lsu_rdata),
+    //     .sram_rvalid(sram_lsu_rvalid),
+    //     .sram_rready(lsu_sram_rready),
+    //     .sram_rresp(sram_lsu_rresp),
+    //     .sram_awaddr(lsu_sram_awaddr),
+    //     .sram_awvalid(lsu_sram_awvalid),
+    //     .sram_awready(sram_lsu_awready),
+    //     .sram_wdata(lsu_sram_wdata),
+    //     .sram_wstrb(lsu_sram_wstrb),
+    //     .sram_wvalid(lsu_sram_wvalid),
+    //     .sram_wready(sram_lsu_wready),
+    //     .sram_bresp(sram_lsu_bresp),
+    //     .sram_bvalid(sram_lsu_bvalid),
+    //     .sram_bready(lsu_sram_bready)
     // );
 
-    // SRAM sram (
+    // SRAM isram (
     //     .clk(clk),
     //     .rst(reset),
-    //     .sram_arvalid(sram_arvalid),
-    //     .sram_arready(sram_arready),
-    //     .sram_araddr(sram_araddr),
-    //     .sram_rdata(sram_rdata),
-    //     .sram_rvalid(sram_rvalid),
-    //     .sram_rready(sram_rready),
-    //     .sram_rresp(sram_rresp),
-    //     .sram_awaddr(sram_awaddr),
-    //     .sram_awvalid(sram_awvalid),
-    //     .sram_awready(sram_awready),
-    //     .sram_wdata(sram_wdata),
-    //     .sram_wstrb(sram_wstrb),
-    //     .sram_wvalid(sram_wvalid),
-    //     .sram_wready(sram_wready),
-    //     .sram_bresp(sram_bresp),
-    //     .sram_bvalid(sram_bvalid),
-    //     .sram_bready(sram_bready)
+    //     .sram_arvalid(if_sram_arvalid),
+    //     .sram_arready(sram_if_arready),
+    //     .sram_araddr(if_sram_araddr),
+    //     .sram_rdata(sram_if_rdata),
+    //     .sram_rvalid(sram_if_rvalid),
+    //     .sram_rready(if_sram_rready),
+    //     .sram_rresp(sram_if_rresp),
+    //     .sram_awaddr(32'h0),
+    //     .sram_awvalid(1'b0),
+    //     .sram_awready(),
+    //     .sram_wdata(32'h0),
+    //     .sram_wstrb(4'b0),
+    //     .sram_wvalid(1'b0),
+    //     .sram_wready(),
+    //     .sram_bresp(),
+    //     .sram_bvalid(),
+    //     .sram_bready(1'b0)
     // );
+
+    SRAM sram (
+        .clk(clk),
+        .rst(reset),
+        .sram_arvalid(sram_arvalid),
+        .sram_arready(sram_arready),
+        .sram_araddr(sram_araddr),
+        .sram_rdata(sram_rdata),
+        .sram_rvalid(sram_rvalid),
+        .sram_rready(sram_rready),
+        .sram_rresp(sram_rresp),
+        .sram_awaddr(sram_awaddr),
+        .sram_awvalid(sram_awvalid),
+        .sram_awready(sram_awready),
+        .sram_wdata(sram_wdata),
+        .sram_wstrb(sram_wstrb),
+        .sram_wvalid(sram_wvalid),
+        .sram_wready(sram_wready),
+        .sram_bresp(sram_bresp),
+        .sram_bvalid(sram_bvalid),
+        .sram_bready(sram_bready)
+    );
+
+    CLINT clint (
+        .clk(clk),
+        .reset(reset),
+        .awvalid(clint_awvalid),
+        .awready(clint_awready),
+        .awaddr(clint_awaddr),
+        .wdata(clint_wdata),
+        .wstrb(clint_wstrb),
+        .wvalid(clint_wvalid),
+        .wready(clint_wready),
+        .bresp(clint_bresp),
+        .bvalid(clint_bvalid),
+        .bready(clint_bready),
+        .arvalid(clint_arvalid),
+        .araddr(clint_araddr),
+        .arready(clint_arready),
+        .rready(clint_rready),
+        .rvalid(clint_rvalid),
+        .rresp(clint_rresp),
+        .rdata(clint_rdata)
+    );
+
+    UART uart (
+        .clk(clk),
+        .reset(reset),
+        .awvalid(uart_awvalid),
+        .awready(uart_awready),
+        .awaddr(uart_awaddr),
+        .wdata(uart_wdata),
+        .wstrb(uart_wstrb),
+        .wvalid(uart_wvalid),
+        .wready(uart_wready),
+        .bresp(uart_bresp),
+        .bvalid(uart_bvalid),
+        .bready(uart_bready),
+        .arvalid(uart_arvalid),
+        .araddr(uart_araddr),
+        .arready(uart_arready),
+        .rready(uart_rready),
+        .rvalid(uart_rvalid),
+        .rresp(uart_rresp),
+        .rdata(uart_rdata)
+    );
+
+    AXI_ARB axi_arb (
+        .clk(clk),
+        .reset(reset),
+        // IFU 接口
+        .ifu_araddr(if_sram_araddr),
+        .ifu_arvalid(if_sram_arvalid),
+        .ifu_arready(sram_if_arready),
+        .ifu_rdata(sram_if_rdata),
+        .ifu_rresp(sram_if_rresp),
+        .ifu_rvalid(sram_if_rvalid),
+        .ifu_rready(if_sram_rready),
+        // LSU 接口
+        .lsu_araddr(lsu_sram_araddr),
+        .lsu_arvalid(lsu_sram_arvalid),
+        .lsu_arready(sram_lsu_arready),
+        .lsu_rdata(sram_lsu_rdata),
+        .lsu_rresp(sram_lsu_rresp),
+        .lsu_rvalid(sram_lsu_rvalid),
+        .lsu_rready(lsu_sram_rready),
+        .lsu_awaddr(lsu_sram_awaddr),
+        .lsu_awvalid(lsu_sram_awvalid),
+        .lsu_awready(sram_lsu_awready),
+        .lsu_wdata(lsu_sram_wdata),
+        .lsu_wstrb(lsu_sram_wstrb),
+        .lsu_wvalid(lsu_sram_wvalid),
+        .lsu_wready(sram_lsu_wready),
+        .lsu_bresp(sram_lsu_bresp),
+        .lsu_bvalid(sram_lsu_bvalid),
+        .lsu_bready(lsu_sram_bready),
+
+        // UART从设备
+        .uart_araddr(uart_araddr),
+        .uart_arvalid(uart_arvalid),
+        .uart_arready(uart_arready),
+        .uart_rdata(uart_rdata),
+        .uart_rresp(uart_rresp),
+        .uart_rvalid(uart_rvalid),
+        .uart_rready(uart_rready),
+        .uart_awaddr(uart_awaddr),
+        .uart_awvalid(uart_awvalid),
+        .uart_awready(uart_awready),
+        .uart_wdata(uart_wdata),
+        .uart_wstrb(uart_wstrb),
+        .uart_wvalid(uart_wvalid),
+        .uart_wready(uart_wready),
+        .uart_bresp(uart_bresp),
+        .uart_bvalid(uart_bvalid),
+        .uart_bready(uart_bready),
+
+        // CLINT从设备
+        .clint_araddr(clint_araddr),
+        .clint_arvalid(clint_arvalid),
+        .clint_arready(clint_arready),
+        .clint_rdata(clint_rdata),
+        .clint_rresp(clint_rresp),
+        .clint_rvalid(clint_rvalid),
+        .clint_rready(clint_rready),
+        .clint_awaddr(clint_awaddr),
+        .clint_awvalid(clint_awvalid),
+        .clint_awready(clint_awready),
+        .clint_wdata(clint_wdata),
+        .clint_wstrb(clint_wstrb),
+        .clint_wvalid(clint_wvalid),
+        .clint_wready(clint_wready),
+        .clint_bresp(clint_bresp),
+        .clint_bvalid(clint_bvalid),
+        .clint_bready(clint_bready),
+
+        // SRAM 从设备
+        .sram_araddr(sram_araddr),
+        .sram_arvalid(sram_arvalid),
+        .sram_arready(sram_arready),
+        .sram_rdata(sram_rdata),
+        .sram_rresp(sram_rresp),
+        .sram_rvalid(sram_rvalid),
+        .sram_rready(sram_rready),
+        .sram_awaddr(sram_awaddr),
+        .sram_awvalid(sram_awvalid),
+        .sram_awready(sram_awready),
+        .sram_wdata(sram_wdata),
+        .sram_wstrb(sram_wstrb),
+        .sram_wvalid(sram_wvalid),
+        .sram_wready(sram_wready),
+        .sram_bresp(sram_bresp),
+        .sram_bvalid(sram_bvalid),
+        .sram_bready(sram_bready)
+    );
 
     // IF（指令获取）模块
     IF_AXI ifu (
@@ -504,26 +630,27 @@ module rv32e (
     //               (ex_lsu_MemLen == 3'b100) ? 2'b11 : // 字
     //               2'b00;                      // 默认
 
-    reg [31:0] inst_cnt;
-    reg [31:0] cycle_cnt;
+    // reg [31:0] inst_cnt;
+    // reg [31:0] cycle_cnt;
 
-    always @(posedge clk) begin
-        if(reset) begin
-            inst_cnt <= 0;
-            cycle_cnt <= 0;
-        end
-        else begin
-            cycle_cnt <= cycle_cnt + 1;
-            if(wb_valid) begin
-                inst_cnt <= inst_cnt + 1;
-            end
-        end
-    end
+    // always @(posedge clk) begin
+    //     if(reset) begin
+    //         inst_cnt <= 0;
+    //         cycle_cnt <= 0;
+    //     end
+    //     else begin
+    //         cycle_cnt <= cycle_cnt + 1;
+    //         if(wb_valid) begin
+    //             inst_cnt <= inst_cnt + 1;
+    //         end
+    //     end
+    // end
+    
     // EBREAK 处理
     always @(posedge clk) begin
         if (IF_ID_inst == 32'h00100073) begin
-            real IPC = (cycle_cnt == 0) ? 0.0 : real'(inst_cnt) / real'(cycle_cnt);
-            $display("\033[33mIPC = %f\033[0m", IPC);
+            // real IPC = (cycle_cnt == 0) ? 0.0 : real'(inst_cnt) / real'(cycle_cnt);
+            // $display("\033[33mIPC = %f\033[0m", IPC);
             // $display("*-------------------*---------------------*---------------------*");
             // $display("| Total predictions | Correct predictions | Prediction accuracy |");
             // $display("| %10d        | %10d          | %10.2f%%         |", 

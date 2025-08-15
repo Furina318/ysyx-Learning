@@ -36,6 +36,9 @@ module IF (
     input wire        sram_bvalid,
     output reg        sram_bready
 );
+`ifdef VERILATOR
+    import "DPI-C" function void counter(input int inst_type, input int cycles, input int ifu_inc, input int lsu_inc, input int exu_inc);
+`endif
     typedef enum {IDLE, READ_ADDR, READ_DATA, STALL} state_t;
     state_t state, next_state;
     
@@ -101,6 +104,9 @@ module IF (
                         // sram_arvalid <= 1'b0;
                         sram_rready <= 1'b0;
                         instr <= sram_rdata;
+                    `ifdef VERILATOR
+                        counter(7, 0, 1, 0, 0);
+                    `endif
                         if(sram_rresp != `OKAY) begin
                             if_access_fault <= 1'b1;
                             if_fault_addr <= sram_araddr;

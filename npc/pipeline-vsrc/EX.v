@@ -90,6 +90,7 @@ module EX (
     output reg        ex_bpu_correct     // EX阶段预测是否正确
 );
     import "DPI-C" function void ebreak(input int station, input int inst);
+    import "DPI-C" function void counter(input int inst_type, input int ifu_inc, input int lsu_inc, input int exu_inc);
     
     // 前递后的源寄存器值
     wire [31:0] src1 = (forward_rs1[1] ? ex_lsu_process_result : 
@@ -403,6 +404,7 @@ module EX (
         // end
         else if ((id_valid && ex_ready) && (lsu_ready || !ex_lsu_valid)) begin
             ex_lsu_valid <= 1'b1;
+            counter(7, 0, 0, 1);
         end
         else if (!(id_valid && ex_ready) && lsu_ready) begin
             ex_lsu_valid <= 1'b0;

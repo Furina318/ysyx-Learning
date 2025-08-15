@@ -5,13 +5,13 @@ module ID (
     input             reset,                  // 复位信号
     input      [31:0] if_id_pc,               // 从IFU传递的PC值
     input      [31:0] if_id_inst,             // 从IFU传递的指令
-    input             ex_flush,                // 执行单元的冲刷信号
+    input             ex_flush,               // 执行单元的冲刷信号
 
     // 握手信号
-    input             if_valid,                // IFU到ID的有效信号
-    output reg        id_ready,                // ID到IFU的就绪信号
-    input             ex_ready,                // EXU到ID的就绪信号
-    output reg        id_valid,                // ID到EXU的有效信号
+    input             if_valid,               // IFU到ID的有效信号
+    output reg        id_ready,               // ID到IFU的就绪信号
+    input             ex_ready,               // EXU到ID的就绪信号
+    output reg        id_valid,               // ID到EXU的有效信号
 
     output reg [31:0] id_ex_pc,               // 传递到EXU的PC值
     output reg [31:0] id_ex_inst,             // 传递到EXU的指令
@@ -21,7 +21,7 @@ module ID (
     output reg [4:0]  id_wb_rs2,              // 源寄存器2地址
     output reg [4:0]  id_ex_zimm,             // CSR立即数（zimm）
     output reg [31:0] id_ex_imm,              // 立即数值
-    output reg [5:0]  id_ex_shamt,              // 移位量
+    output reg [5:0]  id_ex_shamt,            // 移位量
 
     output reg [3:0]  id_ex_alu_op,
     output reg [2:0]  id_ex_MemLen,
@@ -44,107 +44,30 @@ module ID (
 
     output reg [11:0] id_ex_csr_wr_addr1,     // CSR写地址1
     output reg [11:0] id_ex_csr_wr_addr2,     // CSR写地址2
-    output reg [11:0] id_wb_csr_addr1,       // CSR读地址1
-    output reg [11:0] id_wb_csr_addr2        // CSR读地址2
+    output reg [11:0] id_wb_csr_addr1,        // CSR读地址1
+    output reg [11:0] id_wb_csr_addr2         // CSR读地址2
 );
-    wire [31:0] instr = if_id_inst;
-    
-    wire [31:0] immI = {{20{instr[31]}}, instr[31:20]};
-    wire [31:0] immU = {instr[31:12], 12'b0};
-    wire [31:0] immS = {{20{instr[31]}}, instr[31:25], instr[11:7]};
-    wire [31:0] immB = {{20{instr[31]}}, instr[7], instr[30:25], instr[11:8], 1'b0};
-    wire [31:0] immJ = {{12{instr[31]}}, instr[19:12], instr[20], instr[30:21], 1'b0};
-    wire [31:0] immR = 32'b0;
-    wire [31:0] immCSR = {27'b0, instr[19:15]};
-
-    wire [6:0] opcode = instr[6:0];
-    wire [4:0] rs1    = instr[19:15];
-    wire [4:0] rs2    = instr[24:20];
-    wire [4:0] rd     = instr[11:7];
-    wire [2:0] func3  = instr[14:12];
-    wire [6:0] func7  = instr[31:25];
-    wire [5:0] shamt  = instr[25:20];
+    import "DPI-C" function void counter(input int inst_type, input int ifu_inc, input int lsu_inc, input int exu_inc);
+    // 指令字段提取
+    wire [6:0] opcode = if_id_inst[6:0];
+    wire [4:0] rs1    = if_id_inst[19:15];
+    wire [4:0] rs2    = if_id_inst[24:20];
+    wire [4:0] rd     = if_id_inst[11:7];
+    wire [2:0] func3  = if_id_inst[14:12];
+    wire [6:0] func7  = if_id_inst[31:25];
+    wire [5:0] shamt  = if_id_inst[25:20];
     wire [4:0] get_opcode = opcode[6:2];
 
-    wire [31:0] imm;
-    assign imm = (get_opcode == `INST_TYPE_AUIPC || get_opcode == `INST_TYPE_LUI) ? immU :
-                (get_opcode == `INST_TYPE_JAL) ? immJ :
-                (get_opcode == `INST_TYPE_JALR || get_opcode == `INST_TYPE_L || get_opcode == `INST_TYPE_I) ? immI :
-                (get_opcode == `INST_TYPE_R) ? immR :
-                (get_opcode == `INST_TYPE_S) ? immS :
-                (get_opcode == `INST_TYPE_B) ? immB :
-                (opcode == `INST_CSR && (func3 == `F3_CSRRCI || func3 == `F3_CSRRSI || func3 == `F3_CSRRWI)) ? immCSR : 32'h0;
+    // 立即数生成
+    wire [31:0] immI = {{20{if_id_inst[31]}}, if_id_inst[31:20]};
+    wire [31:0] immU = {if_id_inst[31:12], 12'b0};
+    wire [31:0] immS = {{20{if_id_inst[31]}}, if_id_inst[31:25], if_id_inst[11:7]};
+    wire [31:0] immB = {{20{if_id_inst[31]}}, if_id_inst[7], if_id_inst[30:25], if_id_inst[11:8], 1'b0};
+    wire [31:0] immJ = {{12{if_id_inst[31]}}, if_id_inst[19:12], if_id_inst[20], if_id_inst[30:21], 1'b0};
+    wire [31:0] immR = 32'b0;
+    wire [31:0] immCSR = {27'b0, if_id_inst[19:15]};
 
-    wire [3:0] alu_op;
-    // assign alu_op = (get_opcode == `INST_TYPE_R && (func3 == 3'b000 && func7[5])) ? `ALU_SUB :
-    //                 (get_opcode == `INST_TYPE_B && (func3 == `F3_BEQ || func3 == `F3_BNE)) ? `ALU_SUB :
-    //                 ((get_opcode == `INST_TYPE_R || get_opcode == `INST_TYPE_I) && (func3 == `F3_ORI)) ? `ALU_OR :
-    //                 ((get_opcode == `INST_TYPE_R || get_opcode == `INST_TYPE_I) && (func3 == `F3_XORI)) ? `ALU_XOR :
-    //                 ((get_opcode == `INST_TYPE_R || get_opcode == `INST_TYPE_I) && (func3 == `F3_ANDI)) ? `ALU_AND :
-    //                 (get_opcode == `INST_TYPE_R && (func3 == `F3_SLTU && func7 == 7'b0000_000)) ? `ALU_SLTU :
-    //                 ((get_opcode == `INST_TYPE_I || get_opcode == `INST_TYPE_B) && func3 == `F3_SLTU) ? `ALU_SLTU :
-    //                 (get_opcode == `INST_TYPE_B && func3 == `F3_BGEU) ? `ALU_SLTU :
-    //                 ((get_opcode == `INST_TYPE_R || get_opcode == `INST_TYPE_I) && (func3 == `F3_RSH && func7 == 7'b0000_000)) ? `ALU_SRL :
-    //                 ((get_opcode == `INST_TYPE_R || get_opcode == `INST_TYPE_I) && (func3 == `F3_RSH && func7 == 7'b0100_000)) ? `ALU_SRA :
-    //                 ((get_opcode == `INST_TYPE_R || get_opcode == `INST_TYPE_I) && (func3 == `F3_LSH && func7 == 7'b0000_000)) ? `ALU_SLL :
-    //                 ((get_opcode == `INST_TYPE_R || get_opcode == `INST_TYPE_I) && (func3 == `F3_SLT && func7 == 7'b0000_000)) ? `ALU_SLT :
-    //                 (get_opcode == `INST_TYPE_B && (func3 == `F3_BGE || func3 ==  `F3_BLT)) ? `ALU_SLT : 
-    //                 (get_opcode == `INST_TYPE_I && (func3 == `F3_ADDI)) ? `ALU_ADD :
-    //                 (get_opcode == `INST_TYPE_I && (func3 == `F3_SLTI)) ? `ALU_SLT : 
-    //                 (get_opcode == `INST_TYPE_R && func3 == 3'b000 && !func7[5]) ? `ALU_ADD :
-    //                 (get_opcode == `INST_TYPE_L || get_opcode == `INST_TYPE_AUIPC) ? `ALU_ADD : `ALU_ADD;
-
-    assign alu_op = (get_opcode == `INST_TYPE_R && func3 == 3'b000 && func7[5]) ? `ALU_SUB :
-                 (get_opcode == `INST_TYPE_R && func3 == 3'b000 && !func7[5]) ? `ALU_ADD :
-                 (get_opcode == `INST_TYPE_I && func3 == `F3_ADDI) ? `ALU_ADD :
-                 (get_opcode == `INST_TYPE_I && func3 == `F3_SLTI) ? `ALU_SLT :
-                 (get_opcode == `INST_TYPE_B && (func3 == `F3_BEQ || func3 == `F3_BNE)) ? `ALU_SUB :
-                 (get_opcode == `INST_TYPE_B && (func3 == `F3_BLT || func3 == `F3_BGE)) ? `ALU_SLT :
-                 (get_opcode == `INST_TYPE_B && (func3 == `F3_BLTU || func3 == `F3_BGEU)) ? `ALU_SLTU :
-                 ((get_opcode == `INST_TYPE_R || get_opcode == `INST_TYPE_I) && func3 == `F3_ORI) ? `ALU_OR :
-                 ((get_opcode == `INST_TYPE_R || get_opcode == `INST_TYPE_I) && func3 == `F3_XORI) ? `ALU_XOR :
-                 ((get_opcode == `INST_TYPE_R || get_opcode == `INST_TYPE_I) && func3 == `F3_ANDI) ? `ALU_AND :
-                 (get_opcode == `INST_TYPE_R && func3 == `F3_SLTU && func7 == 7'b0000000) ? `ALU_SLTU :
-                 (get_opcode == `INST_TYPE_I && func3 == `F3_SLTU) ? `ALU_SLTU :
-                 ((get_opcode == `INST_TYPE_R || get_opcode == `INST_TYPE_I) && func3 == `F3_RSH && func7 == 7'b0000000) ? `ALU_SRL :
-                 ((get_opcode == `INST_TYPE_R || get_opcode == `INST_TYPE_I) && func3 == `F3_RSH && func7 == 7'b0100000) ? `ALU_SRA :
-                 ((get_opcode == `INST_TYPE_R || get_opcode == `INST_TYPE_I) && func3 == `F3_LSH && func7 == 7'b0000000) ? `ALU_SLL :
-                 ((get_opcode == `INST_TYPE_R || get_opcode == `INST_TYPE_I) && func3 == `F3_SLT && func7 == 7'b0000000) ? `ALU_SLT :
-                 (get_opcode == `INST_TYPE_L || get_opcode == `INST_TYPE_AUIPC) ? `ALU_ADD : `ALU_ADD;
-
-    wire MemRead = (get_opcode == `INST_TYPE_L) &&
-                    ((func3 == `F3_LW) || (func3 == `F3_LH) || (func3 == `F3_LB) || (func3 == `F3_LHU) || (func3 == `F3_LBU));
-    wire MemWrite = (get_opcode == `INST_TYPE_S);
-
-    wire [2:0] MemLen;
-    assign MemLen =  ((get_opcode == `INST_TYPE_S || get_opcode == `INST_TYPE_L) && (func3 == `F3_SW || func3 == `F3_LW)) ? `Mem_Word :
-                    ((get_opcode == `INST_TYPE_S || get_opcode == `INST_TYPE_L) && (func3 == `F3_SH || func3 == `F3_LH)) ? `Mem_Half :
-                    ((get_opcode == `INST_TYPE_S || get_opcode == `INST_TYPE_L) && (func3 == `F3_SB || (func3 == `F3_LB && opcode == 7'b00000_11))) ? `Mem_Bit :
-                    (get_opcode == `INST_TYPE_L && func3 == `F3_LHU) ? `Mem_UHalf : 
-                    (get_opcode == `INST_TYPE_L && func3 == `F3_LBU) ? `Mem_UBit : `Mem_Word; 
-    
-    // wire jal = (get_opcode == `INST_TYPE_JAL);
-    // wire jalr = (get_opcode == `INST_TYPE_JALR) & (func3 == 3'b000);
-    wire jal = (opcode == `INST_JAL);
-    wire jalr = (opcode == `INST_JALR) & (func3 == 3'b000);
-
-    // CSR信号
-    wire csr       = (opcode == `INST_CSR);
-    wire csr_ecall = csr && (instr == `INST_ECALL);
-    wire csr_mret  = csr && (instr == `INST_MRET);
-    wire [11:0] csr_wr_addr1 = csr_ecall ? `MCAUSE : (csr_mret ? `MSTATUS : (csr ? instr[31:20] : 12'b0));
-    wire [11:0] csr_wr_addr2 = csr_ecall ? `MEPC : 12'b0;
-    wire [11:0] csr_rd_addr1 = csr_mret ? `MSTATUS : (csr_ecall ? `MTVEC : (csr ? instr[31:20] : 12'b0));
-    wire [11:0] csr_rd_addr2 = csr_mret ? `MEPC : 12'b0;
-
-    wire [1:0] csr_op = (csr && ((func3 == `F3_CSRRW) || (func3 == `F3_CSRRWI))) ? `CSR_CSRRW :
-                        (csr && ((func3 == `F3_CSRRS) || (func3 == `F3_CSRRSI))) ? `CSR_CSRRS :
-                        (csr && ((func3 == `F3_CSRRC) || (func3 == `F3_CSRRCI))) ? `CSR_CSRRC : `CSR_NONE;
-
-    wire csr_rd_en = csr && !csr_ecall && !csr_mret;
-    wire rd_en = (get_opcode == `INST_TYPE_LUI || get_opcode == `INST_TYPE_AUIPC || get_opcode == `INST_TYPE_L ||
-                    get_opcode == `INST_TYPE_JAL || get_opcode == `INST_TYPE_JALR || get_opcode == `INST_TYPE_R ||
-                    get_opcode == `INST_TYPE_I || csr_rd_en);
+    reg [31:0] inst_type;
 
     // 握手逻辑
     always @(*) begin
@@ -163,25 +86,15 @@ module ID (
         end
     end
 
-    // 输出信号赋值
+    // 译码逻辑和输出信号赋值
     always @(posedge clk) begin
         if (reset) begin
+            inst_type <= 7;
+
+            // 第一组: 控制信号
             id_ex_RegWrite <= 1'b0;
-            id_ex_rd <= 5'b0;
-            id_wb_rs1 <= 5'b0;
-            id_wb_rs2 <= 5'b0;
-            id_ex_zimm <= 5'b0;
-            id_ex_imm <= 32'b0;
-            id_ex_shamt <= 6'b0;
-            id_ex_pc <= 32'b0;
-            id_ex_inst <= 32'b0;
-            id_ex_alu_op <= 4'b0;
             id_ex_MemWrite <= 1'b0;
             id_ex_MemRead <= 1'b0;
-            id_ex_MemLen <= 3'b0;
-            id_ex_opcode <= 7'b0;
-            id_ex_func3 <= 3'b0;
-
             id_ex_jal <= 1'b0;
             id_ex_jalr <= 1'b0;
             id_ex_csr <= 1'b0;
@@ -189,57 +102,247 @@ module ID (
             id_ex_csr_wen2 <= 1'b0;
             id_ex_csr_ecall <= 1'b0;
             id_ex_csr_mret <= 1'b0;
-            // id_ex_csrrw <= 1'b0;
-            // id_ex_csrrs <= 1'b0;
-            // id_ex_csrrc <= 1'b0;
-            // id_ex_csrrwi <= 1'b0;
-            // id_ex_csrrsi <= 1'b0;
-            // id_ex_csrrci <= 1'b0;
+            
+            // 第二组: 地址和立即数
+            id_ex_rd <= 5'b0;
+            id_wb_rs1 <= 5'b0;
+            id_wb_rs2 <= 5'b0;
+            id_ex_zimm <= 5'b0;
+            id_ex_imm <= 32'b0;
+            id_ex_shamt <= 6'b0;
+            
+            // 第三组: 指令和PC
+            id_ex_pc <= 32'b0;
+            // id_ex_pc2 <= 32'b0;
+            id_ex_inst <= 32'b0;
+            
+            // 第四组: ALU和功能信号
+            id_ex_alu_op <= 4'b0;
+            id_ex_MemLen <= 3'b0;
+            id_ex_opcode <= 7'b0;
+            id_ex_func3 <= 3'b0;
             id_ex_csr_op <= 2'b0;
+            
+            // 第五组: CSR地址
             id_ex_csr_wr_addr1 <= 12'b0;
             id_ex_csr_wr_addr2 <= 12'b0;
             id_wb_csr_addr1 <= 12'b0;
             id_wb_csr_addr2 <= 12'b0;
+            
+            // 第六组: 分支预测
             // id_ex_predict_taken <= 1'b0;
+            // id_ex_predict_target <= 32'b0;
         end
         else if (if_valid && id_ready) begin
-            id_ex_RegWrite <= rd_en;
+            // 传递基本信号
+            id_ex_pc <= if_id_pc;
+            // id_ex_pc2 <= if_id_pc2;
+            id_ex_inst <= if_id_inst;
             id_ex_rd <= rd;
             id_wb_rs1 <= rs1;
             id_wb_rs2 <= rs2;
-            id_ex_zimm <= rs1;
-            id_ex_imm <= imm;
+            id_ex_zimm <= rs1;  // CSR zimm
             id_ex_shamt <= shamt;
-
-            id_ex_pc <= if_id_pc;
-            id_ex_inst <= if_id_inst;
             id_ex_opcode <= opcode;
-            id_ex_MemRead <= MemRead;
-            id_ex_MemWrite <= MemWrite;
-            id_ex_MemLen <= MemLen;
-            id_ex_alu_op <= alu_op;
             id_ex_func3 <= func3;
+            // id_ex_predict_taken <= predict_taken & (get_opcode == `INST_TYPE_B || (opcode == `INST_JALR && func3 == 3'b000) || opcode == `INST_JAL);
+            // id_ex_predict_target <= predict_target;
 
-            id_ex_jal <= jal;
-            id_ex_jalr <= jalr;
-            id_ex_csr <= csr;
-            id_ex_csr_wen1 <= csr;
-            id_ex_csr_wen2 <= csr_ecall;
-            id_ex_csr_ecall <= csr_ecall;
-            id_ex_csr_mret <= csr_mret;
-            // id_ex_csrrw <= csrrw;
-            // id_ex_csrrs <= csrrs;
-            // id_ex_csrrc <= csrrc;
-            // id_ex_csrrwi <= csrrwi;
-            // id_ex_csrrsi <= csrrsi;
-            // id_ex_csrrci <= csrrci;
-            id_ex_csr_op <= csr_op;
-            id_ex_csr_wr_addr1 <= csr_wr_addr1;
-            id_ex_csr_wr_addr2 <= csr_wr_addr2;
-            id_wb_csr_addr1 <= csr_rd_addr1;
-            id_wb_csr_addr2 <= csr_rd_addr2;
-            // id_ex_predict_taken <= predict_taken;
+            // 初始化默认值
+            id_ex_imm <= 32'b0;
+            id_ex_RegWrite <= 1'b0;
+            id_ex_MemWrite <= 1'b0;
+            id_ex_MemRead <= 1'b0;
+            id_ex_alu_op <= `ALU_ADD;
+            id_ex_MemLen <= `Mem_Word;
+            id_ex_csr_op <= `CSR_NONE;
+            id_ex_csr <= 1'b0;
+            id_ex_csr_wen1 <= 1'b0;
+            id_ex_csr_wen2 <= 1'b0;
+            id_ex_csr_ecall <= 1'b0;
+            id_ex_csr_mret <= 1'b0;
+            id_ex_jal <= 1'b0;
+            id_ex_jalr <= 1'b0;
+
+            // 译码逻辑
+            case (get_opcode)
+                `INST_TYPE_LUI: begin
+                    id_ex_imm <= immU;
+                    id_ex_RegWrite <= 1'b1;
+                    inst_type <= 1;
+                end
+                `INST_TYPE_AUIPC: begin
+                    id_ex_imm <= immU;
+                    id_ex_RegWrite <= 1'b1;
+                    id_ex_alu_op <= `ALU_ADD;  // PC + imm
+                    inst_type <= 1;
+                end
+                `INST_TYPE_JAL: begin
+                    id_ex_imm <= immJ;
+                    id_ex_RegWrite <= 1'b1;
+                    id_ex_jal <= 1'b1;
+                    inst_type <= 2;
+                end
+                `INST_TYPE_JALR: begin
+                    if (func3 == 3'b000) begin
+                        id_ex_imm <= immI;
+                        id_ex_RegWrite <= 1'b1;
+                        id_ex_jalr <= 1'b1;
+                        inst_type <= 2;
+                    end
+                end
+                `INST_TYPE_S: begin
+                    id_ex_imm <= immS;
+                    id_ex_MemWrite <= 1'b1;
+                    case (func3)
+                        `F3_SW: id_ex_MemLen <= `Mem_Word;
+                        `F3_SH: id_ex_MemLen <= `Mem_Half;
+                        `F3_SB: id_ex_MemLen <= `Mem_Bit;
+                        default: begin
+                            // 可添加错误处理逻辑
+                        end
+                    endcase
+                    inst_type <= 5;
+                end
+                `INST_TYPE_L: begin
+                    id_ex_imm <= immI;
+                    id_ex_RegWrite <= 1'b1;
+                    id_ex_MemRead <= 1'b1;
+                    id_ex_alu_op <= `ALU_ADD;
+                    case (func3)
+                        `F3_LW:  id_ex_MemLen <= `Mem_Word;
+                        `F3_LH:  id_ex_MemLen <= `Mem_Half;
+                        `F3_LB:  id_ex_MemLen <= `Mem_Bit;
+                        `F3_LHU: id_ex_MemLen <= `Mem_UHalf;
+                        `F3_LBU: id_ex_MemLen <= `Mem_UBit;
+                        default: begin
+                            // 可添加错误处理逻辑
+                        end
+                    endcase
+                    inst_type <= 3;
+                end
+                `INST_TYPE_R: begin
+                    id_ex_imm <= immR;
+                    id_ex_RegWrite <= 1'b1;
+                    case (func3)
+                        3'b000: id_ex_alu_op <= (func7[5]) ? `ALU_SUB : `ALU_ADD;
+                        `F3_ANDI: id_ex_alu_op <= `ALU_AND;
+                        `F3_ORI:  id_ex_alu_op <= `ALU_OR;
+                        `F3_XORI: id_ex_alu_op <= `ALU_XOR;
+                        `F3_SLTU: id_ex_alu_op <= `ALU_SLTU;
+                        `F3_SLT:  id_ex_alu_op <= `ALU_SLT;
+                        `F3_RSH:  id_ex_alu_op <= (func7[5]) ? `ALU_SRA : `ALU_SRL;
+                        `F3_LSH:  id_ex_alu_op <= `ALU_SLL;
+                        default: begin
+                            // 可添加错误处理逻辑
+                        end
+                    endcase
+                    inst_type <= 0;
+                end
+                `INST_TYPE_I: begin
+                    id_ex_imm <= immI;
+                    id_ex_RegWrite <= 1'b1;
+                    case (func3)
+                        `F3_ADDI: id_ex_alu_op <= `ALU_ADD;
+                        `F3_ANDI: id_ex_alu_op <= `ALU_AND;
+                        `F3_ORI:  id_ex_alu_op <= `ALU_OR;
+                        `F3_SLTU: id_ex_alu_op <= `ALU_SLTU;
+                        `F3_SLTI: id_ex_alu_op <= `ALU_SLT;
+                        `F3_XORI: id_ex_alu_op <= `ALU_XOR;
+                        `F3_RSH:  id_ex_alu_op <= (func7[5]) ? `ALU_SRA : `ALU_SRL;
+                        `F3_LSH:  id_ex_alu_op <= `ALU_SLL;
+                        default: begin
+                            // 可添加错误处理逻辑
+                        end
+                    endcase
+                    inst_type <=1;
+                end
+                `INST_TYPE_B: begin
+                    id_ex_imm <= immB;
+                    case (func3)
+                        `F3_BEQ:  id_ex_alu_op <= `ALU_SUB;
+                        `F3_BNE:  id_ex_alu_op <= `ALU_SUB;
+                        `F3_BLT:  id_ex_alu_op <= `ALU_SLT;
+                        `F3_BGE:  id_ex_alu_op <= `ALU_SLT;
+                        `F3_BLTU: id_ex_alu_op <= `ALU_SLTU;
+                        `F3_BGEU: id_ex_alu_op <= `ALU_SLTU;
+                        default: begin
+                            // 可添加错误处理逻辑
+                        end
+                    endcase
+                    inst_type <= 4;
+                end
+                `INST_TYPE_E: begin
+                    if (opcode == `INST_CSR) begin
+                        id_ex_csr <= 1'b1;
+                        id_ex_csr_wen1 <= 1'b1;
+                        case (func3)
+                            `F3_CSRRW: begin
+                                // id_ex_csr_wen1 <= 1'b1;
+                                id_ex_RegWrite <= 1'b1;
+                                id_ex_csr_op <= `CSR_CSRRW;
+                            end
+                            `F3_CSRRS: begin
+                                // id_ex_csr_wen1 <= 1'b1;
+                                id_ex_RegWrite <= 1'b1;
+                                id_ex_csr_op <= `CSR_CSRRS;
+                            end
+                            `F3_CSRRC: begin
+                                // id_ex_csr_wen1 <= 1'b1;
+                                id_ex_RegWrite <= 1'b1;
+                                id_ex_csr_op <= `CSR_CSRRC;
+                            end
+                            `F3_CSRRWI: begin
+                                // id_ex_csr_wen1 <= 1'b1;
+                                id_ex_RegWrite <= 1'b1;
+                                id_ex_csr_op <= `CSR_CSRRW;
+                                id_ex_imm <= immCSR;
+                            end
+                            `F3_CSRRSI: begin
+                                // id_ex_csr_wen1 <= 1'b1;
+                                id_ex_RegWrite <= 1'b1;
+                                id_ex_csr_op <= `CSR_CSRRS;
+                                id_ex_imm <= immCSR;
+                            end
+                            `F3_CSRRCI: begin
+                                // id_ex_csr_wen1 <= 1'b1;
+                                id_ex_RegWrite <= 1'b1;
+                                id_ex_csr_op <= `CSR_CSRRC;
+                                id_ex_imm <= immCSR;
+                            end
+                            `F3_ECALL: begin
+                                if (if_id_inst == `INST_ECALL) begin
+                                    id_ex_csr_ecall <= 1'b1;
+                                    // id_ex_csr_wen1 <= 1'b1;
+                                    id_ex_csr_wen2 <= 1'b1;
+                                    id_ex_imm <= 32'h0;
+                                end
+                                else if (if_id_inst == `INST_MRET) begin
+                                    id_ex_csr_mret <= 1'b1;
+                                    // id_ex_csr_wen1 <= 1'b1;
+                                    id_ex_imm <= 32'h0;
+                                end
+                            end
+                            default: begin
+                                // 可添加错误处理逻辑
+                            end
+                        endcase
+                        id_ex_csr_wr_addr1 <= (if_id_inst == `INST_ECALL) ? `MCAUSE : ((if_id_inst == `INST_MRET) ? `MSTATUS : if_id_inst[31:20]);
+                        id_ex_csr_wr_addr2 <= (if_id_inst == `INST_ECALL) ? `MEPC : 12'b0;
+                        id_wb_csr_addr1 <= (if_id_inst == `INST_MRET) ? `MSTATUS : ((if_id_inst == `INST_ECALL) ? `MTVEC : if_id_inst[31:20]);
+                        id_wb_csr_addr2 <= (if_id_inst == `INST_MRET) ? `MEPC : 12'b0;
+                        inst_type <= 6;
+                    end
+                end
+                default: begin
+                    // 可添加错误处理逻辑
+                    inst_type <= 7;
+                end
+            endcase
+
+            if(inst_type != 7) begin
+                counter(inst_type, 0, 0, 0);
+            end
         end
     end
-
 endmodule

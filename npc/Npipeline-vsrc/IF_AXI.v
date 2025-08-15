@@ -26,6 +26,7 @@ module IF_AXI (
 );
 
     import "DPI-C" function void ebreak(input int station, input int inst);
+    import "DPI-C" function void counter(input int inst_type, input int ifu_inc, input int lsu_inc, input int exu_inc);
 
     reg [1:0] state;
     localparam IDLE = 2'b00;
@@ -34,6 +35,8 @@ module IF_AXI (
 
     reg [31:0] next_pc;
     reg once;
+    reg flush_reg, flush_once;
+    reg [31:0] flush_pc_reg;
 
     always @(posedge clk or posedge reset) begin
         if (reset) begin
@@ -48,19 +51,28 @@ module IF_AXI (
             once <= 1;
         end
         else begin
+            if (EX_flush) begin
+                IF_valid <= 0;
+                next_pc <= EX_flush_pc;
+                if_sram_arvalid <= 1;
+                if_sram_araddr  <= EX_flush_pc;
+                if_sram_rready <= 1;      
+                state <= AR_WAIT;      
+            end
             case (state)
                 IDLE: begin
-                    // IF_valid <= 0;
-                    if (EX_flush) begin
-                        IF_valid <= 0;
-                        next_pc <= EX_flush_pc;
-                        if_sram_arvalid <= 1;
-                        if_sram_araddr  <= EX_flush_pc;
-                        // IF_ID_inst <= 32'h0;
-                        // IF_valid <= ID_ready;
-                        state   <= AR_WAIT;
-                    end
-                    else if ((IF_valid && ID_ready) || once) begin
+                    // // IF_valid <= 0;
+                    // if (EX_flush || flush_reg) begin
+                    //     IF_valid <= 0;
+                    //     next_pc <= flush_reg ? flush_pc_reg : EX_flush_pc;
+                    //     if_sram_arvalid <= 1;
+                    //     if_sram_araddr  <= flush_reg ? flush_pc_reg : EX_flush_pc;
+                    //     // IF_ID_inst <= 32'h0;
+                    //     // IF_valid <= ID_ready;
+                    //     state   <= AR_WAIT;
+                    // end
+                    // else 
+                    if ((IF_valid && ID_ready) || once) begin
                         once <= 0;
                         IF_valid <= 0;
                         if_sram_arvalid <= 1;
@@ -83,9 +95,11 @@ module IF_AXI (
                         if_sram_rready <= 0;
                         IF_ID_inst <= sram_if_rdata;
                         IF_ID_pc   <= next_pc;
-                        IF_valid   <= 1;
-                        next_pc    <= next_pc + 4;
+                        IF_valid   <= (EX_flush) ? 0 : 1;
+                        next_pc    <= (EX_flush) ? EX_flush_pc : next_pc + 4;
                         state      <= IDLE;
+
+                        counter(7, 1, 0, 0);
                     end
                 end
 

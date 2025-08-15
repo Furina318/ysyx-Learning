@@ -52,6 +52,7 @@ module ID (
     output reg [11:0] id_wb_csr_addr1,        // CSR读地址1
     output reg [11:0] id_wb_csr_addr2         // CSR读地址2
 );
+    import "DPI-C" function void counter(input int inst_type, input int ifu_inc, input int lsu_inc, input int exu_inc);
     // 指令字段提取
     wire [6:0] opcode = if_id_inst[6:0];
     wire [4:0] rs1    = if_id_inst[19:15];
@@ -70,6 +71,8 @@ module ID (
     wire [31:0] immJ = {{12{if_id_inst[31]}}, if_id_inst[19:12], if_id_inst[20], if_id_inst[30:21], 1'b0};
     wire [31:0] immR = 32'b0;
     wire [31:0] immCSR = {27'b0, if_id_inst[19:15]};
+
+    reg [31:0] inst_type;
 
     // 握手逻辑
     always @(*) begin
@@ -91,6 +94,8 @@ module ID (
     // 译码逻辑和输出信号赋值
     always @(posedge clk) begin
         if (reset) begin
+            inst_type <= 7;
+
             // 第一组: 控制信号
             id_ex_RegWrite <= 1'b0;
             id_ex_MemWrite <= 1'b0;
@@ -169,22 +174,26 @@ module ID (
                 `INST_TYPE_LUI: begin
                     id_ex_imm <= immU;
                     id_ex_RegWrite <= 1'b1;
+                    inst_type <= 1;
                 end
                 `INST_TYPE_AUIPC: begin
                     id_ex_imm <= immU;
                     id_ex_RegWrite <= 1'b1;
                     id_ex_alu_op <= `ALU_ADD;  // PC + imm
+                    inst_type <= 1;
                 end
                 `INST_TYPE_JAL: begin
                     id_ex_imm <= immJ;
                     id_ex_RegWrite <= 1'b1;
                     id_ex_jal <= 1'b1;
+                    inst_type <= 2;
                 end
                 `INST_TYPE_JALR: begin
                     if (func3 == 3'b000) begin
                         id_ex_imm <= immI;
                         id_ex_RegWrite <= 1'b1;
                         id_ex_jalr <= 1'b1;
+                        inst_type <= 2;
                     end
                 end
                 `INST_TYPE_S: begin
@@ -198,6 +207,7 @@ module ID (
                             // 可添加错误处理逻辑
                         end
                     endcase
+                    inst_type <= 5;
                 end
                 `INST_TYPE_L: begin
                     id_ex_imm <= immI;
@@ -214,6 +224,7 @@ module ID (
                             // 可添加错误处理逻辑
                         end
                     endcase
+                    inst_type <= 3;
                 end
                 `INST_TYPE_R: begin
                     id_ex_imm <= immR;
@@ -231,6 +242,7 @@ module ID (
                             // 可添加错误处理逻辑
                         end
                     endcase
+                    inst_type <= 0;
                 end
                 `INST_TYPE_I: begin
                     id_ex_imm <= immI;
@@ -248,6 +260,7 @@ module ID (
                             // 可添加错误处理逻辑
                         end
                     endcase
+                    inst_type <=1;
                 end
                 `INST_TYPE_B: begin
                     id_ex_imm <= immB;
@@ -262,6 +275,7 @@ module ID (
                             // 可添加错误处理逻辑
                         end
                     endcase
+                    inst_type <= 4;
                 end
                 `INST_TYPE_E: begin
                     if (opcode == `INST_CSR) begin
@@ -322,12 +336,18 @@ module ID (
                         id_ex_csr_wr_addr2 <= (if_id_inst == `INST_ECALL) ? `MEPC : 12'b0;
                         id_wb_csr_addr1 <= (if_id_inst == `INST_MRET) ? `MSTATUS : ((if_id_inst == `INST_ECALL) ? `MTVEC : if_id_inst[31:20]);
                         id_wb_csr_addr2 <= (if_id_inst == `INST_MRET) ? `MEPC : 12'b0;
+                        inst_type <= 6;
                     end
                 end
                 default: begin
                     // 可添加错误处理逻辑
+                    inst_type <= 7;
                 end
             endcase
+
+            if(inst_type != 7) begin
+                counter(inst_type, 0, 0, 0);
+            end
         end
     end
 endmodule

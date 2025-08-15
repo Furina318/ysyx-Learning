@@ -21,11 +21,15 @@ module ID (
     output reg        MemWrite,
     output reg        MemRead,
     output reg [3:0]  alu_op,
-    output reg [2:0]  MemLen
-    // input      [31:0] branch_total,
-    // input      [31:0] branch_correct
+    output reg [2:0]  MemLen,
+
+    output reg [31:0] id_start_cycle,
+    output reg [31:0] id_inst_type
 );
+`ifdef VERILATOR
     import "DPI-C" function void ebreak(input int station, input int inst);
+    import "DPI-C" function void counter(input int inst_type, input int cycles, input int ifu_inc, input int lsu_inc, input int exu_inc);
+`endif
 
     // 状态机定义
     typedef enum {
@@ -52,8 +56,24 @@ module ID (
     assign immJ = {{12{instr[31]}}, instr[19:12], instr[20], instr[30:21], 1'b0};
     assign immR = 32'b0;
 
+    //用于性能计数器
+    reg [31:0] cycle_cnt;
+    always @(posedge clk or posedge reset) begin
+        if(reset) begin
+            id_start_cycle <= 0;
+            cycle_cnt <= 0;
+        end
+        else begin
+            cycle_cnt <= cycle_cnt + 1;
+            if(if_valid) begin
+                id_start_cycle <= cycle_cnt;
+            end
+        end
+    end
+
     always @(posedge clk or posedge reset) begin
         if (reset) begin
+            id_inst_type <= 7;
             opcode    = 7'b0;
             rs1       = 5'b0;
             rs2       = 5'b0;
@@ -93,13 +113,14 @@ module ID (
                         alu_op   = `ALU_ADD;
                         MemLen   = `Mem_Word;
                 
-                        assign get_opcode = opcode[6:2];
+                        get_opcode = opcode[6:2];
 
                         case(get_opcode)
                             // LUI
                             `INST_TYPE_LUI: begin
                                 imm = immU;
                                 RegWrite = 1'b1;
+                                id_inst_type <= 1;
                                 // $display("\033[32m[ID]: LUI \033[0m");
                             end
                             // AUIPC
@@ -107,18 +128,21 @@ module ID (
                                 imm = immU;
                                 RegWrite = 1'b1;
                                 alu_op=`ALU_ADD;//PC+imm
+                                id_inst_type <= 1;
                                 // $display("\033[32m[ID]: AUIPC \033[0m");
                             end
                             // JAL
                             `INST_TYPE_JAL: begin
                                 imm = immJ;
                                 RegWrite = 1'b1;
+                                id_inst_type <= 2;
                             end
                             // JALR
                             `INST_TYPE_JALR: begin
                                 if (func3 == 3'b000) begin
                                     imm = immI;
                                     RegWrite = 1'b1;
+                                    id_inst_type <= 2;
                                 end
                             end
                     
@@ -131,10 +155,13 @@ module ID (
                                     `F3_SH: MemLen=`Mem_Half;
                                     `F3_SB: MemLen=`Mem_Bit;
                                     default: begin
+                                    `ifdef VERILATOR
                                         ebreak(`ABORT,instr);
                                         $display("\033[32m[ID] : Unknown S instruction with func3 = %b\033[0m",func3);
+                                    `endif
                                     end
                                 endcase
+                                id_inst_type <= 5;
                                 // $display("\033[32m[ID]: S Instr\033[0m");
                             end
 
@@ -146,6 +173,7 @@ module ID (
                                     alu_op = `ALU_ADD;
 
                                     MemLen = `Mem_Word;
+                                    id_inst_type <= 3;
                                 end
                                 else if(func3 == `F3_LBU) begin
                                     imm=immI;
@@ -154,6 +182,7 @@ module ID (
                                     alu_op = `ALU_ADD;
 
                                     MemLen = `Mem_UBit;//单字节读取
+                                    id_inst_type <= 3;
                                     // $display("\033[32m[ID]: LBU\033[0m");
                                 end
                                 else if(func3 == `F3_LH) begin
@@ -163,6 +192,7 @@ module ID (
                                     alu_op = `ALU_ADD;
 
                                     MemLen = `Mem_Half;
+                                    id_inst_type <= 3;
                                 end
                                 else if(func3 == `F3_LHU) begin
                                     imm=immI;
@@ -171,6 +201,7 @@ module ID (
                                     alu_op = `ALU_ADD;
 
                                     MemLen = `Mem_UHalf;
+                                    id_inst_type <= 3;
                                 end
                                 else if(func3 == `F3_LB && opcode == 7'b00000_11) begin
                                     imm=immI;
@@ -179,6 +210,7 @@ module ID (
                                     alu_op = `ALU_ADD;
 
                                     MemLen = `Mem_Bit;
+                                    id_inst_type <= 3;
                                 end
                             end
 
@@ -205,10 +237,13 @@ module ID (
                                         if(func7==7'b0000000) alu_op=`ALU_SLT;//slt
                                     end
                                     default: begin
+                                    `ifdef VERILATOR
                                         ebreak(`ABORT, instr);
                                         $display("\033[32m[ID] : Unknown R instruction with func3 = %b\033[0m",func3);
+                                    `endif
                                     end
                                 endcase
+                                id_inst_type <= 0;
                             end
 
                             `INST_TYPE_I: begin
@@ -229,10 +264,13 @@ module ID (
                                         if(func7==7'b0000000) alu_op=`ALU_SLL;
                                     end
                                     default:  begin
+                                    `ifdef VERILATOR
                                         ebreak(`ABORT,instr);
                                         $display("\033[32m[ID] : Unknown I instruction with func3 = %b\033[0m",func3);
+                                    `endif
                                     end
                                 endcase
+                                id_inst_type <= 1;
                             end
 
                             `INST_TYPE_B: begin
@@ -246,31 +284,34 @@ module ID (
                                     `F3_BLTU: alu_op = `ALU_SLTU;
                                     `F3_BGEU: alu_op = `ALU_SLTU;
                                     default: begin
+                                    `ifdef VERILATOR
                                         ebreak(`ABORT,instr);
                                         $display("\033[32m[ID] : Unknown B instruction with func3 = %b\033[0m",func3);
+                                    `endif
                                     end
                                 endcase
+                                id_inst_type <= 4;
                             end
 
                             `INST_TYPE_E: begin
                                 if (instr == `INST_EBREAK) begin
+                                `ifdef VERILATOR
                                     ebreak(`HIT_TRAP, instr);
-                                    // // 输出分支预测命中率
-                                    // if (branch_total == 0) begin
-                                    //     $display("\033[32m[npc] Branch Predictor Hit Rate: N/A (no branches)\033[0m");
-                                    // end else begin
-                                    //     $display("\033[32m[npc] Total Branch Predictor Hit Rate: %.2f%% (Correct: %0d, Total: %0d)\033[0m",
-                                    //              ((real'(branch_correct) / (branch_total)) * 100),
-                                    //                 branch_correct, branch_total);
-                                    // end
+                                `endif
                                 end
                             end
 
                             default: begin
+                                id_inst_type <= 7;
+                            `ifdef VERILATOR
                                 ebreak(`ABORT, instr);
                                 $display("\033[32m[ID] : Unknow instruction with inst = %h\033[0m", instr);
+                            `endif
                             end
                         endcase
+                        // if(id_inst_type != 7) begin
+                        //     counter(id_inst_type, 0, 0, 0, 0);
+                        // end
                         next_state = ex_ready ? STALL : IDLE;
                     end
                     else begin

@@ -81,6 +81,7 @@ module LSU_AXI (
 );
 
     import "DPI-C" function void ebreak(input int station, input int inst);
+    import "DPI-C" function void counter(input int inst_type, input int ifu_inc, input int lsu_inc, input int exu_inc);
 
     parameter OKAY = 2'b00;
 
@@ -180,6 +181,7 @@ module LSU_AXI (
                 lsu_sram_rready  <= 0;
                 read_pending     <= 0;
                 read_valid       <= 1;
+                counter(7, 0, 1, 0);
                 case (l_MemLen)
                     `Mem_UBit:  read_lsu_data <= {{24{1'b0}}, sram_lsu_rdata[7:0]};
                     `Mem_Bit:   read_lsu_data <= {{24{sram_lsu_rdata[7]}}, sram_lsu_rdata[7:0]};

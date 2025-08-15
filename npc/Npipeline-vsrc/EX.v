@@ -81,6 +81,7 @@ module EX (
     output reg [31:0] ex_lsu_process_result
 );
     import "DPI-C" function void ebreak(input int station, input int inst);
+    import "DPI-C" function void counter(input int inst_type, input int ifu_inc, input int lsu_inc, input int exu_inc);
     
     // 前递后的源寄存器值
     // wire [31:0] src1 = (forward_rs1[1] ? ex_lsu_process_result : 
@@ -210,7 +211,7 @@ module EX (
         else if(ex_flush)begin
             ex_flush_condition <= 1'b0;
         end
-        else if(id_ready)begin
+        else if(ex_lsu_valid)begin
             ex_flush_condition <= 1'b1;
         end
     end
@@ -294,6 +295,7 @@ module EX (
         // end
         else if ((id_valid && ex_ready) && (lsu_ready || ~ex_lsu_valid)) begin
             ex_lsu_valid <= 1'b1;
+            counter(7, 0, 0, 1);
         end
         else if (~(id_valid && ex_ready) && lsu_ready) begin
             ex_lsu_valid <= 1'b0;

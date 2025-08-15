@@ -63,6 +63,7 @@ module LSU (
     import "DPI-C" function int unsigned pmem_read(input int unsigned raddr, input int len);
     import "DPI-C" function void pmem_write(input int unsigned waddr, input int unsigned wdata, input int len);
     import "DPI-C" function void ebreak(input int station, input int inst);
+    import "DPI-C" function void counter(input int inst_type, input int ifu_inc, input int lsu_inc, input int exu_inc);
 
     // 内部寄存器
     reg l_load;            // 加载标志
@@ -142,6 +143,7 @@ module LSU (
         end
         else if ((ex_lsu_valid & lsu_ex_ready) & (ex_lsu_MemRead & ~ex_lsu_MemWrite)) begin
             read_valid <= 1;
+            counter(7, 0, 1, 0);
             // read_mem_data = pmem_read(addr, 4);
             case (l_MemLen)
                 `Mem_UBit:  begin

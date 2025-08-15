@@ -99,6 +99,9 @@ module ysyx_25010030 (
     output [3:0]  io_slave_rid
 
 );
+`ifdef VERILATOR
+    import "DPI-C" function void counter(input int inst_type, input int cycles, input int ifu_inc, input int lsu_inc, input int exu_inc);
+`endif
     //===== IF =====//
     wire [31:0]  pc;
     wire [31:0]  instr;
@@ -266,6 +269,13 @@ module ysyx_25010030 (
     wire        clint_bvalid;
     wire        clint_bready;
 
+    //性能计数器
+    wire [31:0] id_inst_type;
+    wire [31:0] id_start_cycle;
+    wire [31:0] ex_inst_type;
+    wire [31:0] ex_start_cycle;
+    wire [31:0] mem_inst_type;
+    wire [31:0] mem_start_cycle;
 
     AXI_ARB axi_arb (
         .clk(clock),
@@ -361,54 +371,54 @@ module ysyx_25010030 (
     );
 
     // UART模块
-    UART uart (
-        .clk(clock),
-        .reset(reset),
-        .awvalid(uart_awvalid),
-        .awready(uart_awready),
-        .awaddr(uart_awaddr),
-        .wdata(uart_wdata),
-        .wstrb(uart_wstrb),
-        .wvalid(uart_wvalid),
-        .wready(uart_wready),
-        .bresp(uart_bresp),
-        .bvalid(uart_bvalid),
-        .bready(uart_bready),
-        .arvalid(uart_arvalid),
-        .araddr(uart_araddr),
-        .arready(uart_arready),
-        .rready(uart_rready),
-        .rvalid(uart_rvalid),
-        .rresp(uart_rresp),
-        .rdata(uart_rdata)
-    );
+    // UART uart (
+    //     .clk(clock),
+    //     .reset(reset),
+    //     .awvalid(uart_awvalid),
+    //     .awready(uart_awready),
+    //     .awaddr(uart_awaddr),
+    //     .wdata(uart_wdata),
+    //     .wstrb(uart_wstrb),
+    //     .wvalid(uart_wvalid),
+    //     .wready(uart_wready),
+    //     .bresp(uart_bresp),
+    //     .bvalid(uart_bvalid),
+    //     .bready(uart_bready),
+    //     .arvalid(uart_arvalid),
+    //     .araddr(uart_araddr),
+    //     .arready(uart_arready),
+    //     .rready(uart_rready),
+    //     .rvalid(uart_rvalid),
+    //     .rresp(uart_rresp),
+    //     .rdata(uart_rdata)
+    // );
 
-    SRAM sram(
-            .clk(clock),
-            .reset(reset),
-            //AR channel
-            .araddr(sram_araddr),
-            .arvalid(sram_arvalid),
-            .arready(sram_arready),
-            //R channel
-            .rdata(sram_rdata),
-            .rvalid(sram_rvalid),
-            .rready(sram_rready),
-            .rresp(sram_rresp),
-            //AW channel
-            .awaddr(sram_awaddr),
-            .awvalid(sram_awvalid),
-            .awready(sram_awready),
-            //W channel
-            .wdata(sram_wdata),
-            .wstrb(sram_wstrb),
-            .wvalid(sram_wvalid),
-            .wready(sram_wready),
-            //B channel
-            .bresp(sram_bresp),
-            .bvalid(sram_bvalid),
-            .bready(sram_bready)
-    );
+    // SRAM sram(
+    //         .clk(clock),
+    //         .reset(reset),
+    //         //AR channel
+    //         .araddr(sram_araddr),
+    //         .arvalid(sram_arvalid),
+    //         .arready(sram_arready),
+    //         //R channel
+    //         .rdata(sram_rdata),
+    //         .rvalid(sram_rvalid),
+    //         .rready(sram_rready),
+    //         .rresp(sram_rresp),
+    //         //AW channel
+    //         .awaddr(sram_awaddr),
+    //         .awvalid(sram_awvalid),
+    //         .awready(sram_awready),
+    //         //W channel
+    //         .wdata(sram_wdata),
+    //         .wstrb(sram_wstrb),
+    //         .wvalid(sram_wvalid),
+    //         .wready(sram_wready),
+    //         //B channel
+    //         .bresp(sram_bresp),
+    //         .bvalid(sram_bvalid),
+    //         .bready(sram_bready)
+    // );
 
     // SRAM isram(
     //         .clk(clock),
@@ -508,7 +518,6 @@ module ysyx_25010030 (
         .clk(clock),
         .reset(reset),
         .instr(instr),
-        // .reset(reset),
         .if_valid(if_valid),
         .id_ready(id_ready),
         .id_valid(id_valid),
@@ -524,9 +533,9 @@ module ysyx_25010030 (
         .MemWrite(MemWrite),
         .MemRead(MemRead),
         .alu_op(alu_op),
-        .MemLen(MemLen)
-        // .branch_total(branch_total),
-        // .branch_correct(branch_correct)
+        .MemLen(MemLen),
+        .id_start_cycle(id_start_cycle),
+        .id_inst_type(id_inst_type)
     );
     
     EX ex_stage(
@@ -543,7 +552,11 @@ module ysyx_25010030 (
         .ex_valid(ex_valid),
         .alu_result(alu_result),
         .alu_zero(alu_zero),   
-        .alu_less(alu_less)
+        .alu_less(alu_less),
+        .id_start_cycle(id_start_cycle),
+        .id_inst_type(id_inst_type),
+        .ex_start_cycle(ex_start_cycle),
+        .ex_inst_type(ex_inst_type)
     );
     // 内存模块
     MEM mem_stage(
@@ -578,7 +591,11 @@ module ysyx_25010030 (
         .sram_wready(mem_sram_wready),
         .sram_bresp(mem_sram_bresp),
         .sram_bvalid(mem_sram_bvalid),
-        .sram_bready(mem_sram_bready)
+        .sram_bready(mem_sram_bready),
+        .ex_start_cycle(ex_start_cycle),
+        .ex_inst_type(ex_inst_type),
+        .mem_start_cycle(mem_start_cycle),
+        .mem_inst_type(mem_inst_type)
     );
 
     // 写回模块
@@ -624,9 +641,32 @@ module ysyx_25010030 (
     );
     assign branch_target = is_jalr ? jalr_target : jal_target;
 
-    // always @(posedge clock) begin
-    //     $display("PC = %h, inst = %h", pc, instr);
-    // end
+    reg [31:0] inst_cnt;
+    reg [31:0] cycle_cnt;
+    reg [31:0] cycles;
+    always @(posedge clock) begin
+        if(reset) begin
+            inst_cnt <= 0;
+            cycle_cnt <= 0;
+        end
+        else begin
+            cycle_cnt <= cycle_cnt + 1;
+            if(wb_valid) begin
+                inst_cnt <= inst_cnt + 1;
+            `ifdef VERILATOR
+                counter(mem_inst_type, (cycle_cnt - mem_start_cycle + 1), 0, 0, 0);
+            `endif
+            end
+        end
+    end
+
+    // EBREAK 处理
+    always @(posedge clock) begin
+        if (instr == 32'h00100073) begin
+            real IPC = (cycle_cnt == 0) ? 0.0 : real'(inst_cnt) / real'(cycle_cnt);
+            $display("\033[33mIPC = %f\033[0m", IPC);
+        end
+    end
 
     always @(*) begin
         if(if_access_fault) begin

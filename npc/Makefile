@@ -2,10 +2,12 @@
 ARCH = riscv32e-npc
 ifeq ($(ARCH), riscv32e-ysyxsoc)
 TOP_MODULE = ysyxSoCFull
+YOSYS_TOP = ysyx_25010030
 CXXFLAGS += -DYSYXSOC
 NXDC_FILES = ./constr/ysyxSoCFull.nxdc
 else ifeq ($(ARCH), riscv32e-npc)
 TOP_MODULE = rv32e
+YOSYS_TOP = rv32e
 else
 $(error 不支持的架构：$(ARCH).支持的架构: riscv32e-ysyxsoc, riscv32e-npc)
 endif
@@ -15,15 +17,15 @@ NPC_HOME = /home/furina/ysyx-workbench/npc
 NVBOARD_HOME = /home/furina/ysyx-workbench/nvboard
 SOC_HOME = /home/furina/ysyx-workbench/ysyxSoC
 ifeq ($(ARCH), riscv32e-ysyxsoc)
-CSRCS = $(shell find $(abspath ./soc-csrc) -name "*.cpp")  # 查找 csrc 目录下所有 .cpp 文件
-VSRCS = $(shell find $(abspath ./soc-vsrc) -name "*.v")
+CSRCS = $(shell find $(abspath ./pipeline-soc-csrc) -name "*.cpp")  
+VSRCS = $(shell find $(abspath ./pipeline-soc-vsrc) -name "*.v")
 VSRCS += $(shell find $(abspath ../ysyxSoC/perip) -name "*.v")
 VSRCS += ../ysyxSoC/build/ysyxSoCFull.v 
 
 else
 ifeq ($(ARCH), riscv32e-npc)
-CSRCS = $(shell find $(abspath ./pipeline-csrc) -name "*.cpp")  # 查找 csrc 目录下所有 .cpp 文件
-VSRCS = $(shell find $(abspath ./pipeline-vsrc) -name "*.v")     # 查找 vsrc 目录下所有 .v 文件
+CSRCS = $(shell find $(abspath ./pipeline-csrc) -name "*.cpp") 
+VSRCS = $(shell find $(abspath ./Npipeline-vsrc) -name "*.v")   
 endif
 endif
 
@@ -52,6 +54,7 @@ CXXFLAGS += $(INCFLAGS) -DTOP_NAME="\"V$(TOP_MODULE)\""
 LIBS = -lreadline  # 链接 readline 库, 命令行交互库
 LIBS += -ldl       # 链接 dlfcn 库, 动态链接库
 LIBS += -lSDL2     # 添加 SDL2 库链接, 图形显示库
+LIBS += -lSDL2_image
 LDFLAGS += $(LIBS)
 
 
@@ -115,7 +118,12 @@ wave.vcd: $(BIN)
 	@echo "### SIMULATING ###"
 	@$(BIN) #+verilator+rand+reset+2
 
-
+yosys:
+	cd $(NPC_HOME)/../yosys-sta && make sta DESIGN=$(YOSYS_TOP) \
+											RTL_FILES="$(shell find $(NPC_HOME)/vsrc -name "*.v")" \
+											CLK_FREQ_MHZ=500 \
+											INCLUDE_PATH=$(NPC_HOME)/vsrc
+	cd $(NPC_HOME)
 
 # 伪目标：运行环境准备
 .PHONY: run-env

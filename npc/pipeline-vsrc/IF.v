@@ -18,7 +18,8 @@ module IF (
     input      [31:0] predict_target   // 预测目标地址
 );
     import "DPI-C" function int unsigned pmem_read(input int unsigned raddr, input int len);
-    
+    import "DPI-C" function void counter(input int inst_type, input int ifu_inc, input int lsu_inc, input int exu_inc);
+
     reg check;
     wire is_branch = (IF_ID_inst[6:0] == 7'b1100011);
     wire is_jal    = (IF_ID_inst[6:0] == 7'b1101111);
@@ -45,6 +46,8 @@ module IF (
             // IF_ID_pc <= IF_ID_pc + 4;
             IF_ID_pc <= is_jal ? IF_ID_pc + immJ : (predict_taken && (is_branch || is_jalr)) ? predict_target : (IF_ID_pc + 4);
             IF_ID_pc2 <= IF_ID_pc2 + 4; // 用于分支预测
+
+            if(is_jal) counter(2, 0, 0, 0);
         end
     end
 
@@ -61,6 +64,7 @@ module IF (
             IF_valid = 1'b1;//默认有效，不停取指令
             // $display("[IF] 访问内存");
             IF_ID_inst = pmem_read(IF_ID_pc, 4);
+            counter(7, 1, 0, 0);
         end
         // $display("IF: pc = %h, inst = %h", IF_ID_pc, IF_ID_inst);
     end

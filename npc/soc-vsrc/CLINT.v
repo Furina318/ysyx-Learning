@@ -36,7 +36,7 @@ module CLINT #(
     output reg                    bvalid,
     input  wire                   bready
 );
-    import "DPI-C" function void ebreak(input int station, input int inst);
+    // import "DPI-C" function void ebreak(input int station, input int inst);
 
     // 状态机定义
     typedef enum {IDLE, READ_ADDR, READ_DATA, WRITE_ADDR, WRITE_DATA, WRITE_RESP} state_t;
@@ -118,7 +118,7 @@ module CLINT #(
                                 default: begin
                                     rdata <= 32'h0;
                                     rresp <= `SLVERR;
-                                    ebreak(`ABORT, 32'hdead_beef);
+                                    // ebreak(`ABORT, 32'hdead_beef);
                                     $display("\033[31mCLINT: Invalid read address %h\033[0m", araddr_reg);
                                 end
                             endcase

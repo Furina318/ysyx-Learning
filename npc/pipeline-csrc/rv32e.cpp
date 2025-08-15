@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "Vrv32e.h"
-// #include "verilated_vcd_c.h"
 #include "../obj_dir/Vrv32e___024root.h"
 #include "Vrv32e__Dpi.h"
 #include "svdpi.h"
@@ -26,9 +25,32 @@ extern word_t pmem_r(paddr_t addr, int len);
 extern void pmem_w(paddr_t addr, int len, word_t data);
 
 /* **************** */
-// VerilatedVcdC *tfp = new VerilatedVcdC(); // 导出vcd波形
+#ifdef CONFIG_WAVE
+#include "verilated_vcd_c.h"
+VerilatedVcdC *tfp = new VerilatedVcdC(); // 导出vcd波形
+#endif
 Vrv32e *top = new Vrv32e("top");
 vluint64_t main_time = 0; // 仿真时间
+
+extern uint64_t R_inst, I_inst, J_inst, R_inst, L_inst, B_inst, S_inst, CSR_inst;
+extern uint64_t ifu_get;
+extern uint64_t lsu_get;
+extern uint64_t exu_done;
+extern "C" void counter(int inst_type, int ifu_inc, int lsu_inc, int exu_inc) {
+    ifu_get  += ifu_inc;
+    lsu_get  += lsu_inc;
+    exu_done += exu_inc;
+    switch (inst_type) {
+        case 0: R_inst++; break;  // R 类型
+        case 1: I_inst++; break;  // I 类型 (包括 LUI/AUIPC)
+        case 2: J_inst++; break;  // J 类型 (JAL/JALR)
+        case 3: L_inst++; break;  // L 类型 (假设第二个 R_inst 为 L_inst)
+        case 4: B_inst++; break;  // B 类型
+        case 5: S_inst++; break;  // S 类型
+        case 6: CSR_inst++; break; // CSR 类型
+        default: break;  // 无效类型，不递增
+    }
+}
 
 extern "C" void ebreak(int station, int inst) {
     if(main_time>=start_time){
@@ -80,7 +102,9 @@ void single_cycle(void) {
         }
 
         top->eval(); // 执行仿真
-        //tfp->dump(main_time); // 记录波形
+    #ifdef CONFIG_WAVE
+        tfp->dump(main_time); // 记录波形
+    #endif
         main_time++; // 推进仿真时间
     }
 }
@@ -93,11 +117,12 @@ void reset(void) {
 }
 
 void init_verilator(void) {
-    // Verilated::traceEverOn(true); // 启用波形跟踪
+#ifdef CONFIG_WAVE
+    Verilated::traceEverOn(true); // 启用波形跟踪
 
-    // top->trace(tfp, 0);
-    // tfp->open("wave.vcd"); // 打开波形文件
-
+    top->trace(tfp, 0);
+    tfp->open("wave.vcd"); // 打开波形文件
+#endif
     reset(); // 执行复位
 }
 
@@ -120,7 +145,9 @@ int main(int argc, char *argv[]) {
 
     /* End the simulation */
     top->final();
-    // tfp->close();
+#ifdef CONFIG_WAVE
+    tfp->close();
+#endif
     delete top;
 
     return is_exit_status_bad();

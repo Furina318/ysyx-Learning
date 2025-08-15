@@ -33,8 +33,17 @@ module MEM (
     input wire        sram_wready,
     input wire [1:0]  sram_bresp,
     input wire        sram_bvalid,
-    output reg        sram_bready
+    output reg        sram_bready,
+
+    input      [31:0] ex_inst_type,
+    input      [31:0] ex_start_cycle,
+    output reg [31:0] mem_inst_type,
+    output reg [31:0] mem_start_cycle
 );
+`ifdef VERILATOR
+    import "DPI-C" function void counter(input int inst_type, input int cycles, input int ifu_inc, input int lsu_inc, input int exu_inc);
+`endif
+
     //====状态机定义====//  
     typedef enum {IDLE, READ_ADDR, READ_DATA, 
     WRITE_ADDR, WRITE_DATA, WRITE_RESP, STALL} state_t;//将之前的BUSY状态分为READ_ADDR、READ_DATA、WRITE
@@ -112,55 +121,55 @@ module MEM (
     endfunction
 
     function [31:0] extract_read_data;
-    input [2:0] mem_len;
-    input [1:0] addr_low;
-    input [31:0] rdata;
-    begin
-        case (mem_len)
-            `Mem_Bit: begin
-                // 有符号字节：提取对应字节并进行符号扩展
-                case (addr_low)
-                    2'b00: extract_read_data = {{24{rdata[7]}}, rdata[7:0]};
-                    2'b01: extract_read_data = {{24{rdata[15]}}, rdata[15:8]};
-                    2'b10: extract_read_data = {{24{rdata[23]}}, rdata[23:16]};
-                    2'b11: extract_read_data = {{24{rdata[31]}}, rdata[31:24]};
-                    default: extract_read_data = {{24{rdata[7]}}, rdata[7:0]};
-                endcase
-            end
-            `Mem_UBit: begin
-                // 无符号字节：提取对应字节并进行零扩展
-                case (addr_low)
-                    2'b00: extract_read_data = {24'b0, rdata[7:0]};
-                    2'b01: extract_read_data = {24'b0, rdata[15:8]};
-                    2'b10: extract_read_data = {24'b0, rdata[23:16]};
-                    2'b11: extract_read_data = {24'b0, rdata[31:24]};
-                    default: extract_read_data = {24'b0, rdata[7:0]};
-                endcase
-            end
-            `Mem_Half: begin
-                // 有符号半字：提取对应半字并进行符号扩展
-                case (addr_low)
-                    2'b00: extract_read_data = {{16{rdata[15]}}, rdata[15:0]};
-                    2'b10: extract_read_data = {{16{rdata[31]}}, rdata[31:16]};
-                    default: extract_read_data = {{16{rdata[15]}}, rdata[15:0]}; // 非对齐使用低半字
-                endcase
-            end
-            `Mem_UHalf: begin
-                // 无符号半字：提取对应半字并进行零扩展
-                case (addr_low)
-                    2'b00: extract_read_data = {16'b0, rdata[15:0]};
-                    2'b10: extract_read_data = {16'b0, rdata[31:16]};
-                    default: extract_read_data = {16'b0, rdata[15:0]}; // 非对齐使用低半字
-                endcase
-            end
-            `Mem_Word: begin
-                // 字访问：直接使用全部数据
-                extract_read_data = rdata;
-            end
-            default: extract_read_data = rdata;
-        endcase
-    end
-endfunction
+        input [2:0] mem_len;
+        input [1:0] addr_low;
+        input [31:0] rdata;
+        begin
+            case (mem_len)
+                `Mem_Bit: begin
+                    // 有符号字节：提取对应字节并进行符号扩展
+                    case (addr_low)
+                        2'b00: extract_read_data = {{24{rdata[7]}}, rdata[7:0]};
+                        2'b01: extract_read_data = {{24{rdata[15]}}, rdata[15:8]};
+                        2'b10: extract_read_data = {{24{rdata[23]}}, rdata[23:16]};
+                        2'b11: extract_read_data = {{24{rdata[31]}}, rdata[31:24]};
+                        default: extract_read_data = {{24{rdata[7]}}, rdata[7:0]};
+                    endcase
+                end
+                `Mem_UBit: begin
+                    // 无符号字节：提取对应字节并进行零扩展
+                    case (addr_low)
+                        2'b00: extract_read_data = {24'b0, rdata[7:0]};
+                        2'b01: extract_read_data = {24'b0, rdata[15:8]};
+                        2'b10: extract_read_data = {24'b0, rdata[23:16]};
+                        2'b11: extract_read_data = {24'b0, rdata[31:24]};
+                        default: extract_read_data = {24'b0, rdata[7:0]};
+                    endcase
+                end
+                `Mem_Half: begin
+                    // 有符号半字：提取对应半字并进行符号扩展
+                    case (addr_low)
+                        2'b00: extract_read_data = {{16{rdata[15]}}, rdata[15:0]};
+                        2'b10: extract_read_data = {{16{rdata[31]}}, rdata[31:16]};
+                        default: extract_read_data = {{16{rdata[15]}}, rdata[15:0]}; // 非对齐使用低半字
+                    endcase
+                end
+                `Mem_UHalf: begin
+                    // 无符号半字：提取对应半字并进行零扩展
+                    case (addr_low)
+                        2'b00: extract_read_data = {16'b0, rdata[15:0]};
+                        2'b10: extract_read_data = {16'b0, rdata[31:16]};
+                        default: extract_read_data = {16'b0, rdata[15:0]}; // 非对齐使用低半字
+                    endcase
+                end
+                `Mem_Word: begin
+                    // 字访问：直接使用全部数据
+                    extract_read_data = rdata;
+                end
+                default: extract_read_data = rdata;
+            endcase
+        end
+    endfunction
 
     always @(posedge clk or posedge reset) begin
         if(reset) begin
@@ -183,6 +192,9 @@ endfunction
             load_access_fault <= 1'b0;
             store_access_fault <= 1'b0;
             mem_fault_addr <= 32'h0;
+
+            mem_start_cycle <= 32'b0;
+            mem_inst_type <= 32'd7;
         end
         else begin
             state = next_state;
@@ -247,6 +259,9 @@ endfunction
                     // sram_rready <= 1'b1;//准备接受数据
                     // $display("FUCKING ERROR IS HERE");
                     if(sram_rvalid && sram_rready) begin
+                    `ifdef VERILATOR
+                        counter(7, 0, 0, 1, 0);
+                    `endif
                         // sram_arvalid <= 1'b0;
                         sram_rready <= 1'b0;
                         // $display("\033[31m[MEM]: READ_DATA状态握手成功\033[0m");
@@ -332,6 +347,9 @@ endfunction
                     sram_arvalid <= 1'b0;
                     sram_bready <= 1'b0;
                     sram_awvalid <= 1'b0;
+
+                    mem_inst_type <= ex_inst_type;
+                    mem_start_cycle <= ex_start_cycle;
                     if(wb_ready) begin
                         next_state = IDLE;
                     end
