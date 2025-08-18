@@ -661,12 +661,12 @@ module ysyx_25010030 (
     end
 
     // EBREAK 处理
-    always @(posedge clock) begin
-        if (instr == 32'h00100073) begin
-            real IPC = (cycle_cnt == 0) ? 0.0 : real'(inst_cnt) / real'(cycle_cnt);
-            $display("\033[33mIPC = %f\033[0m", IPC);
-        end
-    end
+    // always @(posedge clock) begin
+    //     if (instr == 32'h00100073) begin
+    //         real IPC = (cycle_cnt == 0) ? 0.0 : real'(inst_cnt) / real'(cycle_cnt);
+    //         $display("\033[33mIPC = %f\033[0m", IPC);
+    //     end
+    // end
 
     always @(*) begin
         if(if_access_fault) begin

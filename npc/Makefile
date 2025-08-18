@@ -17,8 +17,8 @@ NPC_HOME = /home/furina/ysyx-workbench/npc
 NVBOARD_HOME = /home/furina/ysyx-workbench/nvboard
 SOC_HOME = /home/furina/ysyx-workbench/ysyxSoC
 ifeq ($(ARCH), riscv32e-ysyxsoc)
-CSRCS = $(shell find $(abspath ./pipeline-soc-csrc) -name "*.cpp")  
-VSRCS = $(shell find $(abspath ./pipeline-soc-vsrc) -name "*.v")
+CSRCS = $(shell find $(abspath ./soc-csrc) -name "*.cpp")  
+VSRCS = $(shell find $(abspath ./soc-vsrc) -name "*.v")
 VSRCS += $(shell find $(abspath ../ysyxSoC/perip) -name "*.v")
 VSRCS += ../ysyxSoC/build/ysyxSoCFull.v 
 

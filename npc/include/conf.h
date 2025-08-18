@@ -45,7 +45,7 @@
 // #define CONFIG_TRACE 1
 // #define CONFIG_FTRACE 1
 // #define CONFIG_MTRACE 1
-#define CONFIG_DIFFTEST 1
+// #define CONFIG_DIFFTEST 1
 // #define CONFIG_ITRACE 1
 // #define CONFIG_TARGET_AM 1
 // #define CONFIG_WAVE 1

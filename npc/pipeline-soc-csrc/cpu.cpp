@@ -182,11 +182,12 @@ uint64_t R_inst, I_inst, J_inst, B_inst, L_inst, S_inst, CSR_inst;
 uint64_t ifu_get;
 uint64_t lsu_get;
 uint64_t exu_done;
-uint64_t clk_sum;
+uint64_t cycle_sum;
 static void statistic() {
     Log("total guest instructions = %lu", g_nr_guest_inst);
     uint64_t total = g_nr_guest_inst;
-    printf("\033[33mIPC = %lf\033[0m\n", (double)g_nr_guest_inst / clk_sum);
+    printf("\033[33mIPC = %lf\033[0m\n", (double)g_nr_guest_inst / cycle_sum);
+    printf("\033[33m平均每条指令执行周期: %lf\033[0m\n", (double)cycle_sum / g_nr_guest_inst);
     printf("+----------------+------------+-----------+\n");
     printf("| 指令类型       | 数量       | 占比 (%%)  |\n");
     printf("+----------------+------------+-----------+\n");
@@ -229,7 +230,7 @@ static void execute_once() {
     last_pc = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__IF_ID_pc;
     do{
       single_cycle();
-      clk_sum++;
+      cycle_sum++;
     } while (last_pc == top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__IF_ID_pc);
     if(!top->reset) g_nr_guest_inst++;
 
@@ -279,7 +280,7 @@ static void trace_and_difftest() {
 
     int reset_once = 1;
 
-    if(wb_valid && !reset_once){
+    if(wb_valid){
       difftest_step(PCSet.pc, PCSet.next_pc);
     }
     else {

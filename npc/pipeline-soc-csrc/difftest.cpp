@@ -89,12 +89,12 @@ bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc)
     bool success = true;
 
     //check pc
-    // if(ref_r->pc != pc)
-    // {
-    //     _Log(ANSI_FG_YELLOW "[difftest]" ANSI_NONE   ANSI_FG_RED "pc" 
-    //          ANSI_NONE "  dut:0x%08x   ref:0x%08x\n", pc, ref_r->pc);
-    //     success = false;
-    // }
+    if(ref_r->pc != pc)
+    {
+        _Log(ANSI_FG_YELLOW "[difftest]" ANSI_NONE   ANSI_FG_RED "pc" 
+             ANSI_NONE "  dut:0x%08x   ref:0x%08x\n", pc, ref_r->pc);
+        success = false;
+    }
 
     //check general purpose registers
     for(int i = 0; i < 32; i++)
@@ -115,6 +115,7 @@ static void checkregs(CPU_state *ref, vaddr_t pc, vaddr_t npc)
         npc_state.state = NPC_ABORT;
         npc_state.halt_pc = pc;
         Log("Differential test %s at pc = 0x%08x." , (ANSI_FMT("fails", ANSI_FG_RED)), npc_state.halt_pc);
+        printf("\033[33m[REF->GPR]\033[0m\n");
         for(int i = 0; i < 32; i++)
         {
             printf("%s:\t0x%08x\n", ref_regs[i], ref->gpr[i]);

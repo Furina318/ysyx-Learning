@@ -260,6 +260,8 @@ static bool wb_valid_delayed = false;
 static vaddr_t wb_pc_delayed = 0;
 static vaddr_t wb_inst_delayed = 0;
 
+int reset_once = 10;
+
 static bool first_step = true; // 用于第一次执行时的特殊处理
 
 static void trace_and_difftest() {
@@ -278,13 +280,11 @@ static void trace_and_difftest() {
     vaddr_t ex_flush_pc = top->rootp->rv32e__DOT__ex_flush_pc; // EX 冲刷目标 PC
     vaddr_t wb_inst = top->rootp->rv32e__DOT__lsu_wb_inst;  // WB 阶段指令
 
-    int reset_once = 1;
-
-    if(wb_valid){
+    if(wb_valid && !top->reset && (reset_once == 0)){
+      printf("difftest\n");
       difftest_step(PCSet.pc, PCSet.next_pc);
-    }
-    else {
-      reset_once = 0;
+    } else if(reset_once > 0){
+      reset_once --;
     }
     // // 处理流水线冲刷
     // if (ex_flush) {

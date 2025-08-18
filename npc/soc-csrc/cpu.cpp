@@ -10,7 +10,6 @@
 #include "../obj_dir/VysyxSoCFull___024root.h"
 #include "svdpi.h"
 #include "verilated_vcd_c.h"
-// #include "../include/reg.h"
 
 /********extern functions or variables********/
 
@@ -178,9 +177,12 @@ uint64_t ifu_get;
 uint64_t lsu_get;
 uint64_t exu_done;
 uint64_t total_cycles[7] = {0};
+uint64_t cycle_sum;
 static void statistic() {
     Log("total guest instructions = %lu", g_nr_guest_inst);
     uint64_t inst_total = g_nr_guest_inst;
+    printf("\033[33mIPC = %lf\033[0m\n", (double)g_nr_guest_inst / cycle_sum);
+    printf("\033[33m平均每条指令执行周期: %lf\033[0m\n", (double)cycle_sum / g_nr_guest_inst);
     uint64_t cycle_total = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__cycle_cnt;
     printf("+----------------+------------+-----------+--------------+\n");
     printf("| 指令类型       | 数量       | 占比 (%%)  | 平均周期     |\n");
@@ -193,7 +195,7 @@ static void statistic() {
     printf("| B 类型         | %10" PRIu64 " | %7.2f %% | %9.2f    |\n", B_inst, inst_total ? (double)B_inst / inst_total * 100 : 0.0, B_inst ? (double)total_cycles[5] / B_inst : 0.0);
     printf("| CSR 类型       | %10" PRIu64 " | %7.2f %% | %9.2f    |\n", CSR_inst, inst_total ? (double)CSR_inst / inst_total * 100 : 0.0, CSR_inst ? (double)total_cycles[6] / CSR_inst : 0.0);
     printf("+----------------+------------+-----------+--------------+\n");
-    printf("| 总指令数       | %10" PRIu64 " | %7.2f %% | %9ld    |\n", (R_inst + I_inst + J_inst + L_inst + S_inst + B_inst + CSR_inst), (double)(R_inst + I_inst + J_inst + L_inst + S_inst + B_inst + CSR_inst) / inst_total * 100, cycle_total);
+    printf("| 总指令数       | %10" PRIu64 " | %7.2f %% | %9ld    |\n", (R_inst + I_inst + J_inst + L_inst + S_inst + B_inst + CSR_inst), (double)(R_inst + I_inst + J_inst + L_inst + S_inst + B_inst + CSR_inst) / inst_total * 100, cycle_sum);
     printf("+----------------+------------+-----------+--------------+\n");
     printf("+----------------+------------+----------------------+\n");
     printf("| 模块名称       | 操作总数   | 每指令操作数 (次/条) |\n");
@@ -215,12 +217,20 @@ static void statistic() {
 }
 //===============================================================================//
 
+uint64_t last_pc;
+
 static void execute_once() {
     PCSet.pc = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__pc;
     PCSet.inst = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__instr;
+    // printf("pc=0x%08x | inst=0x%08x\n",PCSet.pc,PCSet.inst);
+    last_pc = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__pc;
+    do{
+      single_cycle();
+      cycle_sum++;
+    } while (last_pc == top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__pc);
+    if(!top->reset) g_nr_guest_inst++;
 
-    single_cycle();
-    single_cycle(); // 执行一个时钟周期
+    // if(run_time <= start_time) run_time++;
 
 #ifdef CONFIG_FTRACE
   ftrace_handle();
@@ -228,6 +238,7 @@ static void execute_once() {
 
     PCSet.next_pc = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__pc;
     PCSet.ninst = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__instr;
+    // printf("next_pc=0x%08x | next_inst=0x%08x\n\n",PCSet.next_pc,PCSet.ninst);
 
 #ifdef CONFIG_ITRACE
     char *p = logbuf;
@@ -239,13 +250,13 @@ static void execute_once() {
 }
 int reset_flag = 10;
 static void trace_and_difftest(){
-  #ifdef CONFIG_ITRACE
+#ifdef CONFIG_ITRACE
     log_write("%s\n",logbuf);
-  #endif
+#endif
   if(g_print_step){
     IFDEF(CONFIG_ITRACE,puts(logbuf));
-  }
-  #ifdef CONFIG_DIFFTEST
+    }
+#ifdef CONFIG_DIFFTEST
   if(top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__wb_valid && !reset_flag){
     // printf("pc=0x%08x | inst=0x%08x\n",PCSet.pc,PCSet.inst);
     // printf("next_pc=0x%08x | next_inst=0x%08x\n\n",PCSet.next_pc,PCSet.ninst);
@@ -255,16 +266,18 @@ static void trace_and_difftest(){
     reset_flag -= 1;
   }
   // IFDEF(CONFIG_DIFFTEST,difftest_step(PCSet.pc,PCSet.next_pc));
-  #endif
+#endif
   
 }
-word_t last_pc;
+
+// word_t last_pc; 
+
 static void execute(uint64_t n) {
     
     for (; n > 0; n--) {
-        last_pc = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__pc;
+        // last_pc = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__IF_ID_pc;
         execute_once();
-        if(!top->reset && last_pc != top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__pc) g_nr_guest_inst++;
+        // if(!top->reset && last_pc != top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__IF_ID_pc) g_nr_guest_inst++;
         // g_nr_guest_inst++;
         trace_and_difftest();
         if (npc_state.state != NPC_RUNNING){
