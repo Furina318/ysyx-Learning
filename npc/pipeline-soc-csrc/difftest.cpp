@@ -32,15 +32,15 @@ void difftest_skip_ref() {
 const char *ref_regs[] = {
   "$0", "ra", "sp", "gp", "tp", "t0", "t1", "t2",
   "s0", "s1", "a0", "a1", "a2", "a3", "a4", "a5",
-  "a6", "a7", "s2", "s3", "s4", "s5", "s6", "s7",
-  "s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6"
+//   "a6", "a7", "s2", "s3", "s4", "s5", "s6", "s7",
+//   "s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6"
 };
 
 
 void update_cpu_state(CPU_state *cpu)
 {
     cpu->pc = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__IF_ID_pc;
-    for(int i = 0; i < 32; i++)
+    for(int i = 0; i < 16; i++)
         cpu->gpr[i] = top_regs[i];
 }
 
@@ -97,7 +97,7 @@ bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc)
     }
 
     //check general purpose registers
-    for(int i = 0; i < 32; i++)
+    for(int i = 0; i < 16; i++)
         if(top_regs[i] != ref_r->gpr[i])
         {
             _Log(ANSI_FG_YELLOW "[difftest]" ANSI_NONE   ANSI_FG_RED "%s" 
@@ -116,7 +116,7 @@ static void checkregs(CPU_state *ref, vaddr_t pc, vaddr_t npc)
         npc_state.halt_pc = pc;
         Log("Differential test %s at pc = 0x%08x." , (ANSI_FMT("fails", ANSI_FG_RED)), npc_state.halt_pc);
         printf("\033[33m[REF->GPR]\033[0m\n");
-        for(int i = 0; i < 32; i++)
+        for(int i = 0; i < 16; i++)
         {
             printf("%s:\t0x%08x\n", ref_regs[i], ref->gpr[i]);
         }
