@@ -41,6 +41,22 @@ static const uint32_t img [] = {
   0x00a00713, // addi a4, zero, 10
   0x00e78023, // sb a4, 0(a5)
   0x00100073, // 系统调用/退出指令
+  
+//   0x00000513,          	//li	a0,0
+//   0x100005b7,          	//lui	a1,0x10000
+//   0x04100313,          	//li	t1,65
+//   0x00000617,          	//auipc	a2,0x0
+//   0x01060613,          	//addi	a2,a2,16 # a000001c <again>
+//   0x000083b7,          	//lui	t2,0x8
+//   0x06738393,          	//addi	t2,t2,103 # 8067 <_stack_size+0x7c67>
+
+//  //<again>:
+//   0x00658023,          	//sb	t1,0(a1) # 10000000 <_sram_end+0xffe000>
+//   0x00762023,          	//sw	t2,0(a2)
+//   0x0000100f,          	//.4byte	0x100f
+//   0xff5ff06f,          	//j	a000001c <again>  
+//   0x00000513,          	//li	a0,0
+//   0x00008067,          	//ret
 };
 #define MTRACE_LOG_FILE "mtrace.log"
 static FILE *mtrace_file=NULL;
