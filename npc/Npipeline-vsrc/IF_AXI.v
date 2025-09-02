@@ -22,7 +22,9 @@ module IF_AXI (
     input      [31:0] sram_if_rdata,         // 读数据
     input             sram_if_rvalid,        // 读数据有效
     output reg        if_sram_rready,        // 读数据就绪
-    input      [1:0]  sram_if_rresp         // 读响应
+    input      [1:0]  sram_if_rresp,         // 读响应
+
+    output reg [31:0] ifu_active_cycles
 );
 
     import "DPI-C" function void ebreak(input int station, input int inst);
@@ -37,6 +39,14 @@ module IF_AXI (
     reg once;
     reg flush_reg, flush_once;
     reg [31:0] flush_pc_reg;
+
+    always @(posedge clk) begin
+        if (reset) begin
+            ifu_active_cycles <= 0;
+        end else if (state == AR_WAIT || state == R_WAIT) begin
+            ifu_active_cycles <= ifu_active_cycles + 1;
+        end
+    end
 
     always @(posedge clk or posedge reset) begin
         if (reset) begin

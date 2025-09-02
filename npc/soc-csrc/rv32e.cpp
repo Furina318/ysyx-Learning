@@ -72,6 +72,12 @@ extern "C" void counter(int inst_type, int cycles, int ifu_inc, int lsu_inc, int
     }
 }
 
+void occupancy(int lsu_active_cycles, int total_cycles) {
+    double ratio = (total_cycles == 0) ? 0.0 : (double)lsu_active_cycles / total_cycles * 100.0;
+    printf("\033[33mLSU Occupancy Ratio: %.2f%% (Active Cycles: %d, Total Cycles: %d)\033[0m\n",
+           ratio, lsu_active_cycles, total_cycles);
+}
+
 extern "C" void ebreak(int station, int inst) {
     if(main_time>=start_time){
         if (Verilated::gotFinish())

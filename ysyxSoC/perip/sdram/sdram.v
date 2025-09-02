@@ -16,28 +16,28 @@ module sdram(
   wire bank_sel = a[13];     //字拓展选择
 
   sdram_32 sdram_32_u0(
-    .clk(            clk),
-    .cke(            cke),
-    .cs ( cs & ~bank_sel),
-    .ras(            ras),
-    .cas(            cas),
-    .we (             we),
-    .a  (           addr),
-    .ba (             ba),
-    .dqm(            dqm),
-    .dq (             dq)
+    .clk(clk           ),
+    .cke(cke           ),
+    .cs (cs & ~bank_sel),
+    .ras(ras           ),
+    .cas(cas           ),
+    .we (we            ),
+    .a  (addr          ),
+    .ba (ba            ),
+    .dqm(dqm           ),
+    .dq (dq            )
   );
 
   sdram_32 sdram_32_u1(
-    .clk(           clk),
-    .cke(           cke),
-    .cs ( cs & bank_sel),
-    .ras(           ras),
-    .cas(           cas),
-    .we (            we),
-    .a  (          addr),
-    .ba (            ba),
-    .dqm(           dqm),
-    .dq (            dq)
+    .clk(clk          ),
+    .cke(cke          ),
+    .cs (cs & bank_sel),
+    .ras(ras          ),
+    .cas(cas          ),
+    .we (we           ),
+    .a  (addr         ),
+    .ba (ba           ),
+    .dqm(dqm          ),
+    .dq (dq           )
   );
 endmodule

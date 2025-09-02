@@ -5,6 +5,7 @@
 #include "../include/conf.h"
 #include "../include/paddr.h"
 #include "../include/difftest.h"
+#include "../include/watchpoint.h"
 #include "VysyxSoCFull.h"
 #include "VysyxSoCFull__Dpi.h"
 #include "../obj_dir/VysyxSoCFull___024root.h"
@@ -19,6 +20,9 @@ extern VysyxSoCFull *top;
 extern VerilatedVcdC *tfp;
 extern vluint64_t main_time;
 extern void die();
+extern word_t expr(char *e);
+extern WP *new_wp();
+extern WP *get_wp_head();
 
 #ifdef CONFIG_ITRACE 
 extern void append_iringbuf(char *s);
@@ -267,7 +271,24 @@ static void trace_and_difftest(){
   }
   // IFDEF(CONFIG_DIFFTEST,difftest_step(PCSet.pc,PCSet.next_pc));
 #endif
-  
+
+#ifdef CONFIG_WATCHPOINTS
+  WP *wp=get_wp_head();
+  while(wp != NULL){
+    word_t val = expr(wp->expr);
+    if(val != wp->old_val){
+      // printf("Watchpoint NO.%d: Expression '%s' changed from 0x%08x to 0x%08x.\n", wp->NO, wp->expr, wp->old_val, val);
+      _Log("Watchpoint NO.%d: Expression" ANSI_FG_YELLOW " '%s' " ANSI_NONE "changed from"
+      ANSI_FG_BLUE " 0x%08x " ANSI_NONE "to" ANSI_FG_BLUE " 0x%08x\n" ANSI_NONE,wp->NO, wp->expr, wp->old_val, val);
+      npc_state.state = NPC_STOP;
+      wp->old_val = val;
+      //sdb_mainloop();
+      break;
+    }
+    // wp->old_val=val;
+    wp = wp->next;
+  }
+#endif
 }
 
 // word_t last_pc; 

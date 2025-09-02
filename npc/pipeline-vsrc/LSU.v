@@ -46,8 +46,6 @@ module LSU (
     // 传递到 WB 阶段的信号
     output reg [31:0] lsu_wb_inst,         // 指令
     output reg [31:0] lsu_wb_pc,           // 程序计数器
-    input             ex_flush,
-    output reg        lsu_wb_flush,
 
     output reg [31:0] lsu_wb_csr_wr_data1,
     output reg [31:0] lsu_wb_csr_wr_data2,
@@ -289,7 +287,6 @@ module LSU (
             lsu_wb_csr_wr_addr2 <= 0;
             lsu_wb_csr_wr_data1 <= 0;
             lsu_wb_csr_wr_data2 <= 0;
-            lsu_wb_flush        <= 0;
         end
         else if (write_valid) begin
             lsu_wb_RegWrite        <= l_rd_en;
@@ -303,7 +300,6 @@ module LSU (
             lsu_wb_write_rd_data  <= rd_data;
             lsu_wb_inst           <= l_inst;
             lsu_wb_pc             <= l_pc;
-            lsu_wb_flush          <= ex_flush;
         end
         else if (read_valid) begin
             lsu_wb_RegWrite       <= l_rd_en;
@@ -317,7 +313,6 @@ module LSU (
             lsu_wb_write_rd_data  <= rd_data;
             lsu_wb_inst           <= l_inst;
             lsu_wb_pc             <= l_pc;
-            lsu_wb_flush          <= ex_flush;
         end
         else if (ex_lsu_valid & lsu_ex_ready & ~(ex_lsu_MemRead | ex_lsu_MemWrite)) begin
             lsu_wb_RegWrite        <= ex_lsu_RegWrite; // 非内存访问指令
@@ -331,7 +326,6 @@ module LSU (
             lsu_wb_write_rd_data  <= rd_data;
             lsu_wb_inst           <= ex_lsu_inst;
             lsu_wb_pc             <= ex_lsu_pc;
-            lsu_wb_flush          <= ex_flush;
         end
         else begin
             lsu_wb_RegWrite     <= lsu_wb_RegWrite;
@@ -345,7 +339,6 @@ module LSU (
             lsu_wb_csr_wr_addr2 <= lsu_wb_csr_wr_addr2;
             lsu_wb_csr_wen1     <= lsu_wb_csr_wen1;
             lsu_wb_csr_wen2     <= lsu_wb_csr_wen2;
-            lsu_wb_flush        <= ex_flush;
         end
     end
 

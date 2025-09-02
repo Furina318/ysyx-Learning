@@ -25,7 +25,7 @@ module ID (
     reg [4:0] get_opcode;
     
     assign immI = {{20{instr[31]}}, instr[31:20]};
-    assign immU = {instr[31:12], 12'b0};
+    // assign immU = {instr[31:12], 12'b0};
     assign immS = {{20{instr[31]}}, instr[31:25], instr[11:7]};
     assign immJ = {{12{instr[31]}}, instr[19:12], instr[20], instr[30:21], 1'b0};
     assign immR = 32'b0;
@@ -52,12 +52,12 @@ module ID (
                 imm = immU;
                 RegWrite = 1'b1;
             end
-            // AUIPC
-            `INST_TYPE_AUIPC: begin
-                imm = immU;
-                RegWrite = 1'b1;
-                alu_op=`ALU_ADD;//PC+imm
-            end
+            // // AUIPC
+            // `INST_TYPE_AUIPC: begin
+            //     imm = immU;
+            //     RegWrite = 1'b1;
+            //     alu_op=`ALU_ADD;//PC+imm
+            // end
             // JALR
             `INST_TYPE_JALR: begin
                 if (func3 == 3'b000) begin

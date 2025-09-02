@@ -9,13 +9,13 @@ module EX (
     input             lsu_ready,
     output reg        ex_lsu_valid,
 
-    input      [4:0]  id_wb_rs1,
-    input      [4:0]  id_wb_rs2,
-    input      [4:0]  lsu_ex_forward_rd,
+    input      [ 3:0] id_wb_rs1,
+    input      [ 3:0] id_wb_rs2,
+    input      [ 3:0] lsu_ex_forward_rd,
     input             lsu_ex_forward_RegWrite,
     input             lsu_ex_forward_MemRead,
     input      [31:0] lsu_wb_wdata,
-    input      [4:0]  lsu_wb_rd,
+    input      [ 3:0] lsu_wb_rd,
     input             lsu_wb_RegWrite,
     input             lsu_wb_valid,
     output reg        ex_lsu_forward_las,
@@ -23,21 +23,21 @@ module EX (
     input      [31:0] id_ex_inst,
     input      [31:0] id_ex_pc,
     input      [31:0] id_ex_imm,
-    input      [4:0]  id_ex_zimm,
-    input      [5:0]  id_ex_shamt,
+    input      [ 4:0] id_ex_zimm,
+    input      [ 5:0] id_ex_shamt,
     input      [31:0] wb_ex_src1,
     input      [31:0] wb_ex_src2,
     input             id_ex_RegWrite,
-    input      [4:0]  id_ex_rd,
-    input      [6:0]  id_ex_opcode,
-    input      [2:0]  id_ex_func3,
-    input      [3:0]  id_ex_alu_op,
+    input      [ 3:0] id_ex_rd,
+    input      [ 6:0] id_ex_opcode,
+    input      [ 2:0] id_ex_func3,
+    input      [ 3:0] id_ex_alu_op,
 
     input             id_ex_jal,
     input             id_ex_jalr,
     input             id_ex_MemRead,
     input             id_ex_MemWrite,
-    input      [2:0]  id_ex_MemLen,
+    input      [ 4:0] id_ex_MemLen,
 
     input      [31:0] wb_ex_csr_num1,
     input      [31:0] wb_ex_csr_num2,
@@ -49,7 +49,7 @@ module EX (
     input      [11:0] id_ex_csr_wr_addr2,
     input             id_ex_csr_ecall,
     input             id_ex_csr_mret,
-    input      [1:0]  id_ex_csr_op,
+    input      [ 1:0] id_ex_csr_op,
 
     output reg        ex_flush,
     output reg [31:0] ex_flush_pc,
@@ -58,11 +58,10 @@ module EX (
     output reg [31:0] ex_lsu_pc,
     output reg [31:0] ex_lsu_src2,
     output reg        ex_lsu_RegWrite,
-    output reg [4:0]  ex_lsu_rd,
+    output reg [ 3:0] ex_lsu_rd,
     output reg        ex_lsu_MemRead,
     output reg        ex_lsu_MemWrite,
-    output reg [2:0]  ex_lsu_MemLen,
-    output reg [6:0]  ex_lsu_opcode,
+    output reg [ 4:0] ex_lsu_MemLen,
 
     output reg        ex_lsu_csr,
     output reg        ex_lsu_csr_wen1,
@@ -76,12 +75,23 @@ module EX (
     output reg        ex_lsu_csr_ecall,
     output reg        ex_lsu_csr_mret,
 
-    output reg [31:0] ex_lsu_imm,
     output reg [31:0] ex_lsu_process_result
+
 );
+`ifdef VERILATOR
     import "DPI-C" function void ebreak(input int station, input int inst);
-    import "DPI-C" function void counter(input int inst_type, input int ifu_inc, input int lsu_inc, input int exu_inc);
+    // import "DPI-C" function void counter(input int inst_type, input int ifu_inc, input int lsu_inc, input int exu_inc);
+`endif
     
+    // EXU 活跃周期计数
+    // always @(posedge clk) begin
+    //     if (reset) begin
+    //         exu_active_cycles <= 0;
+    //     end else if (id_valid && ex_ready) begin
+    //         exu_active_cycles <= exu_active_cycles + 1;
+    //     end
+    // end
+
     // 前递后的源寄存器值
     // wire [31:0] src1 = (forward_rs1[1] ? ex_lsu_process_result : 
     //                    (forward_rs1[0] | load_use_flag[1]) ? lsu_wb_wdata : 
@@ -103,7 +113,6 @@ module EX (
     reg [31:0] ex_num1;
     reg [31:0] ex_num2;
     reg [31:0] process_result;
-    // reg [31:0] link_addr; // 存储链接地址
 
     // ALU 输入选择
     always @(*) begin
@@ -132,8 +141,6 @@ module EX (
             ex_num1 = src1;
             ex_num2 = (id_ex_opcode[6:2] == `INST_TYPE_R || id_ex_opcode[6:2] == `INST_TYPE_B) ? src2 : id_ex_imm;
         end
-
-        // link_addr = id_ex_pc + 4; // 保存链接地址(PC+4)
     end
 
     // ALU 操作
@@ -152,7 +159,7 @@ module EX (
             `ALU_SRA:  process_result = $signed(ex_num1) >>> ex_num2[4:0];
             `ALU_SLL:  process_result = ex_num1 << ex_num2[4:0];
             `ALU_SRL:  process_result = ex_num1 >> ex_num2[4:0];
-            default:   begin process_result = 32'b0; ebreak(`ABORT,32'hdeadbeef); end
+            default:   begin process_result = 32'b0; $display("Unkonw alu_op"); end
         endcase
         alu_zero = (process_result == 32'b0);
         alu_less = (id_ex_alu_op == `ALU_SLT) ? ($signed(ex_num1) < $signed(ex_num2)) :
@@ -160,47 +167,50 @@ module EX (
     end
 
     // 分支和跳转逻辑
-    reg [31:0] jal_target;
+    // reg [31:0] jal_target;
     reg [31:0] jalr_target;
     reg        take_branch;
     reg        ex_flush_condition;
 
     always @(*) begin
-        jal_target  = id_ex_pc + id_ex_imm;
+        // jal_target  = id_ex_pc + id_ex_imm;
         jalr_target = (src1 + id_ex_imm) & ~32'h1;
         take_branch = (id_ex_opcode == `INST_B) && (
-                    (id_ex_func3 == `F3_BNE && !alu_zero) || // bne
-                    (id_ex_func3 == `F3_BEQ && alu_zero) ||  // beq
-                    (id_ex_func3 == `F3_BLT && alu_less) ||  // blt
-                    (id_ex_func3 == `F3_BGE && !alu_less) || // bge
-                    (id_ex_func3 == `F3_BLTU && alu_less) || // bltu
-                    (id_ex_func3 == `F3_BGEU && !alu_less)   // bgeu
+                    (id_ex_func3 == `F3_BNE && !alu_zero) ||  // bne
+                    (id_ex_func3 == `F3_BEQ && alu_zero)  ||  // beq
+                    (id_ex_func3 == `F3_BLT && alu_less)  ||  // blt
+                    (id_ex_func3 == `F3_BGE && !alu_less) ||  // bge
+                    (id_ex_func3 == `F3_BLTU && alu_less) ||  // bltu
+                    (id_ex_func3 == `F3_BGEU && !alu_less)    // bgeu
         );
-
-        if (id_ex_jal) begin
-            ex_flush = 1'b1 & ex_flush_condition & (~(|load_use_flag));
-            ex_flush_pc = jal_target;
-        end
-        else if (id_ex_jalr) begin
-            ex_flush = 1'b1 & ex_flush_condition & (~(|load_use_flag));
-            ex_flush_pc = jalr_target;
-        end
-        else if (take_branch) begin
-            ex_flush = 1'b1 & ex_flush_condition & (~(|load_use_flag));
-            ex_flush_pc = id_ex_pc + id_ex_imm;
-        end
-        else if (id_ex_csr_ecall) begin
-            ex_flush = 1'b1 & ex_flush_condition & (~(|load_use_flag));
-            ex_flush_pc = wb_ex_csr_num1;
-        end
-        else if (id_ex_csr_mret) begin
-            ex_flush = 1'b1 & ex_flush_condition & (~(|load_use_flag));
-            ex_flush_pc = wb_ex_csr_num2;
-        end
-        else begin
-            ex_flush = 1'b0;
-            ex_flush_pc = 32'h0;
-        end
+        case(1'b1)
+            // id_ex_jal: begin
+            //     // ex_flush    = 1'b1 & ex_flush_condition & (~(|load_use_flag));
+            //     // ex_flush_pc = jal_target;
+            //     ex_flush = 1'b0;
+            //     ex_flush_pc = 32'h0;
+            // end
+            id_ex_jalr: begin
+                ex_flush    = 1'b1 & ex_flush_condition & (~(|load_use_flag));
+                ex_flush_pc = jalr_target;
+            end
+            id_ex_csr_ecall : begin
+                ex_flush    = 1'b1 & ex_flush_condition & (~(|load_use_flag));
+                ex_flush_pc = wb_ex_csr_num1;
+            end
+            id_ex_csr_mret: begin
+                ex_flush    = 1'b1 & ex_flush_condition & (~(|load_use_flag));
+                ex_flush_pc = wb_ex_csr_num2;
+            end
+            take_branch: begin
+                ex_flush    = 1'b1 & ex_flush_condition & (~(|load_use_flag));
+                ex_flush_pc = id_ex_pc + id_ex_imm;   
+            end
+            default: begin
+                ex_flush    = 1'b0; // 非分支指令不需要冲刷
+                ex_flush_pc = 32'h0;
+            end
+        endcase
     end
     
     always @(posedge clk)begin
@@ -215,51 +225,45 @@ module EX (
         end
     end
 
-    reg [31:0] csr_write_ecall;
-    always @(*) begin
-        if (id_ex_csr_ecall) begin
-            csr_write_ecall = id_ex_pc;
-        end
-        else begin
-            csr_write_ecall = 32'b0;
-        end
-    end
+    // reg [31:0] csr_write_ecall;
+    // always @(*) begin
+    //     if (id_ex_csr_ecall) begin
+    //         csr_write_ecall = id_ex_pc;
+    //     end
+    //     else begin
+    //         csr_write_ecall = 32'b0;
+    //     end
+    // end
 
-    wire [31:0] mstatus_t;
+    wire [31:0] mstatus;
     wire [31:0] mpie;
     assign mpie = (wb_ex_csr_num1 >> 7) & 32'h1;
-    assign mstatus_t = (((wb_ex_csr_num1 & ~(32'h3 << 11)) & ~(32'h1 << 3)) | (mpie << 3)) | (32'h1 << 7);
+    assign mstatus = (((wb_ex_csr_num1 & ~(32'h3 << 11)) & ~(32'h1 << 3)) | (mpie << 3)) | (32'h1 << 7);
 
     reg [31:0] csr_write_data;
     always @(*) begin
-        if (id_ex_csr_op == `CSR_CSRRW && id_ex_func3 == `F3_CSRRW) begin
-            csr_write_data = src1;
-        end
-        else if (id_ex_csr_op == `CSR_CSRRC && id_ex_func3 == `F3_CSRRC) begin
-            csr_write_data = (wb_ex_csr_num1 & ~src1);
-        end
-        else if (id_ex_csr_op == `CSR_CSRRS && id_ex_func3 == `F3_CSRRS) begin
-            csr_write_data = (wb_ex_csr_num1 | src1);
-        end
-        else if (id_ex_csr_op == `CSR_CSRRW && id_ex_func3 == `F3_CSRRWI) begin
-            csr_write_data = {27'b0,id_ex_zimm};
-        end
-        else if (id_ex_csr_op == `CSR_CSRRC && id_ex_func3 == `F3_CSRRCI) begin
-            csr_write_data = wb_ex_csr_num1 & ~({27'b0,id_ex_zimm});
-        end
-        else if (id_ex_csr_op == `CSR_CSRRS && id_ex_func3 == `F3_CSRRSI) begin
-            csr_write_data = wb_ex_csr_num1 | ({27'b0,id_ex_zimm});
-        end
-        else if (id_ex_csr_ecall) begin
-            csr_write_data = 32'd11;
-        end
-        else if (id_ex_csr_mret) begin
-            csr_write_data = mstatus_t;
-        end
-        else begin
-            csr_write_data = 32'b0;
-        end
+        case(1'b1)
+            (id_ex_csr_op == `CSR_CSRRW && id_ex_func3 == `F3_CSRRW): csr_write_data = src1;
+            (id_ex_csr_op == `CSR_CSRRC && id_ex_func3 == `F3_CSRRC): csr_write_data = (wb_ex_csr_num1 & ~src1);
+            (id_ex_csr_op == `CSR_CSRRS && id_ex_func3 == `F3_CSRRS): csr_write_data = (wb_ex_csr_num1 | src1);
+            (id_ex_csr_op == `CSR_CSRRW && id_ex_func3 == `F3_CSRRWI):csr_write_data = {27'b0,id_ex_zimm};
+            (id_ex_csr_op == `CSR_CSRRC && id_ex_func3 == `F3_CSRRCI):csr_write_data = wb_ex_csr_num1 & ~({27'b0,id_ex_zimm});
+            (id_ex_csr_op == `CSR_CSRRS && id_ex_func3 == `F3_CSRRSI):csr_write_data = wb_ex_csr_num1 | ({27'b0,id_ex_zimm});
+            (id_ex_csr_ecall):                                        csr_write_data = 32'd11;
+            (id_ex_csr_mret):                                         csr_write_data = mstatus;
+            default:                                                  csr_write_data = 32'b0;
+        endcase
     end
+
+    // wire [31:0] csr_write_data = (id_ex_csr_op == `CSR_CSRRW && id_ex_func3 == `F3_CSRRW) ? src1                                   :
+    //                              (id_ex_csr_op == `CSR_CSRRC && id_ex_func3 == `F3_CSRRC) ? (wb_ex_csr_num1 & ~src1)               :
+    //                              (id_ex_csr_op == `CSR_CSRRS && id_ex_func3 == `F3_CSRRS) ? (wb_ex_csr_num1 | src1)                :
+    //                              (id_ex_csr_op == `CSR_CSRRW && id_ex_func3 == `F3_CSRRWI)? {27'b0,id_ex_zimm}                     :
+    //                              (id_ex_csr_op == `CSR_CSRRC && id_ex_func3 == `F3_CSRRCI)? wb_ex_csr_num1 & ~({27'b0,id_ex_zimm}) :
+    //                              (id_ex_csr_op == `CSR_CSRRS && id_ex_func3 == `F3_CSRRSI)? wb_ex_csr_num1 | ({27'b0,id_ex_zimm})  :
+    //                              (                                        id_ex_csr_ecall)? 32'd11                                 :
+    //                              (                                         id_ex_csr_mret)? mstatus                                :
+    //                                                                                         32'b0;
 
     // 前递信号定义
     wire [1:0] forward_rs1;
@@ -285,16 +289,15 @@ module EX (
         ex_ready = (lsu_ready || ~ex_lsu_valid) && (load_use_flag == 4'b0);
     end
 
-    always @(posedge clk or posedge reset) begin
+    always @(posedge clk) begin
         if (reset) begin
             ex_lsu_valid <= 1'b0;
         end
-        // else if(load_use_flag != 4'b0) begin
-        //     ex_lsu_valid <= 1'b0; // 如果存在load-use冲突，禁止流水线继续
-        // end
         else if ((id_valid && ex_ready) && (lsu_ready || ~ex_lsu_valid)) begin
             ex_lsu_valid <= 1'b1;
-            counter(7, 0, 0, 1);
+        // `ifdef VERILATOR
+        //     counter(7, 0, 0, 1);
+        // `endif
         end
         else if (~(id_valid && ex_ready) && lsu_ready) begin
             ex_lsu_valid <= 1'b0;
@@ -302,16 +305,16 @@ module EX (
     end
 
     // 输出信号赋值
-    always @(posedge clk or posedge reset) begin
+    always @(posedge clk) begin
         if (reset) begin
             ex_lsu_inst           <= 32'h0;
             ex_lsu_pc             <= 32'h0;
             ex_lsu_src2           <= 32'h0;
             ex_lsu_RegWrite       <= 1'b0;
-            ex_lsu_rd             <= 5'b0;
+            ex_lsu_rd             <= 4'b0;
             ex_lsu_MemRead        <= 1'b0;
             ex_lsu_MemWrite       <= 1'b0;
-            ex_lsu_MemLen         <= 3'b0;
+            ex_lsu_MemLen         <= 5'b0;
             ex_lsu_process_result <= 32'h0;
             ex_lsu_forward_las    <= 1'b0;
             ex_lsu_csr            <= 1'b0;
@@ -324,8 +327,6 @@ module EX (
             ex_lsu_csr_rdata      <= 32'h0;
             ex_lsu_csr_ecall      <= 1'b0;
             ex_lsu_csr_mret       <= 1'b0;
-            ex_lsu_imm            <= 32'h0;
-            ex_lsu_opcode         <= 7'b0;
         end
         else if (id_valid && ex_ready) begin
             ex_lsu_inst           <= id_ex_inst;
@@ -336,8 +337,6 @@ module EX (
             ex_lsu_MemRead        <= id_ex_MemRead;
             ex_lsu_MemWrite       <= id_ex_MemWrite;
             ex_lsu_MemLen         <= id_ex_MemLen;
-            // 对于JAL/JALR指令，传递链接地址而不是ALU结果
-            // ex_lsu_process_result <= (id_ex_jal || id_ex_jalr) ? link_addr : process_result;
             ex_lsu_process_result <= process_result;
             ex_lsu_forward_las    <= forward_las;
             ex_lsu_csr            <= id_ex_csr;
@@ -346,12 +345,11 @@ module EX (
             ex_lsu_csr_wr_addr1   <= id_ex_csr_wr_addr1;
             ex_lsu_csr_wr_addr2   <= id_ex_csr_wr_addr2;
             ex_lsu_csr_wr_data1   <= csr_write_data;
-            ex_lsu_csr_wr_data2   <= csr_write_ecall;
+            // ex_lsu_csr_wr_data2   <= csr_write_ecall;
+            ex_lsu_csr_wr_data2   <= (id_ex_csr_ecall) ? id_ex_pc : 32'b0;
             ex_lsu_csr_rdata      <= wb_ex_csr_num1;
             ex_lsu_csr_ecall      <= id_ex_csr_ecall;
             ex_lsu_csr_mret       <= id_ex_csr_mret;
-            ex_lsu_imm            <= id_ex_imm;
-            ex_lsu_opcode         <= id_ex_opcode;
         end
         else begin
             ex_lsu_inst           <= ex_lsu_inst;
@@ -361,8 +359,6 @@ module EX (
             ex_lsu_rd             <= ex_lsu_rd;
             ex_lsu_MemRead        <= ex_lsu_MemRead;
             ex_lsu_MemWrite       <= ex_lsu_MemWrite;
-            // ex_lsu_MemRead        <= 1'b0;
-            // ex_lsu_MemWrite       <= 1'b0;
             ex_lsu_MemLen         <= ex_lsu_MemLen;
             ex_lsu_process_result <= ex_lsu_process_result;
             ex_lsu_forward_las    <= ex_lsu_forward_las;
@@ -376,15 +372,6 @@ module EX (
             ex_lsu_csr_rdata      <= ex_lsu_csr_rdata;
             ex_lsu_csr_ecall      <= ex_lsu_csr_ecall;
             ex_lsu_csr_mret       <= ex_lsu_csr_mret;
-            ex_lsu_imm            <= ex_lsu_imm;
-            ex_lsu_opcode         <= ex_lsu_opcode;
         end
     end
-
-// always @(posedge clk) begin
-//     if (id_valid && ex_ready) begin
-//         $display("EX: inst=%h, src1=%h, src2=%h, forward_rs1=%b, ex_lsu_process_result=%h",
-//                  id_ex_inst, src1, src2, forward_rs1, ex_lsu_process_result);
-//     end
-// end
 endmodule

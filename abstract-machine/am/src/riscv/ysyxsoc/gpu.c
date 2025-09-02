@@ -8,7 +8,7 @@ static uint32_t SCREEN_HEIGHT = 480;
 void __am_gpu_init(){
   uint32_t *fb = (uint32_t *)(uintptr_t)VGA_FB_ADDR;
   for (int i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; i ++){
-    fb[i] = i;
+    fb[i] = 0;
   } 
   outl(VGA_SYNC_ADDR, 1);
 }

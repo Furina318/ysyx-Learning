@@ -1,106 +1,203 @@
 /* ****************************************
-    * iCache.v - 指令缓存模块（草稿）
+    * iCache.v - 指令缓存模块
     * 
     * 该模块实现了一个简单的指令缓存，支持多路组相联缓存。
     * 包含地址分解、命中检测、LRU 替换策略等功能。
     * 
-    * 目前DPI-C的内存访问函数尚不支持如下操作：
-    * 实际使用需要调用pmem_read函数从主存读取数据，以及在替换时调用pmem_write函数写回数据。
     *
-    * 主要参数：
-    * - SETS: 缓存组数
-    * - WAYS: 路数
-    * - LINE_SIZE: 行大小（字节）
-    * - OFFSET_BITS: 偏移位数
-    * - INDEX_BITS: 索引位数
-    * - TAG_BITS: 标签位数
+    * 第一个icache不包含相联度以及lru替换策略，总共16块每块一条指令（比较简单）
+    * 第二个icache比较完善，但是尚未进行测试
 ***************************************** */
-module iCache (
-    input wire clk,              
-    input wire rst,             
-    input wire [31:0] addr,      
-    output reg [31:0] instr,     
-    output reg hit               // 缓存命中信号
-);
+module iCache #(
+    parameter CACHE_SIZE = 64,    // 缓存大小（字节），16块 * 4字节
+    parameter BLOCK_SIZE = 4      // 块大小（字节），1个32位字
+)(
+    input             clk,        // 时钟信号
+    input             reset,      // 复位信号
+    input      [31:0] addr,       // 指令地址
+    output reg [31:0] inst,       // 输出指令
+    output reg        valid,      // 指令有效信号
 
-    // 参数定义
-    parameter SETS = 256;        // 组数 (2^8)
-    parameter WAYS = 4;          // 路数
-    parameter LINE_SIZE = 64;    // 行大小（字节）
-    parameter OFFSET_BITS = 6;   // 偏移位数 (log2(64))
-    parameter INDEX_BITS = 8;    // 索引位数 (log2(256))
-    parameter TAG_BITS = 18;     // 标签位数 (32 - 8 - 6)
+    // AXI接口信号
+    output reg [31:0] axi_araddr,  // AXI读地址
+    output reg        axi_arvalid, // AXI读地址有效
+    input             axi_arready, // AXI读地址就绪
+    input             axi_rvalid,  // AXI读数据有效
+    output reg        axi_rready,  // AXI读数据就绪
+    input      [31:0] axi_rdata,   // AXI读数据
+    input      [1:0]  axi_rresp    // AXI读响应
+);
+    import "DPI-C" function void cache_counter(input bit ihit);
+    // 地址划分 - 直接映射无ways参数
+    //  31    m+n m+n-1   m m-1    0
+    // +---------+---------+--------+
+    // |   tag   |  index  | offset |
+    // +---------+---------+--------+
+    localparam NUM_BLOCKS         = CACHE_SIZE / BLOCK_SIZE; // 16块
+    localparam SET_INDEX_WIDTH    = $clog2(NUM_BLOCKS);      // 4位（16块需要4位索引）
+    localparam BLOCK_OFFSET_WIDTH = $clog2(BLOCK_SIZE);      // 2位
+    localparam TAG_WIDTH          = 32 - SET_INDEX_WIDTH - BLOCK_OFFSET_WIDTH; // 26位
+
+    // 存储器定义
+    reg [TAG_WIDTH-1:0] tag_ram   [0:NUM_BLOCKS-1];  // 标签存储器
+    reg [         31:0] data_ram  [0:NUM_BLOCKS-1]; // 数据存储器
+    reg                 valid_ram [0:NUM_BLOCKS-1]; // 有效位
 
     // 地址分解
-    wire [OFFSET_BITS-1:0] offset = addr[5:0];    // 偏移
-    wire [INDEX_BITS-1:0] index = addr[13:6];     // 组索引
-    wire [TAG_BITS-1:0] tag = addr[31:14];        // 标签
+    wire [         TAG_WIDTH-1:0] req_tag    = addr[31:32-TAG_WIDTH];
+    wire [   SET_INDEX_WIDTH-1:0] req_index  = addr[SET_INDEX_WIDTH + BLOCK_OFFSET_WIDTH - 1 : BLOCK_OFFSET_WIDTH];
+    wire [BLOCK_OFFSET_WIDTH-1:0] req_offset = addr[BLOCK_OFFSET_WIDTH - 1 : 0];
 
-    // 缓存存储
-    reg [TAG_BITS-1:0] tag_mem [0:SETS-1][0:WAYS-1];     // 标签存储
-    reg [LINE_SIZE*8-1:0] data_mem [0:SETS-1][0:WAYS-1]; // 数据存储 (64字节=512位)
-    reg valid [0:SETS-1][0:WAYS-1];                      // 有效位
+    // 命中检测信号 - 无需way检测
+    reg hit;
+    
+    // 保存当前请求信息
+    reg [         TAG_WIDTH-1:0] saved_tag;
+    reg [   SET_INDEX_WIDTH-1:0] saved_index;
+    reg [BLOCK_OFFSET_WIDTH-1:0] saved_offset;
 
-    // LRU 替换策略
-    reg [1:0] lru [0:SETS-1][0:WAYS-1];  // LRU 计数器, 0 表示最近使用，1 表示次新使用，2 表示最久未使用(age)
+    // 状态机定义
+    localparam IDLE = 2'b00;
+    localparam MISS = 2'b01;
+    localparam READ = 2'b10;
+    localparam FILL = 2'b11;
 
-    // 复位逻辑
-    integer i, j;
-    always @(posedge clk or posedge rst) begin
-        if (rst) begin
-            for (i = 0; i < SETS; i = i + 1) begin
-                for (j = 0; j < WAYS; j = j + 1) begin
-                    valid[i][j] <= 0;
-                    lru[i][j] <= 0;
-                end
-            end
-            hit <= 0;
-            instr <= 0;
-        end
-    end
+    reg [1:0] state, next_state;
+    reg busy;  // 缓存忙信号
 
-    // 命中检测
-    always @(*) begin
-        hit = 0;
-        instr = 0;
-        for (j = 0; j < WAYS; j = j + 1) begin
-            if (valid[index][j] && (tag_mem[index][j] == tag)) begin//如果标签匹配且有效
-                hit = 1;//命中
-                instr = data_mem[index][j][offset*8 +: 32]; // 提取4字节指令
-                break;
-            end
-        end
-    end
-
-    // LRU 更新和替换
+    // 保存请求信息
     always @(posedge clk) begin
-        if (hit) begin
-            lru[index][j] <= 0;  // 命中路置 0
-            for (int k = 0; k < WAYS; k = k + 1) begin
-                if (k != j && lru[index][k] < lru[index][j]) lru[index][k] <= lru[index][k] + 1;// 其他路加 1
+        if (reset) begin
+            saved_tag <= 0;
+            saved_index <= 0;
+            saved_offset <= 0;
+        end else if (!busy) begin
+            saved_tag <= req_tag;
+            saved_index <= req_index;
+            saved_offset <= req_offset;
+        end
+    end
+
+    // 状态寄存器
+    always @(posedge clk) begin
+        if (reset) begin
+            state <= IDLE;
+        end else begin
+            state <= next_state;
+        end
+    end
+
+    // 状态转换逻辑
+    always @(*) begin
+        case (state)
+            IDLE: next_state = hit ? IDLE : (!busy ? MISS : IDLE);
+            MISS: next_state = (axi_arvalid && axi_arready) ? READ : MISS;
+            READ: next_state = (axi_rvalid && axi_rready) ? FILL : READ;
+            FILL: next_state = IDLE;
+            default: next_state = IDLE;
+        endcase
+    end
+
+    // 命中检测逻辑 - 简化为单一路检测
+    always @(*) begin
+        // 直接映射只需检查当前索引的标签和有效位
+        hit = valid_ram[req_index] && (tag_ram[req_index] == req_tag);
+    end
+
+    // 未命中处理：临时存储读取的指令
+    reg [31:0] block_data;
+
+    // 接收AXI数据
+    always @(posedge clk) begin
+        if (reset) begin
+            block_data <= 32'h0;
+        end else if (state == READ && axi_rvalid && axi_rready) begin
+            block_data <= axi_rdata;
+        end
+    end
+
+    // AXI读地址通道控制
+    always @(posedge clk) begin
+        if (reset) begin
+            axi_arvalid <= 1'b0;
+            axi_araddr <= 32'h0;
+        end else if (state == MISS && !axi_arvalid) begin
+            axi_araddr <= {addr[31:BLOCK_OFFSET_WIDTH], {BLOCK_OFFSET_WIDTH{1'b0}}};
+            axi_arvalid <= 1'b1;
+        end else if (axi_arready) begin
+            axi_arvalid <= 1'b0;
+        end
+    end
+
+    // AXI读数据通道控制
+    always @(posedge clk) begin
+        if (reset) begin
+            axi_rready <= 1'b0;
+        end else if (state == READ) begin
+            axi_rready <= 1'b1;
+        end else begin
+            axi_rready <= 1'b0;
+        end
+    end
+
+    // 缓存填充与更新逻辑 - 移除LRU相关代码
+    integer s;
+    
+    always @(posedge clk) begin
+        if (reset) begin
+            // 初始化缓存
+            for (s = 0; s < NUM_BLOCKS; s = s + 1) begin
+                valid_ram[s] <= 1'b0;
+                tag_ram[s] <= {TAG_WIDTH{1'b0}};
+                data_ram[s] <= 32'h0;
             end
-        end else if (!hit && !rst) begin
-            // 选择 LRU 路
-            reg [1:0] max_lru = 0;
-            reg [1:0] replace_way = 0;
-            for (int k = 0; k < WAYS; k = k + 1) begin
-                if (lru[index][k] > max_lru) begin
-                    max_lru = lru[index][k];
-                    replace_way = k;
+            inst <= 32'h0;
+            valid <= 1'b0;
+            busy <= 1'b0;
+        end else begin
+            case (state)
+                IDLE: begin
+                    busy <= 1'b0;
+                    valid <= 1'b0;
+                    
+                    if (hit) begin
+                        // 命中时直接输出指令
+                        inst <= data_ram[req_index];
+                        valid <= 1'b1;
+                        cache_counter(1'b1);
+                    end else if (!busy) begin
+                        busy <= 1'b1;
+                        valid <= 1'b0;
+                        cache_counter(1'b0);
+                    end
                 end
-            end
-            // 替换
-            tag_mem[index][replace_way] <= tag;
-            data_mem[index][replace_way] <= 512'h0; // 模拟填充数据
-            valid[index][replace_way] <= 1;
-            lru[index][replace_way] <= 0;  // 替换后置 0
-            for (int k = 0; k < WAYS; k = k + 1) begin
-                if (k != replace_way) lru[index][k] <= lru[index][k] + 1;
-            end
+                MISS: begin
+                    valid <= 1'b0;
+                    busy <= 1'b1;
+                end
+                READ: begin
+                    valid <= 1'b0;
+                    busy <= 1'b1;
+                    // 检查AXI响应错误
+                    if (axi_rvalid && axi_rresp != 2'b00) begin
+                        // 错误处理
+                    end
+                end
+                FILL: begin
+                    // 填充缓存块 - 直接映射无需选择way
+                    valid_ram[saved_index] <= 1'b1;
+                    tag_ram[saved_index] <= saved_tag;
+                    data_ram[saved_index] <= block_data;
+                    inst <= block_data;
+                    valid <= 1'b1;
+                    busy <= 1'b0;
+                end
+            endcase
         end
     end
 
 endmodule
+    
 
 module icache#(
     parameter BASE_ADDR         = 32'h40000000,//基准玛

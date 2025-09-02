@@ -56,7 +56,7 @@ module apb_delayer(
   // set s = 32, r*s = 119.04 --> 119
   // 每周期加(r-1)*s=87，直到(r-1)*s*k=87*k
   // counter先/s = 87/32*k, 每周期-1
-  localparam R_S = 32'd87;
+  localparam R_S = 32'd47;
 
   always @(posedge clock) begin
     if(reset) begin

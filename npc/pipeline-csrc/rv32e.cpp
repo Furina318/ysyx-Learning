@@ -24,6 +24,7 @@ extern int is_exit_status_bad();
 extern word_t pmem_r(paddr_t addr, int len);
 extern void pmem_w(paddr_t addr, int len, word_t data);
 
+extern double lsu_ratio, ifu_ratio, exu_ratio;
 /* **************** */
 #ifdef CONFIG_WAVE
 #include "verilated_vcd_c.h"
@@ -50,6 +51,12 @@ extern "C" void counter(int inst_type, int ifu_inc, int lsu_inc, int exu_inc) {
         case 6: CSR_inst++; break; // CSR 类型
         default: break;  // 无效类型，不递增
     }
+}
+
+void occupancy(int ifu_active_cycles, int exu_active_cycles, int lsu_active_cycles, int total_cycles) {
+    ifu_ratio = (total_cycles == 0) ? 0.0 : (double)ifu_active_cycles / total_cycles * 100.0;
+    exu_ratio = (total_cycles == 0) ? 0.0 : (double)exu_active_cycles / total_cycles * 100.0;
+    lsu_ratio = (total_cycles == 0) ? 0.0 : (double)lsu_active_cycles / total_cycles * 100.0;
 }
 
 extern "C" void ebreak(int station, int inst) {

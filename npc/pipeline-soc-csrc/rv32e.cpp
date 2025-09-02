@@ -33,6 +33,7 @@ extern uint8_t* soc_flash_guest_to_host(paddr_t paddr);
 extern uint8_t* soc_psram_guest_to_host(paddr_t paddr);
 extern uint8_t* soc_sdram_guest_to_host(paddr_t paddr);
 
+extern double lsu_ratio, ifu_ratio, exu_ratio;
 /* **************** */
 #ifdef CONFIG_WAVE
 #include "verilated_vcd_c.h"
@@ -66,6 +67,22 @@ extern "C" void counter(int inst_type, int ifu_inc, int lsu_inc, int exu_inc) {
         case 6: CSR_inst++; break; // CSR 类型
         default: break;  // 无效类型，不递增
     }
+}
+
+void occupancy(int ifu_active_cycles, int exu_active_cycles, int lsu_active_cycles, int total_cycles) {
+    ifu_ratio = (total_cycles == 0) ? 0.0 : (double)ifu_active_cycles / total_cycles * 100.0;
+    exu_ratio = (total_cycles == 0) ? 0.0 : (double)exu_active_cycles / total_cycles * 100.0;
+    lsu_ratio = (total_cycles == 0) ? 0.0 : (double)lsu_active_cycles / total_cycles * 100.0;
+}
+
+extern uint64_t icache_total_access; 
+extern uint64_t icache_hit;          
+extern uint64_t icache_miss;        
+
+extern "C" void cache_counter(svBit ihit) {
+    icache_total_access++;          
+    if (ihit) icache_hit++;
+    else icache_miss++;               
 }
 
 extern "C" void ebreak(int station, int inst) {

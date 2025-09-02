@@ -77,7 +77,9 @@ module LSU_AXI (
     input             sram_lsu_wready,        // 写数据就绪
     input      [1:0]  sram_lsu_bresp,         // 写响应
     input             sram_lsu_bvalid,        // 写响应有效
-    output reg        lsu_sram_bready         // 写响应就绪
+    output reg        lsu_sram_bready,        // 写响应就绪
+
+    output reg [31:0] lsu_active_cycles
 );
 
     import "DPI-C" function void ebreak(input int station, input int inst);
@@ -104,6 +106,15 @@ module LSU_AXI (
     assign lsu_ex_forward_rd        = l_rd_addr;
     assign lsu_ex_forward_RegWrite  = l_rd_en;
     assign lsu_ex_forward_MemRead   = l_load;
+
+    // reg [31:0] lsu_active_cycles; // LSU 活跃周期计数器
+    always @(posedge clk) begin
+        if (rst) begin
+            lsu_active_cycles <= 0;
+        end else if (read_pending || write_pending) begin
+            lsu_active_cycles <= lsu_active_cycles + 1;
+        end
+    end
 
     // 寄存器更新逻辑
     always @(posedge clk) begin

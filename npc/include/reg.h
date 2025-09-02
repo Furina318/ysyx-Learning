@@ -6,4 +6,5 @@
 void regs_display();
 word_t single_reg_display(char *reg_name);
 word_t reg_str2val(const char *s, bool *success); 
+word_t isa_reg_str2val(const char *s);
 #endif

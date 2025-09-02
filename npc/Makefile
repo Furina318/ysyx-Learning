@@ -17,15 +17,15 @@ NPC_HOME = /home/furina/ysyx-workbench/npc
 NVBOARD_HOME = /home/furina/ysyx-workbench/nvboard
 SOC_HOME = /home/furina/ysyx-workbench/ysyxSoC
 ifeq ($(ARCH), riscv32e-ysyxsoc)
-CSRCS = $(shell find $(abspath ./soc-csrc) -name "*.cpp")  
-VSRCS = $(shell find $(abspath ./soc-vsrc) -name "*.v")
+CSRCS = $(shell find $(abspath ./pipeline-soc-csrc) -name "*.cpp")  
+VSRCS = $(shell find $(abspath ./pipeline-soc-vsrc) -name "*.v")
 VSRCS += $(shell find $(abspath ../ysyxSoC/perip) -name "*.v")
 VSRCS += ../ysyxSoC/build/ysyxSoCFull.v 
 
 else
 ifeq ($(ARCH), riscv32e-npc)
 CSRCS = $(shell find $(abspath ./pipeline-csrc) -name "*.cpp") 
-VSRCS = $(shell find $(abspath ./Npipeline-vsrc) -name "*.v")   
+VSRCS = $(shell find $(abspath ./pipeline-vsrc) -name "*.v")   
 endif
 endif
 
@@ -120,9 +120,10 @@ wave.vcd: $(BIN)
 
 yosys:
 	cd $(NPC_HOME)/../yosys-sta && make sta DESIGN=$(YOSYS_TOP) \
-											RTL_FILES="$(shell find $(NPC_HOME)/vsrc -name "*.v")" \
-											CLK_FREQ_MHZ=500 \
-											INCLUDE_PATH=$(NPC_HOME)/vsrc
+											SDC_FILE=$(NPC_HOME)/npc.sdc \
+											RTL_FILES="$(shell find $(NPC_HOME)/pipeline-soc-vsrc -name "*.v")" \
+											CLK_FREQ_MHZ=200 \
+											INCLUDE_PATH=$(NPC_HOME)/pipeline-soc-vsrc/defines
 	cd $(NPC_HOME)
 
 # 伪目标：运行环境准备
