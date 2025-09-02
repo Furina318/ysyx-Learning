@@ -78,11 +78,22 @@ module EX (
     output reg        ex_lsu_csr_mret,
 
     output reg [31:0] ex_lsu_imm,
-    output reg [31:0] ex_lsu_process_result
+    output reg [31:0] ex_lsu_process_result,
+
+    output reg [31:0] exu_active_cycles
 );
     import "DPI-C" function void ebreak(input int station, input int inst);
     import "DPI-C" function void counter(input int inst_type, input int ifu_inc, input int lsu_inc, input int exu_inc);
     
+    // EXU 活跃周期计数
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            exu_active_cycles <= 0;
+        end else if (id_valid && ex_ready) begin
+            exu_active_cycles <= exu_active_cycles + 1;
+        end
+    end
+
     // 前递后的源寄存器值
     // wire [31:0] src1 = (forward_rs1[1] ? ex_lsu_process_result : 
     //                    (forward_rs1[0] | load_use_flag[1]) ? lsu_wb_wdata : 
