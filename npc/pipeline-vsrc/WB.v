@@ -19,7 +19,6 @@ module WBU #(
   output [DATA_WIDTH-1:0] src2,    
   
   output reg              wb_valid,
-  input                   lsu_wb_flush,
 
   input  [11:0]           raddr_csr1,   
   input  [11:0]           raddr_csr2,   
@@ -34,7 +33,16 @@ module WBU #(
 //   output reg [31:0]           rdata_csr1,
 //   output reg [31:0]           rdata_csr2      
 );
-reg [31:0] CSR[2**12-1:0];
+// reg [31:0] CSR[2**12-1:0];
+reg [31:0] mstatus;
+reg [31:0] mtvec;
+reg [31:0] mepc;
+reg [31:0] mcause;
+
+localparam MSTATUS = 12'h300;
+localparam MTVEC   = 12'h305;
+localparam MEPC    = 12'h341;
+localparam MCAUSE  = 12'h342;
 
 reg [DATA_WIDTH-1:0] regs [2**ADDR_WIDTH-1:0];
 
@@ -61,11 +69,9 @@ always @(posedge clk) begin
     end
     else if (lsu_wb_valid && wb_lsu_ready) begin
         wb_valid <= 1'b1;
-        flush <= lsu_wb_flush;
     end
     else begin
         wb_valid <= 1'b0;
-        flush <= lsu_wb_flush;
     end
 end
 
@@ -77,33 +83,68 @@ assign src2 = (rs2 == 5'b0) ? 32'b0 : regs[rs2];
 // end
 
 
-integer k;
+// integer k;
+// initial begin
+//     for (k = 0; k < 4096; k = k + 1) begin
+//         if(k == 768) begin
+//             CSR[k] = 32'h1800;
+//         end
+//         else begin
+//             CSR[k] = 32'b0; 
+//         end
+//     end
+// end
 initial begin
-    for (k = 0; k < 4096; k = k + 1) begin
-        if(k == 768) begin
-            CSR[k] = 32'h1800;
-        end
-        else begin
-            CSR[k] = 32'b0; 
-        end
-    end
+    mstatus = 32'h1800;
+    mtvec   = 32'h0;
+    mepc    = 32'h0;
+    mcause  = 32'h0;
 end
+
 always @(posedge clk) begin
     if (rst) begin
-        CSR[32'h300] <= 32'h1800;
+        // CSR[32'h300] <= 32'h1800;
+        mstatus <= 32'h1800;
+        mtvec   <= 32'h0;
+        mepc    <= 32'h0;
+        mcause  <= 32'h0;
     end
     else if (lsu_wb_valid && (wen_csr1 | wen_csr2)) begin
+        // if (wen_csr2) begin
+        //     CSR[waddr_csr1] <= wdata_csr1;
+        //     CSR[waddr_csr2] <= wdata_csr2;
+        // end
+        // else begin
+        //     CSR[waddr_csr1] <= wdata_csr1;
+        // end
+        case(waddr_csr1)
+            MSTATUS: mstatus <= wdata_csr1;
+            MTVEC:   mtvec   <= wdata_csr1;
+            MEPC:    mepc    <= wdata_csr1;
+            MCAUSE:  mcause  <= wdata_csr1;
+            default: ;
+        endcase
         if (wen_csr2) begin
-            CSR[waddr_csr1] <= wdata_csr1;
-            CSR[waddr_csr2] <= wdata_csr2;
-        end
-        else begin
-            CSR[waddr_csr1] <= wdata_csr1;
+            case(waddr_csr2)
+                MSTATUS: mstatus <= wdata_csr2;
+                MTVEC:   mtvec   <= wdata_csr2;
+                MEPC:    mepc    <= wdata_csr2;
+                MCAUSE:  mcause  <= wdata_csr2;
+                default: ;
+            endcase
         end
     end
 end
-assign rdata_csr1 = CSR[raddr_csr1];
-assign rdata_csr2 = CSR[raddr_csr2];
+// assign rdata_csr1 = CSR[raddr_csr1];
+// assign rdata_csr2 = CSR[raddr_csr2];
+assign rdata_csr1 = (raddr_csr1 == MSTATUS) ? mstatus :
+                    (raddr_csr1 == MTVEC)   ? mtvec   :
+                    (raddr_csr1 == MEPC)    ? mepc    :
+                    (raddr_csr1 == MCAUSE)  ? mcause  : 32'h0;
+assign rdata_csr2 = (raddr_csr2 == MSTATUS) ? mstatus :
+                    (raddr_csr2 == MTVEC)   ? mtvec   :
+                    (raddr_csr2 == MEPC)    ? mepc    :
+                    (raddr_csr2 == MCAUSE)  ? mcause  : 32'h0;
 // always @(*) begin
 //     rdata_csr1 = CSR[raddr_csr1];
 //     rdata_csr2 = CSR[raddr_csr2];
