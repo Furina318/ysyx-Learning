@@ -9,6 +9,7 @@ extern VysyxSoCFull *top;
 
 
 #define gpr top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__wb_stage__DOT__regs
+#define cpu_pc top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__pc
 
 static const char *regs[] = {
     "$0", "ra", "sp", "gp", "tp", "t0", "t1", "t2",
@@ -27,7 +28,7 @@ void regs_display()
     }
     puts("");
     _Log(ANSI_FG_YELLOW "$%s\t" ANSI_NONE " 0x%08x\t %010u\n", "pc", 
-        top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__pc, top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__pc);
+        cpu_pc, cpu_pc);
 }
 
 word_t single_reg_display(char *reg_name) 
@@ -39,8 +40,8 @@ word_t single_reg_display(char *reg_name)
     if(strcmp(reg_name, "pc") == 0)
     {
         _Log(ANSI_FG_YELLOW "$%s\t" ANSI_NONE " 0x%08x\t %010u %010d\n", "pc", 
-             top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__pc, top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__pc, top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__pc);
-        return top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__pc;
+             cpu_pc, cpu_pc, cpu_pc);
+        return cpu_pc;
     }
 
     //others
@@ -56,12 +57,22 @@ word_t single_reg_display(char *reg_name)
     return -1; // 表示无效寄存器
 }
 
+word_t isa_reg_str2val(const char *s) {
+  if(strcmp(s,"pc")==0) return cpu_pc;
+  for(int i=0;i<sizeof(regs)/sizeof(regs[0]);i++){
+    if(strcmp(s,regs[i])==0){
+      return gpr[i];
+    }
+  }
+  return 0;
+}
+
 word_t reg_str2val(const char *s, bool *success) 
 {
     int i;
     //pc
     if(strcmp(s, "pc") == 0)
-        return top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__pc; 
+        return cpu_pc; 
         
     //reg $0
     if(strcmp(s, regs[0]) == 0)
