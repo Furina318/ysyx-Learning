@@ -24,15 +24,15 @@ module Link_BPU #(
 );
     
     // ====================== BTB 结构 ======================
-    reg  [31-BTB_INDEX_BITS-2:0] btb_tag [0:BTB_ENTRIES-1]; // 地址标签
-    reg  [31:0] btb_target [0:BTB_ENTRIES-1];               // 目标地址
-    reg         btb_valid  [0:BTB_ENTRIES-1];               // 有效位
+    reg  [31-BTB_INDEX_BITS-2:0] btb_tag [0:BTB_ENTRIES-1];                  // 地址标签
+    reg  [                 31:0] btb_target [0:BTB_ENTRIES-1];               // 目标地址
+    reg                          btb_valid  [0:BTB_ENTRIES-1];               // 有效位
     
     // BTB索引和标签计算
-    wire [BTB_INDEX_BITS-1:0]    btb_index_if = if_pc[BTB_INDEX_BITS+1:2];
+    wire [   BTB_INDEX_BITS-1:0] btb_index_if = if_pc[BTB_INDEX_BITS+1:2];
     wire [31-BTB_INDEX_BITS-2:0] btb_tag_if = if_pc[31:BTB_INDEX_BITS+2];
     
-    wire [BTB_INDEX_BITS-1:0]    btb_index_ex = ex_bpu_pc[BTB_INDEX_BITS+1:2];
+    wire [   BTB_INDEX_BITS-1:0] btb_index_ex = ex_bpu_pc[BTB_INDEX_BITS+1:2];
     wire [31-BTB_INDEX_BITS-2:0] btb_tag_ex = ex_bpu_pc[31:BTB_INDEX_BITS+2];
     
     // BTB命中判断
@@ -43,7 +43,7 @@ module Link_BPU #(
     reg [GHR_WIDTH-1:0] ghr;
 
     // ====================== 模式历史表 ======================
-    reg [1:0] pht [0:PHT_SIZE-1];
+    reg [          1:0] pht [0:PHT_SIZE-1];
     
     // PHT索引计算
     wire [PHT_INDEX_BITS-1:0] pht_index_if = 
@@ -56,7 +56,7 @@ module Link_BPU #(
     // RAS存储结构
     reg [31:0] ras [0:RAS_DEPTH-1];      // 返回地址存储
     reg [31:0] ras_call_pc [0:RAS_DEPTH-1]; // 调用点PC记录
-    reg [3:0]  recursion_depth [0:RAS_DEPTH-1]; // 每个栈槽的递归深度
+    reg [ 3:0] recursion_depth [0:RAS_DEPTH-1]; // 每个栈槽的递归深度
     
     // 栈指针和状态
     reg [31:0] ras_ptr;                  // 栈指针
