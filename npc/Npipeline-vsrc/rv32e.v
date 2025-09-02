@@ -6,6 +6,7 @@ module rv32e (
     input reset
 );
     import "DPI-C" function void ebreak(input int station, input int inst);
+    import "DPI-C" function void occupancy(input int ifu_active_cycles, input int exu_active_cycles, input int lsu_active_cycles, input int total_cycles);
 
     // 顶层信号声明
     wire [31:0] IF_ID_pc;         // IF 到 ID：程序计数器
@@ -190,6 +191,10 @@ module rv32e (
     wire [1:0]  clint_bresp;
     wire        clint_bvalid;
     wire        clint_bready;
+
+    wire [31:0] ifu_active_cycles;
+    wire [31:0] exu_active_cycles;
+    wire [31:0] lsu_active_cycles;
 
     // 模块例化
 
@@ -408,6 +413,7 @@ module rv32e (
         .sram_if_rvalid(sram_if_rvalid),
         .if_sram_rready(if_sram_rready),
         .sram_if_rresp(sram_if_rresp),
+        .ifu_active_cycles(ifu_active_cycles),
         .IF_ID_inst(IF_ID_inst)
     );
 
@@ -519,6 +525,7 @@ module rv32e (
         .ex_lsu_csr_ecall(ex_lsu_csr_ecall),
         .ex_lsu_csr_mret(ex_lsu_csr_mret),
         .ex_lsu_imm(ex_lsu_imm),
+        .exu_active_cycles(exu_active_cycles),
         .ex_lsu_process_result(ex_lsu_process_result)
     );
 
@@ -589,6 +596,7 @@ module rv32e (
         .sram_lsu_bresp(sram_lsu_bresp),
         .sram_lsu_bvalid(sram_lsu_bvalid),
         .lsu_sram_bready(lsu_sram_bready),
+        .lsu_active_cycles(lsu_active_cycles),
         .lsu_wb_write_rd_data(lsu_wb_write_rd_data)
     );
 
@@ -631,24 +639,25 @@ module rv32e (
     //               2'b00;                      // 默认
 
     // reg [31:0] inst_cnt;
-    // reg [31:0] cycle_cnt;
+    reg [31:0] cycle_cnt;
 
-    // always @(posedge clk) begin
-    //     if(reset) begin
-    //         inst_cnt <= 0;
-    //         cycle_cnt <= 0;
-    //     end
-    //     else begin
-    //         cycle_cnt <= cycle_cnt + 1;
-    //         if(wb_valid) begin
-    //             inst_cnt <= inst_cnt + 1;
-    //         end
-    //     end
-    // end
+    always @(posedge clk) begin
+        if(reset) begin
+            // inst_cnt <= 0;
+            cycle_cnt <= 0;
+        end
+        else begin
+            cycle_cnt <= cycle_cnt + 1;
+            // if(wb_valid) begin
+            //     inst_cnt <= inst_cnt + 1;
+            // end
+        end
+    end
     
     // EBREAK 处理
     always @(posedge clk) begin
         if (IF_ID_inst == 32'h00100073) begin
+            occupancy(ifu_active_cycles, exu_active_cycles, lsu_active_cycles, cycle_cnt);
             // real IPC = (cycle_cnt == 0) ? 0.0 : real'(inst_cnt) / real'(cycle_cnt);
             // $display("\033[33mIPC = %f\033[0m", IPC);
             // $display("*-------------------*---------------------*---------------------*");
