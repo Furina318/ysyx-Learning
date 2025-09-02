@@ -4,6 +4,7 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 // #include "sdb.h"
+#include "../include/watchpoint.h"
 #include "../include/common.h"
 #include "../include/conf.h"
 #include "../include/paddr.h"
@@ -25,6 +26,10 @@ extern word_t   expr(char *e);
 extern "C" void     pmem_write(paddr_t waddr,word_t wdata,int len);
 extern "C" word_t   pmem_read(paddr_t raddr,int len);
 extern void die();
+
+extern void init_wp_pool();
+extern WP *new_wp();
+extern WP *get_wp_head();
 // extern NPCState npc_state;
 /*********************************************/
 
@@ -82,23 +87,25 @@ static int cmd_info(char *args){
     if(strcmp(arg,"r")==0){
       regs_display();//打印寄存器，文件在isa/risv32/reg.c中
     }
-//     else if(strcmp(arg,"w")==0){
-//       char *wp_state="turn off";
-// #ifdef CONFIG_WATCHPOINTS
-//       wp_state="working";
-// #endif
-//       WP *wp=get_wp_head();
-//       if(wp == NULL){
-//         printf("No watchpoints set.\n");
-//         return 0;
-//       }
-//       printf("Current watchpoints state:            %s\n",wp_state);
-//       while (wp != NULL) {// 打印监视点信息
-//         printf("Watchpoint NO:%-2d: Expression '%s' Last Value: 0x%08x\n",
-//           wp->NO, wp->expr ? wp->expr : "N/A", wp->old_val);
-//         wp=wp->next;
-//      }
-//    }else printf("Invalid operation,please specify 'r' or 'w'.\n");
+    else if(strcmp(arg,"w")==0){
+      const char *wp_state="turn off";
+#ifdef CONFIG_WATCHPOINTS
+      wp_state="working";
+#endif
+      WP *wp=get_wp_head();
+      if(wp == NULL){
+        printf(ANSI_FG_RED "No watchpoint set\n" ANSI_NONE);
+        return 0;
+      }
+      printf("Current watchpoints state: ");
+      printf(ANSI_FG_RED "%s\n" ANSI_NONE, wp_state);
+      printf(ANSI_FG_GREEN "Watchpoint NO\t Expression\t Last Value\n" ANSI_NONE);
+      while (wp != NULL) { // 打印监视点信息
+        printf("%-2d\t\t %s\t\t 0x%08x\n" ANSI_NONE,
+          wp->NO, wp->expr ? wp->expr : "N/A", wp->old_val);
+        wp = wp->next;
+     }
+   }else printf("Invalid operation,please specify 'r' or 'w'.\n");
   }else printf("No argument provided. Please specify 'r'.\n");
   return 0;
 }
@@ -135,42 +142,45 @@ static int cmd_x(char *args){//扫描内存
   return 0;
 }
 
-// static int cmd_w(char *args){
-//   if(args==NULL || strlen(args)==0){
-//     printf("No expression provided\n");
-//     return 0;
-//   }
-//   char *EXPR=args;
-//   WP *wp = new_wp();
-//   if(wp == NULL) return 0;
-//   wp->expr = strdup(EXPR);
-//   if(expr(EXPR)==-1){
-//     free_wp(wp);
-//     return 0;
-//   }
-//   wp->old_val=expr(EXPR); 
-//   // printf("GET\n");
-//   return 0;
-// }
+static int cmd_w(char *args){
+  if(args==NULL || strlen(args)==0){
+    printf("No expression provided\n");
+    return 0;
+  }
+  char *EXPR=args;
+  WP *wp = new_wp();
+  if(wp == NULL) return 0;
+  wp->expr = strdup(EXPR);
+  if(expr(EXPR)==-1){
+    free_wp(wp);
+    return 0;
+  }
+  wp->old_val=expr(EXPR); 
+  // printf("GET\n");
+  return 0;
+}
 
-// static int cmd_d(char *args){
-//   if (args==NULL || strlen(args)==0) {
-//     printf("Invalid index. Please enter a valid number.\n");
-//     return 0;
-//   }
-//   int no=atoi(strtok(NULL," "));
-//   WP *wp=get_wp_head();
-//   while(wp!=NULL){
-//     if(wp->NO==no){
-//       free_wp(wp);
-//       printf("Watchpoint NO.%d deleted.\n", no);
-//       return 0;
-//     }
-//     wp=wp->next;
-//   }
-//   printf("Watchpoint with index %d not found.\n", no);
-//   return 0;
-// }
+static int cmd_d(char *args){
+  if (args==NULL || strlen(args)==0) {
+    // printf("Invalid index. Please enter a valid number.\n");
+    _Log(ANSI_FG_RED "Invalid index. Please enter a valid number.\n" ANSI_NONE);
+    return 0;
+  }
+  int no=atoi(strtok(NULL," "));
+  WP *wp=get_wp_head();
+  while(wp!=NULL){
+    if(wp->NO==no){
+      free_wp(wp);
+      // printf("Watchpoint NO.%d deleted.\n", no);
+      _Log("Watchpoint " ANSI_FG_YELLOW "NO.%d" ANSI_NONE " deleted.\n",no);
+      return 0;
+    }
+    wp=wp->next;
+  }
+  printf("Watchpoint with index %d not found.\n", no);
+  return 0;
+}
+
 static int cmd_p(char *args) {
   if(args == NULL || strlen(args) == 0){
     printf("No expression provided\n");
@@ -221,11 +231,11 @@ static struct {
 
   /* TODO: Add more commands */
   { "si", "Let the program excute N instuctions and then suspend the excution(while the N is not given,the default value is 1)", cmd_si},
-  { "info", "Print register status with\"r\" ",cmd_info},
+ { "info", "Print register/csr status with\"r or c\",or print the monitor status with \"w\" ",cmd_info},
   { "x", "Scan N pieces of memory base on 'EXPR' ",cmd_x},
   { "p", "Find the value of the expression 'EXPR' ",cmd_p},
-//   { "w", "Set watchpoint on 'EXPR',the programme will stop when it change",cmd_w},
-//   { "d", "Delete a watchpoint NO.n you set",cmd_d},
+  { "w", "Set watchpoint on 'EXPR',the programme will stop when it change",cmd_w},
+  { "d", "Delete a watchpoint NO.n you set",cmd_d},
   { "mtrace", "使用格式:筛选起始地址 结束地址 是否筛选数据 需要筛选的数据。若不填则默认全打印",cmd_mtrace},
 };
 
@@ -300,5 +310,5 @@ void sdb_mainloop() {
 void init_sdb() {
   /* Compile the regular expressions. */
   init_regex();
-
+  init_wp_pool();
 }
