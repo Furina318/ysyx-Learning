@@ -170,7 +170,7 @@ static bool make_token(char *e) {
               if (e[position] == '\0') break;
             }
             reg_name[name_num] = '\0';
-            long reg_val = single_reg_display(reg_name);
+            long reg_val = isa_reg_str2val(reg_name);
             if (reg_val < 0) {
               printf("Unknow reg name: %s\n", reg_name);
               return false;
