@@ -5,6 +5,7 @@
 #include "../include/conf.h"
 #include "../include/paddr.h"
 #include "../include/difftest.h"
+#include "../include/watchpoint.h"
 #include "Vrv32e.h"
 #include "Vrv32e__Dpi.h"
 #include "../obj_dir/Vrv32e___024root.h"
@@ -19,6 +20,7 @@ extern Vrv32e *top;
 extern VerilatedVcdC *tfp;
 // extern vluint64_t main_time;
 extern void die();
+extern word_t expr(char *e);
 
 #ifdef CONFIG_ITRACE 
 extern void append_iringbuf(char *s);
@@ -183,6 +185,7 @@ uint64_t ifu_get;
 uint64_t lsu_get;
 uint64_t exu_done;
 uint64_t cycle_sum;
+double lsu_ratio=0, ifu_ratio=0, exu_ratio=0;
 static void statistic() {
     Log("total guest instructions = %lu", g_nr_guest_inst);
     uint64_t total = g_nr_guest_inst;
@@ -211,6 +214,13 @@ static void statistic() {
     printf("| EXU (计算完成) | %10" PRIu64 " |   %18.2f |\n", 
            exu_done, total ? (double)exu_done / total : 0.0);
     printf("+----------------+------------+----------------------+\n");
+    printf("+----------------+------------+------------+\n");
+    printf("| 模块名称       | 活跃周期   | 占用比 (%%) |\n");
+    printf("+----------------+------------+------------+\n");
+    printf("| IFU            | %10" PRIu64 " |  %7.2f %% |\n", (uint64_t)ifu_ratio * cycle_sum / 100, ifu_ratio);
+    printf("| EXU            | %10" PRIu64 " |  %7.2f %% |\n", (uint64_t)exu_ratio * cycle_sum / 100, exu_ratio);
+    printf("| LSU            | %10" PRIu64 " |  %7.2f %% |\n", (uint64_t)lsu_ratio * cycle_sum / 100, lsu_ratio);
+    printf("+----------------+------------+------------+\n");
 #ifdef CONFIG_FTRACE
   puts("");
   Log("Function call statistics:");
@@ -286,83 +296,24 @@ static void trace_and_difftest() {
     } else if(reset_once > 0){
       reset_once --;
     }
-    // // 处理流水线冲刷
-    // if (ex_flush) {
-    //     // 记录冲刷状态，在下一个周期处理
-    //     prev_ex_flush = true;
-    //     prev_ex_flush_pc = ex_flush_pc;
+#endif
 
-    //     // 如果当前 WB 阶段有有效指令，先处理它
-    //     if (wb_valid && run_time >= start_time) {
-    //         vaddr_t npc = ex_flush_pc; // 冲刷后 NPC 为冲刷目标 PC
-    //         difftest_step(wb_pc, npc);
-    //         difftest_skip_ref();       // 跳过参考模型执行，避免状态冲突
-    //         // if(first_step){
-    //         //   difftest_skip_ref();
-    //         //   first_step = false; // 只在第一次执行时跳过参考模型
-    //         // }
-    //         if (g_print_step) {
-    //             printf("difftest: pc: 0x%08x | npc: 0x%08x (flush to 0x%08x)\n",
-    //                    wb_pc, npc, ex_flush_pc);
-    //         }
-    //     }
-    //     return;
-    // }
-
-    // // 处理前一个周期的冲刷
-    // if (prev_ex_flush) {
-    //     CPU_state ref_r;
-    //     update_cpu_state(&ref_r);
-    //     ref_r.pc = prev_ex_flush_pc; // 同步参考模型 PC 到冲刷目标
-    //     ref_difftest_regcpy(&ref_r, DIFFTEST_TO_REF); // 同步寄存器状态
-    //     if (g_print_step) {
-    //         printf("flush: sync to ref pc: 0x%08x\n", prev_ex_flush_pc);
-    //     }
-    //     prev_ex_flush = false;
-    //     return;
-    // }
-
-    // // else if(wb_valid) {
-    // //     // 如果当前 WB 阶段有有效指令，处理它
-    // //     vaddr_t npc = wb_pc + 4; // 默认顺序执行
-    // //     uint32_t opcode = wb_inst & 0x7F;
-    // //     if (g_print_step) {
-    // //         printf("difftest: pc: 0x%08x | npc: 0x%08x\n", wb_pc, npc);
-    // //     }
-    // //     difftest_step(wb_pc, npc);
-    // // } else {
-    // //     // 如果没有有效的 WB 指令，跳过参考模型执行
-    // //     difftest_skip_ref();
-    // // }
-    // // 处理延迟的 WB 指令
-    // if (wb_valid_delayed) {
-    //     vaddr_t npc = wb_pc_delayed + 4; // 默认顺序执行
-    //     uint32_t opcode = wb_inst_delayed & 0x7F;
-
-    //     // 根据指令类型确定实际的下一个 PC
-    //     if (opcode == 0x6F || opcode == 0x67) { // JAL 或 JALR
-    //         npc = wb_valid ? wb_pc : top->rootp->rv32e__DOT__IF_ID_pc; // 跳转目标
-    //     } else if (opcode == 0x63) { // 分支指令 (B-type)
-    //         bool take_branch = top->rootp->rv32e__DOT__exu__DOT__take_branch;
-    //         if (take_branch) {
-    //             npc = wb_valid ? wb_pc : top->rootp->rv32e__DOT__IF_ID_pc;
-    //         }
-    //     }
-
-    //     if (g_print_step) {
-    //         printf("difftest (delayed): pc: 0x%08x | npc: 0x%08x\n", wb_pc_delayed, npc);
-    //     }
-    //     difftest_step(wb_pc_delayed, npc);
-    //     wb_valid_delayed = false;
-    // }
-
-    // // 处理当前 WB 阶段的有效指令
-    // if (wb_valid && run_time >= start_time) {
-    //     // 延迟处理当前指令，等到下一周期确定 npc
-    //     wb_valid_delayed = true;
-    //     wb_pc_delayed = wb_pc;
-    //     wb_inst_delayed = wb_inst;
-    // }
+#ifdef CONFIG_WATCHPOINTS
+  WP *wp=get_wp_head();
+  while(wp != NULL){
+    word_t val = expr(wp->expr);
+    if(val != wp->old_val){
+      // printf("Watchpoint NO.%d: Expression '%s' changed from 0x%08x to 0x%08x.\n", wp->NO, wp->expr, wp->old_val, val);
+      _Log("Watchpoint NO.%d: Expression" ANSI_FG_YELLOW " '%s' " ANSI_NONE "changed from"
+      ANSI_FG_BLUE " 0x%08x " ANSI_NONE "to" ANSI_FG_BLUE " 0x%08x\n" ANSI_NONE,wp->NO, wp->expr, wp->old_val, val);
+      npc_state.state = NPC_STOP;
+      wp->old_val = val;
+      //sdb_mainloop();
+      break;
+    }
+    // wp->old_val=val;
+    wp = wp->next;
+  }
 #endif
 }
 
