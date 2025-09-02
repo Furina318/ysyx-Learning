@@ -58,10 +58,10 @@ module IF(
     end
 
     assign inst_addr = pc;
-    assign pc_out1 = {pc[31:3], 3'b000};
-    assign npc_out1 = {pc[31:3], 3'b100};
+    assign pc_out1   = {pc[31:3], 3'b000};
+    assign npc_out1  = {pc[31:3], 3'b100};
     assign inst_out1 = inst_get[63:32];
-    assign pc_out2 = {pc[31:3], 3'b100};
-    assign npc_out2 = {pc[31:3] + 1, 3'b000};
+    assign pc_out2   = {pc[31:3], 3'b100};
+    assign npc_out2  = {pc[31:3] + 1, 3'b000};
     assign inst_out2 = inst_get[31:0];
 endmodule
