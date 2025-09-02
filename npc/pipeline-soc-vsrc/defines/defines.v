@@ -76,15 +76,18 @@
 `define ALU_SRL    4'b1001//srl,srli
 
 //Mem字节选取
-`define Mem_Word   3'b010
-`define Mem_Half   3'b001
-`define Mem_UHalf  3'b011
-`define Mem_UBit   3'b000
-`define Mem_Bit    3'b100
-// `define Mem_Word   2'b10
-// `define Mem_Half   2'b01
-// `define Mem_UHalf  2'b11
-// `define Mem_Bit    2'b00
+// `define Mem_Word   3'b010
+// `define Mem_Half   3'b001
+// `define Mem_UHalf  3'b011
+// `define Mem_UBit   3'b000
+// `define Mem_Bit    3'b100
+
+`define Mem_Word   5'b11111
+`define Mem_Half   5'b10011
+`define Mem_UHalf  5'b00011
+`define Mem_UBit   5'b00001
+`define Mem_Bit    5'b10001
+
 
 //CSR操作码
 `define CSR_CSRRW 2'b01
