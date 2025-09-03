@@ -1,0 +1,10 @@
+top=alu4
+
+seg7 (SEG0A,SEG0B,SEG0C,SEG0D,SEG0E,SEG0F,SEG0G,DEC0P)
+result (LD3,LD2,LD1,LD0)
+zero LD4
+overflow LD5
+cout LD6
+a (SW3,SW2,SW1,SW0)
+b (SW7,SW6,SW5,SW4)
+sel (SW10,SW9,SW8)
