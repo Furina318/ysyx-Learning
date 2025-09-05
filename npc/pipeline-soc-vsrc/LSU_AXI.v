@@ -18,7 +18,7 @@ module LSU_AXI (
     input         ex_lsu_MemRead,     
     input         ex_lsu_MemWrite,    
     input  [ 4:0] ex_lsu_MemLen,         
-    input  [31:0] ex_lsu_pc,          
+    // input  [31:0] ex_lsu_pc,          
     input  [31:0] addr,               
     input  [31:0] data_in,              
 
@@ -55,10 +55,10 @@ module LSU_AXI (
     output reg        lsu_axi_arvalid,      
     input             axi_lsu_arready,      
     output reg [31:0] lsu_axi_araddr,
-    output reg [ 3:0] lsu_axi_arid,
-    output reg [ 7:0] lsu_axi_arlen,
-    output reg [ 2:0] lsu_axi_arsize,
-    output reg [ 1:0] lsu_axi_arburst,        
+    output wire [ 3:0] lsu_axi_arid,
+    output wire [ 7:0] lsu_axi_arlen,
+    output wire [ 2:0] lsu_axi_arsize,
+    output wire [ 1:0] lsu_axi_arburst,        
     input      [31:0] axi_lsu_rdata,         
     input             axi_lsu_rvalid,       
     output reg        lsu_axi_rready,       
@@ -69,10 +69,10 @@ module LSU_AXI (
     output reg [31:0] lsu_axi_awaddr,        
     output reg        lsu_axi_awvalid,      
     input             axi_lsu_awready, 
-    output reg [ 3:0] lsu_axi_awid,
-    output reg [ 7:0] lsu_axi_awlen,
-    output reg [ 2:0] lsu_axi_awsize,
-    output reg [ 1:0] lsu_axi_awburst,     
+    output wire [ 3:0] lsu_axi_awid,
+    output wire [ 7:0] lsu_axi_awlen,
+    output wire [ 2:0] lsu_axi_awsize,
+    output wire [ 1:0] lsu_axi_awburst,     
     output reg [31:0] lsu_axi_wdata,         
     output reg [ 3:0] lsu_axi_wstrb,         
     output reg        lsu_axi_wvalid,       
@@ -92,62 +92,304 @@ module LSU_AXI (
 
     parameter OKAY = 2'b00;
 
-    dCache data_cache (
-        .clk        (clk                                                    ),
-        .reset      (rst                                                    ),
+    // dCache data_cache (
+    //     .clk        (clk                                                    ),
+    //     .reset      (rst                                                    ),
                                                 
-        .we         (cache_we                                               ),
-        // .addr       (cache_addr     ),                                        
-        .addr       (addr                                                   ),
-        .wdata      (align_write_data(ex_lsu_MemLen, addr[1:0], data_in)    ),
-        .wstrb      (ex_lsu_MemLen[3:0] << addr[1:0]                        ),
-        .rdata      (cache_rdata                                            ),
-        .valid      (cache_valid                                            ),
-        .busy       (cache_busy                                             ),
-        .req_valid  (cache_req_valid                                        ),
-        .rstrb      (l_MemLen                                               ),
+    //     .we         (cache_we                                               ),
+    //     // .addr       (cache_addr     ),                                        
+    //     .addr       (addr                                                   ),
+    //     .wdata      (align_write_data(ex_lsu_MemLen, addr[1:0], data_in)    ),
+    //     .wstrb      (ex_lsu_MemLen[3:0] << addr[1:0]                        ),
+    //     .rdata      (cache_rdata                                            ),
+    //     .valid      (cache_valid                                            ),
+    //     .busy       (cache_busy                                             ),
+    //     .req_valid  (cache_req_valid                                        ),
+    //     .rstrb      (l_MemLen                                               ),
                                 
-        .axi_arid   (lsu_axi_arid                                           ),
-        .axi_araddr (lsu_axi_araddr                                         ),
-        .axi_arvalid(lsu_axi_arvalid                                        ),
-        .axi_arlen  (lsu_axi_arlen                                          ),
-        .axi_arsize (lsu_axi_arsize                                         ),
-        .axi_arburst(lsu_axi_arburst                                        ),
-        .axi_arready(axi_lsu_arready                                        ),
-        .axi_rvalid (axi_lsu_rvalid                                         ),
-        .axi_rlast  (axi_lsu_rlast                                          ),
-        .axi_rready (lsu_axi_rready                                         ),
-        .axi_rdata  (axi_lsu_rdata                                          ),
-        .axi_rresp  (axi_lsu_rresp                                          ),
-        .axi_rid    (axi_lsu_rid                                            ),
+    //     .axi_arid   (lsu_axi_arid                                           ),
+    //     .axi_araddr (lsu_axi_araddr                                         ),
+    //     .axi_arvalid(lsu_axi_arvalid                                        ),
+    //     .axi_arlen  (lsu_axi_arlen                                          ),
+    //     .axi_arsize (lsu_axi_arsize                                         ),
+    //     .axi_arburst(lsu_axi_arburst                                        ),
+    //     .axi_arready(axi_lsu_arready                                        ),
+    //     .axi_rvalid (axi_lsu_rvalid                                         ),
+    //     .axi_rlast  (axi_lsu_rlast                                          ),
+    //     .axi_rready (lsu_axi_rready                                         ),
+    //     .axi_rdata  (axi_lsu_rdata                                          ),
+    //     .axi_rresp  (axi_lsu_rresp                                          ),
+    //     .axi_rid    (axi_lsu_rid                                            ),
                                 
-        .axi_awid   (lsu_axi_awid                                           ),
-        .axi_awaddr (lsu_axi_awaddr                                         ),
-        .axi_awvalid(lsu_axi_awvalid                                        ),
-        .axi_awlen  (lsu_axi_awlen                                          ),
-        .axi_awsize (lsu_axi_awsize                                         ),
-        .axi_awburst(lsu_axi_awburst                                        ),
-        .axi_awready(axi_lsu_awready                                        ),
-        .axi_wdata  (lsu_axi_wdata                                          ),
-        .axi_wstrb  (lsu_axi_wstrb                                          ),
-        .axi_wvalid (lsu_axi_wvalid                                         ),
-        .axi_wlast  (lsu_axi_wlast                                          ),
-        .axi_wready (axi_lsu_wready                                         ),
-        .axi_bid    (axi_lsu_bid                                            ),
-        .axi_bresp  (axi_lsu_bresp                                          ),
-        .axi_bvalid (axi_lsu_bvalid                                         ),
-        .axi_bready (lsu_axi_bready                                         )
-    );
+    //     .axi_awid   (lsu_axi_awid                                           ),
+    //     .axi_awaddr (lsu_axi_awaddr                                         ),
+    //     .axi_awvalid(lsu_axi_awvalid                                        ),
+    //     .axi_awlen  (lsu_axi_awlen                                          ),
+    //     .axi_awsize (lsu_axi_awsize                                         ),
+    //     .axi_awburst(lsu_axi_awburst                                        ),
+    //     .axi_awready(axi_lsu_awready                                        ),
+    //     .axi_wdata  (lsu_axi_wdata                                          ),
+    //     .axi_wstrb  (lsu_axi_wstrb                                          ),
+    //     .axi_wvalid (lsu_axi_wvalid                                         ),
+    //     .axi_wlast  (lsu_axi_wlast                                          ),
+    //     .axi_wready (axi_lsu_wready                                         ),
+    //     .axi_bid    (axi_lsu_bid                                            ),
+    //     .axi_bresp  (axi_lsu_bresp                                          ),
+    //     .axi_bvalid (axi_lsu_bvalid                                         ),
+    //     .axi_bready (lsu_axi_bready                                         )
+    // );
 
-    reg  [31:0] cache_addr;     // 缓存访问地址
-    wire [31:0] cache_rdata;    // 缓存读数据
-    wire        cache_valid;    // 缓存操作完成
-    wire        cache_busy;     // 缓存忙标志
+    localparam SDRAM_BASE        = 32'hA0000000;  
+    localparam SDRAM_END         = 32'hBFFFFFFF;  
+    localparam AXI_BURST_FIXED   = 2'b00;       
+    localparam AXI_BURST_INCR    = 2'b01;   
+    localparam AXI_SIZE_BYTE     = 3'h0;         
+    localparam AXI_SIZE_HALF     = 3'h1;  
+    localparam AXI_SIZE_WORD     = 3'h2;
+    localparam AXI_ID            = 4'h1;  
+    localparam BURST_LEN         = 4; 
+    localparam BLOCK_SIZE        = 16;
+    wire addr_in_sdram = (addr_reg >= SDRAM_BASE) && (addr_reg <= SDRAM_END);
+    wire burst_en = addr_in_sdram;  
 
-    wire       cache_req_valid;
-    wire       cache_we;
-    assign cache_we = (ex_lsu_valid & lsu_ex_ready & ~ex_lsu_MemRead & ex_lsu_MemWrite & ~write_pending);
-    assign cache_req_valid = ((ex_lsu_valid & lsu_ex_ready) & ((~ex_lsu_MemRead & ex_lsu_MemWrite & ~write_pending) || (ex_lsu_MemRead & ~ex_lsu_MemWrite & ~read_pending)));
+    localparam BLOCK_OFFSET_WIDTH = $clog2(16); 
+    wire [BLOCK_OFFSET_WIDTH-1:0] req_offset  = addr[BLOCK_OFFSET_WIDTH - 1 : 0];  // 块内偏移（0-15）
+    wire [                   1:0] word_offset = req_offset[3:2]; 
+
+    reg [                   1:0] saved_word_offset;
+    reg [                  31:0] saved_wdata;  
+    reg [                   3:0] saved_wstrb; 
+    reg [                   3:0] burst_cnt; 
+
+    reg  [31:0] cache_addr;    
+    reg  [31:0] rdata;  
+    reg         valid;   
+    reg         busy; 
+    reg  [31:0] addr_reg; 
+
+    localparam IDLE = 2'b00; 
+    localparam RD   = 2'b10; 
+    localparam WR   = 2'b11; 
+    reg [1:0] state, next_state;
+
+    reg        aw_done;  
+    reg        w_done;   
+    reg        b_done;   
+    reg        ar_done;
+
+    wire we = (ex_lsu_valid & lsu_ex_ready & ~ex_lsu_MemRead & ex_lsu_MemWrite & ~write_pending);
+    wire req_valid = ((ex_lsu_valid & lsu_ex_ready) & ((~ex_lsu_MemRead & ex_lsu_MemWrite & ~write_pending) || (ex_lsu_MemRead & ~ex_lsu_MemWrite & ~read_pending)));
+
+    always @(posedge clk) begin
+        // if (rst) begin
+        //     addr_reg <= 32'h0;  
+        // end
+        if (state == IDLE && !busy && req_valid) begin
+            addr_reg <= addr;  
+        end        
+    end
+
+    always @(posedge clk) begin
+        // if (rst) begin
+        //     saved_word_offset <= 0;
+        //     saved_wdata       <= 0;
+        //     saved_wstrb       <= 0;
+        // end
+        if (state == IDLE && !busy && req_valid) begin
+            saved_word_offset <= word_offset;
+            saved_wdata       <= align_write_data(ex_lsu_MemLen, addr[1:0], data_in);
+            saved_wstrb       <= ex_lsu_MemLen[3:0] << addr[1:0];
+        end
+    end
+
+    always @(posedge clk) begin
+        if (rst) begin
+            state <= IDLE;
+        end else begin
+            state <= next_state;
+        end
+    end
+
+    always @(posedge clk) begin
+        if (state != next_state) begin
+            burst_cnt <= 0;
+        end else if (state == RD && axi_lsu_rvalid && lsu_axi_rready) begin
+            burst_cnt <= burst_cnt + 1;
+        end
+    end
+
+    always @(posedge clk) begin
+        if (state == WR) begin
+            if (lsu_axi_awvalid && axi_lsu_awready) aw_done <= 1'b1;
+            if (lsu_axi_wvalid && axi_lsu_wready && lsu_axi_wlast) w_done <= 1'b1;
+            if (axi_lsu_bvalid && lsu_axi_bready) b_done <= 1'b1;
+        end else begin
+            aw_done <= 1'b0;
+            w_done  <= 1'b0;
+            b_done  <= 1'b0;
+        end 
+    end
+
+    always @(*) begin
+        case (state)
+            IDLE: begin
+                if(req_valid && !busy) begin
+                    // if (we) begin 
+                    //     next_state = WR;     
+                    // end else begin
+                    //     next_state = RD;      
+                    // end
+                    next_state = we ? WR : RD;
+                end
+                else begin
+                    next_state = IDLE;
+                end
+            end
+
+            RD: next_state = (axi_lsu_rvalid && lsu_axi_rready && axi_lsu_rlast) ? IDLE : RD;
+
+            WR: next_state = (aw_done && w_done && b_done) ? IDLE : WR;
+
+            default: next_state = IDLE;
+        endcase
+    end
+
+    reg [BLOCK_SIZE*8-1:0] block_data;
+
+    assign lsu_axi_arid    = AXI_ID;
+    assign lsu_axi_arburst = burst_en ? AXI_BURST_INCR : AXI_BURST_FIXED;
+    assign lsu_axi_arlen   = burst_en ? BURST_LEN - 1 : 8'h0;
+    assign lsu_axi_arsize  = (ex_lsu_MemLen == 5'b10001 || ex_lsu_MemLen == 5'b00001) ? AXI_SIZE_BYTE : 
+                             (ex_lsu_MemLen == 5'b00011 || ex_lsu_MemLen == 5'b10011) ? AXI_SIZE_HALF : 
+                             (ex_lsu_MemLen == 5'b11111) ? AXI_SIZE_WORD : AXI_SIZE_WORD;
+
+    always @(posedge clk) begin
+        // if (rst) begin
+        //     lsu_axi_arvalid <= 1'b0;
+        //     lsu_axi_araddr  <= 32'h0;
+        //     // lsu_axi_arlen   <= 8'h0;
+        //     // lsu_axi_arsize  <= 3'b010;  
+        //     // lsu_axi_arburst <= AXI_BURST_FIXED;
+        //     // lsu_axi_arid    <= 0;
+        //     ar_done         <= 0;
+        // end 
+        // else 
+        if (state == RD) begin
+            if (!ar_done && !lsu_axi_arvalid) begin
+                lsu_axi_araddr  <= burst_en ? {addr_reg[31:BLOCK_OFFSET_WIDTH], {BLOCK_OFFSET_WIDTH{1'b0}}} : addr_reg;
+                lsu_axi_arvalid <= 1'b1;
+                // lsu_axi_arid    <= AXI_ID;
+                // lsu_axi_arlen   <= burst_en ? BURST_LEN - 1 : 8'h0;  
+                // lsu_axi_arburst <= burst_en ? AXI_BURST_INCR : AXI_BURST_FIXED;
+                // lsu_axi_arsize  <= (l_MemLen == 5'b10001 || l_MemLen == 5'b00001) ? AXI_SIZE_BYTE : 
+                //             (l_MemLen == 5'b00011 || l_MemLen == 5'b10011) ? AXI_SIZE_HALF : 
+                //             (l_MemLen == 5'b11111) ? AXI_SIZE_WORD : AXI_SIZE_WORD;
+            end else if (axi_lsu_arready) begin
+                lsu_axi_arvalid <= 1'b0;  
+                ar_done         <= 1;
+            end
+            lsu_axi_rready <= 1'b1;
+            if(axi_lsu_rvalid && burst_en) begin
+                block_data[burst_cnt*32 +: 32] = axi_lsu_rdata;
+            end
+        end else begin
+            lsu_axi_arvalid <= 1'b0; 
+            ar_done         <= 1'b0;
+        end
+    end
+
+    // reg [BLOCK_SIZE*8-1:0] block_data; 
+    // always @(posedge clk) begin
+    //     // if (rst) begin
+    //     //     block_data = 0;
+    //     //     lsu_axi_rready <= 1'b0;
+    //     // end else begin
+    //         lsu_axi_rready <= (state == RD);
+    //         if (state == RD && axi_lsu_rvalid && lsu_axi_rready) begin
+    //             if (burst_en) begin
+    //                 block_data[burst_cnt*32 +: 32] = axi_lsu_rdata;
+    //             end
+    //         end
+    //     // end
+    // end
+
+    assign lsu_axi_awburst = AXI_BURST_FIXED;
+    assign lsu_axi_awid    = AXI_ID;
+    assign lsu_axi_awlen   = 8'h0;
+    assign lsu_axi_awsize  = (saved_wstrb == 4'b0001 || saved_wstrb == 4'b0010 || 
+                             saved_wstrb == 4'b0100 || saved_wstrb == 4'b1000) ? AXI_SIZE_BYTE :
+                             (saved_wstrb == 4'b0011 || saved_wstrb == 4'b1100) ? AXI_SIZE_HALF : 
+                             (saved_wstrb == 4'b1111) ? AXI_SIZE_WORD : AXI_SIZE_WORD;
+
+    always @(posedge clk) begin
+        // if (rst) begin
+        //     lsu_axi_awvalid <= 1'b0;
+        //     lsu_axi_awaddr  <= 32'h0;
+        //     // lsu_axi_awlen   <= 8'h0;     
+        //     // lsu_axi_awsize  <= 3'b010;   
+        //     // lsu_axi_awburst <= AXI_BURST_FIXED;  
+        //     lsu_axi_wvalid  <= 1'b0;
+        //     lsu_axi_wdata   <= 32'h0;
+        //     lsu_axi_wstrb   <= 4'h0;
+        //     lsu_axi_wlast   <= 1'b0;
+        //     lsu_axi_bready  <= 1'b0;
+        //     // lsu_axi_awid    <= 0;
+        // end else 
+        if (state == WR) begin
+            if (!lsu_axi_awvalid && !aw_done) begin
+                lsu_axi_awaddr  <= addr_reg;  
+                lsu_axi_awvalid <= 1'b1;
+                // lsu_axi_awid    <= AXI_ID;
+                // lsu_axi_awsize  <= (saved_wstrb == 4'b0001 || saved_wstrb == 4'b0010 || 
+                //                saved_wstrb == 4'b0100 || saved_wstrb == 4'b1000) ? AXI_SIZE_BYTE :
+                //               (saved_wstrb == 4'b0011 || saved_wstrb == 4'b1100) ? AXI_SIZE_HALF : 
+                //               (saved_wstrb == 4'b1111) ? AXI_SIZE_WORD : AXI_SIZE_WORD;
+            end else if (axi_lsu_awready) begin
+                lsu_axi_awvalid <= 1'b0;  // 地址握手完成后清零
+            end
+
+            if (!lsu_axi_wvalid && !w_done) begin
+                lsu_axi_wdata  <= saved_wdata;  
+                lsu_axi_wstrb  <= saved_wstrb;  
+                lsu_axi_wvalid <= 1'b1;
+                lsu_axi_wlast  <= 1'b1;         
+            end else if (axi_lsu_wready) begin
+                lsu_axi_wvalid <= 1'b0;
+                lsu_axi_wlast  <= 1'b0;
+            end
+
+            if (!b_done) lsu_axi_bready <= 1;
+            else lsu_axi_bready <= 0;
+            
+        end 
+    end
+
+    always @(posedge clk) begin
+        if (rst) begin
+            rdata  <= 32'h0;
+            valid  <= 1'b0;
+            busy   <= 1'b0;
+        end else begin
+            busy <= (state != IDLE);  
+            valid <= 1'b0;
+
+            case (state)
+                IDLE: begin end
+                RD: begin
+                    if (axi_lsu_rvalid && lsu_axi_rready && axi_lsu_rlast) begin
+                        rdata <= burst_en ? block_data[saved_word_offset*32 +: 32] : axi_lsu_rdata;
+                        valid <= 1'b1;
+                    end
+                end
+                WR: begin
+                    if(aw_done && w_done && b_done) begin
+                        valid <= 1'b1;
+                    end
+                end
+                default: begin end
+            endcase
+        end
+    end
 
     function [31:0] align_write_data;
         input [4:0] mem_len;
@@ -241,7 +483,7 @@ module LSU_AXI (
     reg        read_pending;      // 读请求等待标志
     reg        write_pending;     // 写请求等待标志
     reg [31:0] read_lsu_data;     // 从 SRAM 读取的数据
-    reg        cache_op_complete; // 缓存操作完成
+    reg        op_complete; // 缓存操作完成
 
     // 前递信号赋值
     assign lsu_ex_forward_rd        = l_rd_addr;
@@ -291,23 +533,23 @@ module LSU_AXI (
     end
 
     always @(posedge clk) begin
-        if (rst) begin
-            cache_addr        <= 0;
-            read_pending      <= 0;
-            write_pending     <= 0;
-            cache_op_complete <= 0;
-            read_lsu_data     <= 0;
-        end else begin
-            cache_op_complete <= 0;
+        // if (rst) begin
+        //     cache_addr    <= 0;
+        //     read_pending  <= 0;
+        //     write_pending <= 0;
+        //     op_complete   <= 0;
+        //     read_lsu_data <= 0;
+        // end else begin
+            op_complete   <= 0;
             
             // 处理读请求：发送到缓存
             if (ex_lsu_valid & lsu_ex_ready & ex_lsu_MemRead & ~ex_lsu_MemWrite & ~read_pending) begin
-                cache_addr      <= addr;
-                read_pending    <= 1;
-            end else if (read_pending & cache_valid) begin
-                read_pending      <= 0;
-                cache_op_complete <= 1;
-                read_lsu_data     <= extract_read_data(l_MemLen, cache_addr[1:0], cache_rdata);
+                cache_addr     <= addr;
+                read_pending   <= 1;
+            end else if (read_pending & valid) begin
+                read_pending  <= 0;
+                op_complete   <= 1;
+                read_lsu_data <= extract_read_data(l_MemLen, cache_addr[1:0], rdata);
             // `ifdef VERILATOR
             //     counter(7, 0, 1, 0);
             // `endif
@@ -315,15 +557,15 @@ module LSU_AXI (
             
             // 处理写请求：发送到缓存
             if (ex_lsu_valid & lsu_ex_ready & ~ex_lsu_MemRead & ex_lsu_MemWrite & ~write_pending) begin
-                write_pending   <= 1;
-            end else if (write_pending & cache_valid) begin
-                write_pending     <= 0;
-                cache_op_complete <= 1;
+                write_pending <= 1;
+            end else if (write_pending & valid) begin
+                write_pending <= 0;
+                op_complete   <= 1;
             // `ifdef VERILATOR
             //     counter(7, 0, 1, 0);
             // `endif
             end
-        end
+        // end
     end
 
     // 写回数据选择
@@ -366,7 +608,7 @@ module LSU_AXI (
         else if (ex_lsu_valid & lsu_ex_ready & ~(ex_lsu_MemRead | ex_lsu_MemWrite)) begin
             lsu_wb_valid <= 1;
         end 
-        else if (cache_op_complete) begin
+        else if (op_complete) begin
             lsu_wb_valid <= 1;
         end 
         else if (ex_lsu_valid & lsu_ex_ready & (ex_lsu_MemRead | ex_lsu_MemWrite)) begin
@@ -389,7 +631,7 @@ module LSU_AXI (
             lsu_wb_csr_wr_addr2  <= 0;
             lsu_wb_csr_wr_data1  <= 0;
             lsu_wb_csr_wr_data2  <= 0;
-        end else if (cache_op_complete) begin
+        end else if (op_complete) begin
             lsu_wb_RegWrite      <= l_rd_en;
             lsu_wb_rd            <= l_rd_addr;
             lsu_wb_csr_wen1      <= ex_lsu_csr_wen1;
