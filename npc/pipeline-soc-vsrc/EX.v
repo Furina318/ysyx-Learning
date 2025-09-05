@@ -42,7 +42,7 @@ module EX (
     input      [31:0] wb_ex_csr_num1,
     input      [31:0] wb_ex_csr_num2,
      
-    input             id_ex_csr,
+    // input             id_ex_csr,
     input             id_ex_csr_wen1,
     input             id_ex_csr_wen2,
     input      [11:0] id_ex_csr_wr_addr1,
@@ -55,7 +55,7 @@ module EX (
     output reg [31:0] ex_flush_pc,
 
     output reg [31:0] ex_lsu_inst,
-    output reg [31:0] ex_lsu_pc,
+    // output reg [31:0] ex_lsu_pc,
     output reg [31:0] ex_lsu_src2,
     output reg        ex_lsu_RegWrite,
     output reg [ 3:0] ex_lsu_rd,
@@ -171,6 +171,15 @@ module EX (
     reg [31:0] jalr_target;
     reg        take_branch;
     reg        ex_flush_condition;
+
+    // wire [31:0] jalr_target = (src1 + id_ex_imm) & ~32'h1;
+    // wire        take_branch = (id_ex_opcode == `INST_B) && (
+    //                     (id_ex_func3 == `F3_BNE  && !alu_zero) ||  
+    //                     (id_ex_func3 == `F3_BEQ  &&  alu_zero) ||  
+    //                     (id_ex_func3 == `F3_BLT  &&  alu_less) || 
+    //                     (id_ex_func3 == `F3_BGE  && !alu_less) ||  
+    //                     (id_ex_func3 == `F3_BLTU &&  alu_less) ||  
+    //                     (id_ex_func3 == `F3_BGEU && !alu_less));
 
     always @(*) begin
         // jal_target  = id_ex_pc + id_ex_imm;
@@ -308,7 +317,7 @@ module EX (
     always @(posedge clk) begin
         if (reset) begin
             ex_lsu_inst           <= 32'h0;
-            ex_lsu_pc             <= 32'h0;
+            // ex_lsu_pc             <= 32'h0;
             ex_lsu_src2           <= 32'h0;
             ex_lsu_RegWrite       <= 1'b0;
             ex_lsu_rd             <= 4'b0;
@@ -330,7 +339,7 @@ module EX (
         end
         else if (id_valid && ex_ready) begin
             ex_lsu_inst           <= id_ex_inst;
-            ex_lsu_pc             <= id_ex_pc;
+            // ex_lsu_pc             <= id_ex_pc;
             ex_lsu_src2           <= src2;
             ex_lsu_RegWrite       <= id_ex_RegWrite;
             ex_lsu_rd             <= id_ex_rd;
@@ -339,7 +348,9 @@ module EX (
             ex_lsu_MemLen         <= id_ex_MemLen;
             ex_lsu_process_result <= process_result;
             ex_lsu_forward_las    <= forward_las;
-            ex_lsu_csr            <= id_ex_csr;
+            // ex_lsu_csr            <= id_ex_csr;
+            // ex_lsu_csr            <= (id_ex_opcode == `INST_CSR);
+            ex_lsu_csr            <= (id_ex_csr_wen1 | id_ex_csr_wen2 | id_ex_csr_ecall | id_ex_csr_mret);
             ex_lsu_csr_wen1       <= id_ex_csr_wen1;
             ex_lsu_csr_wen2       <= id_ex_csr_wen2;
             ex_lsu_csr_wr_addr1   <= id_ex_csr_wr_addr1;
@@ -353,7 +364,7 @@ module EX (
         end
         else begin
             ex_lsu_inst           <= ex_lsu_inst;
-            ex_lsu_pc             <= ex_lsu_pc;
+            // ex_lsu_pc             <= ex_lsu_pc;
             ex_lsu_src2           <= ex_lsu_src2;
             ex_lsu_RegWrite       <= ex_lsu_RegWrite;
             ex_lsu_rd             <= ex_lsu_rd;
