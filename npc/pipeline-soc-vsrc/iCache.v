@@ -17,19 +17,19 @@ module iCache #(
     output reg        valid,      // 指令有效信号
 
     // AXI接口信号（支持突发传输）
-    output reg [31:0] axi_araddr,  // AXI读地址
-    output reg        axi_arvalid, // AXI读地址有效
-    input             axi_arready, // AXI读地址就绪
-    output reg [ 3:0] axi_arid,
-    output reg [ 7:0] axi_arlen,   // 突发长度（数量-1）
-    output reg [ 2:0] axi_arsize,  // 数据宽度（字节）
-    output reg [ 1:0] axi_arburst, // 突发类型
-    input             axi_rvalid,  // AXI读数据有效
-    output reg        axi_rready,  // AXI读数据就绪
-    input      [31:0] axi_rdata,   // AXI读数据
-    input      [1:0]  axi_rresp,   // AXI读响应
-    input      [ 3:0] axi_rid,
-    input             axi_rlast    // 突发传输结束标志
+    output reg  [31:0] axi_araddr,  // AXI读地址
+    output reg         axi_arvalid, // AXI读地址有效
+    input              axi_arready, // AXI读地址就绪
+    output wire [ 3:0] axi_arid,
+    output wire [ 7:0] axi_arlen,   // 突发长度（数量-1）
+    output wire [ 2:0] axi_arsize,  // 数据宽度（字节）
+    output wire [ 1:0] axi_arburst, // 突发类型
+    input              axi_rvalid,  // AXI读数据有效
+    output reg         axi_rready,  // AXI读数据就绪
+    input       [31:0] axi_rdata,   // AXI读数据
+    input       [ 1:0] axi_rresp,   // AXI读响应
+    input       [ 3:0] axi_rid,
+    input              axi_rlast    // 突发传输结束标志
 );
 `ifdef VERILATOR
     // import "DPI-C" function void cache_counter(input bit ihit);
@@ -40,16 +40,11 @@ module iCache #(
     // +-------------+-----------+------------+
     // |     tag     |  index    |  offset    |
     // +-------------+-----------+------------+
-    // localparam NUM_BLOCKS         = CACHE_SIZE / BLOCK_SIZE;  // 总块数
-    localparam NUM_BLOCKS         = 4;                        // 总块数
-    // localparam BLOCK_OFFSET_WIDTH = $clog2(BLOCK_SIZE);       // 块内偏移宽度（4位 for 16字节）
-    localparam BLOCK_OFFSET_WIDTH = 4;                        // 块内偏移宽度（4位 for 16字节）
-    // localparam INDEX_WIDTH        = $clog2(NUM_BLOCKS);       // 直接映射索引宽度
-    localparam INDEX_WIDTH        = 2;                        // 直接映射索引宽度
-    // localparam TAG_WIDTH          = 32 - INDEX_WIDTH - BLOCK_OFFSET_WIDTH; // 标签宽度
-    localparam TAG_WIDTH          = 26;                       // 标签宽度
-    // localparam BEATS_PER_BLOCK    = BLOCK_SIZE / 4;           // 每块的32位数据数（16/4=4）
-    localparam BEATS_PER_BLOCK    = 4;                        // 每块的32位数据数（16/4=4）
+    localparam NUM_BLOCKS         = CACHE_SIZE / BLOCK_SIZE;  // 总块数
+    localparam BLOCK_OFFSET_WIDTH = $clog2(BLOCK_SIZE);       // 块内偏移宽度（4位 for 16字节）
+    localparam INDEX_WIDTH        = $clog2(NUM_BLOCKS);       // 直接映射索引宽度
+    localparam TAG_WIDTH          = 32 - INDEX_WIDTH - BLOCK_OFFSET_WIDTH; // 标签宽度
+    localparam BEATS_PER_BLOCK    = BLOCK_SIZE / 4;           // 每块的32位数据数（16/4=4）
 
     // 存储器定义 
     reg [TAG_WIDTH-1:0] tag_ram   [0:NUM_BLOCKS-1];          // 标签存储器
@@ -67,8 +62,8 @@ module iCache #(
     reg hit;             // 命中标志
 
     // 保存当前请求信息
-    reg [         TAG_WIDTH-1:0] saved_tag;    // 保存标签
-    reg [       INDEX_WIDTH-1:0] saved_index;  // 保存索引
+    reg [         TAG_WIDTH-1:0] saved_tag;      // 保存标签
+    reg [       INDEX_WIDTH-1:0] saved_index;    // 保存索引
     reg [                   1:0] saved_beat_idx; // 保存块内数据索引
 
     // 状态机定义
@@ -127,25 +122,29 @@ module iCache #(
     end
 
     // AXI突发传输配置与控制
+    assign axi_arid = 4'h1;  // 固定ID
+    assign axi_arlen = 8'h3; // 突发长度4拍（16字节块）
+    assign axi_arburst = 2'b01; // 递增突发
+    assign axi_arsize = 3'b010; // 4字节
     always @(posedge clk) begin
         if (reset) begin
             axi_arvalid <= 1'b0;
             axi_araddr  <= 32'h0;
-            axi_arid    <= 4'h0;
-            axi_arlen   <= 8'h0;
-            axi_arsize  <= 3'h0;
-            axi_arburst <= 2'h0;
+            // axi_arid    <= 4'h0;
+            // axi_arlen   <= 8'h0;
+            // axi_arsize  <= 3'h0;
+            // axi_arburst <= 2'h0;
         end else if (state == MISS && !axi_arvalid) begin
             // 突发传输配置：16字节块=4个32位beat
             axi_araddr  <= {addr[31:BLOCK_OFFSET_WIDTH], {BLOCK_OFFSET_WIDTH{1'b0}}};  // 块对齐地址
             axi_arvalid <= 1'b1;
-            axi_arid    <= 4'h1;
-            axi_arlen   <= 8'h3;  // 4拍突发
-            axi_arsize  <= 3'b010;  // 4字节
-            axi_arburst <= 2'b01;  // 递增突发
+            // axi_arid    <= 4'h1;
+            // axi_arlen   <= 8'h3;  // 4拍突发
+            // axi_arsize  <= 3'b010;  // 4字节
+            // axi_arburst <= 2'b01;  // 递增突发
         end else if (axi_arready) begin
             axi_arvalid <= 1'b0; 
-        end
+        end 
     end
 
     // AXI读数据通道控制与块数据接收
@@ -185,7 +184,7 @@ module iCache #(
     // FENCE.I指令处理：清空所有缓存块的有效位
     integer idx;
     always @(posedge clk) begin
-        if(is_fencei) begin
+        if(is_fencei || reset) begin
             for (idx = 0; idx < NUM_BLOCKS; idx = idx + 1) begin
                 valid_ram[idx] <= 1'b0;
             end
@@ -198,7 +197,7 @@ module iCache #(
         if (reset) begin
             // 初始化缓存：所有块无效
             for (idx = 0; idx < NUM_BLOCKS; idx = idx + 1) begin
-                valid_ram[idx] <= 1'b0;
+                // valid_ram[idx] <= 1'b0;
                 tag_ram[idx]   <= {TAG_WIDTH{1'b0}};
                 for (b = 0; b < BEATS_PER_BLOCK; b = b + 1) begin
                     data_ram[idx][b] <= 32'h0;
