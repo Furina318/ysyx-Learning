@@ -9,33 +9,33 @@ module ysyx_25010030 (
     input         io_master_awready,
     output        io_master_awvalid,
     output [31:0] io_master_awaddr,
-    output [3:0]  io_master_awid,
-    output [7:0]  io_master_awlen,
-    output [2:0]  io_master_awsize,
-    output [1:0]  io_master_awburst,
+    output [ 3:0] io_master_awid,
+    output [ 7:0] io_master_awlen,
+    output [ 2:0] io_master_awsize,
+    output [ 1:0] io_master_awburst,
 
     input         io_master_wready,
     output        io_master_wvalid,
     output [31:0] io_master_wdata,
-    output [3:0]  io_master_wstrb,
+    output [ 3:0] io_master_wstrb,
     output        io_master_wlast,
 
     output        io_master_bready,
     input         io_master_bvalid,
-    input  [1:0]  io_master_bresp,
-    input  [3:0]  io_master_bid,
+    input  [ 1:0] io_master_bresp,
+    input  [ 3:0] io_master_bid,
 
     input         io_master_arready,
     output        io_master_arvalid,
     output [31:0] io_master_araddr,
-    output [3:0]  io_master_arid,
-    output [7:0]  io_master_arlen,
-    output [2:0]  io_master_arsize,
-    output [1:0]  io_master_arburst,
+    output [ 3:0] io_master_arid,
+    output [ 7:0] io_master_arlen,
+    output [ 2:0] io_master_arsize,
+    output [ 1:0] io_master_arburst,
 
     output        io_master_rready,
     input         io_master_rvalid,
-    input  [1:0]  io_master_rresp,
+    input  [ 1:0] io_master_rresp,
     input  [31:0] io_master_rdata,
     input         io_master_rlast,
     input  [3:0]  io_master_rid,
@@ -44,36 +44,36 @@ module ysyx_25010030 (
     output        io_slave_awready,
     input         io_slave_awvalid,
     input  [31:0] io_slave_awaddr,
-    input  [3:0]  io_slave_awid,
-    input  [7:0]  io_slave_awlen,
-    input  [2:0]  io_slave_awsize,
-    input  [1:0]  io_slave_awburst,
+    input  [ 3:0] io_slave_awid,
+    input  [ 7:0] io_slave_awlen,
+    input  [ 2:0] io_slave_awsize,
+    input  [ 1:0] io_slave_awburst,
 
     output        io_slave_wready,
     input         io_slave_wvalid,
     input  [31:0] io_slave_wdata,
-    input  [3:0]  io_slave_wstrb,
+    input  [ 3:0] io_slave_wstrb,
     input         io_slave_wlast,
 
     input         io_slave_bready,
     output        io_slave_bvalid,
-    output [1:0]  io_slave_bresp,
-    output [3:0]  io_slave_bid,
+    output [ 1:0] io_slave_bresp,
+    output [ 3:0] io_slave_bid,
 
     output        io_slave_arready,
     input         io_slave_arvalid,
     input  [31:0] io_slave_araddr,
-    input  [3:0]  io_slave_arid,
-    input  [7:0]  io_slave_arlen,
-    input  [2:0]  io_slave_arsize,
-    input  [1:0]  io_slave_arburst,
+    input  [ 3:0] io_slave_arid,
+    input  [ 7:0] io_slave_arlen,
+    input  [ 2:0] io_slave_arsize,
+    input  [ 1:0] io_slave_arburst,
 
     input         io_slave_rready,
     output        io_slave_rvalid,
-    output [1:0]  io_slave_rresp,
+    output [ 1:0] io_slave_rresp,
     output [31:0] io_slave_rdata,
     output        io_slave_rlast,
-    output [3:0]  io_slave_rid
+    output [ 3:0] io_slave_rid
 );
 `ifdef VERILATOR
     import "DPI-C" function void ebreak(input int station, input int inst);
@@ -90,41 +90,41 @@ module ysyx_25010030 (
     wire        id_valid;         // ID 到 EX：有效信号
     wire        ex_ready;         // EX 到 ID：就绪信号
     wire        id_ex_RegWrite;   // ID 到 EX：寄存器写使能
-    wire [3:0]  id_ex_rd;         // ID 到 EX：目标寄存器
-    wire [3:0]  id_wb_rs1;        // ID 到 WB：源寄存器 1
-    wire [3:0]  id_wb_rs2;        // ID 到 WB：源寄存器 2
-    wire [4:0]  id_ex_zimm;       // ID 到 EX：CSR 立即数
+    wire [ 3:0] id_ex_rd;         // ID 到 EX：目标寄存器
+    wire [ 3:0] id_wb_rs1;        // ID 到 WB：源寄存器 1
+    wire [ 3:0] id_wb_rs2;        // ID 到 WB：源寄存器 2
+    wire [ 4:0] id_ex_zimm;       // ID 到 EX：CSR 立即数
     wire [31:0] id_ex_imm;        // ID 到 EX：立即数
-    wire [5:0]  id_ex_shamt;      // ID 到 EX：移位量
-    wire [3:0]  id_ex_alu_op;     // ID 到 EX：ALU 操作
-    wire [4:0]  id_ex_MemLen;     // ID 到 EX：内存访问长度
+    wire [ 5:0] id_ex_shamt;      // ID 到 EX：移位量
+    wire [ 3:0] id_ex_alu_op;     // ID 到 EX：ALU 操作
+    wire [ 4:0] id_ex_MemLen;     // ID 到 EX：内存访问长度
     wire        id_ex_MemWrite;   // ID 到 EX：内存写使能
     wire        id_ex_MemRead;    // ID 到 EX：内存读使能
-    wire [6:0]  id_ex_opcode;     // ID 到 EX：操作码
-    wire [2:0]  id_ex_func3;      // ID 到 EX：功能码 3
+    wire [ 6:0] id_ex_opcode;     // ID 到 EX：操作码
+    wire [ 2:0] id_ex_func3;      // ID 到 EX：功能码 3
     wire        id_ex_jal;        // ID 到 EX：JAL 信号
     wire        id_ex_jalr;       // ID 到 EX：JALR 信号
-    wire        id_ex_csr;        // ID 到 EX：CSR 指令信号
+    // wire        id_ex_csr;        // ID 到 EX：CSR 指令信号
     wire        id_ex_csr_wen1;   // ID 到 EX：CSR 写使能 1
     wire        id_ex_csr_wen2;   // ID 到 EX：CSR 写使能 2
     wire        id_ex_csr_ecall;  // ID 到 EX：ECALL 信号
     wire        id_ex_csr_mret;   // ID 到 EX：MRET 信号
-    wire [1:0]  id_ex_csr_op;
+    wire [ 1:0] id_ex_csr_op;
     wire [11:0] id_ex_csr_wr_addr1; // ID 到 EX：CSR 写地址 1
     wire [11:0] id_ex_csr_wr_addr2; // ID 到 EX：CSR 写地址 2
     wire [11:0] id_wb_csr_addr1;  // ID 到 WB：CSR 读地址 1
     wire [11:0] id_wb_csr_addr2;  // ID 到 WB：CSR 读地址 2
 
-    wire [31:0] ex_lsu_pc;        // EX 到 MEM：程序计数器
+    // wire [31:0] ex_lsu_pc;        // EX 到 MEM：程序计数器
     wire [31:0] ex_lsu_inst;      // EX 到 MEM：指令
     wire        ex_lsu_valid;     // EX 到 MEM：有效信号
     wire        lsu_ex_ready;     // MEM 到 EX：就绪信号
     wire [31:0] ex_lsu_src2;      // EX 到 MEM：源操作数 2
     wire        ex_lsu_RegWrite;  // EX 到 MEM：寄存器写使能
-    wire [3:0]  ex_lsu_rd;        // EX 到 MEM：目标寄存器
+    wire [ 3:0] ex_lsu_rd;        // EX 到 MEM：目标寄存器
     wire        ex_lsu_MemRead;   // EX 到 MEM：内存读使能
     wire        ex_lsu_MemWrite;  // EX 到 MEM：内存写使能
-    wire [4:0]  ex_lsu_MemLen;    // EX 到 MEM：内存访问长度
+    wire [ 4:0] ex_lsu_MemLen;    // EX 到 MEM：内存访问长度
     wire [31:0] ex_lsu_process_result; // EX 到 MEM：ALU/内存地址结果
     wire        ex_flush;         // EX 到 IF：冲刷信号
     wire [31:0] ex_flush_pc;      // EX 到 IF：冲刷目标 PC
@@ -142,7 +142,7 @@ module ysyx_25010030 (
     wire        lsu_wb_valid;     // MEM 到 WB：有效信号
     wire        wb_lsu_ready;     // WB 到 MEM：就绪信号
     wire        lsu_wb_RegWrite;  // MEM 到 WB：寄存器写使能
-    wire [3:0]  lsu_wb_rd;        // MEM 到 WB：目标寄存器
+    wire [ 3:0] lsu_wb_rd;        // MEM 到 WB：目标寄存器
     wire [31:0] lsu_wb_write_rd_data; // MEM 到 WB：写回数据
     wire [31:0] lsu_wb_csr_wr_data1;  // MEM 到 WB：CSR 写数据 1
     wire [31:0] lsu_wb_csr_wr_data2;  // MEM 到 WB：CSR 写数据 2
@@ -158,7 +158,7 @@ module ysyx_25010030 (
     wire [31:0] wb_ex_csr_num2;   // WB 到 EX：CSR 读数据 2
 
     // 前递信号
-    wire [3:0]  lsu_ex_forward_rd;        // MEM 到 EX：前递的目标寄存器
+    wire [ 3:0] lsu_ex_forward_rd;        // MEM 到 EX：前递的目标寄存器
     wire        lsu_ex_forward_RegWrite;  // MEM 到 EX：前递写使能
     wire        lsu_ex_forward_MemRead;   // MEM 到 EX：前递读使能
     wire        ex_lsu_forward_las;       // EX 到 MEM：加载后存储前递标志
@@ -173,24 +173,24 @@ module ysyx_25010030 (
     wire [1:0]  lsu_axi_arburst;
     wire [31:0] axi_lsu_rdata;
     wire        axi_lsu_rvalid;
-    wire [3:0]  axi_lsu_rid;
+    wire [ 3:0] axi_lsu_rid;
     wire        axi_lsu_rlast;
     wire        lsu_axi_rready;
-    wire [1:0]  axi_lsu_rresp;
+    wire [ 1:0] axi_lsu_rresp;
     wire [31:0] lsu_axi_awaddr;
-    wire [3:0]  lsu_axi_awid;
-    wire [7:0]  lsu_axi_awlen;
-    wire [2:0]  lsu_axi_awsize;
-    wire [1:0]  lsu_axi_awburst;
+    wire [ 3:0] lsu_axi_awid;
+    wire [ 7:0] lsu_axi_awlen;
+    wire [ 2:0] lsu_axi_awsize;
+    wire [ 1:0] lsu_axi_awburst;
     wire        lsu_axi_awvalid;
     wire        axi_lsu_awready;
     wire [31:0] lsu_axi_wdata;
-    wire [3:0]  lsu_axi_wstrb;
+    wire [ 3:0] lsu_axi_wstrb;
     wire        lsu_axi_wvalid;
     wire        lsu_axi_wlast;
     wire        axi_lsu_wready;
-    wire [1:0]  axi_lsu_bresp;
-    wire [3:0]  axi_lsu_bid;
+    wire [ 1:0] axi_lsu_bresp;
+    wire [ 3:0] axi_lsu_bid;
     wire        axi_lsu_bvalid;
     wire        lsu_axi_bready;
 
@@ -198,50 +198,50 @@ module ysyx_25010030 (
     wire        if_axi_arvalid;    
     wire        axi_if_arready;      
     wire [31:0] if_axi_araddr;      
-    wire [3:0]  if_axi_arid;
-    wire [7:0]  if_axi_arlen;
-    wire [2:0]  if_axi_arsize;
-    wire [1:0]  if_axi_arburst;
+    wire [ 3:0] if_axi_arid;
+    wire [ 7:0] if_axi_arlen;
+    wire [ 2:0] if_axi_arsize;
+    wire [ 1:0] if_axi_arburst;
     wire [31:0] axi_if_rdata;        
     wire        axi_if_rvalid;      
-    wire [3:0]  axi_if_rid;
+    wire [ 3:0] axi_if_rid;
     wire        axi_if_rlast;
     wire        if_axi_rready;      
-    wire [1:0]  axi_if_rresp;    
+    wire [ 1:0] axi_if_rresp;    
 
      //====== CLINT =======//
     //AR channel
     wire [31:0] clint_araddr;
     wire        clint_arvalid;
-    wire [3:0]  clint_arid;
-    wire [7:0]  clint_arlen;
-    wire [2:0]  clint_arsize;
-    wire [1:0]  clint_arburst;
+    wire [ 3:0] clint_arid;
+    wire [ 7:0] clint_arlen;
+    wire [ 2:0] clint_arsize;
+    wire [ 1:0] clint_arburst;
     wire        clint_arready;
     //R channel
-    wire [1:0]  clint_rresp;
+    wire [ 1:0] clint_rresp;
     wire [31:0] clint_rdata;
     wire        clint_rvalid;
-    wire [3:0]  clint_rid;
+    wire [ 3:0] clint_rid;
     wire        clint_rlast;
     wire        clint_rready;
     //AW channel
     wire [31:0] clint_awaddr;
     wire        clint_awvalid;
-    wire [3:0]  clint_awid;
-    wire [7:0]  clint_awlen;
-    wire [2:0]  clint_awsize;
-    wire [1:0]  clint_awburst;
+    wire [ 3:0] clint_awid;
+    wire [ 7:0] clint_awlen;
+    wire [ 2:0] clint_awsize;
+    wire [ 1:0] clint_awburst;
     wire        clint_awready;
     //W channel
     wire [31:0] clint_wdata;
-    wire [3:0]  clint_wstrb;
+    wire [ 3:0] clint_wstrb;
     wire        clint_wvalid;
     wire        clint_wlast;
     wire        clint_wready;
     //B channel
-    wire [1:0]  clint_bresp;
-    wire [3:0]  clint_bid;
+    wire [ 1:0] clint_bresp;
+    wire [ 3:0] clint_bid;
     wire        clint_bvalid;
     wire        clint_bready;
 
@@ -445,7 +445,7 @@ module ysyx_25010030 (
         .id_ex_func3(id_ex_func3),
         .id_ex_jal(id_ex_jal),
         .id_ex_jalr(id_ex_jalr),
-        .id_ex_csr(id_ex_csr),
+        // .id_ex_csr(id_ex_csr),
         .id_ex_csr_wen1(id_ex_csr_wen1),
         .id_ex_csr_wen2(id_ex_csr_wen2),
         .id_ex_csr_ecall(id_ex_csr_ecall),
@@ -495,7 +495,7 @@ module ysyx_25010030 (
         .id_ex_MemLen(id_ex_MemLen),
         .wb_ex_csr_num1(wb_ex_csr_num1),
         .wb_ex_csr_num2(wb_ex_csr_num2),
-        .id_ex_csr(id_ex_csr),
+        // .id_ex_csr(id_ex_csr),
         .id_ex_csr_wen1(id_ex_csr_wen1),
         .id_ex_csr_wen2(id_ex_csr_wen2),
         .id_ex_csr_wr_addr1(id_ex_csr_wr_addr1),
@@ -506,7 +506,7 @@ module ysyx_25010030 (
         .ex_flush(ex_flush),
         .ex_flush_pc(ex_flush_pc),
         .ex_lsu_inst(ex_lsu_inst),
-        .ex_lsu_pc(ex_lsu_pc),
+        // .ex_lsu_pc(ex_lsu_pc),
         .ex_lsu_src2(ex_lsu_src2),
         .ex_lsu_RegWrite(ex_lsu_RegWrite),
         .ex_lsu_rd(ex_lsu_rd),
@@ -541,7 +541,7 @@ module ysyx_25010030 (
         .ex_lsu_MemRead(ex_lsu_MemRead),
         .ex_lsu_MemWrite(ex_lsu_MemWrite),
         .ex_lsu_MemLen(ex_lsu_MemLen),
-        .ex_lsu_pc(ex_lsu_pc),
+        // .ex_lsu_pc(ex_lsu_pc),
         .addr(ex_lsu_process_result), // 从 EX 传入的内存地址
         .data_in(ex_lsu_src2),        // 从 EX 传入的写数据
         .lsu_ex_forward_rd(lsu_ex_forward_rd),
