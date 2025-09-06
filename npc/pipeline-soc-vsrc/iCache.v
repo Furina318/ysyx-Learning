@@ -196,13 +196,13 @@ module iCache #(
     always @(posedge clk) begin
         if (reset) begin
             // 初始化缓存：所有块无效
-            for (idx = 0; idx < NUM_BLOCKS; idx = idx + 1) begin
-                // valid_ram[idx] <= 1'b0;
-                tag_ram[idx]   <= {TAG_WIDTH{1'b0}};
-                for (b = 0; b < BEATS_PER_BLOCK; b = b + 1) begin
-                    data_ram[idx][b] <= 32'h0;
-                end
-            end
+            // for (idx = 0; idx < NUM_BLOCKS; idx = idx + 1) begin
+            //     // valid_ram[idx] <= 1'b0;
+            //     tag_ram[idx]   <= {TAG_WIDTH{1'b0}};
+            //     for (b = 0; b < BEATS_PER_BLOCK; b = b + 1) begin
+            //         data_ram[idx][b] <= 32'h0;
+            //     end
+            // end
             inst  <= 32'h0;
             valid <= 1'b0;
             busy  <= 1'b0;
