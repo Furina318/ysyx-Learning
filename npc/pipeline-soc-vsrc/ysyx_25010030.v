@@ -226,24 +226,24 @@ module ysyx_25010030 (
     wire        clint_rlast;
     wire        clint_rready;
     //AW channel
-    wire [31:0] clint_awaddr;
-    wire        clint_awvalid;
-    wire [ 3:0] clint_awid;
-    wire [ 7:0] clint_awlen;
-    wire [ 2:0] clint_awsize;
-    wire [ 1:0] clint_awburst;
-    wire        clint_awready;
+    // wire [31:0] clint_awaddr;
+    // wire        clint_awvalid;
+    // wire [ 3:0] clint_awid;
+    // wire [ 7:0] clint_awlen;
+    // wire [ 2:0] clint_awsize;
+    // wire [ 1:0] clint_awburst;
+    // wire        clint_awready;
     //W channel
-    wire [31:0] clint_wdata;
-    wire [ 3:0] clint_wstrb;
-    wire        clint_wvalid;
-    wire        clint_wlast;
-    wire        clint_wready;
+    // wire [31:0] clint_wdata;
+    // wire [ 3:0] clint_wstrb;
+    // wire        clint_wvalid;
+    // wire        clint_wlast;
+    // wire        clint_wready;
     //B channel
-    wire [ 1:0] clint_bresp;
-    wire [ 3:0] clint_bid;
-    wire        clint_bvalid;
-    wire        clint_bready;
+    // wire [ 1:0] clint_bresp;
+    // wire [ 3:0] clint_bid;
+    // wire        clint_bvalid;
+    // wire        clint_bready;
 
     // wire [31:0] ifu_active_cycles;
     // wire [31:0] exu_active_cycles;
@@ -252,16 +252,16 @@ module ysyx_25010030 (
     CLINT clint (
         .clk(clock),
         .reset(reset),
-        .awvalid(clint_awvalid),
-        .awready(clint_awready),
-        .awaddr(clint_awaddr),
-        .wdata(clint_wdata),
-        .wstrb(clint_wstrb),
-        .wvalid(clint_wvalid),
-        .wready(clint_wready),
-        .bresp(clint_bresp),
-        .bvalid(clint_bvalid),
-        .bready(clint_bready),
+        // .awvalid(clint_awvalid),
+        // .awready(clint_awready),
+        // .awaddr(clint_awaddr),
+        // .wdata(clint_wdata),
+        // .wstrb(clint_wstrb),
+        // .wvalid(clint_wvalid),
+        // .wready(clint_wready),
+        // .bresp(clint_bresp),
+        // .bvalid(clint_bvalid),
+        // .bready(clint_bready),
         .arvalid(clint_arvalid),
         .araddr(clint_araddr),
         .arready(clint_arready),
@@ -271,6 +271,11 @@ module ysyx_25010030 (
         .rresp(clint_rresp),
         .rdata(clint_rdata)
     );
+
+    // assign clint_awready = 1'b0;
+    // assign clint_wready  = 1'b0;
+    // assign clint_bvalid  = 1'b0;
+    // assign clint_bresp   = 2'b00;
 
     AXI_ARB_BURST axi_arb (
         .clk(clock),
@@ -370,25 +375,25 @@ module ysyx_25010030 (
         .clint_rresp(clint_rresp),
         .clint_rdata(clint_rdata),
         .clint_rlast(clint_rlast),
-        .clint_rid(clint_rid),
+        .clint_rid(clint_rid)
 
         // CLINT从设备接口（写通道，始终无效）
-        .clint_awaddr(clint_awaddr),
-        .clint_awvalid(clint_awvalid),
-        .clint_awready(clint_awready),
-        .clint_awid(clint_awid),
-        .clint_awlen(clint_awlen),
-        .clint_awsize(clint_awsize),
-        .clint_awburst(clint_awburst),
-        .clint_wdata(clint_wdata),
-        .clint_wstrb(clint_wstrb),
-        .clint_wvalid(clint_wvalid),
-        .clint_wlast(clint_wlast),
-        .clint_wready(clint_wready),
-        .clint_bready(clint_bready),
-        .clint_bvalid(clint_bvalid),
-        .clint_bresp(clint_bresp),
-        .clint_bid(clint_bid)
+        // .clint_awaddr(clint_awaddr),
+        // .clint_awvalid(clint_awvalid),
+        // .clint_awready(clint_awready),
+        // .clint_awid(clint_awid),
+        // .clint_awlen(clint_awlen),
+        // .clint_awsize(clint_awsize),
+        // .clint_awburst(clint_awburst),
+        // .clint_wdata(clint_wdata),
+        // .clint_wstrb(clint_wstrb),
+        // .clint_wvalid(clint_wvalid),
+        // .clint_wlast(clint_wlast),
+        // .clint_wready(clint_wready),
+        // .clint_bready(clint_bready),
+        // .clint_bvalid(clint_bvalid),
+        // .clint_bresp(clint_bresp),
+        // .clint_bid(clint_bid)
     );
 
     // IF（指令获取）模块
