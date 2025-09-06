@@ -177,8 +177,8 @@ module LSU_AXI (
     reg        b_done;   
     reg        ar_done;
 
-    wire we = (ex_lsu_valid & lsu_ex_ready & ~ex_lsu_MemRead & ex_lsu_MemWrite & ~write_pending);
-    wire req_valid = ((ex_lsu_valid & lsu_ex_ready) & ((~ex_lsu_MemRead & ex_lsu_MemWrite & ~write_pending) || (ex_lsu_MemRead & ~ex_lsu_MemWrite & ~read_pending)));
+    wire we = (ex_lsu_valid & lsu_ex_ready & ex_lsu_MemWrite);
+    wire req_valid = ((ex_lsu_valid & lsu_ex_ready) & (ex_lsu_MemRead | ex_lsu_MemWrite));
 
     always @(posedge clk) begin
         // if (rst) begin
@@ -480,8 +480,8 @@ module LSU_AXI (
     reg [3:0]  l_rd_addr;         
     reg [4:0]  l_MemLen;          
 
-    reg        read_pending;      // 读请求等待标志
-    reg        write_pending;     // 写请求等待标志
+    // reg        read_pending;      // 读请求等待标志
+    // reg        write_pending;     // 写请求等待标志
     reg [31:0] read_lsu_data;     // 从 SRAM 读取的数据
     reg        op_complete; // 缓存操作完成
 
@@ -519,17 +519,17 @@ module LSU_AXI (
             l_MemLen  <= ex_lsu_MemLen;
         end 
         else if (ex_lsu_valid & lsu_ex_ready & ~(ex_lsu_MemRead | ex_lsu_MemWrite)) begin // 非访存指令
-            l_load    <= l_load;
+            l_load    <= 0;
             l_rd_en   <= ex_lsu_RegWrite;
             l_rd_addr <= ex_lsu_rd;
             l_MemLen  <= ex_lsu_MemLen;
         end 
-        else begin
-            l_load    <= l_load;
-            l_rd_en   <= l_rd_en;
-            l_rd_addr <= l_rd_addr;
-            l_MemLen  <= l_MemLen;
-        end
+        // else begin
+        //     l_load    <= l_load;
+        //     l_rd_en   <= l_rd_en;
+        //     l_rd_addr <= l_rd_addr;
+        //     l_MemLen  <= l_MemLen;
+        // end
     end
 
     always @(posedge clk) begin
@@ -543,11 +543,11 @@ module LSU_AXI (
             op_complete   <= 0;
             
             // 处理读请求：发送到缓存
-            if (ex_lsu_valid & lsu_ex_ready & ex_lsu_MemRead & ~ex_lsu_MemWrite & ~read_pending) begin
+            if (ex_lsu_valid & lsu_ex_ready & (ex_lsu_MemRead | ex_lsu_MemWrite)) begin
                 cache_addr     <= addr;
-                read_pending   <= 1;
-            end else if (read_pending & valid) begin
-                read_pending  <= 0;
+                // read_pending   <= 1;
+            end else if (valid) begin
+                // read_pending  <= 0;
                 op_complete   <= 1;
                 read_lsu_data <= extract_read_data(l_MemLen, cache_addr[1:0], rdata);
             // `ifdef VERILATOR
@@ -555,16 +555,16 @@ module LSU_AXI (
             // `endif
             end
             
-            // 处理写请求：发送到缓存
-            if (ex_lsu_valid & lsu_ex_ready & ~ex_lsu_MemRead & ex_lsu_MemWrite & ~write_pending) begin
-                write_pending <= 1;
-            end else if (write_pending & valid) begin
-                write_pending <= 0;
-                op_complete   <= 1;
-            // `ifdef VERILATOR
-            //     counter(7, 0, 1, 0);
-            // `endif
-            end
+            // // 处理写请求：发送到缓存
+            // if (ex_lsu_valid & lsu_ex_ready & ~ex_lsu_MemRead) begin
+            //     // write_pending <= 1;
+            // end else if (valid) begin
+            //     // write_pending <= 0;
+            //     op_complete   <= 1;
+            // // `ifdef VERILATOR
+            // //     counter(7, 0, 1, 0);
+            // // `endif
+            // end
         // end
     end
 
