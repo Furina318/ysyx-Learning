@@ -1,658 +1,387 @@
-
 `include "/home/furina/ysyx-workbench/npc/pipeline-soc-vsrc/defines/defines.v"
 
-module LSU_AXI (
-    input         clk,
-    input         rst,
+module EX (
+    input             clk,
+    input             reset,
+    input             id_ready,        // ID -> IF
+    input             id_valid,
+    output reg        ex_ready,
+    input             lsu_ready,
+    output reg        ex_lsu_valid,
 
-    // 流水线握手信号
-    input         ex_lsu_valid,       
-    output reg    lsu_ex_ready,       
-    input         wb_lsu_ready,       
-    output reg    lsu_wb_valid,       
+    input      [ 3:0] id_wb_rs1,
+    input      [ 3:0] id_wb_rs2,
+    input      [ 3:0] lsu_ex_forward_rd,
+    input             lsu_ex_forward_RegWrite,
+    input             lsu_ex_forward_MemRead,
+    input      [31:0] lsu_wb_wdata,
+    input      [ 3:0] lsu_wb_rd,
+    input             lsu_wb_RegWrite,
+    input             lsu_wb_valid,
+    output reg        ex_lsu_forward_las,
 
-    // EX 阶段输入信号
-    input         ex_lsu_forward_las,
-    input         ex_lsu_RegWrite,    
-    input  [ 3:0] ex_lsu_rd,          
-    input         ex_lsu_MemRead,     
-    input         ex_lsu_MemWrite,    
-    input  [ 4:0] ex_lsu_MemLen,         
-    // input  [31:0] ex_lsu_pc,          
-    input  [31:0] addr,               
-    input  [31:0] data_in,              
+    input      [31:0] id_ex_inst,
+    input      [31:0] id_ex_pc,
+    input      [31:0] id_ex_imm,
+    input      [ 4:0] id_ex_zimm,
+    input      [ 5:0] id_ex_shamt,
+    input      [31:0] wb_ex_src1,
+    input      [31:0] wb_ex_src2,
+    input             id_ex_RegWrite,
+    input      [ 3:0] id_ex_rd,
+    input      [ 6:0] id_ex_opcode,
+    input      [ 2:0] id_ex_func3,
+    input      [ 3:0] id_ex_alu_op,
 
-    // CSR 相关信号
-    input         ex_lsu_csr,
-    input         ex_lsu_csr_wen1,
-    input         ex_lsu_csr_wen2,
-    input  [31:0] ex_lsu_csr_wr_data1,
-    input  [31:0] ex_lsu_csr_wr_data2,
-    input  [11:0] ex_lsu_csr_wr_addr1,
-    input  [11:0] ex_lsu_csr_wr_addr2,
-    input  [31:0] ex_lsu_csr_rdata,
-    input         ex_lsu_csr_ecall,
-    input         ex_lsu_csr_mret,
-    input  [31:0] ex_lsu_process_result,
+    input             id_ex_jal,
+    input             id_ex_jalr,
+    input             id_ex_MemRead,
+    input             id_ex_MemWrite,
+    input      [ 4:0] id_ex_MemLen,
 
-    // 前递信号
-    output [ 3:0] lsu_ex_forward_rd,         
-    output        lsu_ex_forward_RegWrite,   
-    output        lsu_ex_forward_MemRead,    
+    input      [31:0] wb_ex_csr_num1,
+    input      [31:0] wb_ex_csr_num2,
+     
+    // input             id_ex_csr,
+    input             id_ex_csr_wen1,
+    input             id_ex_csr_wen2,
+    input      [11:0] id_ex_csr_wr_addr1,
+    input      [11:0] id_ex_csr_wr_addr2,
+    input             id_ex_csr_ecall,
+    input             id_ex_csr_mret,
+    input      [ 1:0] id_ex_csr_op,
 
-    // 传递到 WB 阶段的信号
-    output reg [31:0] lsu_wb_csr_wr_data1,
-    output reg [31:0] lsu_wb_csr_wr_data2,
-    output reg [11:0] lsu_wb_csr_wr_addr1,
-    output reg [11:0] lsu_wb_csr_wr_addr2,
-    output reg        lsu_wb_csr_wen1,
-    output reg        lsu_wb_csr_wen2,
-    output reg        lsu_wb_RegWrite,        
-    output reg [ 3:0] lsu_wb_rd,              
-    output reg [31:0] lsu_wb_write_rd_data,   
+    output reg        ex_flush,
+    output reg [31:0] ex_flush_pc,
 
-    // AXI4-Lite 接口信号
-    output reg        lsu_axi_arvalid,      
-    input             axi_lsu_arready,      
-    output reg [31:0] lsu_axi_araddr,
-    output wire [ 3:0] lsu_axi_arid,
-    output wire [ 7:0] lsu_axi_arlen,
-    output wire [ 2:0] lsu_axi_arsize,
-    output wire [ 1:0] lsu_axi_arburst,        
-    input      [31:0] axi_lsu_rdata,         
-    input             axi_lsu_rvalid,       
-    output reg        lsu_axi_rready,       
-    input      [ 1:0] axi_lsu_rresp,
-    input      [ 3:0] axi_lsu_rid,
-    input             axi_lsu_rlast,         
+    output reg [31:0] ex_lsu_inst,
+    // output reg [31:0] ex_lsu_pc,
+    output reg [31:0] ex_lsu_src2,
+    output reg        ex_lsu_RegWrite,
+    output reg [ 3:0] ex_lsu_rd,
+    output reg        ex_lsu_MemRead,
+    output reg        ex_lsu_MemWrite,
+    output reg [ 4:0] ex_lsu_MemLen,
 
-    output reg [31:0] lsu_axi_awaddr,        
-    output reg        lsu_axi_awvalid,      
-    input             axi_lsu_awready, 
-    output wire [ 3:0] lsu_axi_awid,
-    output wire [ 7:0] lsu_axi_awlen,
-    output wire [ 2:0] lsu_axi_awsize,
-    output wire [ 1:0] lsu_axi_awburst,     
-    output reg [31:0] lsu_axi_wdata,         
-    output reg [ 3:0] lsu_axi_wstrb,         
-    output reg        lsu_axi_wvalid,       
-    input             axi_lsu_wready,
-    output reg        lsu_axi_wlast,       
-    input      [ 1:0] axi_lsu_bresp,         
-    input             axi_lsu_bvalid,       
-    output reg        lsu_axi_bready,
-    input      [ 3:0] axi_lsu_bid     
+    output reg        ex_lsu_csr,
+    output reg        ex_lsu_csr_wen1,
+    output reg        ex_lsu_csr_wen2,
+    output reg [11:0] ex_lsu_csr_wr_addr1,
+    output reg [11:0] ex_lsu_csr_wr_addr2,
+    output reg [31:0] ex_lsu_csr_wr_data1,
+    output reg [31:0] ex_lsu_csr_wr_data2,
+    output reg [31:0] ex_lsu_csr_rdata,
 
-    // output reg [31:0] lsu_active_cycles
+    output reg        ex_lsu_csr_ecall,
+    output reg        ex_lsu_csr_mret,
+
+    output reg [31:0] ex_lsu_process_result
+
 );
 `ifdef VERILATOR
     import "DPI-C" function void ebreak(input int station, input int inst);
     // import "DPI-C" function void counter(input int inst_type, input int ifu_inc, input int lsu_inc, input int exu_inc);
-`endif 
-
-    parameter OKAY = 2'b00;
-
-    // dCache data_cache (
-    //     .clk        (clk                                                    ),
-    //     .reset      (rst                                                    ),
-                                                
-    //     .we         (cache_we                                               ),
-    //     // .addr       (cache_addr     ),                                        
-    //     .addr       (addr                                                   ),
-    //     .wdata      (align_write_data(ex_lsu_MemLen, addr[1:0], data_in)    ),
-    //     .wstrb      (ex_lsu_MemLen[3:0] << addr[1:0]                        ),
-    //     .rdata      (cache_rdata                                            ),
-    //     .valid      (cache_valid                                            ),
-    //     .busy       (cache_busy                                             ),
-    //     .req_valid  (cache_req_valid                                        ),
-    //     .rstrb      (l_MemLen                                               ),
-                                
-    //     .axi_arid   (lsu_axi_arid                                           ),
-    //     .axi_araddr (lsu_axi_araddr                                         ),
-    //     .axi_arvalid(lsu_axi_arvalid                                        ),
-    //     .axi_arlen  (lsu_axi_arlen                                          ),
-    //     .axi_arsize (lsu_axi_arsize                                         ),
-    //     .axi_arburst(lsu_axi_arburst                                        ),
-    //     .axi_arready(axi_lsu_arready                                        ),
-    //     .axi_rvalid (axi_lsu_rvalid                                         ),
-    //     .axi_rlast  (axi_lsu_rlast                                          ),
-    //     .axi_rready (lsu_axi_rready                                         ),
-    //     .axi_rdata  (axi_lsu_rdata                                          ),
-    //     .axi_rresp  (axi_lsu_rresp                                          ),
-    //     .axi_rid    (axi_lsu_rid                                            ),
-                                
-    //     .axi_awid   (lsu_axi_awid                                           ),
-    //     .axi_awaddr (lsu_axi_awaddr                                         ),
-    //     .axi_awvalid(lsu_axi_awvalid                                        ),
-    //     .axi_awlen  (lsu_axi_awlen                                          ),
-    //     .axi_awsize (lsu_axi_awsize                                         ),
-    //     .axi_awburst(lsu_axi_awburst                                        ),
-    //     .axi_awready(axi_lsu_awready                                        ),
-    //     .axi_wdata  (lsu_axi_wdata                                          ),
-    //     .axi_wstrb  (lsu_axi_wstrb                                          ),
-    //     .axi_wvalid (lsu_axi_wvalid                                         ),
-    //     .axi_wlast  (lsu_axi_wlast                                          ),
-    //     .axi_wready (axi_lsu_wready                                         ),
-    //     .axi_bid    (axi_lsu_bid                                            ),
-    //     .axi_bresp  (axi_lsu_bresp                                          ),
-    //     .axi_bvalid (axi_lsu_bvalid                                         ),
-    //     .axi_bready (lsu_axi_bready                                         )
-    // );
-
-    localparam SDRAM_BASE        = 32'hA0000000;  
-    localparam SDRAM_END         = 32'hBFFFFFFF;  
-    localparam AXI_BURST_FIXED   = 2'b00;       
-    localparam AXI_BURST_INCR    = 2'b01;   
-    localparam AXI_SIZE_BYTE     = 3'h0;         
-    localparam AXI_SIZE_HALF     = 3'h1;  
-    localparam AXI_SIZE_WORD     = 3'h2;
-    localparam AXI_ID            = 4'h1;  
-    localparam BURST_LEN         = 4; 
-    localparam BLOCK_SIZE        = 16;
-    wire addr_in_sdram = (addr_reg >= SDRAM_BASE) && (addr_reg <= SDRAM_END);
-    wire burst_en = addr_in_sdram;  
-
-    localparam BLOCK_OFFSET_WIDTH = $clog2(16); 
-    wire [BLOCK_OFFSET_WIDTH-1:0] req_offset  = addr[BLOCK_OFFSET_WIDTH - 1 : 0];  // 块内偏移（0-15）
-    wire [                   1:0] word_offset = req_offset[3:2]; 
-
-    reg [                   1:0] saved_word_offset;
-    reg [                  31:0] saved_wdata;  
-    reg [                   3:0] saved_wstrb; 
-    reg [                   3:0] burst_cnt; 
-
-    reg  [31:0] cache_addr;    
-    reg  [31:0] rdata;  
-    reg         valid;   
-    reg         busy; 
-    reg  [31:0] addr_reg; 
-
-    localparam IDLE = 2'b00; 
-    localparam RD   = 2'b10; 
-    localparam WR   = 2'b11; 
-    reg [1:0] state, next_state;
-
-    reg        aw_done;  
-    reg        w_done;   
-    reg        b_done;   
-    reg        ar_done;
-
-    wire we = (ex_lsu_valid & lsu_ex_ready & ex_lsu_MemWrite);
-    wire req_valid = ((ex_lsu_valid & lsu_ex_ready) & (ex_lsu_MemRead | ex_lsu_MemWrite));
-
-    always @(posedge clk) begin
-        // if (rst) begin
-        //     addr_reg <= 32'h0;  
-        // end
-        if (state == IDLE && !busy && req_valid) begin
-            addr_reg <= addr;  
-        end        
-    end
-
-    always @(posedge clk) begin
-        // if (rst) begin
-        //     saved_word_offset <= 0;
-        //     saved_wdata       <= 0;
-        //     saved_wstrb       <= 0;
-        // end
-        if (state == IDLE && !busy && req_valid) begin
-            saved_word_offset <= word_offset;
-            saved_wdata       <= align_write_data(ex_lsu_MemLen, addr[1:0], data_in);
-            saved_wstrb       <= ex_lsu_MemLen[3:0] << addr[1:0];
-        end
-    end
-
-    always @(posedge clk) begin
-        if (rst) begin
-            state <= IDLE;
-        end else begin
-            state <= next_state;
-        end
-    end
-
-    always @(posedge clk) begin
-        if (state != next_state) begin
-            burst_cnt <= 0;
-        end else if (state == RD && axi_lsu_rvalid && lsu_axi_rready) begin
-            burst_cnt <= burst_cnt + 1;
-        end
-    end
-
-    always @(posedge clk) begin
-        if (state == WR) begin
-            if (lsu_axi_awvalid && axi_lsu_awready) aw_done <= 1'b1;
-            if (lsu_axi_wvalid && axi_lsu_wready && lsu_axi_wlast) w_done <= 1'b1;
-            if (axi_lsu_bvalid && lsu_axi_bready) b_done <= 1'b1;
-        end else begin
-            aw_done <= 1'b0;
-            w_done  <= 1'b0;
-            b_done  <= 1'b0;
-        end 
-    end
-
-    always @(*) begin
-        case (state)
-            IDLE: begin
-                if(req_valid && !busy) begin
-                    // if (we) begin 
-                    //     next_state = WR;     
-                    // end else begin
-                    //     next_state = RD;      
-                    // end
-                    next_state = we ? WR : RD;
-                end
-                else begin
-                    next_state = IDLE;
-                end
-            end
-
-            RD: next_state = (axi_lsu_rvalid && lsu_axi_rready && axi_lsu_rlast) ? IDLE : RD;
-
-            WR: next_state = (aw_done && w_done && b_done) ? IDLE : WR;
-
-            default: next_state = IDLE;
-        endcase
-    end
-
-    reg [BLOCK_SIZE*8-1:0] block_data;
-
-    assign lsu_axi_arid    = AXI_ID;
-    assign lsu_axi_arburst = burst_en ? AXI_BURST_INCR : AXI_BURST_FIXED;
-    assign lsu_axi_arlen   = burst_en ? BURST_LEN - 1 : 8'h0;
-    assign lsu_axi_arsize  = (ex_lsu_MemLen == 5'b10001 || ex_lsu_MemLen == 5'b00001) ? AXI_SIZE_BYTE : 
-                             (ex_lsu_MemLen == 5'b00011 || ex_lsu_MemLen == 5'b10011) ? AXI_SIZE_HALF : 
-                             (ex_lsu_MemLen == 5'b11111) ? AXI_SIZE_WORD : AXI_SIZE_WORD;
-
-    always @(posedge clk) begin
-        // if (rst) begin
-        //     lsu_axi_arvalid <= 1'b0;
-        //     lsu_axi_araddr  <= 32'h0;
-        //     // lsu_axi_arlen   <= 8'h0;
-        //     // lsu_axi_arsize  <= 3'b010;  
-        //     // lsu_axi_arburst <= AXI_BURST_FIXED;
-        //     // lsu_axi_arid    <= 0;
-        //     ar_done         <= 0;
-        // end 
-        // else 
-        if (state == RD) begin
-            if (!ar_done && !lsu_axi_arvalid) begin
-                lsu_axi_araddr  <= burst_en ? {addr_reg[31:BLOCK_OFFSET_WIDTH], {BLOCK_OFFSET_WIDTH{1'b0}}} : addr_reg;
-                lsu_axi_arvalid <= 1'b1;
-                // lsu_axi_arid    <= AXI_ID;
-                // lsu_axi_arlen   <= burst_en ? BURST_LEN - 1 : 8'h0;  
-                // lsu_axi_arburst <= burst_en ? AXI_BURST_INCR : AXI_BURST_FIXED;
-                // lsu_axi_arsize  <= (l_MemLen == 5'b10001 || l_MemLen == 5'b00001) ? AXI_SIZE_BYTE : 
-                //             (l_MemLen == 5'b00011 || l_MemLen == 5'b10011) ? AXI_SIZE_HALF : 
-                //             (l_MemLen == 5'b11111) ? AXI_SIZE_WORD : AXI_SIZE_WORD;
-            end else if (axi_lsu_arready) begin
-                lsu_axi_arvalid <= 1'b0;  
-                ar_done         <= 1;
-            end
-            lsu_axi_rready <= 1'b1;
-            if(axi_lsu_rvalid && burst_en) begin
-                block_data[burst_cnt*32 +: 32] = axi_lsu_rdata;
-            end
-        end else begin
-            lsu_axi_arvalid <= 1'b0; 
-            ar_done         <= 1'b0;
-        end
-    end
-
-    // reg [BLOCK_SIZE*8-1:0] block_data; 
+`endif
+    
+    // EXU 活跃周期计数
     // always @(posedge clk) begin
-    //     // if (rst) begin
-    //     //     block_data = 0;
-    //     //     lsu_axi_rready <= 1'b0;
-    //     // end else begin
-    //         lsu_axi_rready <= (state == RD);
-    //         if (state == RD && axi_lsu_rvalid && lsu_axi_rready) begin
-    //             if (burst_en) begin
-    //                 block_data[burst_cnt*32 +: 32] = axi_lsu_rdata;
-    //             end
-    //         end
-    //     // end
-    // end
-
-    assign lsu_axi_awburst = AXI_BURST_FIXED;
-    assign lsu_axi_awid    = AXI_ID;
-    assign lsu_axi_awlen   = 8'h0;
-    assign lsu_axi_awsize  = (saved_wstrb == 4'b0001 || saved_wstrb == 4'b0010 || 
-                             saved_wstrb == 4'b0100 || saved_wstrb == 4'b1000) ? AXI_SIZE_BYTE :
-                             (saved_wstrb == 4'b0011 || saved_wstrb == 4'b1100) ? AXI_SIZE_HALF : 
-                             (saved_wstrb == 4'b1111) ? AXI_SIZE_WORD : AXI_SIZE_WORD;
-
-    always @(posedge clk) begin
-        // if (rst) begin
-        //     lsu_axi_awvalid <= 1'b0;
-        //     lsu_axi_awaddr  <= 32'h0;
-        //     // lsu_axi_awlen   <= 8'h0;     
-        //     // lsu_axi_awsize  <= 3'b010;   
-        //     // lsu_axi_awburst <= AXI_BURST_FIXED;  
-        //     lsu_axi_wvalid  <= 1'b0;
-        //     lsu_axi_wdata   <= 32'h0;
-        //     lsu_axi_wstrb   <= 4'h0;
-        //     lsu_axi_wlast   <= 1'b0;
-        //     lsu_axi_bready  <= 1'b0;
-        //     // lsu_axi_awid    <= 0;
-        // end else 
-        if (state == WR) begin
-            if (!lsu_axi_awvalid && !aw_done) begin
-                lsu_axi_awaddr  <= addr_reg;  
-                lsu_axi_awvalid <= 1'b1;
-                // lsu_axi_awid    <= AXI_ID;
-                // lsu_axi_awsize  <= (saved_wstrb == 4'b0001 || saved_wstrb == 4'b0010 || 
-                //                saved_wstrb == 4'b0100 || saved_wstrb == 4'b1000) ? AXI_SIZE_BYTE :
-                //               (saved_wstrb == 4'b0011 || saved_wstrb == 4'b1100) ? AXI_SIZE_HALF : 
-                //               (saved_wstrb == 4'b1111) ? AXI_SIZE_WORD : AXI_SIZE_WORD;
-            end else if (axi_lsu_awready) begin
-                lsu_axi_awvalid <= 1'b0;  // 地址握手完成后清零
-            end
-
-            if (!lsu_axi_wvalid && !w_done) begin
-                lsu_axi_wdata  <= saved_wdata;  
-                lsu_axi_wstrb  <= saved_wstrb;  
-                lsu_axi_wvalid <= 1'b1;
-                lsu_axi_wlast  <= 1'b1;         
-            end else if (axi_lsu_wready) begin
-                lsu_axi_wvalid <= 1'b0;
-                lsu_axi_wlast  <= 1'b0;
-            end
-
-            if (!b_done) lsu_axi_bready <= 1;
-            else lsu_axi_bready <= 0;
-            
-        end 
-    end
-
-    always @(posedge clk) begin
-        if (rst) begin
-            rdata  <= 32'h0;
-            valid  <= 1'b0;
-            busy   <= 1'b0;
-        end else begin
-            busy <= (state != IDLE);  
-            valid <= 1'b0;
-
-            case (state)
-                IDLE: begin end
-                RD: begin
-                    if (axi_lsu_rvalid && lsu_axi_rready && axi_lsu_rlast) begin
-                        rdata <= burst_en ? block_data[saved_word_offset*32 +: 32] : axi_lsu_rdata;
-                        valid <= 1'b1;
-                    end
-                end
-                WR: begin
-                    if(aw_done && w_done && b_done) begin
-                        valid <= 1'b1;
-                    end
-                end
-                default: begin end
-            endcase
-        end
-    end
-
-    function [31:0] align_write_data;
-        input [4:0] mem_len;
-        input [1:0] addr_low;
-        input [31:0] data_in;
-        begin
-            case (mem_len)
-                `Mem_Bit: begin
-                    // 字节访问：将数据移动到对应位置
-                    case (addr_low)
-                        2'b00: align_write_data = {24'b0, data_in[7:0]};
-                        2'b01: align_write_data = {16'b0, data_in[7:0], 8'b0};
-                        2'b10: align_write_data = {8'b0, data_in[7:0], 16'b0};
-                        2'b11: align_write_data = {data_in[7:0], 24'b0};
-                        default: align_write_data = data_in;
-                    endcase
-                end
-                `Mem_Half, `Mem_UHalf: begin
-                    // 半字访问：将数据移动到对应位置
-                    case (addr_low)
-                        2'b00: align_write_data = {16'b0, data_in[15:0]}; // 低16位
-                        2'b10: align_write_data = {data_in[15:0], 16'b0};  // 高16位
-                        default: align_write_data = data_in; // 非对齐访问保持原样
-                    endcase
-                end
-                `Mem_Word: begin
-                    // 字访问：数据不需要移动
-                    align_write_data = data_in;
-                end
-                default: align_write_data = data_in;
-            endcase
-        end
-    endfunction
-
-    function [31:0] extract_read_data;
-        input [4:0] mem_len;
-        input [1:0] addr_low;
-        input [31:0] rdata;
-        begin
-            case (mem_len)
-                `Mem_Bit: begin
-                    // 有符号字节：提取对应字节并进行符号扩展
-                    case (addr_low)
-                        2'b00: extract_read_data = {{24{rdata[7]}}, rdata[7:0]};
-                        2'b01: extract_read_data = {{24{rdata[15]}}, rdata[15:8]};
-                        2'b10: extract_read_data = {{24{rdata[23]}}, rdata[23:16]};
-                        2'b11: extract_read_data = {{24{rdata[31]}}, rdata[31:24]};
-                        default: extract_read_data = {{24{rdata[7]}}, rdata[7:0]};
-                    endcase
-                end
-                `Mem_UBit: begin
-                    // 无符号字节：提取对应字节并进行零扩展
-                    case (addr_low)
-                        2'b00: extract_read_data = {24'b0, rdata[7:0]};
-                        2'b01: extract_read_data = {24'b0, rdata[15:8]};
-                        2'b10: extract_read_data = {24'b0, rdata[23:16]};
-                        2'b11: extract_read_data = {24'b0, rdata[31:24]};
-                        default: extract_read_data = {24'b0, rdata[7:0]};
-                    endcase
-                end
-                `Mem_Half: begin
-                    // 有符号半字：提取对应半字并进行符号扩展
-                    case (addr_low)
-                        2'b00: extract_read_data = {{16{rdata[15]}}, rdata[15:0]};
-                        2'b10: extract_read_data = {{16{rdata[31]}}, rdata[31:16]};
-                        default: extract_read_data = {{16{rdata[15]}}, rdata[15:0]}; // 非对齐使用低半字
-                    endcase
-                end
-                `Mem_UHalf: begin
-                    // 无符号半字：提取对应半字并进行零扩展
-                    case (addr_low)
-                        2'b00: extract_read_data = {16'b0, rdata[15:0]};
-                        2'b10: extract_read_data = {16'b0, rdata[31:16]};
-                        default: extract_read_data = {16'b0, rdata[15:0]}; // 非对齐使用低半字
-                    endcase
-                end
-                `Mem_Word: begin
-                    // 字访问：直接使用全部数据
-                    extract_read_data = rdata;
-                end
-                default: extract_read_data = rdata;
-            endcase
-        end
-    endfunction
-
-    reg        l_load;            
-    reg        l_rd_en;           
-    reg [3:0]  l_rd_addr;         
-    reg [4:0]  l_MemLen;          
-
-    // reg        read_pending;      // 读请求等待标志
-    // reg        write_pending;     // 写请求等待标志
-    reg [31:0] read_lsu_data;     // 从 SRAM 读取的数据
-    reg        op_complete; // 缓存操作完成
-
-    // 前递信号赋值
-    assign lsu_ex_forward_rd        = l_rd_addr;
-    assign lsu_ex_forward_RegWrite  = l_rd_en;
-    assign lsu_ex_forward_MemRead   = l_load;
-
-    // always @(posedge clk) begin
-    //     if (rst) begin
-    //         lsu_active_cycles <= 0;
-    //     end else if (read_pending || write_pending) begin
-    //         lsu_active_cycles <= lsu_active_cycles + 1;
+    //     if (reset) begin
+    //         exu_active_cycles <= 0;
+    //     end else if (id_valid && ex_ready) begin
+    //         exu_active_cycles <= exu_active_cycles + 1;
     //     end
     // end
 
-    // 寄存器更新逻辑
-    always @(posedge clk) begin
-        if (rst) begin
-            l_load    <= 0;
-            l_rd_en   <= 0;
-            l_rd_addr <= 0;
-            l_MemLen  <= 0;
-        end 
-        else if (ex_lsu_valid & lsu_ex_ready & (ex_lsu_MemRead | ex_lsu_MemWrite)) begin
-            l_load    <= ex_lsu_MemRead;
-            l_rd_en   <= ex_lsu_RegWrite;
-            l_rd_addr <= ex_lsu_rd;
-            l_MemLen  <= ex_lsu_MemLen;
-        end 
-        else if (lsu_wb_valid & wb_lsu_ready) begin
-            l_load    <= 0;
-            l_rd_en   <= ex_lsu_RegWrite;
-            l_rd_addr <= ex_lsu_rd;
-            l_MemLen  <= ex_lsu_MemLen;
-        end 
-        else if (ex_lsu_valid & lsu_ex_ready & ~(ex_lsu_MemRead | ex_lsu_MemWrite)) begin // 非访存指令
-            l_load    <= 0;
-            l_rd_en   <= ex_lsu_RegWrite;
-            l_rd_addr <= ex_lsu_rd;
-            l_MemLen  <= ex_lsu_MemLen;
-        end 
-        // else begin
-        //     l_load    <= l_load;
-        //     l_rd_en   <= l_rd_en;
-        //     l_rd_addr <= l_rd_addr;
-        //     l_MemLen  <= l_MemLen;
-        // end
-    end
+    // 前递后的源寄存器值
+    // wire [31:0] src1 = (forward_rs1[1] ? ex_lsu_process_result : 
+    //                    (forward_rs1[0] | load_use_flag[1]) ? lsu_wb_wdata : 
+    //                    wb_ex_src1);
+    // wire [31:0] src2 = (forward_rs2[1] ? ex_lsu_process_result : 
+    //                    (forward_rs2[0] | load_use_flag[0]) ? lsu_wb_wdata : 
+    //                    wb_ex_src2);
+    wire [31:0] src1 = (forward_rs1[1])   ? ex_lsu_process_result : 
+                       (forward_rs1[0])   ? lsu_wb_wdata : 
+                       (load_use_flag[3]) ? lsu_wb_wdata : wb_ex_src1;
 
-    always @(posedge clk) begin
-        // if (rst) begin
-        //     cache_addr    <= 0;
-        //     read_pending  <= 0;
-        //     write_pending <= 0;
-        //     op_complete   <= 0;
-        //     read_lsu_data <= 0;
-        // end else begin
-            op_complete   <= 0;
-            
-            // 处理读请求：发送到缓存
-            if (ex_lsu_valid & lsu_ex_ready & (ex_lsu_MemRead | ex_lsu_MemWrite)) begin
-                cache_addr     <= addr;
-                // read_pending   <= 1;
-            end else if (valid) begin
-                // read_pending  <= 0;
-                op_complete   <= 1;
-                read_lsu_data <= extract_read_data(l_MemLen, cache_addr[1:0], rdata);
-            // `ifdef VERILATOR
-            //     counter(7, 0, 1, 0);
-            // `endif
-            end
-            
-            // // 处理写请求：发送到缓存
-            // if (ex_lsu_valid & lsu_ex_ready & ~ex_lsu_MemRead) begin
-            //     // write_pending <= 1;
-            // end else if (valid) begin
-            //     // write_pending <= 0;
-            //     op_complete   <= 1;
-            // // `ifdef VERILATOR
-            // //     counter(7, 0, 1, 0);
-            // // `endif
-            // end
-        // end
-    end
+    wire [31:0] src2 = (forward_rs2[1])   ? ex_lsu_process_result : 
+                       (forward_rs2[0])   ? lsu_wb_wdata : 
+                       (load_use_flag[2]) ? lsu_wb_wdata : wb_ex_src2;
 
-    // 写回数据选择
-    reg [31:0] rd_data;
+    // ALU 操作中间变量
+    reg [31:0] ex_num1;
+    reg [31:0] ex_num2;
+    reg [31:0] process_result;
+
+    // ALU 输入选择
     always @(*) begin
-        if (l_load) begin
-            rd_data = read_lsu_data;
-        end 
-        else if (ex_lsu_forward_las) begin
-            rd_data = data_in;
-        end 
-        else if (ex_lsu_MemWrite) begin
-            rd_data = 32'h0;
-        end 
-        else if (ex_lsu_csr & !ex_lsu_csr_ecall & !ex_lsu_csr_mret) begin
-            rd_data = ex_lsu_csr_rdata;
-        end 
+        if (id_ex_MemRead | id_ex_MemWrite) begin
+            ex_num1 = src1;
+            ex_num2 = id_ex_imm;
+        end
+        else if (id_ex_jal | id_ex_jalr) begin
+            ex_num1 = id_ex_pc;
+            ex_num2 = 32'd4;
+        end
+        else if(id_ex_opcode == `INST_LUI) begin
+            ex_num1 = id_ex_imm;
+            ex_num2 = 32'd0;
+        end
+        else if(id_ex_opcode == `INST_AUIPC) begin
+            ex_num1 = id_ex_pc;
+            ex_num2 = id_ex_imm;
+        end
+        else if(id_ex_alu_op == `ALU_SLL || id_ex_alu_op == `ALU_SRL || id_ex_alu_op == `ALU_SRA) begin
+            ex_num1 = src1;
+            ex_num2 = (id_ex_opcode[6:2] == `INST_TYPE_I && !id_ex_shamt[5]) ? {27'd0, id_ex_shamt[4:0]} :
+                      (id_ex_opcode[6:2] == `INST_TYPE_R)                    ? {27'd0, src2[4:0]}        : 32'd0;
+        end
         else begin
-            rd_data = ex_lsu_process_result;
+            ex_num1 = src1;
+            ex_num2 = (id_ex_opcode[6:2] == `INST_TYPE_R || id_ex_opcode[6:2] == `INST_TYPE_B) ? src2 : id_ex_imm;
         end
     end
 
-    // 流水线握手逻辑
-    always @(posedge clk) begin
-        if (rst) begin
-            lsu_ex_ready <= 1;
-        end 
-        else if (ex_lsu_valid & lsu_ex_ready & (ex_lsu_MemRead | ex_lsu_MemWrite)) begin
-            lsu_ex_ready <= 0;
-        end 
-        else if (lsu_wb_valid & wb_lsu_ready) begin
-            lsu_ex_ready <= 1;
-        end 
+    // ALU 操作
+    reg        alu_zero;
+    reg        alu_less;
+
+    always @(*) begin
+        case (id_ex_alu_op)
+            `ALU_ADD:  process_result = ex_num1 + ex_num2;
+            `ALU_SUB:  process_result = ex_num1 - ex_num2;
+            `ALU_AND:  process_result = ex_num1 & ex_num2;
+            `ALU_OR:   process_result = ex_num1 | ex_num2;
+            `ALU_XOR:  process_result = ex_num1 ^ ex_num2;
+            `ALU_SLTU: process_result = (ex_num1 < ex_num2) ? {31'b0, 1'b1} : 32'b0;
+            `ALU_SLT:  process_result = ($signed(ex_num1) < $signed(ex_num2)) ? {31'b0, 1'b1} : 32'b0;
+            `ALU_SRA:  process_result = $signed(ex_num1) >>> ex_num2[4:0];
+            `ALU_SLL:  process_result = ex_num1 << ex_num2[4:0];
+            `ALU_SRL:  process_result = ex_num1 >> ex_num2[4:0];
+            default:   begin process_result = 32'b0; $display("Unkonw alu_op"); end
+        endcase
+        alu_zero = (process_result == 32'b0);
+        // alu_less = (id_ex_alu_op == `ALU_SLT)  ? ($signed(ex_num1) < $signed(ex_num2)) :
+        //            (id_ex_alu_op == `ALU_SLTU) ? (ex_num1 < ex_num2) : 1'b0;
+        alu_less = process_result[0];
     end
 
-    always @(posedge clk) begin
-        if (rst) begin
-            lsu_wb_valid <= 0;
-        end 
-        else if (ex_lsu_valid & lsu_ex_ready & ~(ex_lsu_MemRead | ex_lsu_MemWrite)) begin
-            lsu_wb_valid <= 1;
-        end 
-        else if (op_complete) begin
-            lsu_wb_valid <= 1;
-        end 
-        else if (ex_lsu_valid & lsu_ex_ready & (ex_lsu_MemRead | ex_lsu_MemWrite)) begin
-            lsu_wb_valid <= 0;
-        end 
-        else if ((~(ex_lsu_valid && lsu_ex_ready)) && lsu_wb_valid) begin
-            lsu_wb_valid <= 0;
+    // 分支和跳转逻辑
+    // reg [31:0] jal_target;
+    reg [31:0] jalr_target;
+    reg        take_branch;
+    reg        ex_flush_condition;
+
+    // wire [31:0] jalr_target = (src1 + id_ex_imm) & ~32'h1;
+    // wire        take_branch = (id_ex_opcode == `INST_B) && (
+    //                     (id_ex_func3 == `F3_BNE  && !alu_zero) ||  
+    //                     (id_ex_func3 == `F3_BEQ  &&  alu_zero) ||  
+    //                     (id_ex_func3 == `F3_BLT  &&  alu_less) || 
+    //                     (id_ex_func3 == `F3_BGE  && !alu_less) ||  
+    //                     (id_ex_func3 == `F3_BLTU &&  alu_less) ||  
+    //                     (id_ex_func3 == `F3_BGEU && !alu_less));
+
+    always @(*) begin
+        // jal_target  = id_ex_pc + id_ex_imm;
+        jalr_target = (src1 + id_ex_imm) & 32'hfffffffe;
+        take_branch = (id_ex_opcode == `INST_B) && (
+                    (id_ex_func3 == `F3_BNE  && !alu_zero) ||  // bne
+                    (id_ex_func3 == `F3_BEQ  &&  alu_zero) ||  // beq
+                    (id_ex_func3 == `F3_BLT  &&  alu_less) ||  // blt
+                    (id_ex_func3 == `F3_BGE  && !alu_less) ||  // bge
+                    (id_ex_func3 == `F3_BLTU &&  alu_less) ||  // bltu
+                    (id_ex_func3 == `F3_BGEU && !alu_less)     // bgeu
+        );
+        case(1'b1)
+            // id_ex_jal: begin
+            //     // ex_flush    = 1'b1 & ex_flush_condition & (~(|load_use_flag));
+            //     // ex_flush_pc = jal_target;
+            //     ex_flush = 1'b0;
+            //     ex_flush_pc = 32'h0;
+            // end
+            id_ex_jalr: begin
+                ex_flush    = ex_flush_condition & (~|load_use_flag);
+                ex_flush_pc = jalr_target;
+            end
+            id_ex_csr_ecall : begin
+                ex_flush    = ex_flush_condition & (~|load_use_flag);
+                ex_flush_pc = wb_ex_csr_num1;
+            end
+            id_ex_csr_mret: begin
+                ex_flush    = ex_flush_condition & (~|load_use_flag);
+                ex_flush_pc = wb_ex_csr_num2;
+            end
+            take_branch: begin
+                ex_flush    = ex_flush_condition & (~|load_use_flag);
+                ex_flush_pc = id_ex_pc + id_ex_imm;   
+            end
+            default: begin
+                ex_flush    = 1'b0; // 非分支指令不需要冲刷
+                ex_flush_pc = 32'h0;
+            end
+        endcase
+    end
+    
+    always @(posedge clk)begin
+        if(reset)begin
+            ex_flush_condition <= 1'b1;
+        end
+        else if(ex_flush)begin
+            ex_flush_condition <= 1'b0;
+        end
+        else if(id_valid)begin
+            ex_flush_condition <= 1'b1;
         end
     end
 
-    // 输出到 WB 阶段
+    // reg [31:0] csr_write_ecall;
+    // always @(*) begin
+    //     if (id_ex_csr_ecall) begin
+    //         csr_write_ecall = id_ex_pc;
+    //     end
+    //     else begin
+    //         csr_write_ecall = 32'b0;
+    //     end
+    // end
+
+    wire [31:0] mstatus;
+    wire [31:0] mpie;
+    assign mpie = (wb_ex_csr_num1 >> 7) & 32'h1;
+    assign mstatus = (((wb_ex_csr_num1 & ~(32'h3 << 11)) & ~(32'h1 << 3)) | (mpie << 3)) | (32'h1 << 7);
+
+    reg [31:0] csr_write_data;
+    always @(*) begin
+        case(1'b1)
+            (id_ex_csr_op == `CSR_CSRRW && id_ex_func3 == `F3_CSRRW): csr_write_data = src1;
+            (id_ex_csr_op == `CSR_CSRRC && id_ex_func3 == `F3_CSRRC): csr_write_data = (wb_ex_csr_num1 & ~src1);
+            (id_ex_csr_op == `CSR_CSRRS && id_ex_func3 == `F3_CSRRS): csr_write_data = (wb_ex_csr_num1 | src1);
+            (id_ex_csr_op == `CSR_CSRRW && id_ex_func3 == `F3_CSRRWI):csr_write_data = {27'b0,id_ex_zimm};
+            (id_ex_csr_op == `CSR_CSRRC && id_ex_func3 == `F3_CSRRCI):csr_write_data = wb_ex_csr_num1 & ~({27'b0,id_ex_zimm});
+            (id_ex_csr_op == `CSR_CSRRS && id_ex_func3 == `F3_CSRRSI):csr_write_data = wb_ex_csr_num1 | ({27'b0,id_ex_zimm});
+            (id_ex_csr_ecall):                                        csr_write_data = 32'd11;
+            (id_ex_csr_mret):                                         csr_write_data = mstatus;
+            default:                                                  csr_write_data = 32'b0;
+        endcase
+    end
+
+    // wire [31:0] csr_write_data = (id_ex_csr_op == `CSR_CSRRW && id_ex_func3 == `F3_CSRRW) ? src1                                   :
+    //                              (id_ex_csr_op == `CSR_CSRRC && id_ex_func3 == `F3_CSRRC) ? (wb_ex_csr_num1 & ~src1)               :
+    //                              (id_ex_csr_op == `CSR_CSRRS && id_ex_func3 == `F3_CSRRS) ? (wb_ex_csr_num1 | src1)                :
+    //                              (id_ex_csr_op == `CSR_CSRRW && id_ex_func3 == `F3_CSRRWI)? {27'b0,id_ex_zimm}                     :
+    //                              (id_ex_csr_op == `CSR_CSRRC && id_ex_func3 == `F3_CSRRCI)? wb_ex_csr_num1 & ~({27'b0,id_ex_zimm}) :
+    //                              (id_ex_csr_op == `CSR_CSRRS && id_ex_func3 == `F3_CSRRSI)? wb_ex_csr_num1 | ({27'b0,id_ex_zimm})  :
+    //                              (                                        id_ex_csr_ecall)? 32'd11                                 :
+    //                              (                                         id_ex_csr_mret)? mstatus                                :
+    //                                                                                         32'b0;
+
+    // 前递信号定义
+    wire [1:0] forward_rs1;
+    wire [1:0] forward_rs2;
+    wire       forward_las;
+    wire [3:0] load_use_flag;
+
+    assign forward_rs1[1] = ex_lsu_RegWrite & (|ex_lsu_rd) & (ex_lsu_rd == id_wb_rs1) & ex_lsu_valid;
+    assign forward_rs1[0] = lsu_wb_RegWrite & (|lsu_wb_rd) & (lsu_wb_rd == id_wb_rs1) & lsu_wb_valid;
+    assign forward_rs2[1] = ex_lsu_RegWrite & (|ex_lsu_rd) & (ex_lsu_rd == id_wb_rs2) & ex_lsu_valid;
+    assign forward_rs2[0] = lsu_wb_RegWrite & (|lsu_wb_rd) & (lsu_wb_rd == id_wb_rs2) & lsu_wb_valid;
+
+    assign forward_las = id_ex_MemWrite & ex_lsu_MemRead & ex_lsu_RegWrite & ex_lsu_valid &
+                         (|ex_lsu_rd) & (ex_lsu_rd != id_wb_rs1) & (ex_lsu_rd == id_wb_rs2);
+
+    assign load_use_flag[3] = lsu_ex_forward_MemRead & lsu_ex_forward_RegWrite & (|lsu_ex_forward_rd) & (lsu_ex_forward_rd == id_wb_rs1);
+    assign load_use_flag[2] = lsu_ex_forward_MemRead & lsu_ex_forward_RegWrite & (|lsu_ex_forward_rd) & (lsu_ex_forward_rd == id_wb_rs2);
+    assign load_use_flag[1] = ex_lsu_MemRead & ex_lsu_RegWrite & (|ex_lsu_rd) & (ex_lsu_rd == id_wb_rs1) & ex_lsu_valid;
+    assign load_use_flag[0] = ex_lsu_MemRead & ex_lsu_RegWrite & ex_lsu_valid & (|ex_lsu_rd) & (ex_lsu_rd == id_wb_rs2);
+
+    // 流水线控制
+    always @(*) begin
+        ex_ready = (lsu_ready || ~ex_lsu_valid) && (load_use_flag == 4'b0);
+    end
+
     always @(posedge clk) begin
-        if (rst) begin
-            lsu_wb_RegWrite      <= 0;
-            lsu_wb_rd            <= 0;
-            lsu_wb_write_rd_data <= 0;
-            lsu_wb_csr_wen1      <= 0;
-            lsu_wb_csr_wen2      <= 0;
-            lsu_wb_csr_wr_addr1  <= 0;
-            lsu_wb_csr_wr_addr2  <= 0;
-            lsu_wb_csr_wr_data1  <= 0;
-            lsu_wb_csr_wr_data2  <= 0;
-        end else if (op_complete) begin
-            lsu_wb_RegWrite      <= l_rd_en;
-            lsu_wb_rd            <= l_rd_addr;
-            lsu_wb_csr_wen1      <= ex_lsu_csr_wen1;
-            lsu_wb_csr_wen2      <= ex_lsu_csr_wen2;
-            lsu_wb_csr_wr_addr1  <= ex_lsu_csr_wr_addr1;
-            lsu_wb_csr_wr_addr2  <= ex_lsu_csr_wr_addr2;
-            lsu_wb_csr_wr_data1  <= ex_lsu_csr_wr_data1;
-            lsu_wb_csr_wr_data2  <= ex_lsu_csr_wr_data2;
-            lsu_wb_write_rd_data <= rd_data;
-        end else if (ex_lsu_valid & lsu_ex_ready & ~(ex_lsu_MemRead | ex_lsu_MemWrite)) begin
-            lsu_wb_RegWrite      <= ex_lsu_RegWrite; // 非内存访问指令
-            lsu_wb_rd            <= ex_lsu_rd;
-            lsu_wb_csr_wen1      <= ex_lsu_csr_wen1;
-            lsu_wb_csr_wen2      <= ex_lsu_csr_wen2;
-            lsu_wb_csr_wr_addr1  <= ex_lsu_csr_wr_addr1;
-            lsu_wb_csr_wr_addr2  <= ex_lsu_csr_wr_addr2;
-            lsu_wb_csr_wr_data1  <= ex_lsu_csr_wr_data1;
-            lsu_wb_csr_wr_data2  <= ex_lsu_csr_wr_data2;
-            lsu_wb_write_rd_data <= rd_data;
+        if (reset) begin
+            ex_lsu_valid <= 1'b0;
+        end
+        else if ((id_valid && ex_ready) && (lsu_ready || ~ex_lsu_valid)) begin
+            ex_lsu_valid <= 1'b1;
+        // `ifdef VERILATOR
+        //     counter(7, 0, 0, 1);
+        // `endif
+        end
+        else if (~(id_valid && ex_ready) && lsu_ready) begin
+            ex_lsu_valid <= 1'b0;
         end
     end
 
-
+    // 输出信号赋值
+    always @(posedge clk) begin
+        if (reset) begin
+            ex_lsu_inst           <= 32'h0;
+            // ex_lsu_pc             <= 32'h0;
+            ex_lsu_src2           <= 32'h0;
+            ex_lsu_RegWrite       <= 1'b0;
+            ex_lsu_rd             <= 4'b0;
+            ex_lsu_MemRead        <= 1'b0;
+            ex_lsu_MemWrite       <= 1'b0;
+            ex_lsu_MemLen         <= 5'b0;
+            ex_lsu_process_result <= 32'h0;
+            ex_lsu_forward_las    <= 1'b0;
+            ex_lsu_csr            <= 1'b0;
+            ex_lsu_csr_wen1       <= 1'b0;
+            ex_lsu_csr_wen2       <= 1'b0;
+            ex_lsu_csr_wr_addr1   <= 12'b0;
+            ex_lsu_csr_wr_addr2   <= 12'b0;
+            ex_lsu_csr_wr_data1   <= 32'h0;
+            ex_lsu_csr_wr_data2   <= 32'h0;
+            ex_lsu_csr_rdata      <= 32'h0;
+            ex_lsu_csr_ecall      <= 1'b0;
+            ex_lsu_csr_mret       <= 1'b0;
+        end
+        else if (id_valid && ex_ready) begin
+            ex_lsu_inst           <= id_ex_inst;
+            // ex_lsu_pc             <= id_ex_pc;
+            ex_lsu_src2           <= src2;
+            ex_lsu_RegWrite       <= id_ex_RegWrite;
+            ex_lsu_rd             <= id_ex_rd;
+            ex_lsu_MemRead        <= id_ex_MemRead;
+            ex_lsu_MemWrite       <= id_ex_MemWrite;
+            ex_lsu_MemLen         <= id_ex_MemLen;
+            ex_lsu_process_result <= process_result;
+            ex_lsu_forward_las    <= forward_las;
+            // ex_lsu_csr            <= id_ex_csr;
+            // ex_lsu_csr            <= (id_ex_opcode == `INST_CSR);
+            ex_lsu_csr            <= (id_ex_csr_wen1 | id_ex_csr_wen2 | id_ex_csr_ecall | id_ex_csr_mret);
+            ex_lsu_csr_wen1       <= id_ex_csr_wen1;
+            ex_lsu_csr_wen2       <= id_ex_csr_wen2;
+            ex_lsu_csr_wr_addr1   <= id_ex_csr_wr_addr1;
+            ex_lsu_csr_wr_addr2   <= id_ex_csr_wr_addr2;
+            ex_lsu_csr_wr_data1   <= csr_write_data;
+            // ex_lsu_csr_wr_data2   <= csr_write_ecall;
+            ex_lsu_csr_wr_data2   <= (id_ex_csr_ecall) ? id_ex_pc : 32'b0;
+            ex_lsu_csr_rdata      <= wb_ex_csr_num1;
+            ex_lsu_csr_ecall      <= id_ex_csr_ecall;
+            ex_lsu_csr_mret       <= id_ex_csr_mret;
+        end
+        else begin
+            ex_lsu_inst           <= ex_lsu_inst;
+            // ex_lsu_pc             <= ex_lsu_pc;
+            ex_lsu_src2           <= ex_lsu_src2;
+            ex_lsu_RegWrite       <= ex_lsu_RegWrite;
+            ex_lsu_rd             <= ex_lsu_rd;
+            ex_lsu_MemRead        <= ex_lsu_MemRead;
+            ex_lsu_MemWrite       <= ex_lsu_MemWrite;
+            ex_lsu_MemLen         <= ex_lsu_MemLen;
+            ex_lsu_process_result <= ex_lsu_process_result;
+            ex_lsu_forward_las    <= ex_lsu_forward_las;
+            ex_lsu_csr            <= ex_lsu_csr;
+            ex_lsu_csr_wen1       <= ex_lsu_csr_wen1;
+            ex_lsu_csr_wen2       <= ex_lsu_csr_wen2;
+            ex_lsu_csr_wr_addr1   <= ex_lsu_csr_wr_addr1;
+            ex_lsu_csr_wr_addr2   <= ex_lsu_csr_wr_addr2;
+            ex_lsu_csr_wr_data1   <= ex_lsu_csr_wr_data1;
+            ex_lsu_csr_wr_data2   <= ex_lsu_csr_wr_data2;
+            ex_lsu_csr_rdata      <= ex_lsu_csr_rdata;
+            ex_lsu_csr_ecall      <= ex_lsu_csr_ecall;
+            ex_lsu_csr_mret       <= ex_lsu_csr_mret;
+        end
+    end
 endmodule
