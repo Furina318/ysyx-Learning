@@ -94,24 +94,24 @@ module AXI_ARB_BURST #(
     input wire        clint_rvalid,   
     output reg        clint_rready,
     input wire        clint_rlast,
-    input wire [ 3:0] clint_rid,
+    input wire [ 3:0] clint_rid
 
-    output reg [31:0] clint_awaddr,  
-    output reg        clint_awvalid, 
-    input wire        clint_awready, 
-    output reg [ 3:0] clint_awid,    
-    output reg [ 7:0] clint_awlen,   
-    output reg [ 2:0] clint_awsize,  
-    output reg [ 1:0] clint_awburst, 
-    output reg [31:0] clint_wdata,   
-    output reg [ 3:0] clint_wstrb,   
-    output reg        clint_wvalid,  
-    input wire        clint_wready,  
-    output reg        clint_wlast,   
-    input wire [ 1:0] clint_bresp,   
-    input wire        clint_bvalid,  
-    output reg        clint_bready,
-    output reg [ 3:0] clint_bid   
+    // output reg [31:0] clint_awaddr,  
+    // output reg        clint_awvalid, 
+    // input wire        clint_awready, 
+    // output reg [ 3:0] clint_awid,    
+    // output reg [ 7:0] clint_awlen,   
+    // output reg [ 2:0] clint_awsize,  
+    // output reg [ 1:0] clint_awburst, 
+    // output reg [31:0] clint_wdata,   
+    // output reg [ 3:0] clint_wstrb,   
+    // output reg        clint_wvalid,  
+    // input wire        clint_wready,  
+    // output reg        clint_wlast,   
+    // input wire [ 1:0] clint_bresp,   
+    // input wire        clint_bvalid,  
+    // output reg        clint_bready,
+    // output reg [ 3:0] clint_bid   
 );
 
     // 状态机定义
@@ -314,12 +314,12 @@ module AXI_ARB_BURST #(
         io_master_awburst = 2'h0;
         lsu_awready       = 1'b0;
 
-        clint_awaddr      = 32'h0;
-        clint_awvalid     = 1'b0;
-        clint_awid        = 4'h0;
-        clint_awlen       = 8'h0;
-        clint_awsize      = 3'h0;
-        clint_awburst     = 2'h0;
+        // clint_awaddr      = 32'h0;
+        // clint_awvalid     = 1'b0;
+        // clint_awid        = 4'h0;
+        // clint_awlen       = 8'h0;
+        // clint_awsize      = 3'h0;
+        // clint_awburst     = 2'h0;
         if(!reset) begin
             case (current_master)
                 LSU_WRITE: begin
@@ -351,10 +351,10 @@ module AXI_ARB_BURST #(
         io_master_wvalid = 1'b0;
         io_master_wlast  = 1'b0;
         lsu_wready       = 1'b0;
-        clint_wdata      = 32'h0;
-        clint_wstrb      = 4'b0;
-        clint_wvalid     = 1'b0;
-        clint_wlast      = 1'b0;
+        // clint_wdata      = 32'h0;
+        // clint_wstrb      = 4'b0;
+        // clint_wvalid     = 1'b0;
+        // clint_wlast      = 1'b0;
         if(!reset) begin
             case (current_master)
                 LSU_WRITE: begin
@@ -394,7 +394,7 @@ module AXI_ARB_BURST #(
                 IFU: begin
                     case (decode_address(ifu_araddr))
                         CLINT: begin 
-                             ifu_rdata        = clint_rdata;
+                            ifu_rdata        = clint_rdata;
                             ifu_rvalid       = clint_rvalid;
                             ifu_rresp        = clint_rresp;
                             ifu_rlast        = clint_rlast;
@@ -403,7 +403,7 @@ module AXI_ARB_BURST #(
                             io_master_rready = 1'b0;
                         end
                         default: begin
-                           ifu_rdata        = io_master_rdata;
+                            ifu_rdata        = io_master_rdata;
                             ifu_rvalid       = io_master_rvalid;
                             ifu_rresp        = io_master_rresp;
                             ifu_rlast        = io_master_rlast;
@@ -416,7 +416,7 @@ module AXI_ARB_BURST #(
                 LSU_READ: begin
                     case (decode_address(lsu_araddr))
                         CLINT: begin 
-                          lsu_rdata        = clint_rdata;
+                            lsu_rdata        = clint_rdata;
                             lsu_rvalid       = clint_rvalid;
                             lsu_rresp        = clint_rresp;
                             lsu_rlast        = clint_rlast;
@@ -425,7 +425,7 @@ module AXI_ARB_BURST #(
                             io_master_rready = 1'b0;
                         end
                         default: begin
-                             lsu_rdata        = io_master_rdata;
+                            lsu_rdata        = io_master_rdata;
                             lsu_rvalid       = io_master_rvalid;
                             lsu_rresp        = io_master_rresp;
                             lsu_rlast        = io_master_rlast;
@@ -459,8 +459,8 @@ module AXI_ARB_BURST #(
         lsu_bresp        = OKAY;
         lsu_bvalid       = 1'b0;
         lsu_bid          = 4'h0;
-        clint_bready     = 1'b0;
-        clint_bid        = 4'h0;
+        // clint_bready     = 1'b0;
+        // clint_bid        = 4'h0;
         if(!reset) begin
             case (current_master)
                 LSU_WRITE: begin
