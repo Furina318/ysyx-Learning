@@ -32,7 +32,7 @@ module ID (
     output reg        id_ex_jal,              // JAL跳转信号
     output reg        id_ex_jalr,             // JALR跳转信号
 
-    output reg        id_ex_csr,              // CSR指令信号
+    // output reg        id_ex_csr,              // CSR指令信号
     output reg        id_ex_csr_wen1,         // CSR写使能1
     output reg        id_ex_csr_wen2,         // CSR写使能2
     output reg        id_ex_csr_ecall,        // ECALL信号
@@ -48,15 +48,15 @@ module ID (
     // import "DPI-C" function void counter(input int inst_type, input int ifu_inc, input int lsu_inc, input int exu_inc);
 `endif
     // 指令字段提取
-    wire [6:0] opcode = if_id_inst[6:0];
+    wire [6:0] opcode = if_id_inst[ 6: 0];
     wire [3:0] rs1    = if_id_inst[18:15];
     wire [3:0] rs2    = if_id_inst[23:20];
-    wire [3:0] rd     = if_id_inst[10:7];
+    wire [3:0] rd     = if_id_inst[10: 7];
     wire [2:0] func3  = if_id_inst[14:12];
     wire [6:0] func7  = if_id_inst[31:25];
     wire [5:0] shamt  = if_id_inst[25:20];
     wire [4:0] zimm   = if_id_inst[19:15];
-    wire [4:0] get_opcode = opcode[6:2];
+    wire [4:0] get_opcode = opcode[ 6: 2];
 
     // 立即数生成
     wire [31:0] immI   = {{20{if_id_inst[31]}}, if_id_inst[31:20]};
@@ -96,7 +96,7 @@ module ID (
             id_ex_MemRead   <= 1'b0;
             id_ex_jal       <= 1'b0;
             id_ex_jalr      <= 1'b0;
-            id_ex_csr       <= 1'b0;
+            // id_ex_csr       <= 1'b0;
             id_ex_csr_wen1  <= 1'b0;
             id_ex_csr_wen2  <= 1'b0;
             id_ex_csr_ecall <= 1'b0;
@@ -143,7 +143,7 @@ module ID (
             id_ex_alu_op    <= `ALU_ADD;
             id_ex_MemLen    <= `Mem_Word;
             id_ex_csr_op    <= `CSR_NONE;
-            id_ex_csr       <= 1'b0;
+            // id_ex_csr       <= 1'b0;
             id_ex_csr_wen1  <= 1'b0;
             id_ex_csr_wen2  <= 1'b0;
             id_ex_csr_ecall <= 1'b0;
@@ -261,7 +261,7 @@ module ID (
                 end
                 `INST_TYPE_E: begin
                     if (opcode == `INST_CSR) begin
-                        id_ex_csr      <= 1'b1;
+                        // id_ex_csr      <= 1'b1;
                         id_ex_csr_wen1 <= 1'b1;
                         case (func3)
                             `F3_CSRRW: begin

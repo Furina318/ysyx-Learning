@@ -71,7 +71,7 @@ module dCache #(
 
     // 地址划分 - 直接映射结构
     localparam AXI_ID             = 4'b1;
-     localparam BLOCK_OFFSET_WIDTH = $clog2(BLOCK_SIZE);       // 偏移宽度：4位（16字节块）
+    localparam BLOCK_OFFSET_WIDTH = $clog2(BLOCK_SIZE);       // 偏移宽度：4位（16字节块）
     wire [BLOCK_OFFSET_WIDTH-1:0] req_offset  = addr[BLOCK_OFFSET_WIDTH - 1 : 0];  // 块内偏移（0-15）
     wire [                   1:0] word_offset = req_offset[3:2]; 
 

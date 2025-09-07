@@ -63,10 +63,11 @@ always @(posedge clk) begin
 end
 
 always @(posedge clk) begin
-    if (rst) begin
-        wb_valid <= 1'b0;
-    end
-    else if (lsu_wb_valid && wb_lsu_ready) begin
+    // if (rst) begin
+    //     wb_valid <= 1'b0;
+    // end
+    // else 
+    if (lsu_wb_valid && wb_lsu_ready) begin
         wb_valid <= 1'b1;
     end
     else begin
@@ -77,14 +78,6 @@ end
 assign src1 = (rs1 == 4'b0) ? 32'b0 : regs[rs1];
 assign src2 = (rs2 == 4'b0) ? 32'b0 : regs[rs2];
 
-initial begin
-    mstatus = 32'h1800;
-    mtvec   = 32'h0;
-    mepc    = 32'h0;
-    mcause  = 32'h0;
-    // mvendorid <= 32'h79737978;
-    // marchid   <= 32'h17d9f6e;
-end
 always @(posedge clk) begin
     if (rst) begin
         // mvendorid <= 32'h79737978;

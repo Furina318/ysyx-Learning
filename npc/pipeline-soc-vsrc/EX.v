@@ -42,7 +42,7 @@ module EX (
     input      [31:0] wb_ex_csr_num1,
     input      [31:0] wb_ex_csr_num2,
      
-    input             id_ex_csr,
+    // input             id_ex_csr,
     input             id_ex_csr_wen1,
     input             id_ex_csr_wen2,
     input      [11:0] id_ex_csr_wr_addr1,
@@ -55,7 +55,7 @@ module EX (
     output reg [31:0] ex_flush_pc,
 
     output reg [31:0] ex_lsu_inst,
-    output reg [31:0] ex_lsu_pc,
+    // output reg [31:0] ex_lsu_pc,
     output reg [31:0] ex_lsu_src2,
     output reg        ex_lsu_RegWrite,
     output reg [ 3:0] ex_lsu_rd,
@@ -99,15 +99,13 @@ module EX (
     // wire [31:0] src2 = (forward_rs2[1] ? ex_lsu_process_result : 
     //                    (forward_rs2[0] | load_use_flag[0]) ? lsu_wb_wdata : 
     //                    wb_ex_src2);
-    wire [31:0] src1 = (forward_rs1[1]) ? ex_lsu_process_result : 
-                    (forward_rs1[0]) ? lsu_wb_wdata : 
-                    (load_use_flag[3]) ? lsu_wb_wdata : 
-                    wb_ex_src1;
+    wire [31:0] src1 = (forward_rs1[1])   ? ex_lsu_process_result : 
+                       (forward_rs1[0])   ? lsu_wb_wdata : 
+                       (load_use_flag[3]) ? lsu_wb_wdata : wb_ex_src1;
 
-    wire [31:0] src2 = (forward_rs2[1]) ? ex_lsu_process_result : 
-                    (forward_rs2[0]) ? lsu_wb_wdata : 
-                    (load_use_flag[2]) ? lsu_wb_wdata : 
-                    wb_ex_src2;
+    wire [31:0] src2 = (forward_rs2[1])   ? ex_lsu_process_result : 
+                       (forward_rs2[0])   ? lsu_wb_wdata : 
+                       (load_use_flag[2]) ? lsu_wb_wdata : wb_ex_src2;
 
     // ALU 操作中间变量
     reg [31:0] ex_num1;
@@ -126,7 +124,7 @@ module EX (
         end
         else if(id_ex_opcode == `INST_LUI) begin
             ex_num1 = id_ex_imm;
-            ex_num2 = 32'b0;
+            ex_num2 = 32'd0;
         end
         else if(id_ex_opcode == `INST_AUIPC) begin
             ex_num1 = id_ex_pc;
@@ -134,8 +132,8 @@ module EX (
         end
         else if(id_ex_alu_op == `ALU_SLL || id_ex_alu_op == `ALU_SRL || id_ex_alu_op == `ALU_SRA) begin
             ex_num1 = src1;
-            ex_num2 = (id_ex_opcode[6:2] == `INST_TYPE_I && !id_ex_shamt[5]) ? {27'b0, id_ex_shamt[4:0]} :
-                        (id_ex_opcode[6:2] == `INST_TYPE_R) ? {27'b0, src2[4:0]} : 32'b0;
+            ex_num2 = (id_ex_opcode[6:2] == `INST_TYPE_I && !id_ex_shamt[5]) ? {27'd0, id_ex_shamt[4:0]} :
+                      (id_ex_opcode[6:2] == `INST_TYPE_R)                    ? {27'd0, src2[4:0]}        : 32'd0;
         end
         else begin
             ex_num1 = src1;
@@ -162,8 +160,9 @@ module EX (
             default:   begin process_result = 32'b0; $display("Unkonw alu_op"); end
         endcase
         alu_zero = (process_result == 32'b0);
-        alu_less = (id_ex_alu_op == `ALU_SLT) ? ($signed(ex_num1) < $signed(ex_num2)) :
-                (id_ex_alu_op == `ALU_SLTU) ? (ex_num1 < ex_num2) : 1'b0;
+        // alu_less = (id_ex_alu_op == `ALU_SLT)  ? ($signed(ex_num1) < $signed(ex_num2)) :
+        //            (id_ex_alu_op == `ALU_SLTU) ? (ex_num1 < ex_num2) : 1'b0;
+        alu_less = process_result[0];
     end
 
     // 分支和跳转逻辑
@@ -172,16 +171,25 @@ module EX (
     reg        take_branch;
     reg        ex_flush_condition;
 
+    // wire [31:0] jalr_target = (src1 + id_ex_imm) & ~32'h1;
+    // wire        take_branch = (id_ex_opcode == `INST_B) && (
+    //                     (id_ex_func3 == `F3_BNE  && !alu_zero) ||  
+    //                     (id_ex_func3 == `F3_BEQ  &&  alu_zero) ||  
+    //                     (id_ex_func3 == `F3_BLT  &&  alu_less) || 
+    //                     (id_ex_func3 == `F3_BGE  && !alu_less) ||  
+    //                     (id_ex_func3 == `F3_BLTU &&  alu_less) ||  
+    //                     (id_ex_func3 == `F3_BGEU && !alu_less));
+
     always @(*) begin
         // jal_target  = id_ex_pc + id_ex_imm;
-        jalr_target = (src1 + id_ex_imm) & ~32'h1;
+        jalr_target = (src1 + id_ex_imm) & 32'hfffffffe;
         take_branch = (id_ex_opcode == `INST_B) && (
-                    (id_ex_func3 == `F3_BNE && !alu_zero) ||  // bne
-                    (id_ex_func3 == `F3_BEQ && alu_zero)  ||  // beq
-                    (id_ex_func3 == `F3_BLT && alu_less)  ||  // blt
-                    (id_ex_func3 == `F3_BGE && !alu_less) ||  // bge
-                    (id_ex_func3 == `F3_BLTU && alu_less) ||  // bltu
-                    (id_ex_func3 == `F3_BGEU && !alu_less)    // bgeu
+                    (id_ex_func3 == `F3_BNE  && !alu_zero) ||  // bne
+                    (id_ex_func3 == `F3_BEQ  &&  alu_zero) ||  // beq
+                    (id_ex_func3 == `F3_BLT  &&  alu_less) ||  // blt
+                    (id_ex_func3 == `F3_BGE  && !alu_less) ||  // bge
+                    (id_ex_func3 == `F3_BLTU &&  alu_less) ||  // bltu
+                    (id_ex_func3 == `F3_BGEU && !alu_less)     // bgeu
         );
         case(1'b1)
             // id_ex_jal: begin
@@ -191,19 +199,19 @@ module EX (
             //     ex_flush_pc = 32'h0;
             // end
             id_ex_jalr: begin
-                ex_flush    = 1'b1 & ex_flush_condition & (~(|load_use_flag));
+                ex_flush    = ex_flush_condition & (~|load_use_flag);
                 ex_flush_pc = jalr_target;
             end
             id_ex_csr_ecall : begin
-                ex_flush    = 1'b1 & ex_flush_condition & (~(|load_use_flag));
+                ex_flush    = ex_flush_condition & (~|load_use_flag);
                 ex_flush_pc = wb_ex_csr_num1;
             end
             id_ex_csr_mret: begin
-                ex_flush    = 1'b1 & ex_flush_condition & (~(|load_use_flag));
+                ex_flush    = ex_flush_condition & (~|load_use_flag);
                 ex_flush_pc = wb_ex_csr_num2;
             end
             take_branch: begin
-                ex_flush    = 1'b1 & ex_flush_condition & (~(|load_use_flag));
+                ex_flush    = ex_flush_condition & (~|load_use_flag);
                 ex_flush_pc = id_ex_pc + id_ex_imm;   
             end
             default: begin
@@ -308,7 +316,7 @@ module EX (
     always @(posedge clk) begin
         if (reset) begin
             ex_lsu_inst           <= 32'h0;
-            ex_lsu_pc             <= 32'h0;
+            // ex_lsu_pc             <= 32'h0;
             ex_lsu_src2           <= 32'h0;
             ex_lsu_RegWrite       <= 1'b0;
             ex_lsu_rd             <= 4'b0;
@@ -330,7 +338,7 @@ module EX (
         end
         else if (id_valid && ex_ready) begin
             ex_lsu_inst           <= id_ex_inst;
-            ex_lsu_pc             <= id_ex_pc;
+            // ex_lsu_pc             <= id_ex_pc;
             ex_lsu_src2           <= src2;
             ex_lsu_RegWrite       <= id_ex_RegWrite;
             ex_lsu_rd             <= id_ex_rd;
@@ -339,7 +347,9 @@ module EX (
             ex_lsu_MemLen         <= id_ex_MemLen;
             ex_lsu_process_result <= process_result;
             ex_lsu_forward_las    <= forward_las;
-            ex_lsu_csr            <= id_ex_csr;
+            // ex_lsu_csr            <= id_ex_csr;
+            // ex_lsu_csr            <= (id_ex_opcode == `INST_CSR);
+            ex_lsu_csr            <= (id_ex_csr_wen1 | id_ex_csr_wen2 | id_ex_csr_ecall | id_ex_csr_mret);
             ex_lsu_csr_wen1       <= id_ex_csr_wen1;
             ex_lsu_csr_wen2       <= id_ex_csr_wen2;
             ex_lsu_csr_wr_addr1   <= id_ex_csr_wr_addr1;
@@ -353,7 +363,7 @@ module EX (
         end
         else begin
             ex_lsu_inst           <= ex_lsu_inst;
-            ex_lsu_pc             <= ex_lsu_pc;
+            // ex_lsu_pc             <= ex_lsu_pc;
             ex_lsu_src2           <= ex_lsu_src2;
             ex_lsu_RegWrite       <= ex_lsu_RegWrite;
             ex_lsu_rd             <= ex_lsu_rd;

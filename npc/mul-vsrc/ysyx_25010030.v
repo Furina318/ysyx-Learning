@@ -24,7 +24,7 @@
 /*********************************************************************/
 
 `include "/home/furina/ysyx-workbench/npc/mul-vsrc/defines.v"
-module rv32e (
+module ysyx_25010030 (
     input         clock,
     input         reset,
     input         io_interrupt

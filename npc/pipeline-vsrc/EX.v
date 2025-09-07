@@ -459,6 +459,7 @@ module EX (
         end
         else if(id_valid && ex_ready) begin
             ex_lsu_csr            <= id_ex_csr;
+            // ex_lsu_csr            <= (id_ex_csr_wen1 | id_ex_csr_wen2 | id_ex_csr_ecall | id_ex_csr_mret);
             ex_lsu_csr_wen1       <= id_ex_csr_wen1;
             ex_lsu_csr_wen2       <= id_ex_csr_wen2;
             ex_lsu_csr_wr_addr1   <= id_ex_csr_wr_addr1;
