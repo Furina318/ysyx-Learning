@@ -16,7 +16,7 @@ module WB (
 
     // 写回数据选择
     assign wb_data = (opcode == `INST_LUI) ? imm :                   // LUI
-                     (opcode == `INST_AUIPC) ? (pc + imm) :          // AUIPC
+                     // (opcode == `INST_AUIPC) ? (pc + imm) :          // AUIPC
                      (opcode == `INST_JALR) ? (pc + 4) :
                      (opcode == `INST_LW) ? data_out :              // LW
                      (opcode == `INST_R || opcode == `INST_I) ? alu_result : 32'b0; // R-type, I-type
