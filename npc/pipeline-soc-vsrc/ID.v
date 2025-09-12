@@ -1,4 +1,4 @@
-`include "/home/furina/ysyx-workbench/npc/pipeline-soc-vsrc/defines/defines.v"
+`include "../pipeline-soc-vsrc/defines/defines.v"
 module ID (
     input             clk,                    // 时钟信号
     input             reset,                  // 复位信号
@@ -13,7 +13,7 @@ module ID (
     output reg        id_valid,               // ID到EXU的有效信号
 
     output reg [31:0] id_ex_pc,               // 传递到EXU的PC值
-    output reg [31:0] id_ex_inst,             // 传递到EXU的指令
+    // output reg [31:0] id_ex_inst,             // 传递到EXU的指令
     output reg        id_ex_RegWrite,         // 寄存器写使能
     output reg [ 3:0] id_ex_rd,               // 寄存器写地址
     output reg [ 3:0] id_wb_rs1,              // 源寄存器1地址
@@ -34,13 +34,13 @@ module ID (
 
     // output reg        id_ex_csr,              // CSR指令信号
     output reg        id_ex_csr_wen1,         // CSR写使能1
-    output reg        id_ex_csr_wen2,         // CSR写使能2
+    // output reg        id_ex_csr_wen2,         // CSR写使能2
     output reg        id_ex_csr_ecall,        // ECALL信号
     output reg        id_ex_csr_mret,         // MRET信号
     output reg [ 1:0] id_ex_csr_op,
 
     output reg [11:0] id_ex_csr_wr_addr1,     // CSR写地址1
-    output reg [11:0] id_ex_csr_wr_addr2,     // CSR写地址2
+    // output reg [11:0] id_ex_csr_wr_addr2,     // CSR写地址2
     output reg [11:0] id_wb_csr_addr1,        // CSR读地址1
     output reg [11:0] id_wb_csr_addr2         // CSR读地址2
 );
@@ -88,45 +88,46 @@ module ID (
 
     // 译码逻辑和输出信号赋值
     always @(posedge clk) begin
-        if (reset) begin
+        // if (reset) begin
             // inst_type <= 7;
 
-            id_ex_RegWrite  <= 1'b0;
-            id_ex_MemWrite  <= 1'b0;
-            id_ex_MemRead   <= 1'b0;
-            id_ex_jal       <= 1'b0;
-            id_ex_jalr      <= 1'b0;
-            // id_ex_csr       <= 1'b0;
-            id_ex_csr_wen1  <= 1'b0;
-            id_ex_csr_wen2  <= 1'b0;
-            id_ex_csr_ecall <= 1'b0;
-            id_ex_csr_mret  <= 1'b0;
+            // id_ex_RegWrite  <= 1'b0;
+            // id_ex_MemWrite  <= 1'b0;
+            // id_ex_MemRead   <= 1'b0;
+            // id_ex_jal       <= 1'b0;
+            // id_ex_jalr      <= 1'b0;
+            // // id_ex_csr       <= 1'b0;
+            // id_ex_csr_wen1  <= 1'b0;
+            // id_ex_csr_wen2  <= 1'b0;
+            // id_ex_csr_ecall <= 1'b0;
+            // id_ex_csr_mret  <= 1'b0;
             
-            id_ex_rd    <= 4'b0;
-            id_wb_rs1   <= 4'b0;
-            id_wb_rs2   <= 4'b0;
-            id_ex_zimm  <= 5'b0;
-            id_ex_imm   <= 32'b0;
-            id_ex_shamt <= 6'b0;
+            // id_ex_rd    <= 4'b0;
+            // id_wb_rs1   <= 4'b0;
+            // id_wb_rs2   <= 4'b0;
+            // id_ex_zimm  <= 5'b0;
+            // id_ex_imm   <= 32'b0;
+            // id_ex_shamt <= 6'b0;
             
-            id_ex_pc   <= 32'b0;
-            id_ex_inst <= 32'b0;
+            // id_ex_pc   <= 32'b0;
+            // id_ex_inst <= 32'b0;
             
-            id_ex_alu_op <= 4'b0;
-            id_ex_MemLen <= 5'b0;
-            id_ex_opcode <= 7'b0;
-            id_ex_func3  <= 3'b0;
-            id_ex_csr_op <= 2'b0;
+            // id_ex_alu_op <= `ALU_ADD;
+            // id_ex_MemLen <= `Mem_Word;
+            // id_ex_opcode <= 7'b0;
+            // id_ex_func3  <= 3'b0;
+            // id_ex_csr_op <= `CSR_NONE;
             
-            id_ex_csr_wr_addr1 <= 12'b0;
-            id_ex_csr_wr_addr2 <= 12'b0;
-            id_wb_csr_addr1    <= 12'b0;
-            id_wb_csr_addr2    <= 12'b0;
-        end
-        else if (if_valid && id_ready) begin
+            // id_ex_csr_wr_addr1 <= 12'b0;
+            // id_ex_csr_wr_addr2 <= 12'b0;
+            // id_wb_csr_addr1    <= 12'b0;
+            // id_wb_csr_addr2    <= 12'b0;
+        // end
+        // else 
+        if (if_valid && id_ready) begin
             // 传递基本信号
             id_ex_pc     <= if_id_pc;
-            id_ex_inst   <= if_id_inst;
+            // id_ex_inst   <= if_id_inst;
             id_ex_rd     <= rd;
             id_wb_rs1    <= rs1;
             id_wb_rs2    <= rs2;
@@ -143,13 +144,17 @@ module ID (
             id_ex_alu_op    <= `ALU_ADD;
             id_ex_MemLen    <= `Mem_Word;
             id_ex_csr_op    <= `CSR_NONE;
-            // id_ex_csr       <= 1'b0;
             id_ex_csr_wen1  <= 1'b0;
-            id_ex_csr_wen2  <= 1'b0;
+            // id_ex_csr_wen2  <= 1'b0;
             id_ex_csr_ecall <= 1'b0;
             id_ex_csr_mret  <= 1'b0;
             id_ex_jal       <= 1'b0;
             id_ex_jalr      <= 1'b0;
+
+            id_ex_csr_wr_addr1 <= 12'b0;
+            // id_ex_csr_wr_addr2 <= 12'b0;
+            id_wb_csr_addr1    <= 12'b0;
+            id_wb_csr_addr2    <= 12'b0;
 
             // 译码逻辑
             case (get_opcode)
@@ -186,7 +191,7 @@ module ID (
                         `F3_SH: id_ex_MemLen <= `Mem_Half;
                         `F3_SB: id_ex_MemLen <= `Mem_Bit;
                         default: begin
-                            // 可添加错误处理逻辑
+
                         end
                     endcase
                     // inst_type <= 5;
@@ -203,7 +208,7 @@ module ID (
                         `F3_LHU: id_ex_MemLen <= `Mem_UHalf;
                         `F3_LBU: id_ex_MemLen <= `Mem_UBit;
                         default: begin
-                            // 可添加错误处理逻辑
+                         
                         end
                     endcase
                     // inst_type <= 3;
@@ -221,7 +226,7 @@ module ID (
                         `F3_RSH:  id_ex_alu_op <= (func7[5]) ? `ALU_SRA : `ALU_SRL;
                         `F3_LSH:  id_ex_alu_op <= `ALU_SLL;
                         default: begin
-                            // 可添加错误处理逻辑
+                            
                         end
                     endcase
                     // inst_type <= 0;/
@@ -239,7 +244,7 @@ module ID (
                         `F3_RSH:  id_ex_alu_op <= (func7[5]) ? `ALU_SRA : `ALU_SRL;
                         `F3_LSH:  id_ex_alu_op <= `ALU_SLL;
                         default: begin
-                            // 可添加错误处理逻辑
+                            
                         end
                     endcase
                     // inst_type <=1;
@@ -247,14 +252,11 @@ module ID (
                 `INST_TYPE_B: begin
                     id_ex_imm <= immB;
                     case (func3)
-                        `F3_BEQ:  id_ex_alu_op <= `ALU_SUB;
-                        `F3_BNE:  id_ex_alu_op <= `ALU_SUB;
-                        `F3_BLT:  id_ex_alu_op <= `ALU_SLT;
-                        `F3_BGE:  id_ex_alu_op <= `ALU_SLT;
-                        `F3_BLTU: id_ex_alu_op <= `ALU_SLTU;
-                        `F3_BGEU: id_ex_alu_op <= `ALU_SLTU;
+                        `F3_BEQ, `F3_BNE:   id_ex_alu_op <= `ALU_SUB;
+                        `F3_BLT, `F3_BGE:   id_ex_alu_op <= `ALU_SLT;
+                        `F3_BLTU, `F3_BGEU: id_ex_alu_op <= `ALU_SLTU;
                         default: begin
-                            // 可添加错误处理逻辑
+                            
                         end
                     endcase
                     // inst_type <= 4;
@@ -294,7 +296,7 @@ module ID (
                             `F3_ECALL: begin
                                 if (if_id_inst == `INST_ECALL) begin
                                     id_ex_csr_ecall <= 1'b1;
-                                    id_ex_csr_wen2  <= 1'b1;
+                                    // id_ex_csr_wen2  <= 1'b1;
                                     id_ex_imm       <= 32'h0;
                                 end
                                 else if (if_id_inst == `INST_MRET) begin
@@ -303,18 +305,17 @@ module ID (
                                 end
                             end
                             default: begin
-                                // 可添加错误处理逻辑
+                                
                             end
                         endcase
                         id_ex_csr_wr_addr1 <= (if_id_inst == `INST_ECALL) ? `MCAUSE : ((if_id_inst == `INST_MRET) ? `MSTATUS : if_id_inst[31:20]);
-                        id_ex_csr_wr_addr2 <= (if_id_inst == `INST_ECALL) ? `MEPC : 12'b0;
+                        // id_ex_csr_wr_addr2 <= (if_id_inst == `INST_ECALL) ? `MEPC : 12'b0;
                         id_wb_csr_addr1    <= (if_id_inst == `INST_MRET) ? `MSTATUS : ((if_id_inst == `INST_ECALL) ? `MTVEC : if_id_inst[31:20]);
                         id_wb_csr_addr2    <= (if_id_inst == `INST_MRET) ? `MEPC : 12'b0;
                         // inst_type <= 6;
                     end
                 end
                 default: begin
-                    // 可添加错误处理逻辑
                     // inst_type <= 7;
                 end
             endcase
