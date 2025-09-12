@@ -1,4 +1,4 @@
-`include "/home/furina/ysyx-workbench/npc/pipeline-soc-vsrc/defines/defines.v"
+`include "../pipeline-soc-vsrc/defines/defines.v"
 
 module ysyx_25010030 (
     input         clock,
@@ -86,7 +86,7 @@ module ysyx_25010030 (
     wire        id_ready;         // ID 到 IF：就绪信号
 
     wire [31:0] id_ex_pc;         // ID 到 EX：程序计数器
-    wire [31:0] id_ex_inst;       // ID 到 EX：指令
+    // wire [31:0] id_ex_inst;       // ID 到 EX：指令
     wire        id_valid;         // ID 到 EX：有效信号
     wire        ex_ready;         // EX 到 ID：就绪信号
     wire        id_ex_RegWrite;   // ID 到 EX：寄存器写使能
@@ -106,17 +106,17 @@ module ysyx_25010030 (
     wire        id_ex_jalr;       // ID 到 EX：JALR 信号
     // wire        id_ex_csr;        // ID 到 EX：CSR 指令信号
     wire        id_ex_csr_wen1;   // ID 到 EX：CSR 写使能 1
-    wire        id_ex_csr_wen2;   // ID 到 EX：CSR 写使能 2
+    // wire        id_ex_csr_wen2;   // ID 到 EX：CSR 写使能 2
     wire        id_ex_csr_ecall;  // ID 到 EX：ECALL 信号
     wire        id_ex_csr_mret;   // ID 到 EX：MRET 信号
     wire [ 1:0] id_ex_csr_op;
     wire [11:0] id_ex_csr_wr_addr1; // ID 到 EX：CSR 写地址 1
-    wire [11:0] id_ex_csr_wr_addr2; // ID 到 EX：CSR 写地址 2
+    // wire [11:0] id_ex_csr_wr_addr2; // ID 到 EX：CSR 写地址 2
     wire [11:0] id_wb_csr_addr1;  // ID 到 WB：CSR 读地址 1
     wire [11:0] id_wb_csr_addr2;  // ID 到 WB：CSR 读地址 2
 
     // wire [31:0] ex_lsu_pc;        // EX 到 MEM：程序计数器
-    wire [31:0] ex_lsu_inst;      // EX 到 MEM：指令
+    // wire [31:0] ex_lsu_inst;      // EX 到 MEM：指令
     wire        ex_lsu_valid;     // EX 到 MEM：有效信号
     wire        lsu_ex_ready;     // MEM 到 EX：就绪信号
     wire [31:0] ex_lsu_src2;      // EX 到 MEM：源操作数 2
@@ -130,9 +130,9 @@ module ysyx_25010030 (
     wire [31:0] ex_flush_pc;      // EX 到 IF：冲刷目标 PC
     wire        ex_lsu_csr;       // EX 到 MEM：CSR 指令信号
     wire        ex_lsu_csr_wen1;  // EX 到 MEM：CSR 写使能 1
-    wire        ex_lsu_csr_wen2;  // EX 到 MEM：CSR 写使能 2
+    // wire        ex_lsu_csr_wen2;  // EX 到 MEM：CSR 写使能 2
     wire [11:0] ex_lsu_csr_wr_addr1; // EX 到 MEM：CSR 写地址 1
-    wire [11:0] ex_lsu_csr_wr_addr2; // EX 到 MEM：CSR 写地址 2
+    // wire [11:0] ex_lsu_csr_wr_addr2; // EX 到 MEM：CSR 写地址 2
     wire [31:0] ex_lsu_csr_wr_data1; // EX 到 MEM：CSR 写数据 1
     wire [31:0] ex_lsu_csr_wr_data2; // EX 到 MEM：CSR 写数据 2
     wire [31:0] ex_lsu_csr_rdata; // EX 到 MEM：CSR 读数据
@@ -147,10 +147,10 @@ module ysyx_25010030 (
     wire [31:0] lsu_wb_csr_wr_data1;  // MEM 到 WB：CSR 写数据 1
     wire [31:0] lsu_wb_csr_wr_data2;  // MEM 到 WB：CSR 写数据 2
     wire [11:0] lsu_wb_csr_wr_addr1;  // MEM 到 WB：CSR 写地址 1
-    wire [11:0] lsu_wb_csr_wr_addr2;  // MEM 到 WB：CSR 写地址 2
+    // wire [11:0] lsu_wb_csr_wr_addr2;  // MEM 到 WB：CSR 写地址 2
     wire        lsu_wb_csr_wen1;      // MEM 到 WB：CSR 写使能 1
-    wire        lsu_wb_csr_wen2;      // MEM 到 WB：CSR 写使能 2
-    wire        wb_valid;         
+    wire        lsu_wb_csr_ecall;    
+    // wire        wb_valid;         
 
     wire [31:0] wb_ex_src1;       // WB 到 EX：源操作数 1（前递）
     wire [31:0] wb_ex_src2;       // WB 到 EX：源操作数 2（前递）
@@ -434,7 +434,7 @@ module ysyx_25010030 (
         .ex_ready(ex_ready),
         .id_valid(id_valid),
         .id_ex_pc(id_ex_pc),
-        .id_ex_inst(id_ex_inst),
+        // .id_ex_inst(id_ex_inst),
         .id_ex_RegWrite(id_ex_RegWrite),
         .id_ex_rd(id_ex_rd),
         .id_wb_rs1(id_wb_rs1),
@@ -452,12 +452,12 @@ module ysyx_25010030 (
         .id_ex_jalr(id_ex_jalr),
         // .id_ex_csr(id_ex_csr),
         .id_ex_csr_wen1(id_ex_csr_wen1),
-        .id_ex_csr_wen2(id_ex_csr_wen2),
+        // .id_ex_csr_wen2(id_ex_csr_wen2),
         .id_ex_csr_ecall(id_ex_csr_ecall),
         .id_ex_csr_mret(id_ex_csr_mret),
         .id_ex_csr_op(id_ex_csr_op),
         .id_ex_csr_wr_addr1(id_ex_csr_wr_addr1),
-        .id_ex_csr_wr_addr2(id_ex_csr_wr_addr2),
+        // .id_ex_csr_wr_addr2(id_ex_csr_wr_addr2),
         .id_wb_csr_addr1(id_wb_csr_addr1),
         .id_wb_csr_addr2(id_wb_csr_addr2)
     );
@@ -481,7 +481,7 @@ module ysyx_25010030 (
         .lsu_wb_RegWrite(lsu_wb_RegWrite),
         .lsu_wb_valid(lsu_wb_valid),
         .ex_lsu_forward_las(ex_lsu_forward_las),
-        .id_ex_inst(id_ex_inst),
+        // .id_ex_inst(id_ex_inst),
         .id_ex_pc(id_ex_pc),
         .id_ex_imm(id_ex_imm),
         .id_ex_zimm(id_ex_zimm),
@@ -502,15 +502,15 @@ module ysyx_25010030 (
         .wb_ex_csr_num2(wb_ex_csr_num2),
         // .id_ex_csr(id_ex_csr),
         .id_ex_csr_wen1(id_ex_csr_wen1),
-        .id_ex_csr_wen2(id_ex_csr_wen2),
+        // .id_ex_csr_wen2(id_ex_csr_wen2),
         .id_ex_csr_wr_addr1(id_ex_csr_wr_addr1),
-        .id_ex_csr_wr_addr2(id_ex_csr_wr_addr2),
+        // .id_ex_csr_wr_addr2(id_ex_csr_wr_addr2),
         .id_ex_csr_ecall(id_ex_csr_ecall),
         .id_ex_csr_mret(id_ex_csr_mret),
         .id_ex_csr_op(id_ex_csr_op),
         .ex_flush(ex_flush),
         .ex_flush_pc(ex_flush_pc),
-        .ex_lsu_inst(ex_lsu_inst),
+        // .ex_lsu_inst(ex_lsu_inst),
         // .ex_lsu_pc(ex_lsu_pc),
         .ex_lsu_src2(ex_lsu_src2),
         .ex_lsu_RegWrite(ex_lsu_RegWrite),
@@ -520,9 +520,9 @@ module ysyx_25010030 (
         .ex_lsu_MemLen(ex_lsu_MemLen),
         .ex_lsu_csr(ex_lsu_csr),
         .ex_lsu_csr_wen1(ex_lsu_csr_wen1),
-        .ex_lsu_csr_wen2(ex_lsu_csr_wen2),
+        // .ex_lsu_csr_wen2(ex_lsu_csr_wen2),
         .ex_lsu_csr_wr_addr1(ex_lsu_csr_wr_addr1),
-        .ex_lsu_csr_wr_addr2(ex_lsu_csr_wr_addr2),
+        // .ex_lsu_csr_wr_addr2(ex_lsu_csr_wr_addr2),
         .ex_lsu_csr_wr_data1(ex_lsu_csr_wr_data1),
         .ex_lsu_csr_wr_data2(ex_lsu_csr_wr_data2),
         .ex_lsu_csr_rdata(ex_lsu_csr_rdata),
@@ -554,11 +554,11 @@ module ysyx_25010030 (
         .lsu_ex_forward_MemRead(lsu_ex_forward_MemRead),
         .ex_lsu_csr(ex_lsu_csr),
         .ex_lsu_csr_wen1(ex_lsu_csr_wen1),
-        .ex_lsu_csr_wen2(ex_lsu_csr_wen2),
+        // .ex_lsu_csr_wen2(ex_lsu_csr_wen2),
         .ex_lsu_csr_wr_data1(ex_lsu_csr_wr_data1),
         .ex_lsu_csr_wr_data2(ex_lsu_csr_wr_data2),
         .ex_lsu_csr_wr_addr1(ex_lsu_csr_wr_addr1),
-        .ex_lsu_csr_wr_addr2(ex_lsu_csr_wr_addr2),
+        // .ex_lsu_csr_wr_addr2(ex_lsu_csr_wr_addr2),
         .ex_lsu_csr_rdata(ex_lsu_csr_rdata),
         .ex_lsu_csr_ecall(ex_lsu_csr_ecall),
         .ex_lsu_csr_mret(ex_lsu_csr_mret),
@@ -566,9 +566,9 @@ module ysyx_25010030 (
         .lsu_wb_csr_wr_data1(lsu_wb_csr_wr_data1),
         .lsu_wb_csr_wr_data2(lsu_wb_csr_wr_data2),
         .lsu_wb_csr_wr_addr1(lsu_wb_csr_wr_addr1),
-        .lsu_wb_csr_wr_addr2(lsu_wb_csr_wr_addr2),
+        // .lsu_wb_csr_wr_addr2(lsu_wb_csr_wr_addr2),
         .lsu_wb_csr_wen1(lsu_wb_csr_wen1),
-        .lsu_wb_csr_wen2(lsu_wb_csr_wen2),
+        .lsu_wb_csr_ecall(lsu_wb_csr_ecall),
         .lsu_wb_RegWrite(lsu_wb_RegWrite),
         .lsu_wb_rd(lsu_wb_rd),
         .lsu_axi_arvalid(lsu_axi_arvalid),
@@ -617,15 +617,15 @@ module ysyx_25010030 (
         .rs2(id_wb_rs2),
         .src1(wb_ex_src1),
         .src2(wb_ex_src2),
-        .wb_valid(wb_valid),
+        // .wb_valid(wb_valid),
         .raddr_csr1(id_wb_csr_addr1),
         .raddr_csr2(id_wb_csr_addr2),
         .wen_csr1(lsu_wb_csr_wen1),
-        .wen_csr2(lsu_wb_csr_wen2),
+        .is_ecall(lsu_wb_csr_ecall),
         .wdata_csr1(lsu_wb_csr_wr_data1),
         .wdata_csr2(lsu_wb_csr_wr_data2),
         .waddr_csr1(lsu_wb_csr_wr_addr1),
-        .waddr_csr2(lsu_wb_csr_wr_addr2),
+        // .waddr_csr2(lsu_wb_csr_wr_addr2),
         .rdata_csr1(wb_ex_csr_num1),
         .rdata_csr2(wb_ex_csr_num2)
     );
@@ -650,7 +650,7 @@ module ysyx_25010030 (
     always @(posedge clock) begin
         if (IF_ID_inst == 32'h00100073) begin
             // occupancy(ifu_active_cycles, exu_active_cycles, lsu_active_cycles, cycle_cnt);
-            ebreak(`HIT_TRAP, ex_lsu_inst);
+            ebreak(`HIT_TRAP, IF_ID_inst);
         end
     end
 `endif
