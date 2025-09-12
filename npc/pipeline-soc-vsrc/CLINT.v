@@ -1,4 +1,4 @@
-`include "/home/furina/ysyx-workbench/npc/pipeline-soc-vsrc/defines/defines.v"
+`include "../pipeline-soc-vsrc/defines/defines.v"
 
 module CLINT #(
     parameter ADDR_WIDTH = 32,
@@ -17,32 +17,25 @@ module CLINT #(
     output reg                    rvalid,
     output reg                    rlast, 
     input  wire                   rready,
-    output reg  [            1:0] rresp
-
-    // input  wire [ ADDR_WIDTH-1:0] awaddr,
-    // input  wire                   awvalid,
-    // output wire                   awready,
-
-    // input  wire [ DATA_WIDTH-1:0] wdata,
-    // input  wire [            3:0] wstrb,
-    // input  wire                   wvalid,
-    // output wire                   wready,
-
-    // output wire  [           1:0] bresp, 
-    // output wire                   bvalid,
-    // input  wire                   bready
+    output wire [            1:0] rresp
 );
 
     localparam IDLE = 1'b0;
     localparam BUSY = 1'b1;
     reg clint_state, next_clint_state;
 
-    reg [ADDR_WIDTH-1:0] araddr_reg;
-    
+    // reg [           2:0] LFSR; 
+    // reg [ADDR_WIDTH-1:0] araddr_reg;
+    // reg [DATA_WIDTH-1:0] rdata_reg;
+    // reg addr_valid;
+    localparam OKAY   = 2'b00;
+
     reg  [63:0] mtime;//时间寄存器
     wire [31:0] mtime_low  = mtime[31:0];
     wire [31:0] mtime_high = mtime[63:32];
-    wire [31:0] clint_offset = araddr_reg - 32'h0200_0000;
+    // reg [31:0] mtime_low;
+    // reg [31:0] mtime_high;
+    wire [31:0] clint_offset = araddr - 32'h0200_0000;
 
     //时间更新逻辑
     always @(posedge clk) begin
@@ -52,23 +45,47 @@ module CLINT #(
         else begin
             mtime <= mtime + 64'h1;
         end
+        // if(reset) begin
+        //     mtime_low  <= 32'h0;
+        //     mtime_high <= 32'h0;
+        // end
+        // else begin
+        //     if(mtime_low == 32'hffff_ffff) begin
+        //         mtime_low  <= 32'h0;
+        //         mtime_high <= mtime_high + 32'h1;
+        //     end
+        //     else begin
+        //         mtime_low <= mtime_low + 32'h1;
+        //     end
+        // end
     end
+
+    always @(*) begin
+        case(clint_state)
+            IDLE: next_clint_state = arvalid ? BUSY : IDLE;
+            BUSY: next_clint_state = rready ? IDLE : BUSY;
+            default: next_clint_state = IDLE;
+        endcase 
+    end
+
+    assign rresp   = OKAY;
     
     always @(posedge clk) begin
         if (reset) begin
-            // clint_state <= IDLE;
-            // arready     <= 1'b0;
-            // rvalid      <= 1'b0;
-            // rlast       <= 1'b0;  
-            // // wready      <= 1'b0;
-            // // awready     <= 1'b0;
-            // // bvalid      <= 1'b0;
-            // rdata       <= 32'h0;
-            // rresp       <= `OKAY;
-            // // bresp       <= `OKAY;
-            // // LFSR        <= MIN_DELAY;
-            // araddr_reg  <= 32'h0;
-            // // rdata_reg   <= 32'h0;
+        //     // clint_state <= IDLE;
+        //     // arready     <= 1'b0;
+        //     // rvalid      <= 1'b0;
+        //     // rlast       <= 1'b0;  
+        //     // // wready      <= 1'b0;
+        //     // // awready     <= 1'b0;
+        //     // // bvalid      <= 1'b0;
+        //     // rdata       <= 32'h0;
+        //     // rresp       <= `OKAY;
+        //     // // bresp       <= `OKAY;
+        //     // // LFSR        <= MIN_DELAY;
+        //     // araddr_reg  <= 32'h0;
+        //     // // rdata_reg   <= 32'h0;
+            clint_state <= IDLE;
         end else begin
             clint_state <= next_clint_state;
             case (clint_state)
@@ -76,27 +93,36 @@ module CLINT #(
                     arready <= 1'b1; 
                     rvalid  <= 1'b0;
                     rlast   <= 1'b0;  
-                    if (arvalid && arready) begin
-                        araddr_reg <= araddr;
+                    // LFSR <= $urandom_range(1, 10); // 随机生成1~10的延迟
+                    // LFSR <= MIN_DELAY;
+                    if (arvalid) begin
+                        // araddr_reg <= araddr;
                         arready    <= 1'b0;
-                        next_clint_state <= BUSY;
+                        // next_clint_state <= BUSY;
                     end 
+                // `ifdef VERILATOR
+                //     else if (awvalid && awready) begin 
+                //         $display("你怎么敢往里面写东西的");
+                //     end
+                // `endif
                 end
                 BUSY: begin
                     rlast <= 1'b1;
                     if (rready) begin
+                        // rdata      <= rdata_reg;
                         rdata      <= (clint_offset == 32'h0) ? mtime_low :
                                       (clint_offset == 32'h4) ? mtime_high :
                                       32'h0;    
                         rvalid     <= 1'b1;
-                        rresp      <= `OKAY;
-                        next_clint_state <= IDLE;
-                    end else begin
-                        next_clint_state <= BUSY;
+                        // araddr_reg <= 32'h0; 
+                        // rresp      <= OKAY;
+                    //     next_clint_state <= IDLE;
+                    // end else begin
+                    //     next_clint_state <= BUSY;
                     end
                 end
                 default: begin
-                    next_clint_state <= IDLE;
+                    // next_clint_state <= IDLE;
                 end
             endcase
         end
