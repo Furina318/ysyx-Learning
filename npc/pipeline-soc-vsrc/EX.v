@@ -1,4 +1,4 @@
-`include "/home/furina/ysyx-workbench/npc/pipeline-soc-vsrc/defines/defines.v"
+`include "../pipeline-soc-vsrc/defines/defines.v"
 
 module EX (
     input             clk,
@@ -20,7 +20,7 @@ module EX (
     input             lsu_wb_valid,
     output reg        ex_lsu_forward_las,
 
-    input      [31:0] id_ex_inst,
+    // input      [31:0] id_ex_inst,
     input      [31:0] id_ex_pc,
     input      [31:0] id_ex_imm,
     input      [ 4:0] id_ex_zimm,
@@ -44,9 +44,9 @@ module EX (
      
     // input             id_ex_csr,
     input             id_ex_csr_wen1,
-    input             id_ex_csr_wen2,
+    // input             id_ex_csr_wen2,
     input      [11:0] id_ex_csr_wr_addr1,
-    input      [11:0] id_ex_csr_wr_addr2,
+    // input      [11:0] id_ex_csr_wr_addr2,
     input             id_ex_csr_ecall,
     input             id_ex_csr_mret,
     input      [ 1:0] id_ex_csr_op,
@@ -54,7 +54,7 @@ module EX (
     output reg        ex_flush,
     output reg [31:0] ex_flush_pc,
 
-    output reg [31:0] ex_lsu_inst,
+    // output reg [31:0] ex_lsu_inst,
     // output reg [31:0] ex_lsu_pc,
     output reg [31:0] ex_lsu_src2,
     output reg        ex_lsu_RegWrite,
@@ -65,9 +65,9 @@ module EX (
 
     output reg        ex_lsu_csr,
     output reg        ex_lsu_csr_wen1,
-    output reg        ex_lsu_csr_wen2,
+    // output reg        ex_lsu_csr_wen2,
     output reg [11:0] ex_lsu_csr_wr_addr1,
-    output reg [11:0] ex_lsu_csr_wr_addr2,
+    // output reg [11:0] ex_lsu_csr_wr_addr2,
     output reg [31:0] ex_lsu_csr_wr_data1,
     output reg [31:0] ex_lsu_csr_wr_data2,
     output reg [31:0] ex_lsu_csr_rdata,
@@ -157,7 +157,12 @@ module EX (
             `ALU_SRA:  process_result = $signed(ex_num1) >>> ex_num2[4:0];
             `ALU_SLL:  process_result = ex_num1 << ex_num2[4:0];
             `ALU_SRL:  process_result = ex_num1 >> ex_num2[4:0];
-            default:   begin process_result = 32'b0; $display("Unkonw alu_op"); end
+            default:   begin 
+                process_result = 32'b0; 
+            `ifdef VERILATOR
+                $display("Unkonw alu_op"); 
+            `endif
+            end
         endcase
         alu_zero = (process_result == 32'b0);
         // alu_less = (id_ex_alu_op == `ALU_SLT)  ? ($signed(ex_num1) < $signed(ex_num2)) :
@@ -315,7 +320,7 @@ module EX (
     // 输出信号赋值
     always @(posedge clk) begin
         if (reset) begin
-            ex_lsu_inst           <= 32'h0;
+            // ex_lsu_inst           <= 32'h0;
             // ex_lsu_pc             <= 32'h0;
             ex_lsu_src2           <= 32'h0;
             ex_lsu_RegWrite       <= 1'b0;
@@ -327,9 +332,9 @@ module EX (
             ex_lsu_forward_las    <= 1'b0;
             ex_lsu_csr            <= 1'b0;
             ex_lsu_csr_wen1       <= 1'b0;
-            ex_lsu_csr_wen2       <= 1'b0;
+            // ex_lsu_csr_wen2       <= 1'b0;
             ex_lsu_csr_wr_addr1   <= 12'b0;
-            ex_lsu_csr_wr_addr2   <= 12'b0;
+            // ex_lsu_csr_wr_addr2   <= 12'b0;
             ex_lsu_csr_wr_data1   <= 32'h0;
             ex_lsu_csr_wr_data2   <= 32'h0;
             ex_lsu_csr_rdata      <= 32'h0;
@@ -337,7 +342,7 @@ module EX (
             ex_lsu_csr_mret       <= 1'b0;
         end
         else if (id_valid && ex_ready) begin
-            ex_lsu_inst           <= id_ex_inst;
+            // ex_lsu_inst           <= id_ex_inst;
             // ex_lsu_pc             <= id_ex_pc;
             ex_lsu_src2           <= src2;
             ex_lsu_RegWrite       <= id_ex_RegWrite;
@@ -349,39 +354,40 @@ module EX (
             ex_lsu_forward_las    <= forward_las;
             // ex_lsu_csr            <= id_ex_csr;
             // ex_lsu_csr            <= (id_ex_opcode == `INST_CSR);
-            ex_lsu_csr            <= (id_ex_csr_wen1 | id_ex_csr_wen2 | id_ex_csr_ecall | id_ex_csr_mret);
+            ex_lsu_csr            <= (id_ex_csr_wen1 | id_ex_csr_ecall | id_ex_csr_mret);
             ex_lsu_csr_wen1       <= id_ex_csr_wen1;
-            ex_lsu_csr_wen2       <= id_ex_csr_wen2;
+            // ex_lsu_csr_wen2       <= id_ex_csr_wen2;
             ex_lsu_csr_wr_addr1   <= id_ex_csr_wr_addr1;
-            ex_lsu_csr_wr_addr2   <= id_ex_csr_wr_addr2;
+            // ex_lsu_csr_wr_addr2   <= id_ex_csr_wr_addr2;
             ex_lsu_csr_wr_data1   <= csr_write_data;
             // ex_lsu_csr_wr_data2   <= csr_write_ecall;
             ex_lsu_csr_wr_data2   <= (id_ex_csr_ecall) ? id_ex_pc : 32'b0;
+            // ex_lsu_csr_wr_data2   <= id_ex_pc;
             ex_lsu_csr_rdata      <= wb_ex_csr_num1;
             ex_lsu_csr_ecall      <= id_ex_csr_ecall;
             ex_lsu_csr_mret       <= id_ex_csr_mret;
         end
-        else begin
-            ex_lsu_inst           <= ex_lsu_inst;
-            // ex_lsu_pc             <= ex_lsu_pc;
-            ex_lsu_src2           <= ex_lsu_src2;
-            ex_lsu_RegWrite       <= ex_lsu_RegWrite;
-            ex_lsu_rd             <= ex_lsu_rd;
-            ex_lsu_MemRead        <= ex_lsu_MemRead;
-            ex_lsu_MemWrite       <= ex_lsu_MemWrite;
-            ex_lsu_MemLen         <= ex_lsu_MemLen;
-            ex_lsu_process_result <= ex_lsu_process_result;
-            ex_lsu_forward_las    <= ex_lsu_forward_las;
-            ex_lsu_csr            <= ex_lsu_csr;
-            ex_lsu_csr_wen1       <= ex_lsu_csr_wen1;
-            ex_lsu_csr_wen2       <= ex_lsu_csr_wen2;
-            ex_lsu_csr_wr_addr1   <= ex_lsu_csr_wr_addr1;
-            ex_lsu_csr_wr_addr2   <= ex_lsu_csr_wr_addr2;
-            ex_lsu_csr_wr_data1   <= ex_lsu_csr_wr_data1;
-            ex_lsu_csr_wr_data2   <= ex_lsu_csr_wr_data2;
-            ex_lsu_csr_rdata      <= ex_lsu_csr_rdata;
-            ex_lsu_csr_ecall      <= ex_lsu_csr_ecall;
-            ex_lsu_csr_mret       <= ex_lsu_csr_mret;
-        end
+        // else begin
+        //     // ex_lsu_inst           <= ex_lsu_inst;
+        //     // ex_lsu_pc             <= ex_lsu_pc;
+        //     ex_lsu_src2           <= ex_lsu_src2;
+        //     ex_lsu_RegWrite       <= ex_lsu_RegWrite;
+        //     ex_lsu_rd             <= ex_lsu_rd;
+        //     ex_lsu_MemRead        <= ex_lsu_MemRead;
+        //     ex_lsu_MemWrite       <= ex_lsu_MemWrite;
+        //     ex_lsu_MemLen         <= ex_lsu_MemLen;
+        //     ex_lsu_process_result <= ex_lsu_process_result;
+        //     ex_lsu_forward_las    <= ex_lsu_forward_las;
+        //     ex_lsu_csr            <= ex_lsu_csr;
+        //     ex_lsu_csr_wen1       <= ex_lsu_csr_wen1;
+        //     ex_lsu_csr_wen2       <= ex_lsu_csr_wen2;
+        //     ex_lsu_csr_wr_addr1   <= ex_lsu_csr_wr_addr1;
+        //     ex_lsu_csr_wr_addr2   <= ex_lsu_csr_wr_addr2;
+        //     ex_lsu_csr_wr_data1   <= ex_lsu_csr_wr_data1;
+        //     ex_lsu_csr_wr_data2   <= ex_lsu_csr_wr_data2;
+        //     ex_lsu_csr_rdata      <= ex_lsu_csr_rdata;
+        //     ex_lsu_csr_ecall      <= ex_lsu_csr_ecall;
+        //     ex_lsu_csr_mret       <= ex_lsu_csr_mret;
+        // end
     end
 endmodule
