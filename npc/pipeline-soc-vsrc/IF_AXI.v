@@ -1,4 +1,4 @@
-`include "/home/furina/ysyx-workbench/npc/pipeline-soc-vsrc/defines/defines.v"
+`include "../pipeline-soc-vsrc/defines/defines.v"
 
 // 带iCache的取指模块
 module IF_AXI (
