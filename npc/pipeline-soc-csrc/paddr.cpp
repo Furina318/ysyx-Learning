@@ -1,15 +1,22 @@
 #include "../include/paddr.h"
-#include "VysyxSoCFull.h"
-#include "../obj_dir/VysyxSoCFull___024root.h"
 #include "../include/common.h"
 #include "../include/debug.h"
 #include "../include/reg.h"
 #include "../include/utils.h"
 #include "../include/device/mmio.h"
 
+#ifdef YSYXSOC
+#include "VysyxSoCFull.h"
+#include "../obj_dir/VysyxSoCFull___024root.h"
+extern VysyxSoCFull *top;
+#else
+#include "Vysyx_25010030_npc.h"
+#include "../obj_dir/Vysyx_25010030_npc___024root.h"
+extern Vysyx_25010030_npc *top;
+#endif
+
 
 /********extern functions or variables********/
-extern VysyxSoCFull *top;
 extern vluint64_t main_time;
 // extern void ebreak(int station, int inst);
 // extern NPCState npc_state;
@@ -162,12 +169,16 @@ static inline bool in_pmem(paddr_t addr) {
 
 static inline void out_of_bound(paddr_t addr) {
   regs_display();
+
+  #ifdef YSYXSOC
   printf("[npc]address = 0x%08x is out of bound of pmem [0x%08x, 0x%08x] at pc = 0x%08x  time = %ld\n", 
          addr, PMEM_LEFT, PMEM_RIGHT, top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__IF_ID_pc, main_time);
+  #else
+  printf("[npc]address = 0x%08x is out of bound of pmem [0x%08x, 0x%08x] at pc = 0x%08x  time = %ld\n", 
+         addr, PMEM_LEFT, PMEM_RIGHT, top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__IF_ID_pc, main_time);
+  #endif
+
   npc_state.state=NPC_ABORT;
-  // die();
-  // _Log(ANSI_FG_RED "address = 0x%08x is out of bound of pmem [0x%08x, 0x%08x] at pc = 0x%08x  time = %ld", 
-  //        addr, PMEM_LEFT, PMEM_RIGHT, top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__pc_now, main_time ANSI_NONE);
 }
 
 word_t pmem_r(paddr_t addr, int len) 
@@ -198,8 +209,8 @@ void pmem_w(paddr_t addr, int len, word_t data)
 
 void init_mem(void) 
 {
-  memset(pmem, 0, CONFIG_MSIZE);
   // Log("physical memory area [0x%08x, 0x%08x]", PMEM_LEFT, PMEM_RIGHT);
+  #ifdef YSYXSOC
   Log("SoC MROM area [0x%08x, 0x%08x]", CONFIG_SOC_MROM_BASE, CONFIG_SOC_MROM_BASE + CONFIG_SOC_MROM_SIZE);
   Log("SoC FLASH area [0x%08x, 0x%08x]", CONFIG_SOC_FLASH_BASE, CONFIG_SOC_FLASH_BASE + CONFIG_SOC_FLASH_SIZE);
   Log("SoC PSRAM area [0x%08x, 0x%08x]", CONFIG_SOC_PSRAM_BASE, CONFIG_SOC_PSRAM_BASE + CONFIG_SOC_PSRAM_SIZE);
@@ -212,4 +223,9 @@ void init_mem(void)
   // memcpy(soc_mrom_guest_to_host(CONFIG_SOC_MROM_BASE), img, sizeof(img));
   memset(flash, 0, CONFIG_SOC_FLASH_SIZE);
   memcpy(soc_flash_guest_to_host(CONFIG_SOC_FLASH_BASE), img, sizeof(img));
+  #else
+  memset(pmem, 0, CONFIG_MSIZE);
+  Log("physical memory area [0x%08x, 0x%08x]", PMEM_LEFT, PMEM_RIGHT);
+  memcpy(guest_to_host(RESET_VECTOR), img, sizeof(img));
+  #endif
 }
