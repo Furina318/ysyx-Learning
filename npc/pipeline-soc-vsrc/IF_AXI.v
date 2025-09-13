@@ -123,10 +123,10 @@ module IF_AXI (
     // 主控制逻辑
     always @(posedge clk or posedge reset) begin
         if (reset) begin
-            IF_ID_pc   <= `RESET_PC;
+            IF_ID_pc   <= `RESET_FLASH_PC;
             IF_ID_inst <= 0;
             IF_valid   <= 0;
-            next_pc    <= `RESET_PC;
+            next_pc    <= `RESET_FLASH_PC;
             state      <= IDLE;
             cache_req  <= 0;
             flush_once <= 0;
