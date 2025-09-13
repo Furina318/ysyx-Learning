@@ -77,6 +77,9 @@ module iCache #(
     reg [ 1:0] beat_cnt;  // 已接收的突发beat数（0-3）
     reg [31:0] block_data [0:BEATS_PER_BLOCK-1];  // 存储块内所有32位数据
 
+    localparam SDRAM_BASE        = 32'hA0000000;  
+    localparam SDRAM_END         = 32'hBFFFFFFF;
+    wire in_sdram = (addr >= SDRAM_BASE) && (addr <= SDRAM_END);
     // 保存请求信息
     always @(posedge clk) begin
         if (reset) begin
@@ -119,12 +122,12 @@ module iCache #(
     //     // end
     //     hit = valid_ram[req_index] && (tag_ram[req_index] == req_tag) && !is_fencei;
     // end
-    wire hit = valid_ram[req_index] && (tag_ram[req_index] == req_tag) && !is_fencei;
+    wire hit = valid_ram[req_index] && (tag_ram[req_index] == req_tag) && !is_fencei && in_sdram;
 
     // AXI突发传输配置与控制
     assign axi_arid    = 4'h1;    // 固定ID
-    assign axi_arlen   = 8'h3;    // 突发长度4拍（16字节块）
-    assign axi_arburst = 2'b01;   // 递增突发
+    assign axi_arlen   = in_sdram ? 8'h3   : 8'b0;    // 突发长度4拍（16字节块）
+    assign axi_arburst = in_sdram ? 2'b01 : 2'b00;   // 递增突发
     assign axi_arsize  = 3'b010;  // 4字节
     always @(posedge clk) begin
         if (reset) begin
@@ -136,7 +139,7 @@ module iCache #(
             // axi_arburst <= 2'h0;
         end else if (state == MISS && !axi_arvalid) begin
             // 突发传输配置：16字节块=4个32位beat
-            axi_araddr  <= {addr[31:BLOCK_OFFSET_WIDTH], {BLOCK_OFFSET_WIDTH{1'b0}}};  // 块对齐地址
+            axi_araddr  <= in_sdram ? {addr[31:BLOCK_OFFSET_WIDTH], {BLOCK_OFFSET_WIDTH{1'b0}}} : addr;  // 块对齐地址
             axi_arvalid <= 1'b1;
             // axi_arid    <= 4'h1;
             // axi_arlen   <= 8'h3;  // 4拍突发
@@ -251,7 +254,7 @@ module iCache #(
                     axi_rready <= 1'b1;
                     if (axi_rvalid) begin
                         block_data[beat_cnt] <= axi_rdata;
-                        beat_cnt <= beat_cnt + 1'b1;
+                        beat_cnt <= in_sdram ? beat_cnt + 1'b1 : 2'b0;
                     end
                 end
 
@@ -265,7 +268,7 @@ module iCache #(
                         data_ram[saved_index][b] <= block_data[b];
                     end
                     // 输出当前请求的指令
-                    inst  <= block_data[saved_beat_idx];
+                    inst  <= in_sdram ? block_data[saved_beat_idx] : block_data[2'b0];
                     valid <= 1'b1;
                     // busy  <= 1'b0;
                 end
