@@ -1,15 +1,21 @@
 #include "../include/common.h"
 #include "../include/debug.h"
+
+#ifdef YSYXSOC
 #include "VysyxSoCFull.h"
 #include "VysyxSoCFull___024root.h" 
-
-/********extern functions or variables********/
 extern VysyxSoCFull *top;
-/*********************************************/
-
-
 #define gpr top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__wbu__DOT__regs
 #define cpu_pc top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__IF_ID_pc
+#define cpu_inst top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__IF_ID_inst
+#else
+#include "Vysyx_25010030_npc.h"
+#include "Vysyx_25010030_npc___024root.h" 
+extern Vysyx_25010030_npc *top;
+#define gpr top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__wbu__DOT__regs
+#define cpu_pc top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__IF_ID_pc
+#define cpu_inst top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__IF_ID_inst
+#endif
 
 static const char *regs[] = {
     "$0", "ra", "sp", "gp", "tp", "t0", "t1", "t2",
@@ -30,7 +36,7 @@ void regs_display()
     _Log(ANSI_FG_YELLOW "$%s\t" ANSI_NONE " 0x%08x\t %010u\n", "pc", 
         cpu_pc, cpu_pc);
     _Log(ANSI_FG_YELLOW "$%s\t" ANSI_NONE " 0x%08x\t %010u\n", "inst", 
-        top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__IF_ID_inst, top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__IF_ID_inst);
+        cpu_inst, cpu_inst);
 }
 
 word_t single_reg_display(char *reg_name) 
