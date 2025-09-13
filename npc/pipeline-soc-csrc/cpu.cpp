@@ -6,17 +6,24 @@
 #include "../include/paddr.h"
 #include "../include/difftest.h"
 #include "../include/watchpoint.h"
-#include "VysyxSoCFull.h"
-#include "VysyxSoCFull__Dpi.h"
-#include "../obj_dir/VysyxSoCFull___024root.h"
 #include "svdpi.h"
 #include "verilated_vcd_c.h"
 
+#ifdef YSYXSOC
+#include "VysyxSoCFull.h"
+#include "VysyxSoCFull__Dpi.h"
+#include "../obj_dir/VysyxSoCFull___024root.h"
+extern VysyxSoCFull *top;
+#else
+#include "Vysyx_25010030_npc.h"
+#include "Vysyx_25010030_npc__Dpi.h"
+#include "../obj_dir/Vysyx_25010030_npc___024root.h"
+extern Vysyx_25010030_npc *top;
+#endif
 /********extern functions or variables********/
 
 extern void single_cycle(void);
 // extern NPCState npc_state;
-extern VysyxSoCFull *top;
 extern VerilatedVcdC *tfp;
 // extern vluint64_t main_time;
 extern void die();
@@ -131,16 +138,17 @@ const char *get_func_name(vaddr_t addr){
 #ifdef CONFIG_FTRACE
 static void ftrace_handle() {
     // 获取当前流水线级信号
-    // uint32_t pc = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__IF_ID_pc;
-    // uint32_t instr = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__IF_ID_inst;
+    #ifdef YSYXSOC
     uint32_t pc = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__id_ex_pc;
     uint32_t instr = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__id_ex_inst;
     uint32_t opcode = instr & 0x7F;
-    
-    // 获取译码阶段信号
-    // uint32_t imm = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__id_ex_imm;
-    // uint32_t rs1_val = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__exu__DOT__src1;
     uint32_t target = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__ex_flush_pc;
+    #else
+    uint32_t pc = top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__IF_ID_pc;
+    uint32_t instr = top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__IF_ID_inst;
+    uint32_t opcode = instr & 0x7F;
+    uint32_t target = top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__ex_flush_pc;
+    #endif
 
     // 计算真实跳转目标
     if (opcode == 0x6F) { // JAL
@@ -243,6 +251,7 @@ static void statistic() {
 uint64_t last_pc;
 
 static void execute_once() {
+    #ifdef YSYXSOC
     PCSet.pc = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__IF_ID_pc;
     PCSet.inst = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__IF_ID_inst;
     // printf("pc=0x%08x | inst=0x%08x\n",PCSet.pc,PCSet.inst);
@@ -251,16 +260,30 @@ static void execute_once() {
       single_cycle();
       cycle_sum++;
     } while (last_pc == top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__IF_ID_pc);
-    if(!top->reset) g_nr_guest_inst++;
+    #else
+    PCSet.pc = top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__IF_ID_pc;
+    PCSet.inst = top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__IF_ID_inst;
+    last_pc = top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__IF_ID_pc;
+    do{
+      single_cycle();
+      cycle_sum++;
+    } while (last_pc == top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__IF_ID_pc);
+    #endif
 
+    if(!top->reset) g_nr_guest_inst++;
     if(run_time <= start_time) run_time++;
 
 #ifdef CONFIG_FTRACE
   ftrace_handle();
 #endif 
 
+    #ifdef YSYXSOC
     PCSet.next_pc = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__IF_ID_pc;
     PCSet.ninst = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__IF_ID_inst;
+    #else
+    PCSet.next_pc = top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__IF_ID_pc;
+    PCSet.ninst = top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__IF_ID_inst;
+    #endif
     // printf("next_pc=0x%08x | next_inst=0x%08x\n\n",PCSet.next_pc,PCSet.ninst);
 
 #ifdef CONFIG_ITRACE
@@ -290,21 +313,21 @@ static void trace_and_difftest() {
     }
 
 #ifdef CONFIG_DIFFTEST
-    // 获取流水线信号
-    bool wb_valid = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__wb_valid;       // WB 阶段指令有效
-    bool ex_flush = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__ex_flush;       // EX 阶段冲刷
-    vaddr_t wb_pc = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__lsu_wb_pc;      // WB 阶段 PC
-    vaddr_t ex_flush_pc = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__ex_flush_pc; // EX 冲刷目标 PC
-    vaddr_t wb_inst = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__lsu_wb_inst;  // WB 阶段指令
+    // // 获取流水线信号
+    // bool wb_valid = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__wb_valid;       // WB 阶段指令有效
+    // bool ex_flush = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__ex_flush;       // EX 阶段冲刷
+    // vaddr_t wb_pc = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__lsu_wb_pc;      // WB 阶段 PC
+    // vaddr_t ex_flush_pc = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__ex_flush_pc; // EX 冲刷目标 PC
+    // vaddr_t wb_inst = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__lsu_wb_inst;  // WB 阶段指令
 
-    int reset_once = 1;
+    // int reset_once = 1;
 
-    if(wb_valid){
-      difftest_step(PCSet.pc, PCSet.next_pc);
-    }
-    else {
-      reset_once = 0;
-    }
+    // if(wb_valid){
+    //   difftest_step(PCSet.pc, PCSet.next_pc);
+    // }
+    // else {
+    //   reset_once = 0;
+    // }
 #endif
 
 #ifdef CONFIG_WATCHPOINTS

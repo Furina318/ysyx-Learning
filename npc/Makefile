@@ -6,7 +6,7 @@ YOSYS_TOP = ysyx_25010030
 CXXFLAGS += -DYSYXSOC
 NXDC_FILES = ./constr/ysyxSoCFull.nxdc
 else ifeq ($(ARCH), riscv32e-npc)
-TOP_MODULE = rv32e
+TOP_MODULE = ysyx_25010030_npc
 YOSYS_TOP = rv32e
 else
 $(error 不支持的架构：$(ARCH).支持的架构: riscv32e-ysyxsoc, riscv32e-npc)
@@ -24,8 +24,9 @@ VSRCS += ../ysyxSoC/build/ysyxSoCFull.v
 
 else
 ifeq ($(ARCH), riscv32e-npc)
-CSRCS = $(shell find $(abspath ./pipeline-csrc) -name "*.cpp") 
-VSRCS = $(shell find $(abspath ./pipeline-vsrc) -name "*.v")   
+CSRCS = $(shell find $(abspath ./pipeline-soc-csrc) -name "*.cpp") 
+VSRCS = $(shell find $(abspath ./pipeline-soc-vsrc) -name "*.v")   
+VSRCS += $(shell find $(abspath ./simple-SoC) -name "*.v")
 endif
 endif
 
