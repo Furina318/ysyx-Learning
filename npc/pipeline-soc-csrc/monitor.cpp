@@ -116,7 +116,13 @@ static long load_img() {//load_img函数用于加载镜像文件
   Log("The image is %s, size = %ld", img_file, size);
 
   fseek(fp, 0, SEEK_SET);
+  
+  #ifdef YSYXSOC
   int ret = fread(soc_flash_guest_to_host(CONFIG_SOC_FLASH_BASE), size, 1, fp);
+  #else
+  int ret = fread(guest_to_host(RESET_VECTOR), size, 1, fp);
+  #endif
+
   assert(ret == 1);
 
   fclose(fp);
