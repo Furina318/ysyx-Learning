@@ -37,7 +37,8 @@ module WBU #(
 reg [31:0] mstatus;
 reg [31:0] mtvec;
 reg [31:0] mepc;
-reg [31:0] mcause;
+// reg [31:0] mcause;
+wire [31:0] mcause = 32'hb;
 
 localparam MSTATUS = 12'h300;
 localparam MTVEC   = 12'h305;
@@ -94,12 +95,12 @@ assign src2 = (rs2 == 5'b0) ? 32'b0 : regs[rs2];
 //         end
 //     end
 // end
-initial begin
-    mstatus = 32'h1800;
-    mtvec   = 32'h0;
-    mepc    = 32'h0;
-    mcause  = 32'h0;
-end
+// initial begin
+//     mstatus = 32'h1800;
+//     mtvec   = 32'h0;
+//     mepc    = 32'h0;
+//     mcause  = 32'h0;
+// end
 
 always @(posedge clk) begin
     if (rst) begin
@@ -107,7 +108,7 @@ always @(posedge clk) begin
         mstatus <= 32'h1800;
         mtvec   <= 32'h0;
         mepc    <= 32'h0;
-        mcause  <= 32'h0;
+        // mcause  <= 32'h0;
     end
     else if (lsu_wb_valid && (wen_csr1 | wen_csr2)) begin
         // if (wen_csr2) begin
@@ -121,7 +122,7 @@ always @(posedge clk) begin
             MSTATUS: mstatus <= wdata_csr1;
             MTVEC:   mtvec   <= wdata_csr1;
             MEPC:    mepc    <= wdata_csr1;
-            MCAUSE:  mcause  <= wdata_csr1;
+            // MCAUSE:  mcause  <= wdata_csr1;
             default: ;
         endcase
         if (wen_csr2) begin
@@ -129,7 +130,7 @@ always @(posedge clk) begin
                 MSTATUS: mstatus <= wdata_csr2;
                 MTVEC:   mtvec   <= wdata_csr2;
                 MEPC:    mepc    <= wdata_csr2;
-                MCAUSE:  mcause  <= wdata_csr2;
+                // MCAUSE:  mcause  <= wdata_csr2;
                 default: ;
             endcase
         end

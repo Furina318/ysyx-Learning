@@ -37,28 +37,17 @@ VM_MODPREFIX = VysyxSoCFull
 VM_USER_CFLAGS = \
 	-DYSYXSOC \
 	-I/home/furina/ysyx-workbench/npc/include/ \
-	-I/home/furina/ysyx-workbench/nvboard/usr/include \
 	-DTOP_NAME="VysyxSoCFull" \
-	-DNVBOARD \
-	-MMD \
-	-O3 \
-	-I/usr/include/SDL2 \
-	-D_REENTRANT \
 
 # User LDLIBS (from -LDFLAGS on Verilator command line)
 VM_USER_LDLIBS = \
-	/home/furina/ysyx-workbench/nvboard/build/nvboard.a \
 	-lreadline \
 	-ldl \
 	-lSDL2 \
 	-lSDL2_image \
-	-lSDL2 \
-	-lSDL2_image \
-	-lSDL2_ttf \
 
 # User .cpp files (from .cpp's on Verilator command line)
 VM_USER_CLASSES = \
-	auto_bind \
 	cpu \
 	alarm \
 	device \
@@ -82,7 +71,6 @@ VM_USER_CLASSES = \
 
 # User .cpp directories (from .cpp's on Verilator command line)
 VM_USER_DIR = \
-	/home/furina/ysyx-workbench/npc/obj_dir \
 	/home/furina/ysyx-workbench/npc/pipeline-soc-csrc \
 	/home/furina/ysyx-workbench/npc/pipeline-soc-csrc/device \
 	/home/furina/ysyx-workbench/npc/pipeline-soc-csrc/device/io \
@@ -97,8 +85,6 @@ include $(VERILATOR_ROOT)/include/verilated.mk
 ### Executable rules... (from --exe)
 VPATH += $(VM_USER_DIR)
 
-auto_bind.o: /home/furina/ysyx-workbench/npc/obj_dir/auto_bind.cpp
-	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
 cpu.o: /home/furina/ysyx-workbench/npc/pipeline-soc-csrc/cpu.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
 alarm.o: /home/furina/ysyx-workbench/npc/pipeline-soc-csrc/device/alarm.cpp
