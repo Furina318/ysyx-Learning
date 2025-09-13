@@ -1,14 +1,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-#include "VysyxSoCFull.h"
-#include "../obj_dir/VysyxSoCFull___024root.h"
-#include "VysyxSoCFull__Dpi.h"
 #include "svdpi.h"
 #include "../include/common.h"
 #include "../include/utils.h"
 #include "../include/debug.h"
 #include "../include/paddr.h"
+
+#ifdef YSYXSOC
+#include "VysyxSoCFull.h"
+#include "../obj_dir/VysyxSoCFull___024root.h"
+#include "VysyxSoCFull__Dpi.h"
+#else
+#include "Vysyx_25010030_npc.h"
+#include "../obj_dir/Vysyx_25010030_npc___024root.h"
+#include "Vysyx_25010030_npc__Dpi.h"
+#endif
 
 #define HIT_TRAP 1
 #define ABORT 2
@@ -40,7 +47,12 @@ extern double lsu_ratio, ifu_ratio, exu_ratio;
 VerilatedVcdC *tfp = new VerilatedVcdC(); // 导出vcd波形
 #endif
 
+#ifdef YSYXSOC
 VysyxSoCFull *top = new VysyxSoCFull("top");
+#else
+Vysyx_25010030_npc *top = new Vysyx_25010030_npc("top");
+#endif
+
 vluint64_t main_time = 0; // 仿真时间
 
 #ifdef NVBOARD
@@ -89,9 +101,13 @@ extern "C" void ebreak(int station, int inst) {
     if(main_time>=start_time){
         if (Verilated::gotFinish())
             return;
-
+        #ifdef YSYXSOC
         npc_state.halt_ret = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__wbu__DOT__regs[10]; // a0
         npc_state.halt_pc = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__IF_ID_pc;
+        #else
+        npc_state.halt_pc = top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__IF_ID_pc;
+        npc_state.halt_ret = top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__wbu__DOT__regs[10];
+        #endif
 
         switch (station) {
             case HIT_TRAP:
@@ -101,7 +117,7 @@ extern "C" void ebreak(int station, int inst) {
 
             case ABORT:
             default:
-                Log("maintime = %ld, pc = 0x%08x, inst = 0x%08x", main_time, top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__IF_ID_pc, top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__IF_ID_inst);
+                Log("maintime = %ld, pc = 0x%08x", main_time, npc_state.halt_pc);
                 npc_state.state = NPC_ABORT;
                 // _Log(ANSI_FG_RED "HIT BAD TRAP\n" ANSI_NONE);
                 break;
