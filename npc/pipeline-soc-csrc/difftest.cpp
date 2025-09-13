@@ -3,18 +3,27 @@
 #include "../include/difftest.h"
 #include "../include/utils.h"
 #include <dlfcn.h>
+
+#ifdef YSYXSOC
 #include "VysyxSoCFull.h"
 #include "../obj_dir/VysyxSoCFull___024root.h"
+extern VysyxSoCFull *top;
+#define top_regs top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__wbu__DOT__regs
+#else
+#include "Vysyx_25010030_npc.h"
+#include "../obj_dir/Vysyx_25010030_npc___024root.h"
+extern Vysyx_25010030_npc *top;
+#define top_regs top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__wbu__DOT__regs
+#endif
 
 /********extern functions or variables********/
-extern VysyxSoCFull *top;
+
 extern NPCState npc_state;
 extern uint8_t* guest_to_host(paddr_t paddr);
 /*********************************************/
 
 #ifdef CONFIG_DIFFTEST
 
-#define top_regs top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__wbu__DOT__regs
 CPU_state cpu;
 static int skip_cnt_ref = 0;   // the amount to skip the ref
 static bool skip_flag = false; // the flag   to skip the ref 
