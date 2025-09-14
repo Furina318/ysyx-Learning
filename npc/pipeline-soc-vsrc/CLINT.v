@@ -1,4 +1,4 @@
-`include "../pipeline-soc-vsrc/defines/defines.v"
+`include "define.vh"
 
 module CLINT #(
     parameter ADDR_WIDTH = 32,
@@ -102,7 +102,7 @@ module CLINT #(
                     end 
                 // `ifdef VERILATOR
                 //     else if (awvalid && awready) begin 
-                //         $display("你怎么敢往里面写东西的");
+                //         $display("你他妈怎么敢往里面写东西的");
                 //     end
                 // `endif
                 end
