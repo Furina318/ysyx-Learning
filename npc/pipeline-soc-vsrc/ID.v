@@ -1,4 +1,4 @@
-`include "../pipeline-soc-vsrc/defines/defines.v"
+`include "define.vh"
 module ID (
     input             clk,                    // 时钟信号
     input             reset,                  // 复位信号
