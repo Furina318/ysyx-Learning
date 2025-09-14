@@ -1,5 +1,5 @@
 
-`include "../pipeline-soc-vsrc/defines/defines.v"
+`include "define.vh"
 
 module LSU_AXI (
     input         clk,
