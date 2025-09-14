@@ -1,4 +1,4 @@
-`include "../pipeline-soc-vsrc/defines/defines.v"
+`include "define.vh"
 
 module WBU #(
   parameter ADDR_WIDTH = 4,
