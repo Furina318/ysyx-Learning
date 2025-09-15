@@ -37,11 +37,6 @@ _do_bl_ss:
   la a2, _text_end
   jal _bl_ss_load_align4
 
-  la a0, _rodata_start
-  la a1, _rodata_load_lma
-  la a2, _rodata_end
-  jal _bl_ss_load_align4
-
   la a0, _data_start
   la a1, _data_load_lma
   la a2, _data_end
