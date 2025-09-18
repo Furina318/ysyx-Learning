@@ -212,6 +212,7 @@ begin
                 top   <= #1 top_plus_1;
                 count <= #1 count + 1'b1;
                 $write("%c", data_in);
+                $fflush();
             end
         2'b01 : if(count>0)
             begin
@@ -222,6 +223,7 @@ begin
                 bottom <= #1 bottom + 1'b1;
                 top    <= #1 top_plus_1;
                 $write("%c", data_in);
+                $fflush();
                 end
         default: ;
         endcase

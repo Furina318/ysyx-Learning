@@ -7,7 +7,7 @@ CXXFLAGS += -DYSYXSOC
 NXDC_FILES = ./constr/ysyxSoCFull.nxdc
 else ifeq ($(ARCH), riscv32e-npc)
 TOP_MODULE = ysyx_25010030_npc
-YOSYS_TOP = rv32e
+YOSYS_TOP = ysyx_25010030
 else
 $(error 不支持的架构：$(ARCH).支持的架构: riscv32e-ysyxsoc, riscv32e-npc)
 endif
@@ -17,33 +17,110 @@ NPC_HOME = /home/furina/ysyx-workbench/npc
 NVBOARD_HOME = /home/furina/ysyx-workbench/nvboard
 SOC_HOME = /home/furina/ysyx-workbench/ysyxSoC
 ifeq ($(ARCH), riscv32e-ysyxsoc)
-CSRCS = $(shell find $(abspath ./pipeline-soc-csrc) -name "*.cpp")  
+CSRCS = $(shell find $(abspath ./pipeline-soc-csrc) -name "*.cpp")  #可修改
 VSRCS = $(shell find $(abspath ./pipeline-soc-vsrc) -name "*.v")
 VSRCS += $(shell find $(abspath ../ysyxSoC/perip) -name "*.v")
 VSRCS += ../ysyxSoC/build/ysyxSoCFull.v 
 
 else
 ifeq ($(ARCH), riscv32e-npc)
-CSRCS = $(shell find $(abspath ./pipeline-soc-csrc) -name "*.cpp") 
+CSRCS = $(shell find $(abspath ./pipeline-soc-csrc) -name "*.cpp") #可修改
 VSRCS = $(shell find $(abspath ./pipeline-soc-vsrc) -name "*.v")   
+# VSRCS = $(shell find $(abspath ./build) -name "*.v")
 VSRCS += $(shell find $(abspath ./simple-SoC) -name "*.v")
 endif
 endif
 
+VVP = vvp
 VERILATOR = verilator
 VERILATOR_FLAGS += -cc --exe
 VERILATOR_FLAGS += -MMD
 VERILATOR_FLAGS += --trace
 VERILATOR_FLAGS += -Wno-STMTDLY -Wno-MODDUP -Wno-fatal
 
+BUILD_DIR = ./build
+IVERILOG = iverilog
+IVERILOG_DIR = $(BUILD_DIR)/iverilog
+WAVEFORM = $(IVERILOG_DIR)/waveform.fst
+WAVEFORM_NETLIST = $(IVERILOG_DIR)/waveform_netlist.fst
+MEM_INIT = $(IVERILOG_DIR)/mem_init.hex
+
+# IMG ?= ../am-kernels/benchmarks/microbench/build/microbench-riscv32e-npc.bin
+IMG ?= ../am-kernels/tests/cpu-tests/build/char-test-riscv32e-npc.bin
+
+CELLS ?= ../yosys-sta/nangate45/sim/cells.v
+NETLIST ?= ../yosys-sta/result/ysyx_25010030-250MHz/ysyx_25010030.netlist.fixed.v
+IVERILOG_BIN = $(IVERILOG_DIR)/sim
+IVERILOG_BIN_NETLIST = $(IVERILOG_DIR)/sim_netlist
+IVERILOG_FLAGS += -Wall -g2012 -s sim_top -o $(IVERILOG_BIN) \
+    -I./vsrc/core \
+    -DWAVE=$(WAVE) \
+    -DMEM_INIT_PATH=\"$(MEM_INIT)\" \
+    -DWAVEFORM_PATH=\"$(WAVEFORM)\"
+
+IVERILOG_NETLIST_FLAGS += -Wall -g2012 -s sim_top -o $(IVERILOG_BIN) \
+    -I./vsrc/core \
+    -DWAVE=$(WAVE) \
+    -DMEM_INIT_PATH=\"$(MEM_INIT)\" \
+    -DWAVEFORM_PATH=\"$(WAVEFORM_NETLIST)\"
+	
+WAVE ?= 0
+ifeq ($(WAVE), 1)
+IVERILOG_VVP_FLAGS = -lxt2  # 生成波形文件
+else
+IVERILOG_VVP_FLAGS =        # 不生成波形文件
+endif
+
+VERILOG_MERGED = $(BUILD_DIR)/ysyx_25010030.v
+$(VERILOG_MERGED): $(wildcard ./pipeline-soc-vsrc/*.v) $(wildcard ./pipeline-soc-vsrc/*.vh)
+	@echo "Merging core Verilog files into $@..."
+# 	@echo "// Merged Verilog file with PC reset value 0x30000000" > $@
+# 	@echo \`define RESET_VAL 0 >> $@
+	@echo "" >> $@
+	
+	@for file in $(wildcard ./pipeline-soc-vsrc/*.vh); do \
+		echo "// Included from $$file" >> $@; \
+		cat $$file >> $@; \
+		echo "" >> $@; \
+	done
+	
+	@for file in $(wildcard ./pipeline-soc-vsrc/*.v); do \
+		echo "// Included from $$file" >> $@; \
+		cat $$file | sed -e '/`include "ysyx_25010030_define.vh"/d' >> $@; \
+		echo "" >> $@; \
+	done
+
+$(IVERILOG_BIN): ARCH=riscv32e-npc
+$(IVERILOG_BIN): TOPNAME=ysyx_25010030_npc
+$(IVERILOG_BIN): $(VERILOG_MERGED) \
+                 $(wildcard ./simple-SoC/*.v) \
+                 ./sim_top.v
+	@echo "Building iverilog simulation for NPC architecture..."
+	$(IVERILOG) $(IVERILOG_FLAGS) $^
+
+$(IVERILOG_BIN_NETLIST): ARCH=riscv32e-npc
+$(IVERILOG_BIN_NETLIST): TOPNAME=ysyx_25010030_npc
+$(IVERILOG_BIN_NETLIST): $(NETLIST) \
+                         $(CELLS) \
+                 		 $(wildcard ./simple-SoC/*.v) \
+                         ./sim_top.v
+	@echo "Building iverilog netlist simulation (NETLIST=$(NETLIST), CELLS=$(CELLS))..."
+	$(IVERILOG) $(IVERILOG_NETLIST_FLAGS) \
+		-DWAVEFORM_PATH=\"$(WAVEFORM_NETLIST)\" \
+		-o $@ $^
+
+$(MEM_INIT): $(IMG)
+	@echo "Generating memory init from BIN..."
+	riscv64-linux-gnu-objcopy -I binary -O verilog --adjust-vma=-0x00000000 $^ $@
 
 ifeq ($(ARCH), riscv32e-ysyxsoc)
 VERILATOR_FLAGS += +incdir+$(SOC_HOME)/perip/uart16550/rtl +incdir+$(SOC_HOME)/perip/spi/rtl 
 VERILATOR_FLAGS += --timescale "1ns/1ns" --no-timing
+VERILATOR_FLAGS += -DYSYXSOC
 endif
 VERILATOR_FLAGS += --build -Mdir $(OBJ_DIR)
+VERILATOR_FLAGS += -I$(NPC_HOME)/pipeline-soc-vsrc #可修改
 
-BUILD_DIR = $(NPC_HOME)/build
 OBJ_DIR = ./obj_dir
 BIN = $(OBJ_DIR)/V$(TOP_MODULE)
 
@@ -69,7 +146,7 @@ $(DIFF_REF_SO):
 # endif
 
 # 参数设置
-IMG ?=  
+
 override ARGS ?= --log=$(OBJ_DIR)/npc-log.txt
 override ARGS += $(ARGS_DIFF)
 NPC_EXEC = $(BIN) $(ARGS) $(IMG)
@@ -80,7 +157,7 @@ ASFLAGS += -DBIN_PATH=\"$(mainargs)\"
 endif
 
 default: $(BIN)
-$(shell mkdir -p $(OBJ_DIR))
+$(shell mkdir -p $(OBJ_DIR) $(BUILD_DIR) $(IVERILOG_DIR))
 
 ifeq ($(ARCH), riscv32e-ysyxsoc)
 ifeq ($(nvboard), 1)
@@ -94,12 +171,20 @@ CSRCS += $(SRC_AUTO_BIND)
 endif
 endif
 
-# 伪目标：运行 GTKWave 查看波形
-.PHONY: gtkw
-gtkw: uae.gtkw
-	@echo
-	@echo "### WAVES ###"
-	gtkwave uae.gtkw
+.PHONY: sim-iverilog sim-iverilog-netlist
+sim-iverilog: $(MEM_INIT) $(IVERILOG_BIN)
+	@echo "Running iverilog simulation $(IMG) (WAVE=$(WAVE))..."
+	$(VVP) -n $(IVERILOG_BIN) $(IVERILOG_VVP_FLAGS)
+	@if [ $(WAVE) -eq 1 ] && [ -f $(WAVEFORM) ]; then \
+		echo "Waveform: $(WAVEFORM)"; \
+	fi
+
+sim-iverilog-netlist: $(MEM_INIT) $(IVERILOG_BIN_NETLIST)
+	@echo "Running iverilog netlist simulation (WAVE=$(WAVE))..."
+	$(VVP) -n $(IVERILOG_BIN_NETLIST) $(IVERILOG_VVP_FLAGS)
+	@if [ $(WAVE) -eq 1 ] && [ -f $(WAVEFORM_NETLIST) ]; then \
+		echo "Netlist Simulation Waveform: $(WAVEFORM_NETLIST)"; \
+	fi
 
 # 伪目标：仿真
 .PHONY: sim
@@ -120,11 +205,18 @@ wave.vcd: $(BIN)
 	@$(BIN) #+verilator+rand+reset+2
 
 yosys:
+ifeq ($(ARCH), riscv32e-ysyxsoc)
 	cd $(NPC_HOME)/../yosys-sta && make sta DESIGN=$(YOSYS_TOP) \
 											SDC_FILE=$(NPC_HOME)/npc.sdc \
 											RTL_FILES="$(shell find $(NPC_HOME)/pipeline-soc-vsrc -name "*.v")" \
 											CLK_FREQ_MHZ=200 \
-											INCLUDE_PATH=$(NPC_HOME)/pipeline-soc-vsrc/defines
+											INCLUDE_PATH=$(NPC_HOME)/pipeline-soc-vsrc
+else
+	cd $(NPC_HOME)/../yosys-sta && make sta DESIGN=$(YOSYS_TOP) \
+											SDC_FILE=$(NPC_HOME)/npc.sdc \
+											RTL_FILES="$(shell find $(NPC_HOME)/build -name "ysyx_25010030.v")" \
+											CLK_FREQ_MHZ=250 
+endif
 	cd $(NPC_HOME)
 
 # 伪目标：运行环境准备
@@ -135,6 +227,10 @@ run-env: $(BIN) $(DIFF_REF_SO)
 .PHONY: run
 run: run-env
 	$(NPC_EXEC)
+
+.PHONY: verilog
+verilog: $(VERILOG_MERGED)
+	@echo "Generated merged Verilog file: $(VERILOG_MERGED)"
 
 # 伪目标：调试
 .PHONY: gdb
@@ -152,39 +248,19 @@ $(BIN): $(VSRCS) $(CSRCS) $(NVBOARD_ARCHIVE) $(SRC_AUTO_BIND)
 		$(addprefix -CFLAGS , $(CXXFLAGS)) $(addprefix -LDFLAGS , $(LDFLAGS)) \
 		--Mdir $(OBJ_DIR) --exe -o $(abspath $(BIN))
 
-# # 构建仿真可执行文件
-# $(BINARY): .stamp.verilate
-# 	@echo
-# 	@echo "### BUILDING SIM ###"
-# 	make -C obj_dir -f V$(TOP_MODULE).mk V$(TOP_MODULE)
-
-# # 伪目标：Verilator 转换
-# .PHONY: verilate
-# verilate: .stamp.verilate
-
-# # Verilator 转换和生成构建文件
-# .stamp.verilate: $(VSRCS) $(CSRCS) 
-# 	@echo
-# 	@echo "### VERILATING ###"
-# 	verilator -Wno-STMTDLY -Wno-MODDUP --trace --top-module $(TOP_MODULE) \
-# 	$(if $(filter riscv32e-ysyxsoc,$(ARCH)),-I../ysyxSoC/perip/uart16550/rtl -I../ysyxSoC/perip/spi/rtl --timescale "1ns/1ns" --no-timing) \
-# 	$(if $(filter 1,$(nvboard)),-I$(NVBOARD_HOME)/usr/include/ -I$(NVBOARD_HOME)/include/) \
-# 	-cc $(VSRCS) --exe $(CSRCS) $(INCFLAGS)
-# # verilator -Wno-STMTDLY -Wno-MODDUP --top-module $(MODULE) -cc $(VSRCS) --exe $(CSRCS) $(INCFLAGS) $(CFLAGS)
-# 	@echo "LIBS += $(LIBS)" >> ./obj_dir/V$(TOP_MODULE).mk    # 添加链接库
-# 	@echo "CXXFLAGS += $(INCFLAGS)" >> ./obj_dir/V$(TOP_MODULE).mk  # 添加包含路径
-# 	@touch .stamp.verilate
 
 # 伪目标：Lint 检查
 .PHONY: lint
-lint: $(TOP_MODULE).v
-	verilator --lint-only $(TOP_MODULE).v
+lint: 
+	verilator --lint-only -Wall $(shell find $(abspath ./pipeline-soc-vsrc) -name "*.v") \
+			-I$(NPC_HOME)/pipeline-soc-vsrc
 
 # 伪目标：清理
 .PHONY: clean
 clean:
 	rm -rf .stamp.*
 	rm -rf $(OBJ_DIR)
+	rm -rf $(BUILD_DIR)
 	rm -rf wave.vcd
 	rm -rf ./log/*
 

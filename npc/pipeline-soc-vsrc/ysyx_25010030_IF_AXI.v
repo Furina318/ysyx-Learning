@@ -1,7 +1,7 @@
-`include "../pipeline-soc-vsrc/defines/defines.v"
+`include "ysyx_25010030_define.vh"
 
 // 带iCache的取指模块
-module IF_AXI (
+module ysyx_25010030_IF_AXI (
     input             clk,
     input             reset,
 
@@ -46,7 +46,7 @@ module IF_AXI (
 
     // 内部信号
     reg [31:0] next_pc;
-    reg cache_req;
+    // reg cache_req;
     reg flush_once;
     reg once;
     
@@ -68,7 +68,7 @@ module IF_AXI (
     wire [31:0] jal_target = (flush_once ? IF_ID_pc : next_pc) + immJ;
     
     // 实例化iCache模块
-    iCache u_icache (
+    ysyx_25010030_iCache u_icache (
         .clk            (clk           ),
         .reset          (reset         ),
         .is_fencei      (is_fencei     ),
@@ -121,14 +121,19 @@ module IF_AXI (
     end
 
     // 主控制逻辑
-    always @(posedge clk or posedge reset) begin
+    always @(posedge clk) begin
         if (reset) begin
+        `ifdef YSYXSOC
             IF_ID_pc   <= `RESET_FLASH_PC;
+            next_pc    <= `RESET_FLASH_PC;
+        `else
+            IF_ID_pc   <= `RESET_PC;
+            next_pc    <= `RESET_PC;
+        `endif
             IF_ID_inst <= 0;
             IF_valid   <= 0;
-            next_pc    <= `RESET_FLASH_PC;
             state      <= IDLE;
-            cache_req  <= 0;
+            // cache_req  <= 0;
             flush_once <= 0;
             once       <= 1;
         end
@@ -147,7 +152,7 @@ module IF_AXI (
                         if ((IF_valid && ID_ready) || flush_once || once) begin
                             once       <= 0;
                             flush_once <= 0;
-                            cache_req  <= 1;
+                            // cache_req  <= 1;
                             IF_valid   <= 0;
                             state      <= WAIT_FLUSH;
                         end
@@ -156,7 +161,7 @@ module IF_AXI (
                         state <= WAIT_CACHE;
                     end
                     WAIT_CACHE: begin
-                        cache_req <= 0;
+                        // cache_req <= 0;
                         
                         // 缓存命中
                         if (cache_valid) begin

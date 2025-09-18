@@ -1,5 +1,5 @@
-`include "../pipeline-soc-vsrc/defines/defines.v"
-module ID (
+`include "ysyx_25010030_define.vh"
+module ysyx_25010030_ID (
     input             clk,                    // 时钟信号
     input             reset,                  // 复位信号
     input      [31:0] if_id_pc,               // 从IFU传递的PC值
@@ -53,7 +53,8 @@ module ID (
     wire [3:0] rs2    = if_id_inst[23:20];
     wire [3:0] rd     = if_id_inst[10: 7];
     wire [2:0] func3  = if_id_inst[14:12];
-    wire [6:0] func7  = if_id_inst[31:25];
+    // wire [6:0] func7  = if_id_inst[31:25];
+    wire       func7_5 = if_id_inst[30];
     wire [5:0] shamt  = if_id_inst[25:20];
     wire [4:0] zimm   = if_id_inst[19:15];
     wire [4:0] get_opcode = opcode[ 6: 2];
@@ -217,13 +218,13 @@ module ID (
                     id_ex_imm      <= immR;
                     id_ex_RegWrite <= 1'b1;
                     case (func3)
-                        3'b000:   id_ex_alu_op <= (func7[5]) ? `ALU_SUB : `ALU_ADD;
+                        3'b000:   id_ex_alu_op <= (func7_5) ? `ALU_SUB : `ALU_ADD;
                         `F3_ANDI: id_ex_alu_op <= `ALU_AND;
                         `F3_ORI:  id_ex_alu_op <= `ALU_OR;
                         `F3_XORI: id_ex_alu_op <= `ALU_XOR;
                         `F3_SLTU: id_ex_alu_op <= `ALU_SLTU;
                         `F3_SLT:  id_ex_alu_op <= `ALU_SLT;
-                        `F3_RSH:  id_ex_alu_op <= (func7[5]) ? `ALU_SRA : `ALU_SRL;
+                        `F3_RSH:  id_ex_alu_op <= (func7_5) ? `ALU_SRA : `ALU_SRL;
                         `F3_LSH:  id_ex_alu_op <= `ALU_SLL;
                         default: begin
                             
@@ -241,7 +242,7 @@ module ID (
                         `F3_SLTU: id_ex_alu_op <= `ALU_SLTU;
                         `F3_SLTI: id_ex_alu_op <= `ALU_SLT;
                         `F3_XORI: id_ex_alu_op <= `ALU_XOR;
-                        `F3_RSH:  id_ex_alu_op <= (func7[5]) ? `ALU_SRA : `ALU_SRL;
+                        `F3_RSH:  id_ex_alu_op <= (func7_5) ? `ALU_SRA : `ALU_SRL;
                         `F3_LSH:  id_ex_alu_op <= `ALU_SLL;
                         default: begin
                             

@@ -30,23 +30,23 @@ void putch(char ch) {
   outb(UART_TX, ch);
 }
 
-// static void uart_init(){
-//   	unsigned int divisor = 1;
-// 	uint32_t lcr = 0x03;//8位数据位，无校验
+static void uart_init(){
+  	unsigned int divisor = 1;
+	uint32_t lcr = 0x03;//8位数据位，无校验
 
-// 	outb(UART_LCR, 0x80 | lcr); //LCR寄存器最高位，使能分频系数寄存器
-// 	outb(UART_MSB, 0xff & (divisor >> 8));//写入分频系数
-// 	outb(UART_LSB, 0xff & divisor); 
-// 	outb(UART_LCR, lcr); //恢复LCR寄存器的值，关闭分频系数寄存器，可正常收发数据
-// }
-
-static void uart_init(uint32_t baud_rate) {
-	uint16_t divisor = (uint16_t)(50000000 / (baud_rate * 16)); //50MHz工作时钟，每比特周期采样16次（因子）
-	outb(UART_LCR, 0x80 | inb(UART_LCR)); // enable divisor latch
-	outb(UART_MSB, 0xff & (divisor >> 8));
+	outb(UART_LCR, 0x80 | lcr); //LCR寄存器最高位，使能分频系数寄存器
+	outb(UART_MSB, 0xff & (divisor >> 8));//写入分频系数
 	outb(UART_LSB, 0xff & divisor); 
-	outb(UART_LCR, inb(UART_LCR) & 0x7f); // resume	
+	outb(UART_LCR, lcr); //恢复LCR寄存器的值，关闭分频系数寄存器，可正常收发数据
 }
+
+// static void uart_init(uint32_t baud_rate) {
+// 	uint16_t divisor = (uint16_t)(50000000 / (baud_rate * 16)); //50MHz工作时钟，每比特周期采样16次（因子）
+// 	outb(UART_LCR, 0x80 | inb(UART_LCR)); // enable divisor latch
+// 	outb(UART_MSB, 0xff & (divisor >> 8));
+// 	outb(UART_LSB, 0xff & divisor); 
+// 	outb(UART_LCR, inb(UART_LCR) & 0x7f); // resume	
+// }
 
 void halt(int code) {
   ysyxsoc_trap(code);
@@ -75,8 +75,8 @@ void ysyx_show(){
 }
 
 void _trm_init() {
-  uart_init(115200);
-//   uart_init();
+//   uart_init(115200);
+  uart_init();
 
 //   bootloader();
 

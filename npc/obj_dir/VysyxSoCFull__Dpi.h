@@ -16,7 +16,7 @@ extern "C" {
 
 
     // DPI IMPORTS
-    // DPI import at /home/furina/ysyx-workbench/npc/pipeline-soc-vsrc/ysyx_25010030.v:79:34
+    // DPI import at /home/furina/ysyx-workbench/npc/pipeline-soc-vsrc/ysyx_25010030.v:95:34
     extern void ebreak(int station, int inst);
     // DPI import at /home/furina/ysyx-workbench/ysyxSoC/perip/flash/flash.v:84:30
     extern void flash_read(int addr, int* data);

@@ -1,9 +1,9 @@
-`include "../pipeline-soc-vsrc/defines/defines.v"
+`include "ysyx_25010030_define.vh"
 
-module EX (
+module ysyx_25010030_EX (
     input             clk,
     input             reset,
-    input             id_ready,        // ID -> IF
+    // input             id_ready,        // ID -> IF
     input             id_valid,
     output reg        ex_ready,
     input             lsu_ready,
@@ -114,8 +114,8 @@ module EX (
 
     // ALU 输入选择
     always @(*) begin
+        ex_num1 = src1;
         if (id_ex_MemRead | id_ex_MemWrite) begin
-            ex_num1 = src1;
             ex_num2 = id_ex_imm;
         end
         else if (id_ex_jal | id_ex_jalr) begin
@@ -131,12 +131,10 @@ module EX (
             ex_num2 = id_ex_imm;
         end
         else if(id_ex_alu_op == `ALU_SLL || id_ex_alu_op == `ALU_SRL || id_ex_alu_op == `ALU_SRA) begin
-            ex_num1 = src1;
             ex_num2 = (id_ex_opcode[6:2] == `INST_TYPE_I && !id_ex_shamt[5]) ? {27'd0, id_ex_shamt[4:0]} :
                       (id_ex_opcode[6:2] == `INST_TYPE_R)                    ? {27'd0, src2[4:0]}        : 32'd0;
         end
         else begin
-            ex_num1 = src1;
             ex_num2 = (id_ex_opcode[6:2] == `INST_TYPE_R || id_ex_opcode[6:2] == `INST_TYPE_B) ? src2 : id_ex_imm;
         end
     end
@@ -187,14 +185,17 @@ module EX (
 
     always @(*) begin
         // jal_target  = id_ex_pc + id_ex_imm;
+        ex_flush    = ex_flush_condition & (~|load_use_flag);
         jalr_target = (src1 + id_ex_imm) & 32'hfffffffe;
         take_branch = (id_ex_opcode == `INST_B) && (
                     (id_ex_func3 == `F3_BNE  && !alu_zero) ||  // bne
                     (id_ex_func3 == `F3_BEQ  &&  alu_zero) ||  // beq
-                    (id_ex_func3 == `F3_BLT  &&  alu_less) ||  // blt
-                    (id_ex_func3 == `F3_BGE  && !alu_less) ||  // bge
-                    (id_ex_func3 == `F3_BLTU &&  alu_less) ||  // bltu
-                    (id_ex_func3 == `F3_BGEU && !alu_less)     // bgeu
+                    // (id_ex_func3 == `F3_BLT  &&  alu_less) ||  // blt
+                    // (id_ex_func3 == `F3_BGE  && !alu_less) ||  // bge
+                    // (id_ex_func3 == `F3_BLTU &&  alu_less) ||  // bltu
+                    // (id_ex_func3 == `F3_BGEU && !alu_less)     // bgeu
+                    ( alu_less && (id_ex_func3 == `F3_BLT || id_ex_func3 == `F3_BLTU)) ||
+                    (!alu_less && (id_ex_func3 == `F3_BGE || id_ex_func3 == `F3_BGEU))
         );
         case(1'b1)
             // id_ex_jal: begin
@@ -204,19 +205,15 @@ module EX (
             //     ex_flush_pc = 32'h0;
             // end
             id_ex_jalr: begin
-                ex_flush    = ex_flush_condition & (~|load_use_flag);
                 ex_flush_pc = jalr_target;
             end
             id_ex_csr_ecall : begin
-                ex_flush    = ex_flush_condition & (~|load_use_flag);
                 ex_flush_pc = wb_ex_csr_num1;
             end
             id_ex_csr_mret: begin
-                ex_flush    = ex_flush_condition & (~|load_use_flag);
                 ex_flush_pc = wb_ex_csr_num2;
             end
             take_branch: begin
-                ex_flush    = ex_flush_condition & (~|load_use_flag);
                 ex_flush_pc = id_ex_pc + id_ex_imm;   
             end
             default: begin
@@ -250,8 +247,10 @@ module EX (
 
     wire [31:0] mstatus;
     wire [31:0] mpie;
+    wire [31:0] zimm;
     assign mpie = (wb_ex_csr_num1 >> 7) & 32'h1;
     assign mstatus = (((wb_ex_csr_num1 & ~(32'h3 << 11)) & ~(32'h1 << 3)) | (mpie << 3)) | (32'h1 << 7);
+    assign zimm = {27'b0, id_ex_zimm};
 
     reg [31:0] csr_write_data;
     always @(*) begin
@@ -259,9 +258,9 @@ module EX (
             (id_ex_csr_op == `CSR_CSRRW && id_ex_func3 == `F3_CSRRW): csr_write_data = src1;
             (id_ex_csr_op == `CSR_CSRRC && id_ex_func3 == `F3_CSRRC): csr_write_data = (wb_ex_csr_num1 & ~src1);
             (id_ex_csr_op == `CSR_CSRRS && id_ex_func3 == `F3_CSRRS): csr_write_data = (wb_ex_csr_num1 | src1);
-            (id_ex_csr_op == `CSR_CSRRW && id_ex_func3 == `F3_CSRRWI):csr_write_data = {27'b0,id_ex_zimm};
-            (id_ex_csr_op == `CSR_CSRRC && id_ex_func3 == `F3_CSRRCI):csr_write_data = wb_ex_csr_num1 & ~({27'b0,id_ex_zimm});
-            (id_ex_csr_op == `CSR_CSRRS && id_ex_func3 == `F3_CSRRSI):csr_write_data = wb_ex_csr_num1 | ({27'b0,id_ex_zimm});
+            (id_ex_csr_op == `CSR_CSRRW && id_ex_func3 == `F3_CSRRWI):csr_write_data = zimm;
+            (id_ex_csr_op == `CSR_CSRRC && id_ex_func3 == `F3_CSRRCI):csr_write_data = wb_ex_csr_num1 & ~zimm;
+            (id_ex_csr_op == `CSR_CSRRS && id_ex_func3 == `F3_CSRRSI):csr_write_data = wb_ex_csr_num1 | zimm;
             (id_ex_csr_ecall):                                        csr_write_data = 32'd11;
             (id_ex_csr_mret):                                         csr_write_data = mstatus;
             default:                                                  csr_write_data = 32'b0;

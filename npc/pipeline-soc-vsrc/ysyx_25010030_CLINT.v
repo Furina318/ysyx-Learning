@@ -1,6 +1,6 @@
-`include "../pipeline-soc-vsrc/defines/defines.v"
+`include "ysyx_25010030_define.vh"
 
-module CLINT #(
+module ysyx_25010030_CLINT #(
     parameter ADDR_WIDTH = 32,
     parameter DATA_WIDTH = 32
     // parameter MAX_DELAY  = 4,

@@ -1,9 +1,12 @@
-`include "../pipeline-soc-vsrc/defines/defines.v"
+`include "ysyx_25010030_define.vh"
 
 module ysyx_25010030 (
     input         clock,
     input         reset,
     input         io_interrupt,
+`ifdef __ICARUS__
+    output reg   sim_end,
+`endif
 
     //====== AXI Master ======//
     input         io_master_awready,
@@ -75,6 +78,19 @@ module ysyx_25010030 (
     output        io_slave_rlast,
     output [ 3:0] io_slave_rid
 );
+
+    assign io_slave_awready = 1'b0;
+    assign io_slave_wready  = 1'b0;
+    assign io_slave_bvalid  = 1'b0;
+    assign io_slave_bresp   = 2'b0;
+    assign io_slave_bid     = 4'b0;
+    assign io_slave_arready = 1'b0;
+    assign io_slave_rvalid  = 1'b0;
+    assign io_slave_rresp   = 2'b0;
+    assign io_slave_rdata   = 32'b0;
+    assign io_slave_rlast   = 1'b0;
+    assign io_slave_rid     = 4'b0;
+
 `ifdef VERILATOR
     import "DPI-C" function void ebreak(input int station, input int inst);
     // import "DPI-C" function void occupancy(input int ifu_active_cycles, input int exu_active_cycles, input int lsu_active_cycles, input int total_cycles);
@@ -213,16 +229,16 @@ module ysyx_25010030 (
     //AR channel
     wire [31:0] clint_araddr;
     wire        clint_arvalid;
-    wire [ 3:0] clint_arid;
-    wire [ 7:0] clint_arlen;
-    wire [ 2:0] clint_arsize;
-    wire [ 1:0] clint_arburst;
+    // wire [ 3:0] clint_arid;
+    // wire [ 7:0] clint_arlen;
+    // wire [ 2:0] clint_arsize;
+    // wire [ 1:0] clint_arburst;
     wire        clint_arready;
     //R channel
     wire [ 1:0] clint_rresp;
     wire [31:0] clint_rdata;
     wire        clint_rvalid;
-    wire [ 3:0] clint_rid;
+    // wire [ 3:0] clint_rid;
     wire        clint_rlast;
     wire        clint_rready;
     //AW channel
@@ -249,7 +265,7 @@ module ysyx_25010030 (
     // wire [31:0] exu_active_cycles;
     // wire [31:0] lsu_active_cycles;
 
-    CLINT clint (
+    ysyx_25010030_CLINT clint (
         .clk    (clock        ),
         .reset  (reset        ),
         .arvalid(clint_arvalid),
@@ -263,7 +279,7 @@ module ysyx_25010030 (
     );
 
 
-    AXI_ARB_BURST axi_arb (
+    ysyx_25010030_AXI_ARB axi_arb (
         .clk              (clock            ),
         .reset            (reset            ),
 
@@ -352,16 +368,16 @@ module ysyx_25010030 (
         .clint_araddr     (clint_araddr     ),
         .clint_arvalid    (clint_arvalid    ),
         .clint_arready    (clint_arready    ),
-        .clint_arid       (clint_arid       ),
-        .clint_arlen      (clint_arlen      ),
-        .clint_arsize     (clint_arsize     ),
-        .clint_arburst    (clint_arburst    ),
+        // .clint_arid       (clint_arid       ),
+        // .clint_arlen      (clint_arlen      ),
+        // .clint_arsize     (clint_arsize     ),
+        // .clint_arburst    (clint_arburst    ),
         .clint_rready     (clint_rready     ),
         .clint_rvalid     (clint_rvalid     ),
         .clint_rresp      (clint_rresp      ),
         .clint_rdata      (clint_rdata      ),
-        .clint_rlast      (clint_rlast      ),
-        .clint_rid        (clint_rid        )
+        .clint_rlast      (clint_rlast      )
+        // .clint_rid        (clint_rid        )
 
         // CLINT从设备接口（写通道，始终无效）
         // .clint_awaddr(clint_awaddr),
@@ -383,7 +399,7 @@ module ysyx_25010030 (
     );
 
     // IF（指令获取）模块
-    IF_AXI ifu (
+    ysyx_25010030_IF_AXI ifu (
         .clk           (clock         ),
         .reset         (reset         ),
         .EX_flush      (ex_flush      ),
@@ -409,7 +425,7 @@ module ysyx_25010030 (
     );
 
     // ID（指令解码）模块
-    ID idu (
+    ysyx_25010030_ID idu (
         .clk               (clock             ),
         .reset             (reset             ),
         .if_id_pc          (IF_ID_pc          ),
@@ -449,10 +465,10 @@ module ysyx_25010030 (
     );
 
     // EX（执行）模块
-    EX exu (
+    ysyx_25010030_EX exu (
         .clk                    (clock                  ),
         .reset                  (reset                  ),
-        .id_ready               (id_ready               ),
+        // .id_ready               (id_ready               ),
         .id_valid               (id_valid               ),
         .ex_ready               (ex_ready               ),
         .lsu_ready              (lsu_ex_ready           ),
@@ -519,7 +535,7 @@ module ysyx_25010030 (
     );
 
     // MEM（内存访问）模块
-    LSU_AXI lsu (
+    ysyx_25010030_LSU_AXI lsu (
         .clk                    (clock                  ),
         .rst                    (reset                  ),
         .ex_lsu_valid           (ex_lsu_valid           ),
@@ -591,7 +607,7 @@ module ysyx_25010030 (
     );
 
     // WBU（写回）模块
-    WBU wbu (
+    ysyx_25010030_WB wbu (
         .clk         (clock               ),
         .rst         (reset               ),
         .wen         (lsu_wb_RegWrite     ),
@@ -637,6 +653,17 @@ module ysyx_25010030 (
         if (IF_ID_inst == 32'h00100073) begin
             // occupancy(ifu_active_cycles, exu_active_cycles, lsu_active_cycles, cycle_cnt);
             ebreak(`HIT_TRAP, IF_ID_inst);
+        end
+    end
+`endif
+
+`ifdef __ICARUS__
+    always @(posedge clock) begin
+        if (reset) begin
+            sim_end <= 1'b0;
+        end
+        if (IF_ID_inst == 32'h00100073) begin
+            sim_end <= 1;
         end
     end
 `endif

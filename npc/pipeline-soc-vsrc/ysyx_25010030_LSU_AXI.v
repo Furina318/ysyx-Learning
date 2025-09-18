@@ -1,7 +1,7 @@
 
-`include "../pipeline-soc-vsrc/defines/defines.v"
+`include "ysyx_25010030_define.vh"
 
-module LSU_AXI (
+module ysyx_25010030_LSU_AXI (
     input         clk,
     input         rst,
 
@@ -90,7 +90,7 @@ module LSU_AXI (
     // import "DPI-C" function void counter(input int inst_type, input int ifu_inc, input int lsu_inc, input int exu_inc);
 `endif 
 
-    parameter OKAY = 2'b00;
+    // parameter OKAY = 2'b00;
 
     localparam SDRAM_BASE        = 32'hA0000000;  
     localparam SDRAM_END         = 32'hBFFFFFFF;  
@@ -105,7 +105,7 @@ module LSU_AXI (
     wire in_sdram = (addr_reg >= SDRAM_BASE) && (addr_reg <= SDRAM_END);
 
     localparam BLOCK_OFFSET_WIDTH = 4; 
-    wire [BLOCK_OFFSET_WIDTH-1:0] req_offset  = addr[BLOCK_OFFSET_WIDTH - 1 : 0];  // 块内偏移（0-15）
+    // wire [BLOCK_OFFSET_WIDTH-1:0] req_offset  = addr[BLOCK_OFFSET_WIDTH - 1 : 0];  // 块内偏移（0-15）
     // wire [                   1:0] word_offset = req_offset[3:2]; 
     wire [                      1:0] word_offset = addr[3:2];
 
@@ -114,7 +114,8 @@ module LSU_AXI (
     reg [                   3:0] saved_wstrb; 
     reg [                   3:0] burst_cnt; 
 
-    reg  [31:0] cache_addr;   
+    // reg  [31:0] cache_addr;
+    reg  [ 1:0] addr_off;   
     reg  [31:0] rdata;  
     reg         valid;   
     reg  [31:0] addr_reg; 
@@ -253,13 +254,12 @@ module LSU_AXI (
     assign lsu_axi_bready = 1'b1;
 
     always @(posedge clk) begin
-        // if (rst) begin
-        //     lsu_axi_arvalid <= 1'b0;
-        //     lsu_axi_araddr  <= 32'h0;
-        //     ar_done         <= 0;
-        // end 
-        // else 
-        if (state == RD) begin
+        if (rst) begin
+            lsu_axi_awvalid <= 1'b0;
+            lsu_axi_wvalid  <= 1'b0;
+            lsu_axi_arvalid <= 1'b0;
+        end 
+        else if (state == RD) begin
             if (!ar_done && !lsu_axi_arvalid) begin
                 lsu_axi_araddr  <= in_sdram ? {addr_reg[31:BLOCK_OFFSET_WIDTH], {BLOCK_OFFSET_WIDTH{1'b0}}} : addr_reg;
                 lsu_axi_arvalid <= 1'b1;
@@ -404,10 +404,10 @@ module LSU_AXI (
         end 
     end
 
-    wire [31:0] byte_data1 = (rdata >> (cache_addr[1:0]*8));
+    wire [31:0] byte_data1 = (rdata >> (addr_off*8));
     wire [ 7:0] byte_data = byte_data1[7:0];
-    wire [15:0] half_data = (cache_addr[1:0] == 2'b00) ? (rdata[15:0]) :
-                            (cache_addr[1:0] == 2'b10) ? (rdata[31:16]) : rdata[15:0];
+    wire [15:0] half_data = (addr_off == 2'b00) ? (rdata[15:0]) :
+                            (addr_off == 2'b10) ? (rdata[31:16]) : rdata[15:0];
     wire [31:0] read_lsu_data = (l_MemLen == `Mem_Bit) ? {{24{byte_data[7]}}, byte_data} :
                                 (l_MemLen == `Mem_UBit) ? {24'b0, byte_data} :
                                 (l_MemLen == `Mem_Half) ? {{16{half_data[15]}}, half_data} :
@@ -425,7 +425,8 @@ module LSU_AXI (
             
             // 处理读请求：发送到缓存
             if (ex_lsu_valid & lsu_ex_ready & (ex_lsu_MemRead | ex_lsu_MemWrite)) begin
-                cache_addr     <= addr;
+                // cache_addr     <= addr;
+                addr_off <= addr[1:0];
             end else if (valid) begin
                 // read_pending  <= 0;
                 op_complete   <= 1;

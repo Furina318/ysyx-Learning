@@ -1,6 +1,6 @@
-`include "../pipeline-soc-vsrc/defines/defines.v"
+`include "ysyx_25010030_define.vh"
 
-module WBU #(
+module ysyx_25010030_WB #(
   parameter ADDR_WIDTH = 4,
   parameter DATA_WIDTH = 32)(
   input 		  clk,
@@ -50,29 +50,17 @@ reg [DATA_WIDTH-1:0] regs [2**ADDR_WIDTH-1:0];
 
 assign wb_lsu_ready = 1;
 
-// integer i;
-// always @(posedge clk) begin
-//     if(rst)begin
-//         for(i = 0; i < 16; i = i + 1)begin
-//             regs[i] = 32'b0;
-//         end
-//     end
-//     else if (lsu_wb_valid & wen & (waddr != 4'b0)) begin
-//         regs[waddr] <= wdata;
-//     end
-// end
-generate
-    genvar i;
-    for (i = 0; i < 16; i = i + 1) begin : reg_block
-        Reg #(DATA_WIDTH, 32'b0) reg_inst (
-            .clk(clk),
-            .rst(rst),
-            .din(wdata),
-            .dout(regs[i]),
-            .wen(lsu_wb_valid & wen & (waddr == i) & (waddr != 4'b0))
-        );
+integer i;
+always @(posedge clk) begin
+    if(rst)begin
+        for(i = 0; i < 16; i = i + 1)begin
+            regs[i] <= 32'b0;
+        end
     end
-endgenerate
+    else if (lsu_wb_valid & wen & (waddr != 4'b0)) begin
+        regs[waddr] <= wdata;
+    end
+end
 
 // always @(posedge clk) begin
 //     // if (rst) begin
@@ -87,62 +75,41 @@ endgenerate
 //     end
 // end
 
-assign src1 = regs[rs1];
-assign src2 = regs[rs2];
+assign src1 = (rs1 == 4'b0) ? 32'b0 : regs[rs1];
+assign src2 = (rs2 == 4'b0) ? 32'b0 : regs[rs2];
 
-// always @(posedge clk) begin
-//     if (rst) begin
-//         // mvendorid <= 32'h79737978;
-//         // marchid   <= 32'h17d9f6e;
+always @(posedge clk) begin
+    if (rst) begin
+        // mvendorid <= 32'h79737978;
+        // marchid   <= 32'h17d9f6e;
 
-//         mstatus <= 32'h1800;
-//         mtvec   <= 32'h0;
-//         mepc    <= 32'h0;
-//         // mcause  <= 32'h0;
-//     end
-//     else if (lsu_wb_valid) begin
-//         if (wen_csr1) begin
-//             case(waddr_csr1)
-//                 MSTATUS: mstatus <= wdata_csr1;
-//                 MTVEC:   mtvec   <= wdata_csr1;
-//                 MEPC:    mepc    <= wdata_csr1;
-//                 // MCAUSE:  mcause  <= wdata_csr1;
-//                 default: ;
-//             endcase
-//         end
-//         if (is_ecall) begin
-//             // case(waddr_csr2)
-//             //     MSTATUS: mstatus <= wdata_csr2;
-//             //     MTVEC:   mtvec   <= wdata_csr2;
-//             //     MEPC:    mepc    <= wdata_csr2;
-//             //     // MCAUSE:  mcause  <= wdata_csr2;
-//             //     default: ;
-//             // endcase
-//             mepc <= wdata_csr2;
-//         end
-//     end
-// end
-Reg #(32, 32'h1800) mstatus_reg (
-    .clk(clk),
-    .rst(rst),
-    .din(wdata_csr1),
-    .dout(mstatus),
-    .wen(lsu_wb_valid & wen_csr1 & (waddr_csr1 == MSTATUS))
-);
-Reg #(32, 32'h0) mtvec_reg (
-    .clk(clk),
-    .rst(rst),
-    .din(wdata_csr1),
-    .dout(mtvec),
-    .wen(lsu_wb_valid & wen_csr1 & (waddr_csr1 == MTVEC))
-);
-Reg #(32, 32'h0) mepc_reg (
-    .clk(clk),
-    .rst(rst),
-    .din(is_ecall ? wdata_csr2 : wdata_csr1),
-    .dout(mepc),
-    .wen(lsu_wb_valid & ( (wen_csr1 & (waddr_csr1 == MEPC)) | is_ecall ))
-);
+        mstatus <= 32'h1800;
+        mtvec   <= 32'h0;
+        mepc    <= 32'h0;
+        // mcause  <= 32'h0;
+    end
+    else if (lsu_wb_valid) begin
+        if (wen_csr1) begin
+            case(waddr_csr1)
+                MSTATUS: mstatus <= wdata_csr1;
+                MTVEC:   mtvec   <= wdata_csr1;
+                MEPC:    mepc    <= wdata_csr1;
+                // MCAUSE:  mcause  <= wdata_csr1;
+                default: ;
+            endcase
+        end
+        if (is_ecall) begin
+            // case(waddr_csr2)
+            //     MSTATUS: mstatus <= wdata_csr2;
+            //     MTVEC:   mtvec   <= wdata_csr2;
+            //     MEPC:    mepc    <= wdata_csr2;
+            //     // MCAUSE:  mcause  <= wdata_csr2;
+            //     default: ;
+            // endcase
+            mepc <= wdata_csr2;
+        end
+    end
+end
 
 // assign rdata_csr1 = (raddr_csr1 == MSTATUS) ? mstatus :
 //                     // (raddr_csr1 == MVENDORID) ? mvendorid :
@@ -173,21 +140,4 @@ endfunction
 assign rdata_csr1 = csr_read(raddr_csr1);
 assign rdata_csr2 = csr_read(raddr_csr2);
 
-endmodule
-
-module Reg #(parameter WIDTH = 32, parameter RESET_VAL = 32'h0)(
-    input wire             clk,
-    input wire             rst,
-    input wire [WIDTH-1:0] din,
-    output reg [WIDTH-1:0] dout,
-    input wire             wen
-);
-    always @(posedge clk) begin
-        if (rst) begin
-            dout <= RESET_VAL;
-        end
-        else if (wen) begin
-            dout <= din;
-        end
-    end
 endmodule

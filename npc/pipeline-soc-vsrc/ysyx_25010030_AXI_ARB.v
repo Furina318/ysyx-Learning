@@ -1,101 +1,101 @@
-module AXI_ARB_BURST (
+module ysyx_25010030_AXI_ARB (
     input wire clk,           // 时钟信号
     input wire reset,         // 复位信号
 
     // IFU 接口
-    output reg          ifu_arready,
-    input  wire         ifu_arvalid,
-    input  wire [31: 0] ifu_araddr,
-    input  wire [ 3: 0] ifu_arid,
-    input  wire [ 7: 0] ifu_arlen,
-    input  wire [ 2: 0] ifu_arsize,
-    input  wire [ 1: 0] ifu_arburst,
-    input  wire         ifu_rready,
-    output reg          ifu_rvalid,
-    output reg  [ 1: 0] ifu_rresp,
-    output reg  [31: 0] ifu_rdata,
-    output reg          ifu_rlast,
-    output reg  [ 3: 0] ifu_rid,
+    output reg         ifu_arready,
+    input  wire        ifu_arvalid,
+    input  wire [31:0] ifu_araddr,
+    input  wire [ 3:0] ifu_arid,
+    input  wire [ 7:0] ifu_arlen,
+    input  wire [ 2:0] ifu_arsize,
+    input  wire [ 1:0] ifu_arburst,
+    input  wire        ifu_rready,
+    output reg         ifu_rvalid,
+    output reg  [ 1:0] ifu_rresp,
+    output reg  [31:0] ifu_rdata,
+    output reg         ifu_rlast,
+    output reg  [ 3:0] ifu_rid,
 
     // LSU 写接口
-    output reg          lsu_awready,
-    input  wire         lsu_awvalid,
-    input  wire [31: 0] lsu_awaddr,
-    input  wire [ 3: 0] lsu_awid,
-    input  wire [ 7: 0] lsu_awlen,
-    input  wire [ 2: 0] lsu_awsize,
-    input  wire [ 1: 0] lsu_awburst,
-    output reg          lsu_wready,
-    input  wire         lsu_wvalid,
-    input  wire [31: 0] lsu_wdata,
-    input  wire [ 3: 0] lsu_wstrb,
-    input  wire         lsu_wlast,
-    input  wire         lsu_bready,
-    output reg          lsu_bvalid,
-    output reg  [ 1: 0] lsu_bresp,
-    output reg  [ 3: 0] lsu_bid,
+    output reg         lsu_awready,
+    input  wire        lsu_awvalid,
+    input  wire [31:0] lsu_awaddr,
+    input  wire [ 3:0] lsu_awid,
+    input  wire [ 7:0] lsu_awlen,
+    input  wire [ 2:0] lsu_awsize,
+    input  wire [ 1:0] lsu_awburst,
+    output reg         lsu_wready,
+    input  wire        lsu_wvalid,
+    input  wire [31:0] lsu_wdata,
+    input  wire [ 3:0] lsu_wstrb,
+    input  wire        lsu_wlast,
+    input  wire        lsu_bready,
+    output reg         lsu_bvalid,
+    output reg  [ 1:0] lsu_bresp,
+    output reg  [ 3:0] lsu_bid,
 
     // LSU 读接口
-    output reg          lsu_arready,
-    input  wire         lsu_arvalid,
-    input  wire [31: 0] lsu_araddr,
-    input  wire [ 3: 0] lsu_arid,
-    input  wire [ 7: 0] lsu_arlen,
-    input  wire [ 2: 0] lsu_arsize,
-    input  wire [ 1: 0] lsu_arburst,
-    input  wire         lsu_rready,
-    output reg          lsu_rvalid,
-    output reg  [ 1: 0] lsu_rresp,
-    output reg  [31: 0] lsu_rdata,
-    output reg          lsu_rlast,
-    output reg  [ 3: 0] lsu_rid,
+    output reg         lsu_arready,
+    input  wire        lsu_arvalid,
+    input  wire [31:0] lsu_araddr,
+    input  wire [ 3:0] lsu_arid,
+    input  wire [ 7:0] lsu_arlen,
+    input  wire [ 2:0] lsu_arsize,
+    input  wire [ 1:0] lsu_arburst,
+    input  wire        lsu_rready,
+    output reg         lsu_rvalid,
+    output reg  [ 1:0] lsu_rresp,
+    output reg  [31:0] lsu_rdata,
+    output reg         lsu_rlast,
+    output reg  [ 3:0] lsu_rid,
 
     // 主设备接口
-    input  wire         io_master_awready,
-    output reg          io_master_awvalid,
-    output reg  [31: 0] io_master_awaddr,
-    output reg  [ 3: 0] io_master_awid,
-    output reg  [ 7: 0] io_master_awlen,
-    output reg  [ 2: 0] io_master_awsize,
-    output reg  [ 1: 0] io_master_awburst,
-    input  wire         io_master_wready,
-    output reg          io_master_wvalid,
-    output reg  [31: 0] io_master_wdata,
-    output reg  [ 3: 0] io_master_wstrb,
-    output reg          io_master_wlast,
-    output reg          io_master_bready,
-    input  wire         io_master_bvalid,
-    input  wire [ 1: 0] io_master_bresp,
-    input  wire [ 3: 0] io_master_bid,
+    input  wire        io_master_awready,
+    output reg         io_master_awvalid,
+    output reg  [31:0] io_master_awaddr,
+    output reg  [ 3:0] io_master_awid,
+    output reg  [ 7:0] io_master_awlen,
+    output reg  [ 2:0] io_master_awsize,
+    output reg  [ 1:0] io_master_awburst,
+    input  wire        io_master_wready,
+    output reg         io_master_wvalid,
+    output reg  [31:0] io_master_wdata,
+    output reg  [ 3:0] io_master_wstrb,
+    output reg         io_master_wlast,
+    output reg         io_master_bready,
+    input  wire        io_master_bvalid,
+    input  wire [ 1:0] io_master_bresp,
+    input  wire [ 3:0] io_master_bid,
 
-    input  wire         io_master_arready,
-    output reg          io_master_arvalid,
-    output reg [31: 0]  io_master_araddr,
-    output reg [ 3: 0]  io_master_arid,
-    output reg [ 7: 0]  io_master_arlen,
-    output reg [ 2: 0]  io_master_arsize,
-    output reg [ 1: 0]  io_master_arburst,
-    output reg          io_master_rready,
-    input  wire         io_master_rvalid,
-    input  wire [ 1: 0] io_master_rresp,
-    input  wire [31: 0] io_master_rdata,
-    input  wire         io_master_rlast,
-    input  wire [ 3: 0] io_master_rid,
+    input  wire        io_master_arready,
+    output reg         io_master_arvalid,
+    output reg  [31:0] io_master_araddr,
+    output reg  [ 3:0] io_master_arid,
+    output reg  [ 7:0] io_master_arlen,
+    output reg  [ 2:0] io_master_arsize,
+    output reg  [ 1:0] io_master_arburst,
+    output reg         io_master_rready,
+    input  wire        io_master_rvalid,
+    input  wire [ 1:0] io_master_rresp,
+    input  wire [31:0] io_master_rdata,
+    input  wire        io_master_rlast,
+    input  wire [ 3:0] io_master_rid,
 
     // CLINT 接口
-    output reg [31:0] clint_araddr,  
-    output reg        clint_arvalid,  
-    input  wire       clint_arready,
-    output reg [ 3:0] clint_arid,
-    output reg [ 7:0] clint_arlen,
-    output reg [ 2:0] clint_arsize,
-    output reg [ 1:0] clint_arburst,  
+    output reg  [31:0] clint_araddr,  
+    output reg         clint_arvalid,  
+    input  wire        clint_arready,
+    // output reg  [ 3:0] clint_arid,
+    // output reg  [ 7:0] clint_arlen,
+    // output reg  [ 2:0] clint_arsize,
+    // output reg  [ 1:0] clint_arburst,  
     input  wire [31:0] clint_rdata,   
     input  wire [ 1:0] clint_rresp,   
     input  wire        clint_rvalid,   
-    output reg        clint_rready,
-    input  wire        clint_rlast,
-    input  wire [ 3:0] clint_rid
+    output reg         clint_rready,
+    input  wire        clint_rlast
+    // input  wire [ 3:0] clint_rid
 );
 
     // 状态机定义
@@ -111,8 +111,8 @@ module AXI_ARB_BURST (
 
     // AXI 响应类型
     parameter OKAY   = 2'b00;
-    parameter SLVERR = 2'b10;
-    parameter DECERR = 2'b11;
+    // parameter SLVERR = 2'b10;
+    // parameter DECERR = 2'b11;
 
     // 状态寄存器
     always @(posedge clk) begin
@@ -137,7 +137,9 @@ module AXI_ARB_BURST (
                      (clint_rvalid && clint_rready)) || 
                     (io_master_bvalid && io_master_bready)) next_master = NONE;
             end
-            default: next_master = NONE;
+            default: begin 
+                next_master = NONE;
+            end
         endcase
     end
 
@@ -152,10 +154,10 @@ module AXI_ARB_BURST (
         io_master_arburst = 2'h0;
         clint_araddr      = 32'h0;
         clint_arvalid     = 1'b0;
-        clint_arid        = 4'h0;
-        clint_arlen       = 8'h0;
-        clint_arsize      = 3'h0;
-        clint_arburst     = 2'h0;
+        // clint_arid        = 4'h0;
+        // clint_arlen       = 8'h0;
+        // clint_arsize      = 3'h0;
+        // clint_arburst     = 2'h0;
         ifu_arready       = 1'b0;
         lsu_arready       = 1'b0;
         io_master_rready  = 1'b0;
@@ -193,17 +195,17 @@ module AXI_ARB_BURST (
                     if (lsu_is_clint) begin
                         clint_araddr  = lsu_araddr;
                         clint_arvalid = lsu_arvalid;
-                        clint_arid    = lsu_arid;
-                        clint_arlen   = lsu_arlen;
-                        clint_arsize  = lsu_arsize;
-                        clint_arburst = lsu_arburst;
+                        // clint_arid    = lsu_arid;
+                        // clint_arlen   = lsu_arlen;
+                        // clint_arsize  = lsu_arsize;
+                        // clint_arburst = lsu_arburst;
                         lsu_arready  = clint_arready;
 
                         lsu_rdata    = clint_rdata;
                         lsu_rvalid   = clint_rvalid;
                         lsu_rresp    = clint_rresp;
                         lsu_rlast    = clint_rlast;
-                        lsu_rid      = clint_rid;
+                        // lsu_rid      = clint_rid;
                         clint_rready = lsu_rready;
                     end else begin
                         io_master_araddr  = lsu_araddr;
