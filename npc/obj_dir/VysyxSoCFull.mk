@@ -2,9 +2,9 @@
 # DESCRIPTION: Verilator output: Makefile for building Verilated archive or executable
 #
 # Execute this makefile from the object directory:
-#    make -f Vysyx_25010030_npc.mk
+#    make -f VysyxSoCFull.mk
 
-default: /home/furina/ysyx-workbench/npc/obj_dir/Vysyx_25010030_npc
+default: /home/furina/ysyx-workbench/npc/obj_dir/VysyxSoCFull
 
 ### Constants...
 # Perl executable (from $PERL)
@@ -30,13 +30,14 @@ VM_SC_TARGET_ARCH = linux
 
 ### Vars...
 # Design prefix (from --prefix)
-VM_PREFIX = Vysyx_25010030_npc
+VM_PREFIX = VysyxSoCFull
 # Module prefix (from --prefix)
-VM_MODPREFIX = Vysyx_25010030_npc
+VM_MODPREFIX = VysyxSoCFull
 # User CFLAGS (from -CFLAGS on Verilator command line)
 VM_USER_CFLAGS = \
+	-DYSYXSOC \
 	-I/home/furina/ysyx-workbench/npc/include/ \
-	-DTOP_NAME="Vysyx_25010030_npc" \
+	-DTOP_NAME="VysyxSoCFull" \
 
 # User LDLIBS (from -LDFLAGS on Verilator command line)
 VM_USER_LDLIBS = \
@@ -77,7 +78,7 @@ VM_USER_DIR = \
 
 ### Default rules...
 # Include list of all generated classes
-include Vysyx_25010030_npc_classes.mk
+include VysyxSoCFull_classes.mk
 # Include global rules
 include $(VERILATOR_ROOT)/include/verilated.mk
 
@@ -126,7 +127,7 @@ watchpoint.o: /home/furina/ysyx-workbench/npc/pipeline-soc-csrc/watchpoint.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
 
 ### Link rules... (from --exe)
-/home/furina/ysyx-workbench/npc/obj_dir/Vysyx_25010030_npc: $(VK_USER_OBJS) $(VK_GLOBAL_OBJS) $(VM_PREFIX)__ALL.a $(VM_HIER_LIBS)
+/home/furina/ysyx-workbench/npc/obj_dir/VysyxSoCFull: $(VK_USER_OBJS) $(VK_GLOBAL_OBJS) $(VM_PREFIX)__ALL.a $(VM_HIER_LIBS)
 	$(LINK) $(LDFLAGS) $^ $(LOADLIBES) $(LDLIBS) $(LIBS) $(SC_LIBS) -o $@
 
 

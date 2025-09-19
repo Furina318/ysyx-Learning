@@ -2,7 +2,7 @@
 # DESCRIPTION: Verilator output: Make include file with class lists
 #
 # This file lists generated Verilated files, for including in higher level makefiles.
-# See Vysyx_25010030_npc.mk for the caller.
+# See VysyxSoCFull.mk for the caller.
 
 ### Switches...
 # C11 constructs required?  0/1 (always on now)
@@ -12,7 +12,7 @@ VM_TIMING = 0
 # Coverage output mode?  0/1 (from --coverage)
 VM_COVERAGE = 0
 # Parallel builds?  0/1 (from --output-split)
-VM_PARALLEL_BUILDS = 0
+VM_PARALLEL_BUILDS = 1
 # Tracing output mode?  0/1 (from --trace/--trace-fst)
 VM_TRACE = 1
 # Tracing output mode in VCD format?  0/1 (from --trace)
@@ -23,26 +23,31 @@ VM_TRACE_FST = 0
 ### Object file lists...
 # Generated module classes, fast-path, compile with highest optimization
 VM_CLASSES_FAST += \
-	Vysyx_25010030_npc \
-	Vysyx_25010030_npc___024root__DepSet_hf3ba38c8__0 \
-	Vysyx_25010030_npc___024root__DepSet_h988eafea__0 \
+	VysyxSoCFull \
+	VysyxSoCFull___024root__DepSet_h4d156741__0 \
+	VysyxSoCFull___024root__DepSet_h4d156741__1 \
+	VysyxSoCFull___024root__DepSet_h0188974b__0 \
+	VysyxSoCFull___024root__DepSet_h0188974b__1 \
+	VysyxSoCFull___024unit__DepSet_h308b0958__0 \
 
 # Generated module classes, non-fast-path, compile with low/medium optimization
 VM_CLASSES_SLOW += \
-	Vysyx_25010030_npc__ConstPool_0 \
-	Vysyx_25010030_npc___024root__Slow \
-	Vysyx_25010030_npc___024root__DepSet_hf3ba38c8__0__Slow \
-	Vysyx_25010030_npc___024root__DepSet_h988eafea__0__Slow \
+	VysyxSoCFull__ConstPool_0 \
+	VysyxSoCFull___024root__Slow \
+	VysyxSoCFull___024root__DepSet_h4d156741__0__Slow \
+	VysyxSoCFull___024root__DepSet_h0188974b__0__Slow \
+	VysyxSoCFull___024unit__Slow \
+	VysyxSoCFull___024unit__DepSet_h460a3d32__0__Slow \
 
 # Generated support classes, fast-path, compile with highest optimization
 VM_SUPPORT_FAST += \
-	Vysyx_25010030_npc__Dpi \
-	Vysyx_25010030_npc__Trace__0 \
+	VysyxSoCFull__Dpi \
+	VysyxSoCFull__Trace__0 \
 
 # Generated support classes, non-fast-path, compile with low/medium optimization
 VM_SUPPORT_SLOW += \
-	Vysyx_25010030_npc__Syms \
-	Vysyx_25010030_npc__Trace__0__Slow \
+	VysyxSoCFull__Syms \
+	VysyxSoCFull__Trace__0__Slow \
 
 # Global classes, need linked once per executable, fast-path, compile with highest optimization
 VM_GLOBAL_FAST += \
