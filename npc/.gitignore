@@ -10,3 +10,7 @@
 !.gitignore
 !README.md
 build/
+!*.nxdc
+!*.scala
+!*.vh
+!build.sc
