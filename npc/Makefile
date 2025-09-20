@@ -1,8 +1,8 @@
 ARCH ?= riscv32e-ysyxsoc
 VVP = vvp
 IVERILOG = iverilog
-NETLIST ?= /home/tanghongwei/yosys-sta/result/ysyx_25020037-250MHz/ysyx_25020037.netlist.fixed.v
-CELLS ?= /home/tanghongwei/yosys-sta/nangate45/sim/cells.v
+NETLIST ?= /home/furina/ysyx-workbench/yosys-sta/result/ysyx_25020037-250MHz/ysyx_25020037.netlist.fixed.v
+CELLS ?= /home/furina/ysyx-workbench/yosys-sta/nangate45/sim/cells.v
 VERILOG_MERGED = $(BUILD_DIR)/ysyx_25020037.v
 ifeq ($(ARCH), riscv32e-npc)
 TOPNAME = ysyx_25020037_npc
@@ -38,7 +38,7 @@ endif
 
 ISA ?= 
 ARGS ?= 
-IMG ?= /home/tanghongwei/ysyx-workbench/am-kernels/benchmarks/microbench/build/microbench-riscv32e-npc.bin
+IMG ?= /home/furina/ysyx-workbench/am-kernels/benchmarks/microbench/build/microbench-riscv32e-npc.bin
 
 SIMULATOR = $(BIN)
 
@@ -176,7 +176,7 @@ run: $(BIN)
 	@$^ $(ARGS) $(IMG)
 
 yosys: $(VERILOG_MERGED)
-	cd $(NPC_HOME)/../../yosys-sta && make sta DESIGN=$(YOSYSTOP) \
+	cd $(NPC_HOME)/../yosys-sta && make sta DESIGN=$(YOSYSTOP) \
 											SDC_FILE=$(NPC_HOME)/ysyx_25020037.sdc \
 											RTL_FILES="$(shell find $(NPC_HOME)/build -name "ysyx_25020037.v")" \
 											CLK_FREQ_MHZ=250 \
