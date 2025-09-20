@@ -1,8 +1,0 @@
-top=mux241
-
-y (LD1,LD0)
-s (SW1,SW0)
-a (SW3,SW2)
-b (SW5,SW4)
-c (SW7,SW6)
-d (SW9,SW8)
