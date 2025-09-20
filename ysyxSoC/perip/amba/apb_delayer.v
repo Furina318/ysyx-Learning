@@ -24,91 +24,93 @@ module apb_delayer(
   input         out_pslverr
 );
 
-  assign out_paddr  = in_paddr;
-  assign out_psel   = in_psel;
+  assign out_paddr   = in_paddr;
+  assign out_psel    = in_psel;
   assign out_penable = in_penable;
-  assign out_pprot  = in_pprot;
-  assign out_pwrite = in_pwrite;
-  assign out_pwdata = in_pwdata;
-  assign out_pstrb  = in_pstrb;
+  assign out_pprot   = in_pprot;
+  assign out_pwrite  = in_pwrite;
+  assign out_pwdata  = in_pwdata;
+  assign out_pstrb   = in_pstrb;
+  assign in_pready   = out_pready;
+  assign in_prdata   = out_prdata;
+  assign in_pslverr  = out_pslverr;
 
-  assign in_pready  = out_pready;
-  assign in_prdata  = out_prdata;
-  assign in_pslverr = out_pslverr;
-
-  // localparam IDLE  = 2'b00;
-  // localparam WAIT  = 2'b01;
-  // localparam DELAY = 2'b10;
-
-  // reg [ 1:0] state;
-  // reg [31:0] counter;
-  // reg [31:0] prdata_r;
-  // reg pslverr_r;
+  // reg [1:0] state;
+  // localparam IDLE  = 0;
+  // localparam WAIT  = 1;
+  // localparam DELAY = 2;
 
   // assign out_paddr   = in_paddr;
-  // assign out_psel    = in_psel && state != DELAY;
+  // assign out_psel    = in_psel & (state != DELAY);
   // assign out_penable = in_penable;
   // assign out_pprot   = in_pprot;
   // assign out_pwrite  = in_pwrite;
   // assign out_pwdata  = in_pwdata;
   // assign out_pstrb   = in_pstrb;
-  // // assign in_pready   = out_pready;
-  // // assign in_prdata   = out_prdata;
-  // // assign in_pslverr  = out_pslverr;
 
-  // // Fmax: 502MHz, Perip: 100MHz, r = 5.02
-  // // set s = 32, r*s = 160.64 -> 161
-  // // wait perip resp: counter 每周期加(r-1)*s=128.64，取整为129
-  // // wait apb delayer done: counter先/s = 129/32*k, 每周期-1
+  // reg [31:0] counter;
+  // reg [31:0] prdata_reg;
+  // reg        pslverr_reg;
 
-  // localparam delay_cnt = 129;
+  // // Fmax: 372MHz, Perip: 100MHz, r = 3.72
+  // // set s = 32, r*s = 119.04 --> 119
+  // // 每周期加(r-1)*s=87，直到(r-1)*s*k=87*k
+  // // counter先/s = 87/32*k, 每周期-1
+  // localparam R_S = 32'd47;
 
   // always @(posedge clock) begin
   //   if(reset) begin
   //     state <= IDLE;
-  //     counter <= 32'b0;
-  //   end else begin
+  //     counter <= 0;
+  //   end
+  //   else begin
   //     case(state)
   //       IDLE: begin
   //         if(in_psel) begin
   //           state <= WAIT;
-  //           counter <= counter + delay_cnt;
+  //           counter <= counter + R_S;
   //         end
   //       end
   //       WAIT: begin
   //         if(out_pready) begin
   //           state <= DELAY;
-  //           counter <= (counter + delay_cnt) >> 5;
-  //         end else begin
-  //           counter <= counter + delay_cnt;
+  //           counter <= (counter + R_S) >> 5;
+  //         end
+  //         else begin
+  //           counter <= counter + R_S;
   //         end
   //       end
   //       DELAY: begin
   //         if(counter == 32'b1) begin
   //           state <= IDLE;
   //           counter <= 32'b0;
-  //         end else begin
-  //           counter <= counter - 1'b1;
+  //         end
+  //         else begin
+  //           counter <= counter - 1;
   //         end
   //       end
-  //       default: state <= IDLE;
+  //       default: begin
+  //         state <= IDLE;
+  //       end
   //     endcase
   //   end
   // end
 
   // always @(posedge clock) begin
   //   if(reset) begin
-  //     prdata_r <= 32'b0;
-  //     pslverr_r <= 1'b0;
-  //   end else if(out_pready) begin
-  //     prdata_r <= out_prdata;
-  //     pslverr_r <= out_pslverr;
+  //     prdata_reg <= 32'h0;
+  //     pslverr_reg <= 1'b0;
+  //   end
+  //   else if(out_pready) begin
+  //     prdata_reg <= out_prdata;
+  //     pslverr_reg <= out_pslverr;
   //   end
   // end
 
+  // assign in_pready = (state == DELAY) && (counter == 1);
+  // assign in_prdata = prdata_reg;
+  // assign in_pslverr = pslverr_reg;
 
-  // assign in_pready = state == DELAY && counter == 32'b1;
-  // assign in_prdata   = prdata_r;
-  // assign in_pslverr  = pslverr_r;
+
 
 endmodule

@@ -1,105 +1,111 @@
 #include <am.h>
 #include <klib-macros.h>
 #include <klib.h>
-#include "include/ysyxsoc.h"
+#include "../ysyxsoc/include/ysyxsoc.h"
 
 extern char _heap_start;
+
+extern char _ssbl_lma, _ssbl, _essbl;
+extern char _text_lma, _text, _etext;
+extern char _rodata_lma, _rodata, _erodata;
+extern char _data_lma, _data, _edata;
+extern char _bss, _ebss;
+extern char _stack_top;
+extern char _sdram_start, _sdram_end;
 extern char _psram_end;
-extern char _data_start;
-extern char _data_end;
 int main(const char *args);
 
 extern char _sram_start;
 #define SRAM_SIZE (8 * 1024)
-#define SRAM_END ((uintptr_t)&_sram_start + SRAM_SIZE)
+#define SRAM_END  ((uintptr_t)&_sram_start + SRAM_SIZE)
 
 Area heap = RANGE(&_heap_start, &_psram_end);
 static const char mainargs[MAINARGS_MAX_LEN] = MAINARGS_PLACEHOLDER; // defined in CFLAGS
 
-void init_uart(uint32_t baud_rate) {
-  outb(UART_REG_LC, inb(UART_REG_LC) | 0x80);
-  outb(UART_REG_TX, 0x01);
-  outb(UART_REG_LC, inb(UART_REG_LC) & 0x7F);
-}
-
-void spi_tx_start() {
-  outl(SPI_CTRL, inl(SPI_CTRL) | 0x100);
-}
-
 void putch(char ch) {
-  while((inb(UART_REG_LS) & 0x20) == 0);
-  outb(UART_REG_TX, ch);
+	// if(*(volatile char *)UART_LCR == 0x03){
+	// 	while(!(*(volatile char *)UART_LSR & 0x20));
+	// }
+	// outb(UART_TX, ch);
+  while ((inb(UART_LSR) & 0x20) == 0);//等待发送缓冲区空
+  outb(UART_TX, ch);
 }
 
-void ysyxsoc_trap(int code) {
-    asm volatile("mv a0, %0; ebreak" : :"r"(code));
+static void uart_init(){
+	outb(UART_LCR, inb(UART_LCR) | 0x80); //LCR寄存器最高位，使能分频系数寄存器
+	//outb(UART_TX, 0x01);
+	//outb(UART_LSB, 0xff & 10);
+	outb(UART_LCR, inb(UART_LCR) & 0x7F); //恢复LCR寄存器的值，关闭分频系数寄存器，可正常收发数据
 }
+
+// static void uart_init(uint32_t baud_rate) {
+// 	uint16_t divisor = (uint16_t)(50000000 / (baud_rate * 16)); //50MHz工作时钟，每比特周期采样16次（因子）
+// 	outb(UART_LCR, 0x80 | inb(UART_LCR)); // enable divisor latch
+// 	outb(UART_MSB, 0xff & (divisor >> 8));
+// 	outb(UART_LSB, 0xff & divisor); 
+// 	outb(UART_LCR, inb(UART_LCR) & 0x7f); // resume	
+// }
 
 void halt(int code) {
   ysyxsoc_trap(code);
-  
-  // should not reach here
   while (1);
 }
 
 void ysyx_show(){
-  int i;
-  int index;
-  char buf[10];
-  uint32_t number;
-  uint32_t mvendorid;
-  uint32_t marchid;
-  asm volatile("csrr %0, mvendorid" : "=r"(mvendorid));
-  asm volatile("csrr %0, marchid" : "=r"(marchid));
-  for(i = 3;i >= 0;i--){
-    putch((char)((mvendorid >> i*8) & 0xFF));
-  }
-  number = marchid;
-  index = 0;
-  while (number > 0)
-  {
-    buf[index++] = (number % 10) + '0';
-    number /= 10;
-  }
-  for(i = index - 1; i >= 0; i--) {
-    putch(buf[i]);
-  }
-  putch('\n');
-  
+	// TODO:
+	// mvendorid - 从中读出ysyx的ASCII码, 即0x79737978(厂商ID寄存器)(CSR地址：0xF11)
+	// marchid - 从中读出学号数字部分的十进制表示, 学号为ysyx_25010030, 则读出25010030, 即0x17d9f6e(架构ID寄存器)(CSR地址：0xF12)
+	uint32_t mvendorid, marchid;
+	uint32_t temp, index = 0;
+	char buf[10];
+	asm volatile("csrr %0, mvendorid" : "=r"(mvendorid));
+	asm volatile("csrr %0, marchid" : "=r"(marchid));
+	for(int i = 3; i >= 0; i--){
+		putch((char)((mvendorid >> i * 8) & 0xff));
+	}
+	temp = marchid;
+	while(temp > 0){
+		buf[index++] = (temp % 10) + '0';
+		temp /= 10;
+	}
+	for(int i = index - 1; i >= 0; i--) putch(buf[i]);
+	putch('\n');
 }
 
 void _trm_init() {
+//   uart_init(115200);
+  uart_init();
 
-  init_uart(115200);
-  //ysyx_show();
-  //printf("0x%08x  0x%08x\n", &_data_end, &_data_start);
+//   bootloader();
+
   int ret = main(mainargs);
   halt(ret);
 }
 
-void init_spi(uint32_t spi_clock, uint8_t spi_ss, uint8_t char_len, uint8_t tx_neg, uint8_t rx_neg, uint8_t lsb) {
-  uint16_t divider = 50000000/(2 * spi_clock);
-  outw(SPI_DIV, divider);
-  outb(SPI_SS, spi_ss);
-  uint32_t ctrl_reg = 1 << 13 | 0 << 12 | lsb << 11 | tx_neg << 10 | rx_neg << 9 | 0 << 8 | char_len; // ASS: 1, IE: 0
-  outl(SPI_CTRL, ctrl_reg);
-}
+// void __attribute__((section(".ssbl")))_bootloader(void){
+// 	//flash .text --> RAM .text
+// 	char *src = &_text_lma;
+// 	char *dst = &_text;
+// 	while(dst < &_etext)
+// 		*dst++ = *src++;
 
-void spi_tx(uint8_t *tx_data, uint8_t len) {
-  if(len == 8) outb(SPI_TX0, *tx_data);
-  else if(len == 16) outw(SPI_TX0, *(uint16_t *)tx_data);
-  else if(len == 32) outl(SPI_TX0, *(uint32_t *)tx_data);
-  else if(len == 64) {
-    outl(SPI_TX0, *(uint64_t *)tx_data);
-    outl(SPI_TX1, *(uint64_t *)tx_data >> 32);
-  } else return ;
-}
+// 	//flash .data --> RAM .data(用于初始化RAM)
 
-void spi_rx(uint8_t *rx_data, uint8_t len) {
-  while((inl(SPI_CTRL) & 0x100) == 0x100);
-  if(len == 8) *rx_data = inb(SPI_RX0);
-  else if(len == 16) *(uint16_t *)rx_data = inw(SPI_RX0);
-  else if(len == 32) *(uint32_t *)rx_data = inl(SPI_RX0);
-  else if(len == 64) *(uint64_t *)rx_data = (uint64_t)inl(SPI_RX1) << 32 | inl(SPI_RX0);
-  else return;
-}
+// 	// flash是只读的，变量运行时需要在RAM中可读写
+// 	// linker-ysyxsoc.ld只负责把初值放在flash，运行时需要手动搬运到RAM
+// 	src = &_data_lma;
+// 	dst = &_data;
+// 	while(dst < &_edata)
+// 		*dst++ = *src++;
+
+// 	_trm_init();
+// }
+
+// void __attribute((section(".fsbl")))_fsbl_init(void) {
+// 	char *src = &_ssbl_lma;
+// 	char *dst = &_ssbl;
+// 	while(dst < &_essbl)
+// 		*dst++ = *src++;
+
+// 	_bootloader();
+// }
