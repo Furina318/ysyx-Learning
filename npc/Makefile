@@ -13,9 +13,9 @@ $(error 不支持的架构：$(ARCH).支持的架构: riscv32e-ysyxsoc, riscv32e
 endif
 
 # 源文件路径和定义
-NPC_HOME = /home/furina/ysyx-workbench/npc
-NVBOARD_HOME = /home/furina/ysyx-workbench/nvboard
-SOC_HOME = /home/furina/ysyx-workbench/ysyxSoC
+# NPC_HOME = /home/furina/ysyx-workbench/npc
+# NVBOARD_HOME = /home/furina/ysyx-workbench/nvboard
+# SOC_HOME = /home/furina/ysyx-workbench/ysyxSoC
 ifeq ($(ARCH), riscv32e-ysyxsoc)
 CSRCS = $(shell find $(abspath ./pipeline-soc-csrc) -name "*.cpp")  #可修改
 VSRCS = $(shell find $(abspath ./pipeline-soc-vsrc) -name "*.v")
@@ -115,7 +115,7 @@ $(MEM_INIT): $(IMG)
 	riscv64-linux-gnu-objcopy -I binary -O verilog --adjust-vma=-0x00000000 $^ $@
 
 ifeq ($(ARCH), riscv32e-ysyxsoc)
-VERILATOR_FLAGS += +incdir+$(SOC_HOME)/perip/uart16550/rtl +incdir+$(SOC_HOME)/perip/spi/rtl 
+VERILATOR_FLAGS += +incdir+../ysyxSoC/perip/uart16550/rtl +incdir+../ysyxSoC/perip/spi/rtl 
 VERILATOR_FLAGS += --timescale "1ns/1ns" --no-timing
 VERILATOR_FLAGS += -DYSYXSOC
 endif
