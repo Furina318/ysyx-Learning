@@ -1,7 +1,6 @@
 // define this macro to enable fast behavior simulation
 // for flash by skipping SPI transfers
-// `define FAST_FLASH
-`include "spi_defines.v"
+//`define FAST_FLASH
 
 module spi_top_apb #(
   parameter flash_addr_start = 32'h30000000,
@@ -49,95 +48,87 @@ assign in_prdata  = data[31:0];
 
 `else
 
-  parameter SPI_ADDR_START = 32'h10001000;
-  parameter SPI_ADDR_END   = 32'h10001fff;
-  parameter FLASH_ADDR_START = 32'h30000000;
-  parameter FLASH_ADDR_END   = 32'h3fffffff;
+  localparam IDLE        = 3'h0;
+  localparam INIT_DVI    = 3'h1;
+  localparam INIT_SS     = 3'h2;
+  localparam INIT_CTRL   = 3'h3;
+  localparam WRITE_CMD   = 3'h4;
+  localparam START_TRANS = 3'h5;
+  localparam WAIT_TRANS  = 3'h6;
+  localparam READ_DATA   = 3'h7;
 
-  wire is_spi_addr   = (in_paddr >= SPI_ADDR_START) && (in_paddr <= SPI_ADDR_END);
-  wire is_flash_addr = (in_paddr >= FLASH_ADDR_START) && (in_paddr <= FLASH_ADDR_END) && !in_pwrite;
+  wire         spi_master_psel;
+  reg          flash_xip_psel;
+  wire [31: 0] apb_paddr;
+  wire         apb_psel;
+  wire         apb_penable;
+  wire [ 2: 0] apb_pprot;
+  wire         apb_pwrite;
+  wire [31: 0] apb_pwdata;
+  wire [ 3: 0] apb_pstrb;
+  wire         apb_pready;
+  wire [31: 0] apb_prdata;
+  wire         apb_pslverr;
+  wire         flash_xip_sel;
+  reg  [31: 0] flash_xip_paddr;
+  reg          flash_xip_penable;
+  wire [ 2: 0] flash_xip_pprot;
+  reg          flash_xip_pwrite;
+  reg  [31: 0] flash_xip_pwdata;
+  wire [ 3: 0] flash_xip_pstrb;
+  reg          flash_xip_pready;
+  reg  [31: 0] flash_xip_prdata;
+  wire         flash_xip_pslverr;   
 
-  localparam IDLE        = 3'd0;
-  localparam INIT_DIV    = 3'd1;
-  localparam INIT_SS     = 3'd2;
-  localparam INIT_CTRL   = 3'd3;
-  localparam WRITE_CMD   = 3'd4;
-  localparam START_TRANS = 3'd5;
-  localparam WAIT_TRANS  = 3'd6;
-  localparam READ_DATA   = 3'd7;
-  reg [2:0] xip_state;
+  wire         spi_ctrl_ass;
+  wire         spi_ctrl_ie;
+  wire [ 6: 0] spi_ctrl_char_len;
+  wire         spi_ctrl_tx_neg;
+  wire         spi_ctrl_rx_neg;
+  wire         spi_ctrl_lsb;
+  wire [31: 0] spi_ctrl_data;
+  wire         spi_ctrl_go_busy;
 
-  wire        spi_master_psel;
-  wire [31:0] apb_paddr;
-  wire        apb_psel;
-  wire        apb_penable;
-  wire [2:0]  apb_pprot;
-  wire        apb_pwrite;
-  wire [31:0] apb_pwdata;
-  wire [3:0]  apb_pstrb;
-  wire        apb_pready;
-  wire [31:0] apb_prdata;
-  wire        apb_pslverr;
 
-  wire        flash_xip_sel;
-  // wire        flash_xip_psel;
-  reg  [31:0] flash_xip_paddr;
-  reg         flash_xip_psel;
-  reg         flash_xip_penable;
-  wire [2:0]  flash_xip_pprot;
-  reg         flash_xip_pwrite;
-  reg  [31:0] flash_xip_pwdata;
-  wire [3:0]  flash_xip_pstrb;
-  reg         flash_xip_pready;
-  reg  [31:0] flash_xip_prdata;
-  wire        flash_xip_pslverr;
-
-  wire        spi_ctrl_ass;
-  wire        spi_ctrl_ie;
-  wire [6:0]  spi_ctrl_char_len;
-  wire        spi_ctrl_reserved;
-  wire        spi_ctrl_tx_neg;
-  wire        spi_ctrl_rx_neg;
-  wire        spi_ctrl_lsb;
-  wire [31:0] spi_ctrl_data;
-  wire        spi_ctrl_go;
+  reg  [ 2: 0] flash_xip_state;
 
   assign spi_master_psel = (in_paddr[31:12] == 20'h10001) && in_psel;
   assign flash_xip_sel   = (in_paddr[31:28] == 4'h3) && in_psel;
-
-  assign apb_paddr   = spi_master_psel ? in_paddr    : flash_xip_sel ? flash_xip_paddr : 0;
+  assign apb_paddr   = spi_master_psel ? in_paddr : flash_xip_sel ? flash_xip_paddr : 0;
   assign apb_psel    = spi_master_psel | flash_xip_psel;
-  assign apb_penable = spi_master_psel ? in_penable  : flash_xip_sel ? flash_xip_penable : 0;
-  assign apb_pprot   = spi_master_psel ? in_pprot    : flash_xip_sel ? flash_xip_pprot   : 0;
-  assign apb_pwrite  = spi_master_psel ? in_pwrite   : flash_xip_sel ? flash_xip_pwrite  : 0;
-  assign apb_pwdata  = spi_master_psel ? in_pwdata   : flash_xip_sel ? flash_xip_pwdata  : 0;
-  assign apb_pstrb   = spi_master_psel ? in_pstrb    : flash_xip_sel ? flash_xip_pstrb   : 0;
-  assign in_pready   = spi_master_psel ? apb_pready  : flash_xip_sel ? flash_xip_pready  : 0;
-  assign in_prdata   = spi_master_psel ? apb_prdata  : flash_xip_sel ? flash_xip_prdata  : 0;
-  assign in_pslverr  = spi_master_psel ? apb_pslverr : flash_xip_sel ? flash_xip_pslverr : 0;
+  assign apb_penable = spi_master_psel ? in_penable  : flash_xip_sel ? flash_xip_penable : 1'b0;
+  assign apb_pprot   = spi_master_psel ? in_pprot    : flash_xip_sel ? flash_xip_pprot   : 3'b0;
+  assign apb_pwrite  = spi_master_psel ? in_pwrite   : flash_xip_sel ? flash_xip_pwrite  : 1'b0;
+  assign apb_pwdata  = spi_master_psel ? in_pwdata   : flash_xip_sel ? flash_xip_pwdata  : 32'b0;
+  assign apb_pstrb   = spi_master_psel ? in_pstrb    : flash_xip_sel ? flash_xip_pstrb   : 4'b0;
+  assign in_pready   = spi_master_psel ? apb_pready  : flash_xip_sel ? flash_xip_pready  : 1'b0;
+  assign in_prdata   = spi_master_psel ? apb_prdata  : flash_xip_sel ? flash_xip_prdata  : 32'b0;
+  assign in_pslverr  = spi_master_psel ? apb_pslverr : flash_xip_sel ? flash_xip_pslverr : 1'b0;
 
-  assign flash_xip_pstrb   = flash_xip_psel && apb_pwrite ? 4'b1111 : 4'b0000;
+  assign flash_xip_pstrb   = flash_xip_psel && apb_pwrite ? 4'b1111 : 4'b0;
   assign flash_xip_pprot   = 3'b001;
   assign flash_xip_pslverr = 1'b0;
 
   assign spi_ctrl_ass      = 1'b1;
   assign spi_ctrl_ie       = 1'b1;
   assign spi_ctrl_char_len = 7'd64;
-  assign spi_ctrl_reserved = 1'b0;
   assign spi_ctrl_tx_neg   = 1'b1;
   assign spi_ctrl_rx_neg   = 1'b0;
   assign spi_ctrl_lsb      = 1'b0;
-  assign spi_ctrl_go       = (xip_state == WRITE_CMD) && flash_xip_penable && apb_pready; 
-  assign spi_ctrl_data     = {18'b0, 
-                            spi_ctrl_ass, 
-                            spi_ctrl_ie, 
-                            spi_ctrl_lsb, 
-                            spi_ctrl_tx_neg, 
-                            spi_ctrl_rx_neg, 
-                            spi_ctrl_go, 
-                            spi_ctrl_reserved,
-                            spi_ctrl_char_len
-                            };
+
+  assign spi_ctrl_go_busy = (flash_xip_state == WRITE_CMD) && flash_xip_penable && apb_pready;
+
+  assign spi_ctrl_data = {
+    18'b0,
+    spi_ctrl_ass,
+    spi_ctrl_ie,
+    spi_ctrl_lsb,
+    spi_ctrl_tx_neg,
+    spi_ctrl_rx_neg,
+    spi_ctrl_go_busy,
+    1'b0,
+    spi_ctrl_char_len
+  };
 
   spi_top u0_spi_top (
     .wb_clk_i(clock),
@@ -153,7 +144,7 @@ assign in_prdata  = data[31:0];
     .wb_err_o(apb_pslverr),
     .wb_int_o(spi_irq_out),
 
-    .ss_pad_o(spi_ss),
+    .ss_pad_o  (spi_ss),
     .sclk_pad_o(spi_sck),
     .mosi_pad_o(spi_mosi),
     .miso_pad_i(spi_miso)
@@ -161,107 +152,105 @@ assign in_prdata  = data[31:0];
 
   always @(posedge clock) begin
     if (reset) begin
-      xip_state        <= INIT_DIV;
-      flash_xip_psel   <= 0;
-      flash_xip_pwrite <= 0;
-      flash_xip_pwdata <= 0;
-      flash_xip_paddr  <= 0;
-      flash_xip_pready <= 0;
-      flash_xip_prdata <= 0;
-    end
-    else begin
-      case(xip_state)
-        INIT_DIV: begin
-          flash_xip_psel <= 1;
-          flash_xip_penable <= 1;
-          flash_xip_pwrite <= 1;
+      flash_xip_state  <= INIT_DVI;
+      flash_xip_psel   <= 1'b0;
+      flash_xip_pwrite <= 1'b0;
+      flash_xip_pwdata <= 32'b0;
+      flash_xip_paddr  <= 32'b0;
+      flash_xip_pready <= 1'b0;
+      flash_xip_prdata <= 32'b0;
+    end else begin
+      case (flash_xip_state)
+        INIT_DVI: begin
+          flash_xip_psel <= 1'b1;
+          flash_xip_penable <= 1'b1;
+          flash_xip_pwrite <= 1'b1;
           if (flash_xip_penable && apb_pready) begin
-            flash_xip_penable <= 0;
-            flash_xip_pwdata <= 1;
-            flash_xip_paddr <= (`SPI_DEVIDE << 2);
-            xip_state <= INIT_SS;
+            flash_xip_penable <= 1'b0;
+            flash_xip_pwdata  <= 50000000 / (2 * 25000000);
+            flash_xip_paddr   <= (`SPI_DEVIDE << 2);
+            flash_xip_state   <= INIT_SS;
           end
         end
         INIT_SS: begin
-          flash_xip_penable <= 1;
+          flash_xip_penable <= 1'b1;
           if (flash_xip_penable && apb_pready) begin
-            flash_xip_penable <= 0;
-            flash_xip_pwdata <= 32'h1;//选择编号0，若选择bitrev（编号7）则输入32'h10000000
-            flash_xip_paddr <= (`SPI_SS << 2);
-            xip_state <= INIT_CTRL;
+            flash_xip_penable <= 1'b0;
+            flash_xip_pwdata  <= 32'b1;
+            flash_xip_paddr   <= (`SPI_SS << 2);
+            flash_xip_state   <= INIT_CTRL;
           end
         end
         INIT_CTRL: begin
-          flash_xip_penable <= 1;
+          flash_xip_penable <= 1'b1;
           if (flash_xip_penable && apb_pready) begin
-            flash_xip_penable <= 0;
-            flash_xip_psel <= 0;
-            flash_xip_pwrite <= 0;
+            flash_xip_psel <= 1'b0;
+            flash_xip_penable <= 1'b0;
+            flash_xip_pwrite <= 1'b0;
             flash_xip_pwdata <= spi_ctrl_data;
             flash_xip_paddr <= (`SPI_CTRL << 2);
-            xip_state <= IDLE;
+            flash_xip_state <= IDLE;
           end
         end
         IDLE: begin
           if (in_penable && flash_xip_pready) begin
-            flash_xip_pready <= 0;
-            flash_xip_prdata <= 0;
-          end
-          else if (flash_xip_sel && in_penable) begin
-            flash_xip_psel <= 1;
-            flash_xip_pwrite <= 1;
-            flash_xip_pwdata <= {8'h3, in_paddr[23:2], 2'b0}; 
-            flash_xip_paddr <= (`SPI_TX_1 << 2);
-            xip_state <= WRITE_CMD;
+            flash_xip_pready <= 1'b0;
+            flash_xip_prdata <= 32'b0;
+          end else if (flash_xip_sel && in_penable) begin
+            flash_xip_psel   <= 1'b1;
+            flash_xip_pwrite <= 1'b1;
+            flash_xip_pwdata <= {8'h3, in_paddr[23:2], 2'b0};
+            flash_xip_paddr  <= (`SPI_TX_1 << 2);
+            flash_xip_state  <= WRITE_CMD;
           end
         end
         WRITE_CMD: begin
-          flash_xip_penable <= 1;
+          flash_xip_penable <= 1'b1;
           if (flash_xip_penable && apb_pready) begin
-            flash_xip_penable <= 0;
-            flash_xip_pwdata <= spi_ctrl_data;
-            flash_xip_paddr <= (`SPI_CTRL << 2);
-            xip_state <= START_TRANS;
+            flash_xip_penable <= 1'b0;
+            flash_xip_pwdata  <= spi_ctrl_data;
+            flash_xip_paddr   <= (`SPI_CTRL << 2);
+            flash_xip_state   <= START_TRANS;
           end
         end
         START_TRANS: begin
-          flash_xip_penable <= 1;
+          flash_xip_penable <= 1'b1;
           if (flash_xip_penable && apb_pready) begin
-            flash_xip_penable <= 0;
-            flash_xip_pwrite <= 0;
-            xip_state <= WAIT_TRANS;
+            flash_xip_penable <= 1'b0;
+            flash_xip_pwrite  <= 1'b0;
+            flash_xip_state   <= WAIT_TRANS;
           end
         end
         WAIT_TRANS: begin
-          if (spi_irq_out) begin
-            // flash_xip_penable <= 1'b1;
-            // if (flash_xip_penable && apb_pready) begin
-            //   if (apb_prdata == spi_ctrl_data) begin  // transfer done
-            //     flash_xip_penable <= 1'b0;
-            //     flash_xip_paddr   <= (`SPI_RX_0 << 2);  //lower 32bits
-            //     xip_state   <= READ_DATA;
-            //   end
-            // end
-            flash_xip_paddr <= (`SPI_RX_0 << 2);
-            xip_state <= READ_DATA;
+          // flash_xip_penable <= 1'b1;
+          // if (flash_xip_penable && apb_pready) begin
+          //   if (apb_prdata == spi_ctrl_data) begin
+          //     flash_xip_penable <= 1'b0;
+          //     flash_xip_paddr   <= (`SPI_RX_0 << 2);
+          //     flash_xip_state   <= READ_DATA;
+          //   end
+          // end
+          if(spi_irq_out) begin
+             flash_xip_paddr   <= (`SPI_RX_0 << 2);
+             flash_xip_state   <= READ_DATA;
           end
         end
         READ_DATA: begin
-          flash_xip_penable <= 1;
+          flash_xip_penable <= 1'b1;
           if (flash_xip_penable && apb_pready) begin
-            flash_xip_penable <= 0;
-            flash_xip_pready <= 1;
+            flash_xip_psel   <= 1'b0;
+            flash_xip_pready <= 1'b1;
             flash_xip_prdata <= apb_prdata;
-            xip_state <= IDLE;
+            flash_xip_state  <= IDLE;
           end
         end
-        default: begin
-
-        end
+        default: ;
       endcase
     end
   end
 
-`endif // FAST_FLASH
+
+
+`endif  // FAST_FLASH
 
 endmodule

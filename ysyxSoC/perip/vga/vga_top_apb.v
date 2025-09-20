@@ -12,151 +12,135 @@ module vga_top_apb(
   output [31:0] in_prdata,
   output        in_pslverr,
 
-  output [7:0]  vga_r,      //RGB
+  output [7:0]  vga_r,
   output [7:0]  vga_g,
   output [7:0]  vga_b,
-  output        vga_hsync,  //同步信号
+  output        vga_hsync,
   output        vga_vsync,
   output        vga_valid
 );
-  localparam NUM = 2 ** 21;  //帧缓冲区
-  reg [31:0] data [0:NUM-1];
+
+  localparam N = 2 ** 21;
   reg sync_reg;
 
-  localparam H_FRONT = 96;  //前肩（消隐），负脉冲宽度
-  localparam H_ACT   = 144; //有效像素开始点
-  localparam H_BACK  = 784; //后肩,有效像素结束点
-  localparam H_TOTAL = 800; 
+  localparam h_sync       = 96;
+  localparam h_active     = 48;
+  localparam h_back       = 16;
+  localparam h_disp       = 640;
+  localparam h_total      = 800;
+  localparam v_sync       = 2;
+  localparam v_active     = 35;
+  localparam v_back       = 10;
+  localparam v_disp       = 480;
+  localparam v_total      = 525;
 
-  localparam V_FRONT = 2;
-  localparam V_ACT   = 35;
-  localparam V_BACK  = 515;
-  localparam V_TOTAL = 525;
-
-  localparam VGA_SYNC = 32'h211ffff4;
-
-  reg [9:0] x_cnt;
-  reg [9:0] y_cnt;
-  reg [20:0] cnt;
+  reg [ 9:0] h_cnt;
+  reg [ 9:0] v_cnt;
+  reg [20:0] counter;
+  reg [31:0] data[0:N-1];
   wire h_valid;
   wire v_valid;
 
-  always @(posedge clock) begin
-    if(reset) begin
-      x_cnt <= 0;
-    end
-    else begin
-      if(x_cnt == H_TOTAL) begin
-        if(y_cnt == V_TOTAL) begin
-          x_cnt <= 0;
-        end
-        else begin
-          x_cnt <= 1;
-        end
-      end
-      else if(x_cnt > 0) begin
-        x_cnt <= x_cnt + 1;
-      end
-      else begin
-        if(sync_reg) begin
-          x_cnt <= 1;
-        end
-      end
-    end
-  end
-
-  always @(posedge clock) begin
-    if(reset) begin
-        y_cnt <= 1;
-    end 
-    else begin
-        if(x_cnt == H_TOTAL) begin
-            if(y_cnt == V_TOTAL) begin
-                y_cnt <= 1;
-            end 
-            else begin
-                y_cnt <= y_cnt + 1;
-            end
-        end
-    end
-end
-
-always @(posedge clock) begin
+  always @(posedge clock or posedge reset) begin
     if (reset) begin
-        cnt <= 0;
-    end 
-    else begin
-        if(y_cnt == V_TOTAL) begin
-            cnt <= 0;
-        end 
-        else if(vga_valid) begin
-            cnt <= cnt + 1;
-        end 
-        else begin
-            cnt <= cnt;
+      h_cnt <= 0;
+    end else begin
+      if (h_cnt == h_total) begin
+        if (v_cnt == v_total) begin
+          h_cnt <= 0;
+        end else begin
+          h_cnt <= 1;
         end
-    end
-end
-
-localparam VGA_IDLE  = 0;
-localparam VGA_WRITE = 1;
-reg [1:0] vga_state;
-
-assign in_pready = (vga_state == VGA_WRITE) ? 1 : 0;
-assign in_prdata = 0;
-assign in_pslverr = 0;
-
-always @(posedge clock) begin
-  if(reset) begin
-    vga_state <= VGA_IDLE;
-  end
-  else begin
-    case(vga_state)
-      VGA_IDLE: begin
-        if(in_psel && in_pwrite) begin
-          vga_state <= VGA_WRITE;
+      end else if (h_cnt > 0) begin
+        h_cnt <= h_cnt + 1;
+      end else begin
+        if (sync_reg) begin
+          h_cnt <= 1;
         end
-      end 
-      VGA_WRITE: begin
-        vga_state <= VGA_IDLE;
-      end
-      default: begin
-        vga_state <= VGA_IDLE;
-      end
-    endcase
-  end
-end
-
-integer i;
-always @(posedge clock) begin
-  if(reset) begin
-    for(i = 0; i < NUM; i++) begin
-      data[i] = 0;
-    end
-    sync_reg <= 0;
-  end
-  else begin
-    if(in_penable) begin
-      if(in_paddr == VGA_SYNC) begin
-        sync_reg <= in_pwdata[0];
-      end
-      else begin
-        data[in_paddr[22:2]] <= in_pwdata;
-        sync_reg <= 0;
       end
     end
   end
-end
 
-assign vga_hsync = (x_cnt > H_FRONT);
-assign vga_vsync = (y_cnt > V_FRONT);
+  always @(posedge clock or posedge reset) begin
+    if (reset) begin
+      v_cnt <= 1;
+    end else begin
+      if (h_cnt == h_total) begin
+        if (v_cnt == v_total) begin
+          v_cnt <= 1;
+        end else begin
+          v_cnt <= v_cnt + 1;
+        end
+      end
+    end
+  end
 
-assign h_valid   = (x_cnt > H_ACT) & (x_cnt <= H_BACK);
-assign v_valid   = (y_cnt > V_ACT) & (y_cnt <= V_BACK);
-assign vga_valid = h_valid & v_valid;
+  always @(posedge clock or posedge reset) begin
+    if (reset) begin
+      counter <= 0;
+    end else begin
+      if (v_cnt == v_total) begin
+        counter <= 0;
+      end else if (vga_valid) begin
+        counter <= counter + 1;
+      end else begin
+        counter <= counter;
+      end
+    end
+  end
 
-assign vga_r     = vga_valid ? data[cnt][23:16] : 8'h0;
-assign vga_g     = vga_valid ? data[cnt][15: 8] : 8'h0;
-assign vga_b     = vga_valid ? data[cnt][ 7: 0] : 8'h0;
+  localparam IDLE  = 2'b0;
+  localparam WRITE = 2'b1;
+  reg [1:0] state;
+
+  assign in_pready  = (state == WRITE) ? 1'b1 : 1'b0;
+  assign in_prdata  = 32'b0;
+  assign in_pslverr = 1'b0;
+
+  always @(posedge clock) begin
+    if (reset) begin
+      state <= IDLE;
+    end else begin
+      case (state)
+        IDLE: begin
+          if (in_psel && in_pwrite) begin
+            state <= WRITE;
+          end
+        end
+        WRITE: begin
+          state <= IDLE;
+        end
+        default: begin
+          state <= IDLE;
+        end
+      endcase
+    end
+  end
+
+  always @(posedge clock or posedge reset) begin
+    if (reset) begin
+      sync_reg <= 1'b0;
+    end else begin
+      if (in_penable) begin
+        if (in_paddr == 32'h211FFFF4) begin
+          sync_reg <= in_pwdata[0];
+        end else begin
+          data[in_paddr[22:2]] <= in_pwdata;
+          sync_reg <= 1'b0;
+        end
+      end
+    end
+  end
+
+  assign vga_hsync = (h_cnt > h_sync);
+  assign vga_vsync = (v_cnt > v_sync);
+
+  assign h_valid   = (h_cnt > h_sync + h_active) & (h_cnt <= h_sync + h_active + h_disp);
+  assign v_valid   = (v_cnt > v_sync + v_active) & (v_cnt <= v_sync + v_active + v_disp);
+  assign vga_valid = h_valid & v_valid;
+
+  assign vga_r     = vga_valid ? data[counter][23:16] : 8'h00;
+  assign vga_g     = vga_valid ? data[counter][15: 8] : 8'h00;
+  assign vga_b     = vga_valid ? data[counter][ 7: 0] : 8'h00;
 
 endmodule
