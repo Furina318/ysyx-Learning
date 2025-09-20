@@ -95,7 +95,7 @@ module ysyx_25010030_iCache #(
     wire hit = valid_ram[beat_idx] && (tag_ram == req_tag) && !is_fencei && in_sdram;
 
     // AXI突发传输配置与控制
-    assign axi_arid    = 4'h1;    // 固定ID
+    assign axi_arid    = 4'h0;    // 固定ID
     assign axi_arlen   = in_sdram ? 8'h3   : 8'b0;    // 突发长度4拍（16字节块）
     assign axi_arburst = in_sdram ? 2'b01 : 2'b00;   // 递增突发
     assign axi_arsize  = 3'b010;  // 4字节

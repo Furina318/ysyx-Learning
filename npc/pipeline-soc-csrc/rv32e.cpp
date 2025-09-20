@@ -213,14 +213,16 @@ int main(int argc, char *argv[]) {
 #ifdef NVBOARD
     nvboard_bind_all_pins(top);
     nvboard_init();
-#ifdef CONFIG_WAVE
+
+    Verilated::commandArgs(argc, argv); // 处理命令行参数
     init_verilator();
-#endif
+
     reset();
     init_monitor(argc, argv);
     while(1) {
         nvboard_update();
         single_cycle();
+        // single_cycle();
         // if(top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__asic__DOT__cpu__DOT__cpu__DOT__pc == 0xa0000074) break;
     }
 #else

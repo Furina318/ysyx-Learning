@@ -86,7 +86,7 @@ module ysyx_25010030_LSU_AXI (
     // output reg [31:0] lsu_active_cycles
 );
 `ifdef VERILATOR
-    import "DPI-C" function void ebreak(input int station, input int inst);
+    // import "DPI-C" function void ebreak(input int station, input int inst);
     // import "DPI-C" function void counter(input int inst_type, input int ifu_inc, input int lsu_inc, input int exu_inc);
 `endif 
 
@@ -99,7 +99,7 @@ module ysyx_25010030_LSU_AXI (
     localparam AXI_SIZE_BYTE     = 3'h0;         
     localparam AXI_SIZE_HALF     = 3'h1;  
     localparam AXI_SIZE_WORD     = 3'h2;
-    localparam AXI_ID            = 4'h1;  
+    localparam AXI_ID            = 4'h0;  
     localparam BURST_LEN         = 4; 
     localparam BLOCK_SIZE        = 16;
     wire in_sdram = (addr_reg >= SDRAM_BASE) && (addr_reg <= SDRAM_END);

@@ -26,6 +26,7 @@
 #define UART_LSR		(UART_BASE + 0x05)
 #define UART_LSB		(UART_BASE + 0x00)
 #define UART_MSB		(UART_BASE + 0x01)
+#define UART_IC     (UART_BASE + 0x02)
 
 #define PS2_KBD_ADDR         0x10011000
 #define PS2_KBD_REG_SCANCODE 0x0

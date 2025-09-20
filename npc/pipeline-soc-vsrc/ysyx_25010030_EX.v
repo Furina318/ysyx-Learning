@@ -78,10 +78,10 @@ module ysyx_25010030_EX (
     output reg [31:0] ex_lsu_process_result
 
 );
-`ifdef VERILATOR
-    import "DPI-C" function void ebreak(input int station, input int inst);
+// `ifdef VERILATOR
+    // import "DPI-C" function void ebreak(input int station, input int inst);
     // import "DPI-C" function void counter(input int inst_type, input int ifu_inc, input int lsu_inc, input int exu_inc);
-`endif
+// `endif
     
     // EXU 活跃周期计数
     // always @(posedge clk) begin
