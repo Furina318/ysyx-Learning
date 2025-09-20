@@ -7,7 +7,11 @@
 2. **SoC 适配五级流水线模块（pipeline-soc-vsrc）**  
    - 特性：在基础五级流水线基础上，支持突发传输，可对接 SoC 系统。
    - 备注：流片面积24553，正在进行iverilog四值仿真和CI流片测试...
+<<<<<<< HEAD
    -      同时可通过makefile完成riscv32e-ysyxsoc和riscv32e-npc之间的切换。两者共用一个cpu内核，但是riscv32e-npc接上本人自己编写的simple-SoC，主要是用于测试仿真
+=======
+   -    同时可通过makefile完成riscv32e-ysyxsoc和riscv32e-npc之间的切换。两者共用一个cpu内核，但是riscv32e-npc接上本人自己编写的simple-SoC，主要是用于测试仿真
+>>>>>>> e5368e83de3fd0ac53d723c7d966c3383cb6a33c
 3. **多周期模块（mul-vsrc）**  
    - 特性：基于 AXI4-Lite 总线协议实现，适用于对时序要求较高、面积受限的场景。
    - 备注：不包含CSR指令，无法运行rtt

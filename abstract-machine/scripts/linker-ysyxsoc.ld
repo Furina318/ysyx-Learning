@@ -55,6 +55,7 @@ SECTIONS {
     _data_start = .;
     *(.data*)
     *(.sdata*)
+<<<<<<< HEAD
 
     /* section information for finsh shell */
     __fsymtab_start = .;
@@ -82,6 +83,8 @@ SECTIONS {
     *(__am_apps.data*)
     *(__am_apps.sdata*)
     __am_apps_data_end = .;
+=======
+>>>>>>> e5368e83de3fd0ac53d723c7d966c3383cb6a33c
     _data_end = .;
   } > sdram AT> flash
   _data_load_lma = LOADADDR(.data);
@@ -91,12 +94,15 @@ SECTIONS {
     *(.bss*)
     *(.sbss*)
     *(.scommon)
+<<<<<<< HEAD
     . = ALIGN(4);
     __am_apps_bss_start = .;
     *(__am_apps.bss*)
     *(__am_apps.sbss*)
     *(__am_apps.scommon*)
     __am_apps_bss_end = .;
+=======
+>>>>>>> e5368e83de3fd0ac53d723c7d966c3383cb6a33c
     _bss_end = .;
   } > sdram AT> flash
 

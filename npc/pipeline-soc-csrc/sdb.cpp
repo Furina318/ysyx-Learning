@@ -316,4 +316,8 @@ void init_sdb() {
 #ifdef CONFIG_WATCHPOINTS
   init_wp_pool();
 #endif
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> e5368e83de3fd0ac53d723c7d966c3383cb6a33c

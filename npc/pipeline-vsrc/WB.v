@@ -37,8 +37,12 @@ module WBU #(
 reg [31:0] mstatus;
 reg [31:0] mtvec;
 reg [31:0] mepc;
+<<<<<<< HEAD
 // reg [31:0] mcause;
 wire [31:0] mcause = 32'hb;
+=======
+reg [31:0] mcause;
+>>>>>>> e5368e83de3fd0ac53d723c7d966c3383cb6a33c
 
 localparam MSTATUS = 12'h300;
 localparam MTVEC   = 12'h305;
@@ -95,12 +99,21 @@ assign src2 = (rs2 == 5'b0) ? 32'b0 : regs[rs2];
 //         end
 //     end
 // end
+<<<<<<< HEAD
 // initial begin
 //     mstatus = 32'h1800;
 //     mtvec   = 32'h0;
 //     mepc    = 32'h0;
 //     mcause  = 32'h0;
 // end
+=======
+initial begin
+    mstatus = 32'h1800;
+    mtvec   = 32'h0;
+    mepc    = 32'h0;
+    mcause  = 32'h0;
+end
+>>>>>>> e5368e83de3fd0ac53d723c7d966c3383cb6a33c
 
 always @(posedge clk) begin
     if (rst) begin
@@ -108,7 +121,11 @@ always @(posedge clk) begin
         mstatus <= 32'h1800;
         mtvec   <= 32'h0;
         mepc    <= 32'h0;
+<<<<<<< HEAD
         // mcause  <= 32'h0;
+=======
+        mcause  <= 32'h0;
+>>>>>>> e5368e83de3fd0ac53d723c7d966c3383cb6a33c
     end
     else if (lsu_wb_valid && (wen_csr1 | wen_csr2)) begin
         // if (wen_csr2) begin
@@ -122,7 +139,11 @@ always @(posedge clk) begin
             MSTATUS: mstatus <= wdata_csr1;
             MTVEC:   mtvec   <= wdata_csr1;
             MEPC:    mepc    <= wdata_csr1;
+<<<<<<< HEAD
             // MCAUSE:  mcause  <= wdata_csr1;
+=======
+            MCAUSE:  mcause  <= wdata_csr1;
+>>>>>>> e5368e83de3fd0ac53d723c7d966c3383cb6a33c
             default: ;
         endcase
         if (wen_csr2) begin
@@ -130,7 +151,11 @@ always @(posedge clk) begin
                 MSTATUS: mstatus <= wdata_csr2;
                 MTVEC:   mtvec   <= wdata_csr2;
                 MEPC:    mepc    <= wdata_csr2;
+<<<<<<< HEAD
                 // MCAUSE:  mcause  <= wdata_csr2;
+=======
+                MCAUSE:  mcause  <= wdata_csr2;
+>>>>>>> e5368e83de3fd0ac53d723c7d966c3383cb6a33c
                 default: ;
             endcase
         end

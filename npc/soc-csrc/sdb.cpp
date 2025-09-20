@@ -311,4 +311,8 @@ void init_sdb() {
   /* Compile the regular expressions. */
   init_regex();
   init_wp_pool();
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> e5368e83de3fd0ac53d723c7d966c3383cb6a33c

@@ -17,17 +17,26 @@ endif
 # NVBOARD_HOME = /home/furina/ysyx-workbench/nvboard
 # SOC_HOME = /home/furina/ysyx-workbench/ysyxSoC
 ifeq ($(ARCH), riscv32e-ysyxsoc)
+<<<<<<< HEAD
 CSRCS = $(shell find $(abspath ./pipeline-soc-csrc) -name "*.cpp")  #可修改
+=======
+CSRCS = $(shell find $(abspath ./pipeline-soc-csrc) -name "*.cpp")  
+>>>>>>> e5368e83de3fd0ac53d723c7d966c3383cb6a33c
 VSRCS = $(shell find $(abspath ./pipeline-soc-vsrc) -name "*.v")
 VSRCS += $(shell find $(abspath ../ysyxSoC/perip) -name "*.v")
 VSRCS += ../ysyxSoC/build/ysyxSoCFull.v 
 
 else
 ifeq ($(ARCH), riscv32e-npc)
+<<<<<<< HEAD
 CSRCS = $(shell find $(abspath ./pipeline-soc-csrc) -name "*.cpp") #可修改
 VSRCS = $(shell find $(abspath ./pipeline-soc-vsrc) -name "*.v")   
 # VSRCS = $(shell find $(abspath ./build) -name "*.v")
 VSRCS += $(shell find $(abspath ./simple-SoC) -name "*.v")
+=======
+CSRCS = $(shell find $(abspath ./pipeline-csrc) -name "*.cpp") 
+VSRCS = $(shell find $(abspath ./pipeline-vsrc) -name "*.v")   
+>>>>>>> e5368e83de3fd0ac53d723c7d966c3383cb6a33c
 endif
 endif
 
@@ -211,6 +220,7 @@ ifeq ($(ARCH), riscv32e-ysyxsoc)
 											SDC_FILE=$(NPC_HOME)/npc.sdc \
 											RTL_FILES="$(shell find $(NPC_HOME)/pipeline-soc-vsrc -name "*.v")" \
 											CLK_FREQ_MHZ=200 \
+<<<<<<< HEAD
 											INCLUDE_PATH=$(NPC_HOME)/pipeline-soc-vsrc
 else
 	cd $(NPC_HOME)/../yosys-sta && make sta DESIGN=$(YOSYS_TOP) \
@@ -218,6 +228,9 @@ else
 											RTL_FILES="$(shell find $(NPC_HOME)/build -name "ysyx_25010030.v")" \
 											CLK_FREQ_MHZ=250 
 endif
+=======
+											INCLUDE_PATH=$(NPC_HOME)/pipeline-soc-vsrc/defines
+>>>>>>> e5368e83de3fd0ac53d723c7d966c3383cb6a33c
 	cd $(NPC_HOME)
 
 # 伪目标：运行环境准备

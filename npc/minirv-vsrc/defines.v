@@ -53,4 +53,8 @@
 `define Mem_Half   3'b001
 `define Mem_UHalf  3'b011
 `define Mem_UBit   3'b000
+<<<<<<< HEAD
 `define Mem_Bit    3'b100
+=======
+`define Mem_Bit    3'b100
+>>>>>>> e5368e83de3fd0ac53d723c7d966c3383cb6a33c

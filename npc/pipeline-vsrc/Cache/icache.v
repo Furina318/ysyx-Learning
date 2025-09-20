@@ -325,4 +325,8 @@ module ICache #(
         end
     end
 
+<<<<<<< HEAD
 endmodule
+=======
+endmodule
+>>>>>>> e5368e83de3fd0ac53d723c7d966c3383cb6a33c

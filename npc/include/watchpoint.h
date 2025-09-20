@@ -15,4 +15,8 @@ WP *new_wp();
 void free_wp(WP *wp);
 void update_all_watchpoint_NOs();
 void init_wp_pool();
+<<<<<<< HEAD
 #endif
+=======
+#endif
+>>>>>>> e5368e83de3fd0ac53d723c7d966c3383cb6a33c
