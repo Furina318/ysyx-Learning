@@ -5,7 +5,7 @@ extern char _heap_start;
 int main(const char *args);
 
 Area heap = RANGE(&_heap_start, PMEM_END);
-static const char mainargs[MAINARGS_MAX_LEN] = MAINARGS_PLACEHOLDER; // defined in CFLAGS
+static const char mainargs[MAINARGS_MAX_LEN] = MAINARGS_PLACEHOLDER; // defined in CFLAGS  mainargs的占位，会在nemu.mk中被替换为真正的mainargs
 
 void putch(char ch) {
   outb(SERIAL_PORT, ch);
