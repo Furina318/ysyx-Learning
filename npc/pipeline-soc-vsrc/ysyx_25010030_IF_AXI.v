@@ -31,12 +31,12 @@ module ysyx_25010030_IF_AXI (
 
     // output reg [31:0] ifu_active_cycles
 );
-`ifdef VERILATOR
+// `ifdef VERILATOR
     // import "DPI-C" function void counter(input int inst_type, input int ifu_inc, input int lsu_inc, input int exu_inc);
-`endif
+// `endif
 
     // 状态机定义
-    reg [1:0] state;
+    reg [1:0] ifu_state;
     localparam IDLE = 2'b00;
     localparam WAIT_FLUSH = 2'b01;
     localparam WAIT_CACHE = 2'b11;  // 等待缓存响应
@@ -94,7 +94,7 @@ module ysyx_25010030_IF_AXI (
     // always @(posedge clk) begin
     //     if (reset) begin
     //         ifu_active_cycles <= 0;
-    //     end else if (state != IDLE || cache_arvalid) begin
+    //     end else if (ifu_state != IDLE || cache_arvalid) begin
     //         ifu_active_cycles <= ifu_active_cycles + 1;
     //     end
     // end
@@ -132,7 +132,7 @@ module ysyx_25010030_IF_AXI (
         `endif
             IF_ID_inst <= 0;
             IF_valid   <= 0;
-            state      <= IDLE;
+            ifu_state  <= IDLE;
             // cache_req  <= 0;
             flush_once <= 0;
             once       <= 1;
@@ -143,10 +143,10 @@ module ysyx_25010030_IF_AXI (
                 IF_valid   <= 0;
                 next_pc    <= EX_flush_pc;
                 flush_once <= 1;
-                state      <= WAIT_CACHE;
+                ifu_state  <= WAIT_CACHE;
             end
             else begin
-                case (state)
+                case (ifu_state)
                     IDLE: begin
                         // 准备新的取指请求
                         if ((IF_valid && ID_ready) || flush_once || once) begin
@@ -154,11 +154,11 @@ module ysyx_25010030_IF_AXI (
                             flush_once <= 0;
                             // cache_req  <= 1;
                             IF_valid   <= 0;
-                            state      <= WAIT_FLUSH;
+                            ifu_state  <= WAIT_FLUSH;
                         end
                     end
                     WAIT_FLUSH: begin
-                        state <= WAIT_CACHE;
+                        ifu_state <= WAIT_CACHE;
                     end
                     WAIT_CACHE: begin
                         // cache_req <= 0;
@@ -169,7 +169,7 @@ module ysyx_25010030_IF_AXI (
                             IF_ID_pc   <= (flush_once) ? IF_ID_pc : next_pc;
                             IF_valid   <= (flush_once) ? 0 : 1;
                             next_pc    <= (flush_once) ? next_pc : (is_jal) ? jal_target : next_pc + 4;
-                            state      <= IDLE;
+                            ifu_state  <= IDLE;
                         // `ifdef VERILATOR
                         //     // 统计指令
                         //     counter(7, 1, 0, 0);
@@ -178,7 +178,7 @@ module ysyx_25010030_IF_AXI (
                         
                     end
 
-                    default: state <= IDLE;
+                    default: ifu_state <= IDLE;
                 endcase
             end
         end
@@ -216,7 +216,7 @@ endmodule
 
 //     import "DPI-C" function void counter(input int inst_type, input int ifu_inc, input int lsu_inc, input int exu_inc);
 
-//     reg [1:0] state;
+//     reg [1:0] ifu_state;
 //     localparam IDLE = 2'b00;
 //     localparam AR_WAIT = 2'b01;
 //     localparam R_WAIT  = 2'b10;
@@ -229,7 +229,7 @@ endmodule
 //     always @(posedge clk) begin
 //         if (reset) begin
 //             ifu_active_cycles <= 0;
-//         end else if (state == AR_WAIT || state == R_WAIT) begin
+//         end else if (ifu_state == AR_WAIT || ifu_state == R_WAIT) begin
 //             ifu_active_cycles <= ifu_active_cycles + 1;
 //         end
 //     end
@@ -243,7 +243,7 @@ endmodule
 //             if_axi_rready   <= 0;
 //             IF_ID_inst <= 0;
 //             IF_valid   <= 0;
-//             state      <= IDLE;
+//             ifu_state      <= IDLE;
 //             once       <= 1;
 //             flush_once <= 0;
 //         end
@@ -255,8 +255,8 @@ endmodule
 //                 //     if_axi_arvalid <= 1;
 //                 //     if_axi_araddr  <= EX_flush_pc;
 //                 //     if_axi_rready <= 1;      
-//                 //     state <= AR_WAIT;
-//                 //     flush_once <= (state == AR_WAIT) ? 2'd2 : 2'd1;
+//                 //     ifu_state <= AR_WAIT;
+//                 //     flush_once <= (ifu_state == AR_WAIT) ? 2'd2 : 2'd1;
 //                 // end
 //                 // else begin
 //                 //     flush_once <= flush_once - 1;
@@ -266,10 +266,10 @@ endmodule
 //                 // if_axi_arvalid <= 1;
 //                 if_axi_araddr  <= EX_flush_pc;
 //                 // if_axi_rready <= 1;      
-//                 // state <= AR_WAIT;
-//                 flush_once <= (axi_if_arready && if_axi_arvalid) || (state == R_WAIT);
+//                 // ifu_state <= AR_WAIT;
+//                 flush_once <= (axi_if_arready && if_axi_arvalid) || (ifu_state == R_WAIT);
 //             end
-//             case (state)
+//             case (ifu_state)
 //                 IDLE: begin
 //                     // // IF_valid <= 0;
 //                     // if (EX_flush || flush_reg) begin
@@ -279,7 +279,7 @@ endmodule
 //                     //     if_axi_araddr  <= flush_reg ? flush_pc_reg : EX_flush_pc;
 //                     //     // IF_ID_inst <= 32'h0;
 //                     //     // IF_valid <= ID_ready;
-//                     //     state   <= AR_WAIT;
+//                     //     ifu_state   <= AR_WAIT;
 //                     // end
 //                     // else 
 //                     if ((IF_valid && ID_ready) || once) begin
@@ -287,7 +287,7 @@ endmodule
 //                         IF_valid <= 0;
 //                         if_axi_arvalid <= 1;
 //                         if_axi_araddr  <= next_pc;
-//                         state   <= AR_WAIT;
+//                         ifu_state   <= AR_WAIT;
 //                     end
 //                 end
 
@@ -296,7 +296,7 @@ endmodule
 //                         if_axi_arvalid <= 0;
 //                         if_axi_rready  <= 1;
 //                         IF_valid <= 0;
-//                         state   <= R_WAIT;
+//                         ifu_state   <= R_WAIT;
 //                     end
 //                 end
 
@@ -307,7 +307,7 @@ endmodule
 //                         IF_ID_pc   <= next_pc;
 //                         IF_valid   <= (EX_flush || flush_once) ? 0 : 1;
 //                         next_pc    <= (EX_flush || flush_once) ? EX_flush_pc : next_pc + 4;
-//                         state      <= flush_once ? AR_WAIT : IDLE;
+//                         ifu_state      <= flush_once ? AR_WAIT : IDLE;
 //                         flush_once <= 0;
 //                         if_axi_arvalid <= flush_once ? 1 : 0;
 //                         if_axi_araddr  <= flush_once ? EX_flush_pc : next_pc + 4;
@@ -316,7 +316,7 @@ endmodule
 //                     end
 //                 end
 
-//                 default: state <= IDLE;
+//                 default: ifu_state <= IDLE;
 //             endcase
 //         end
 //     end

@@ -123,7 +123,7 @@ module ysyx_25010030_LSU_AXI (
     localparam IDLE = 2'b00; 
     localparam RD   = 2'b10; 
     localparam WR   = 2'b01; 
-    reg [1:0] state, next_state;
+    reg [1:0] lsu_state, lsu_next_state;
 
     reg        aw_done;  
     reg        w_done;   
@@ -137,7 +137,7 @@ module ysyx_25010030_LSU_AXI (
         // if (rst) begin
         //     addr_reg <= 32'h0;  
         // end
-        if (state == IDLE & req_valid) begin
+        if (lsu_state == IDLE & req_valid) begin
             addr_reg <= addr;  
         end        
     end
@@ -148,7 +148,7 @@ module ysyx_25010030_LSU_AXI (
         //     saved_wdata       <= 0;
         //     saved_wstrb       <= 0;
         // end
-        if (state == IDLE & req_valid) begin
+        if (lsu_state == IDLE & req_valid) begin
             saved_word_offset <= word_offset;
             // saved_wdata       <= align_write_data(ex_lsu_MemLen, addr[1:0], data_in);
             saved_wdata       <= (ex_lsu_MemLen == `Mem_Bit) ? ({24'b0, data_in[7:0]} << (addr[1:0] * 8)) :
@@ -162,14 +162,14 @@ module ysyx_25010030_LSU_AXI (
 
     always @(posedge clk) begin
         if (rst) begin
-            state <= IDLE;
+            lsu_state <= IDLE;
         end else begin
-            state <= next_state;
+            lsu_state <= lsu_next_state;
         end
     end
 
     // always @(posedge clk) begin
-    //     if (state != RD) begin
+    //     if (lsu_state != RD) begin
     //         burst_cnt <= 0;
     //     end else if (axi_lsu_rvalid && lsu_axi_rready) begin
     //         burst_cnt <= burst_cnt + 1;
@@ -177,7 +177,7 @@ module ysyx_25010030_LSU_AXI (
     // end
 
     // always @(posedge clk) begin
-    //     if (state == WR) begin
+    //     if (lsu_state == WR) begin
     //         if (lsu_axi_awvalid && axi_lsu_awready) aw_done <= 1'b1;
     //         if (lsu_axi_wvalid && axi_lsu_wready && lsu_axi_wlast) w_done <= 1'b1;
     //         if (axi_lsu_bvalid && lsu_axi_bready) b_done <= 1'b1;
@@ -189,46 +189,46 @@ module ysyx_25010030_LSU_AXI (
     // end
 
     always @(*) begin
-        case (state)
+        case (lsu_state)
             // IDLE: begin
             //     if(req_valid) begin
-            //         next_state = we ? WR : RD;
+            //         lsu_next_state = we ? WR : RD;
             //     end
             //     else begin
-            //         next_state = IDLE;
+            //         lsu_next_state = IDLE;
             //     end
             // end
-            IDLE: next_state = req_valid ? (we ? WR : RD) : IDLE;
-            RD: next_state = (axi_lsu_rvalid && lsu_axi_rready && axi_lsu_rlast) ? IDLE : RD;
-            WR: next_state = (aw_done && w_done && b_done) ? IDLE : WR;
-            default: next_state = IDLE;
+            IDLE: lsu_next_state = req_valid ? (we ? WR : RD) : IDLE;
+            RD: lsu_next_state = (axi_lsu_rvalid && lsu_axi_rready && axi_lsu_rlast) ? IDLE : RD;
+            WR: lsu_next_state = (aw_done && w_done && b_done) ? IDLE : WR;
+            default: lsu_next_state = IDLE;
         endcase
     end
     
     always @(posedge clk) begin
         if(rst) begin
-            state <= IDLE;
+            lsu_state <= IDLE;
         end
         else begin
-            case(state)
+            case(lsu_state)
                 IDLE: begin
                     aw_done <= 0;
                     w_done  <= 0;
                     b_done  <= 0;
                     burst_cnt <= 0;
-                    // state <= req_valid ? (we ? WR : RD) : IDLE;
+                    // lsu_state <= req_valid ? (we ? WR : RD) : IDLE;
                 end
                 RD: begin
                     if(axi_lsu_rvalid && lsu_axi_rready) begin
                         burst_cnt <= burst_cnt + 1;
                     end
-                    // state <= (axi_lsu_rvalid && lsu_axi_rready && axi_lsu_rlast) ? IDLE : RD;
+                    // lsu_state <= (axi_lsu_rvalid && lsu_axi_rready && axi_lsu_rlast) ? IDLE : RD;
                 end
                 WR: begin
                     if (lsu_axi_awvalid && axi_lsu_awready) aw_done <= 1'b1;
                     if (lsu_axi_wvalid && axi_lsu_wready && lsu_axi_wlast) w_done <= 1'b1;
                     if (axi_lsu_bvalid && lsu_axi_bready) b_done <= 1'b1;
-                    // state <= (aw_done && w_done && b_done) ? IDLE : WR;
+                    // lsu_state <= (aw_done && w_done && b_done) ? IDLE : WR;
                 end
                 default: begin end
             endcase
@@ -259,7 +259,7 @@ module ysyx_25010030_LSU_AXI (
             lsu_axi_wvalid  <= 1'b0;
             lsu_axi_arvalid <= 1'b0;
         end 
-        else if (state == RD) begin
+        else if (lsu_state == RD) begin
             if (!ar_done && !lsu_axi_arvalid) begin
                 lsu_axi_araddr  <= in_sdram ? {addr_reg[31:BLOCK_OFFSET_WIDTH], {BLOCK_OFFSET_WIDTH{1'b0}}} : addr_reg;
                 lsu_axi_arvalid <= 1'b1;
@@ -276,7 +276,7 @@ module ysyx_25010030_LSU_AXI (
             ar_done         <= 1'b0;
         end
 
-        if (state == WR) begin
+        if (lsu_state == WR) begin
             if (!lsu_axi_awvalid && !aw_done) begin
                 lsu_axi_awaddr  <= addr_reg;  
                 lsu_axi_awvalid <= 1'b1;
@@ -310,7 +310,7 @@ module ysyx_25010030_LSU_AXI (
     //     //     lsu_axi_bready  <= 1'b0;
     //     //     // lsu_axi_awid    <= 0;
     //     // end else 
-    //     if (state == WR) begin
+    //     if (lsu_state == WR) begin
     //         if (!lsu_axi_awvalid && !aw_done) begin
     //             lsu_axi_awaddr  <= addr_reg;  
     //             lsu_axi_awvalid <= 1'b1;
@@ -346,7 +346,7 @@ module ysyx_25010030_LSU_AXI (
         end else begin  
             valid <= 1'b0;
 
-            case (state)
+            case (lsu_state)
                 // IDLE: begin end
                 RD: begin
                     if (axi_lsu_rvalid && lsu_axi_rready && axi_lsu_rlast) begin
