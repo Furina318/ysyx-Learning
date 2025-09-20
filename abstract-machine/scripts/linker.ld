@@ -14,7 +14,7 @@ SECTIONS {
     *(.rodata*)
   }
   .data : {
-    *(.data)
+    *(.data*)
   } : data
   edata = .;
   _data = .;
@@ -31,3 +31,29 @@ SECTIONS {
   _end = .;
   _heap_start = ALIGN(0x1000);
 }
+/* 低地址
+┌───────────────────┐
+│      .text        │ ← _pmem_start
+│   (entry, code)   │
+├───────────────────┤
+│     .rodata       │
+│   (read-only)     │
+├───────────────────┤
+│      .data        │
+│ (initialized data)│
+├───────────────────┤
+│       .bss        │ ← _bss_start
+│ (uninitialized)   │
+├───────────────────┤
+│                   │
+│     栈空间        │ ← _stack_top (栈底)
+│    (32KB)         │
+│                   │ ← _stack_pointer (初始SP)
+├───────────────────┤
+│                   │
+│     未分配空间     │ ← end/_end
+├───────────────────┤
+│                   │
+│      堆空间        │ ← _heap_start
+│   (动态分配)       │
+└───────────────────┘ 高地址 */

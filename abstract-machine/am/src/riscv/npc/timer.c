@@ -1,25 +1,47 @@
 #include <am.h>
+#include "../npc/include/npc.h"
 #include "../riscv.h"
-#include <stdio.h>
 
-#define RTC_ADDR 0x02000000
+// void __am_timer_init() {
+//   outl(RTC_ADDR,0);//将计时器的低 32 位和高 32 位清零
+//   outl(RTC_ADDR + 4,0);
+// }
 
-static uint64_t start_time = 0;
+// void __am_timer_uptime(AM_TIMER_UPTIME_T *uptime) {
+//   // uptime->us = 0;
+//   uptime->us = (uint64_t)inl(RTC_ADDR+4);//高32
+//   uptime->us <<= 32;
+//   uptime->us += (uint64_t)inl(RTC_ADDR);//低32
+// }
 
-static uint64_t get_time()
-{
-  uint32_t high = inl(RTC_ADDR + 4);
-  uint32_t low = inl(RTC_ADDR);
-  uint64_t time = ((uint64_t)high << 32) + low;
-  return time / 4;
+// void __am_timer_rtc(AM_TIMER_RTC_T *rtc) {
+//   rtc->second = 0;
+//   rtc->minute = 0;
+//   rtc->hour   = 0;
+//   rtc->day    = 0;
+//   rtc->month  = 0;
+//   rtc->year   = 1900;
+// }
+
+static uint64_t boot_time = 0;
+static uint64_t get_time() {
+  uint32_t lo = inl(RTC_ADDR);
+  uint32_t hi = inl(RTC_ADDR + 4);
+  uint64_t time = ((uint64_t)hi << 32) + lo;
+  return time;
 }
 
 void __am_timer_init() {
-  start_time = get_time();
+  // outl(RTC_ADDR,0);//将计时器的低 32 位和高 32 位清零
+  // outl(RTC_ADDR + 4,0);
+  boot_time = get_time();
 }
 
 void __am_timer_uptime(AM_TIMER_UPTIME_T *uptime) {
-  uptime->us = (get_time() - start_time);
+  // uptime->us = (uint64_t)inl(RTC_ADDR+4);//高32
+  // uptime->us <<= 32;
+  // uptime->us += (uint64_t)inl(RTC_ADDR);//低32
+  uptime->us = get_time() - boot_time;
 }
 
 void __am_timer_rtc(AM_TIMER_RTC_T *rtc) {
