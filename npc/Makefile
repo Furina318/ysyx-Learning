@@ -11,6 +11,7 @@ else
 ifeq ($(ARCH), riscv32e-ysyxsoc)
 TOPNAME = ysyxSoCFull
 CXXFLAGS += -DCONFIG_YSYXSOC
+nvboard ?= 1
 endif
 endif
 YOSYSTOP = ysyx_25020037
@@ -31,7 +32,7 @@ WAVEFORM_NETLIST = $(IVERILOG_DIR)/waveform_netlist.fst
 MEM_INIT = $(IVERILOG_DIR)/mem_init.hex
 WAVE ?= 0
 
-nvboard ?= 1
+
 ifndef NVBOARD_HOME
 $(error NVBOARD_HOME is not set. Please set the environment variable NVBOARD_HOME to your NVBoard installation path)
 endif
