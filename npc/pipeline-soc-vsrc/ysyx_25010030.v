@@ -265,6 +265,19 @@ module ysyx_25010030 (
     // wire [31:0] exu_active_cycles;
     // wire [31:0] lsu_active_cycles;
 
+    wire [31:0] cache_inst;
+    wire        cache_valid;
+
+    wire [31:0] cache_araddr;
+    wire        cache_arvalid;
+    wire [ 3:0] cache_arid;
+    wire [ 7:0] cache_arlen;
+    wire [ 2:0] cache_arsize;
+    wire [ 1:0] cache_arburst;
+    wire        cache_rready;
+    wire        is_fencei;
+    wire [31:0] next_pc;
+
     ysyx_25010030_CLINT clint (
         .clk    (clock        ),
         .reset  (reset        ),
@@ -398,6 +411,28 @@ module ysyx_25010030 (
         // .clint_bid(clint_bid)
     );
 
+    ysyx_25010030_iCache u_icache (
+        .clk            (clock           ),
+        .reset          (reset         ),
+        .is_fencei      (is_fencei     ),
+        .addr           (next_pc       ),
+        .inst           (cache_inst    ),
+        .valid          (cache_valid   ),
+        .axi_araddr     (cache_araddr  ),
+        .axi_arvalid    (cache_arvalid ),
+        .axi_arready    (axi_if_arready),
+        .axi_arid       (cache_arid    ),  
+        .axi_arlen      (cache_arlen   ),  
+        .axi_arsize     (cache_arsize  ),  
+        .axi_arburst    (cache_arburst ),  
+        .axi_rvalid     (axi_if_rvalid ),
+        .axi_rready     (cache_rready  ),
+        .axi_rdata      (axi_if_rdata  ),
+        .axi_rresp      (axi_if_rresp  ),
+        .axi_rid        (axi_if_rid    ),  
+        .axi_rlast      (axi_if_rlast  )   
+    );
+
     // IF（指令获取）模块
     ysyx_25010030_IF_AXI ifu (
         .clk           (clock         ),
@@ -409,18 +444,29 @@ module ysyx_25010030 (
         .IF_ID_pc      (IF_ID_pc      ),
         .IF_ID_inst    (IF_ID_inst    ),
         .if_axi_arvalid(if_axi_arvalid),
-        .axi_if_arready(axi_if_arready),
+        // .axi_if_arready(axi_if_arready),
         .if_axi_araddr (if_axi_araddr ),
         .if_axi_arid   (if_axi_arid   ),
         .if_axi_arlen  (if_axi_arlen  ),
         .if_axi_arsize (if_axi_arsize ),
         .if_axi_arburst(if_axi_arburst),
-        .axi_if_rdata  (axi_if_rdata  ),
-        .axi_if_rvalid (axi_if_rvalid ),
+        // .axi_if_rdata  (axi_if_rdata  ),
+        // .axi_if_rvalid (axi_if_rvalid ),
         .if_axi_rready (if_axi_rready ),
-        .axi_if_rresp  (axi_if_rresp  ),
-        .axi_if_rid    (axi_if_rid    ),
-        .axi_if_rlast  (axi_if_rlast  )
+        // .axi_if_rresp  (axi_if_rresp  ),
+        // .axi_if_rid    (axi_if_rid    ),
+        // .axi_if_rlast  (axi_if_rlast  )
+        .is_fencei     (is_fencei),
+        .next_pc       (next_pc),
+        .cache_inst    (cache_inst),
+        .cache_valid   (cache_valid),
+        .cache_araddr  (cache_araddr),
+        .cache_arvalid (cache_arvalid),
+        .cache_arid    (cache_arid),
+        .cache_arlen   (cache_arlen),
+        .cache_arsize  (cache_arsize),
+        .cache_arburst (cache_arburst),
+        .cache_rready  (cache_rready)
         // .ifu_active_cycles(ifu_active_cycles)
     );
 

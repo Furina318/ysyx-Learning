@@ -11,5 +11,6 @@
 !.gitignore
 !init.sh
 /fceux-am
+/ysyxSoC
 !/patch/rt-thread-am/*.patch
 !/patch/ysyxSoC/*.patch

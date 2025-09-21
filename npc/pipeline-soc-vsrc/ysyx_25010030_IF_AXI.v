@@ -16,19 +16,29 @@ module ysyx_25010030_IF_AXI (
 
     // AXI4-Lite 接口信号（与 SRAM 连接）
     output reg        if_axi_arvalid,       // 读地址有效
-    input             axi_if_arready,       // 读地址就绪
+    // input             axi_if_arready,       // 读地址就绪
     output reg [31:0] if_axi_araddr,        // 读地址
     output reg [ 3:0] if_axi_arid,
     output reg [ 7:0] if_axi_arlen,
     output reg [ 2:0] if_axi_arsize,
     output reg [ 1:0] if_axi_arburst,
-    input      [31:0] axi_if_rdata,         // 读数据
-    input             axi_if_rvalid,        // 读数据有效
+    // input      [31:0] axi_if_rdata,         // 读数据
+    // input             axi_if_rvalid,        // 读数据有效
     output reg        if_axi_rready,        // 读数据就绪
-    input      [ 1:0] axi_if_rresp,         // 读响应
-    input      [ 3:0] axi_if_rid,
-    input             axi_if_rlast
-
+    // input      [ 1:0] axi_if_rresp,         // 读响应
+    // input      [ 3:0] axi_if_rid,
+    // input             axi_if_rlast
+    output wire       is_fencei,
+    output reg [31:0] next_pc,
+    input      [31:0] cache_inst,
+    input             cache_valid,
+    input      [31:0] cache_araddr,
+    input             cache_arvalid,
+    input      [ 3:0] cache_arid,
+    input      [ 7:0] cache_arlen,
+    input      [ 2:0] cache_arsize,
+    input      [ 1:0] cache_arburst,
+    input             cache_rready
     // output reg [31:0] ifu_active_cycles
 );
 // `ifdef VERILATOR
@@ -45,50 +55,50 @@ module ysyx_25010030_IF_AXI (
     localparam JAL_OPCODE = 7'b1101111;
 
     // 内部信号
-    reg [31:0] next_pc;
+    // reg [31:0] next_pc;
     // reg cache_req;
     reg flush_once;
     reg once;
     
     // cache接口信号
-    wire [31:0] cache_inst;
-    wire        cache_valid;
+    // wire [31:0] cache_inst;
+    // wire        cache_valid;
 
-    wire [31:0] cache_araddr;
-    wire        cache_arvalid;
-    wire [ 3:0] cache_arid;
-    wire [ 7:0] cache_arlen;
-    wire [ 2:0] cache_arsize;
-    wire [ 1:0] cache_arburst;
-    wire        cache_rready;
+    // wire [31:0] cache_araddr;
+    // wire        cache_arvalid;
+    // wire [ 3:0] cache_arid;
+    // wire [ 7:0] cache_arlen;
+    // wire [ 2:0] cache_arsize;
+    // wire [ 1:0] cache_arburst;
+    // wire        cache_rready;
 
-    wire        is_fencei = (IF_ID_inst == FENCEI);
+    assign      is_fencei = (IF_ID_inst == FENCEI);
     wire        is_jal    = (cache_inst[6:0] == JAL_OPCODE);
     wire [31:0] immJ      = {{12{cache_inst[31]}}, cache_inst[19:12], cache_inst[20], cache_inst[30:21], 1'b0};
     wire [31:0] jal_target = (flush_once ? IF_ID_pc : next_pc) + immJ;
     
     // 实例化iCache模块
-    ysyx_25010030_iCache u_icache (
-        .clk            (clk           ),
-        .reset          (reset         ),
-        .is_fencei      (is_fencei     ),
-        .addr           (next_pc       ),
-        .inst           (cache_inst    ),
-        .valid          (cache_valid   ),
-        .axi_araddr     (cache_araddr  ),
-        .axi_arvalid    (cache_arvalid ),
-        .axi_arready    (axi_if_arready),
-        .axi_arid       (cache_arid    ),  
-        .axi_arlen      (cache_arlen   ),  
-        .axi_arsize     (cache_arsize  ),  
-        .axi_arburst    (cache_arburst ),  
-        .axi_rvalid     (axi_if_rvalid ),
-        .axi_rready     (cache_rready  ),
-        .axi_rdata      (axi_if_rdata  ),
-        .axi_rresp      (axi_if_rresp  ),
-        .axi_rid        (axi_if_rid    ),  
-        .axi_rlast      (axi_if_rlast  )   
-    );
+    // ysyx_25010030_iCache u_icache (
+    //     .clk            (clk           ),
+    //     .reset          (reset         ),
+    //     .is_fencei      (is_fencei     ),
+    //     .addr           (next_pc       ),
+    //     .inst           (cache_inst    ),
+    //     .valid          (cache_valid   ),
+    //     .axi_araddr     (cache_araddr  ),
+    //     .axi_arvalid    (cache_arvalid ),
+    //     .axi_arready    (axi_if_arready),
+    //     .axi_arid       (cache_arid    ),  
+    //     .axi_arlen      (cache_arlen   ),  
+    //     .axi_arsize     (cache_arsize  ),  
+    //     .axi_arburst    (cache_arburst ),  
+    //     .axi_rvalid     (axi_if_rvalid ),
+    //     .axi_rready     (cache_rready  ),
+    //     .axi_rdata      (axi_if_rdata  ),
+    //     .axi_rresp      (axi_if_rresp  ),
+    //     .axi_rid        (axi_if_rid    ),  
+    //     .axi_rlast      (axi_if_rlast  )   
+    // );
 
     // 统计活跃周期
     // always @(posedge clk) begin
@@ -101,7 +111,7 @@ module ysyx_25010030_IF_AXI (
 
     // AXI信号转发（缓存 -> 外部总线）
     always @(*) begin
-        if (cache_arvalid || cache_rready) begin
+        // if (cache_arvalid || cache_rready) begin
             if_axi_arvalid = cache_arvalid;
             if_axi_araddr  = cache_araddr;
             if_axi_rready  = cache_rready;
@@ -109,15 +119,15 @@ module ysyx_25010030_IF_AXI (
             if_axi_arlen   = cache_arlen;
             if_axi_arsize  = cache_arsize;
             if_axi_arburst = cache_arburst;
-        end else begin
-            if_axi_arvalid = 0;
-            if_axi_araddr  = 0;
-            if_axi_rready  = 0;
-            if_axi_arid    = 0;
-            if_axi_arlen   = 0;
-            if_axi_arsize  = 0;
-            if_axi_arburst = 0;
-        end
+        // end else begin
+        //     if_axi_arvalid = 0;
+        //     if_axi_araddr  = 0;
+        //     if_axi_rready  = 0;
+        //     if_axi_arid    = 0;
+        //     if_axi_arlen   = 0;
+        //     if_axi_arsize  = 0;
+        //     if_axi_arburst = 0;
+        // end
     end
 
     // 主控制逻辑
@@ -185,141 +195,3 @@ module ysyx_25010030_IF_AXI (
     end
 
 endmodule
-
-
-
-
-// module IF_AXI_NICACHE (
-//     input             clk,
-//     input             reset,
-
-//     input             EX_flush,
-//     input      [31:0] EX_flush_pc,
-
-//     input             ID_ready,
-//     output reg        IF_valid,
-
-//     output reg [31:0] IF_ID_pc,
-//     output reg [31:0] IF_ID_inst,
-
-//     // AXI4-Lite 接口信号（与 SRAM 连接）
-//     output reg        if_axi_arvalid,       // 读地址有效
-//     input             axi_if_arready,       // 读地址就绪
-//     output reg [31:0] if_axi_araddr,        // 读地址
-//     input      [31:0] axi_if_rdata,         // 读数据
-//     input             axi_if_rvalid,        // 读数据有效
-//     output reg        if_axi_rready,        // 读数据就绪
-//     input      [1:0]  axi_if_rresp,         // 读响应
-
-//     output reg [31:0] ifu_active_cycles
-// );
-
-//     import "DPI-C" function void counter(input int inst_type, input int ifu_inc, input int lsu_inc, input int exu_inc);
-
-//     reg [1:0] ifu_state;
-//     localparam IDLE = 2'b00;
-//     localparam AR_WAIT = 2'b01;
-//     localparam R_WAIT  = 2'b10;
-
-//     reg [31:0] next_pc;
-//     reg once;
-//     reg flush_once;
-//     reg [31:0] flush_pc_reg;
-
-//     always @(posedge clk) begin
-//         if (reset) begin
-//             ifu_active_cycles <= 0;
-//         end else if (ifu_state == AR_WAIT || ifu_state == R_WAIT) begin
-//             ifu_active_cycles <= ifu_active_cycles + 1;
-//         end
-//     end
-
-//     always @(posedge clk or posedge reset) begin
-//         if (reset) begin
-//             IF_ID_pc <= `RESET_FLASH_PC;
-//             next_pc  <= `RESET_FLASH_PC;
-//             if_axi_arvalid  <= 0;
-//             if_axi_araddr   <= 0;
-//             if_axi_rready   <= 0;
-//             IF_ID_inst <= 0;
-//             IF_valid   <= 0;
-//             ifu_state      <= IDLE;
-//             once       <= 1;
-//             flush_once <= 0;
-//         end
-//         else begin
-//             if (EX_flush) begin
-//                 // if (flush_once == 2'd0) begin
-//                 //     IF_valid <= 0;
-//                 //     next_pc <= EX_flush_pc;
-//                 //     if_axi_arvalid <= 1;
-//                 //     if_axi_araddr  <= EX_flush_pc;
-//                 //     if_axi_rready <= 1;      
-//                 //     ifu_state <= AR_WAIT;
-//                 //     flush_once <= (ifu_state == AR_WAIT) ? 2'd2 : 2'd1;
-//                 // end
-//                 // else begin
-//                 //     flush_once <= flush_once - 1;
-//                 // end     
-//                 IF_valid <= 0;
-//                 next_pc <= EX_flush_pc;
-//                 // if_axi_arvalid <= 1;
-//                 if_axi_araddr  <= EX_flush_pc;
-//                 // if_axi_rready <= 1;      
-//                 // ifu_state <= AR_WAIT;
-//                 flush_once <= (axi_if_arready && if_axi_arvalid) || (ifu_state == R_WAIT);
-//             end
-//             case (ifu_state)
-//                 IDLE: begin
-//                     // // IF_valid <= 0;
-//                     // if (EX_flush || flush_reg) begin
-//                     //     IF_valid <= 0;
-//                     //     next_pc <= flush_reg ? flush_pc_reg : EX_flush_pc;
-//                     //     if_axi_arvalid <= 1;
-//                     //     if_axi_araddr  <= flush_reg ? flush_pc_reg : EX_flush_pc;
-//                     //     // IF_ID_inst <= 32'h0;
-//                     //     // IF_valid <= ID_ready;
-//                     //     ifu_state   <= AR_WAIT;
-//                     // end
-//                     // else 
-//                     if ((IF_valid && ID_ready) || once) begin
-//                         once <= 0;
-//                         IF_valid <= 0;
-//                         if_axi_arvalid <= 1;
-//                         if_axi_araddr  <= next_pc;
-//                         ifu_state   <= AR_WAIT;
-//                     end
-//                 end
-
-//                 AR_WAIT: begin
-//                     if (axi_if_arready && if_axi_arvalid) begin
-//                         if_axi_arvalid <= 0;
-//                         if_axi_rready  <= 1;
-//                         IF_valid <= 0;
-//                         ifu_state   <= R_WAIT;
-//                     end
-//                 end
-
-//                 R_WAIT: begin
-//                     if (axi_if_rvalid && if_axi_rready) begin
-//                         if_axi_rready <= 0;
-//                         IF_ID_inst <= axi_if_rdata;
-//                         IF_ID_pc   <= next_pc;
-//                         IF_valid   <= (EX_flush || flush_once) ? 0 : 1;
-//                         next_pc    <= (EX_flush || flush_once) ? EX_flush_pc : next_pc + 4;
-//                         ifu_state      <= flush_once ? AR_WAIT : IDLE;
-//                         flush_once <= 0;
-//                         if_axi_arvalid <= flush_once ? 1 : 0;
-//                         if_axi_araddr  <= flush_once ? EX_flush_pc : next_pc + 4;
-
-//                         counter(7, 1, 0, 0);
-//                     end
-//                 end
-
-//                 default: ifu_state <= IDLE;
-//             endcase
-//         end
-//     end
-
-// endmodule
-
