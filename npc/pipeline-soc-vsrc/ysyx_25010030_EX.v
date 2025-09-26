@@ -185,7 +185,7 @@ module ysyx_25010030_EX (
 
     always @(*) begin
         // jal_target  = id_ex_pc + id_ex_imm;
-        ex_flush    = ex_flush_condition & (~|load_use_flag);
+        ex_flush    = (reset) ? 1'b0 : (ex_flush_condition & (~|load_use_flag));
         jalr_target = (src1 + id_ex_imm) & 32'hfffffffe;
         take_branch = (id_ex_opcode == `INST_B) && (
                     (id_ex_func3 == `F3_BNE  && !alu_zero) ||  // bne
@@ -298,7 +298,12 @@ module ysyx_25010030_EX (
 
     // 流水线控制
     always @(*) begin
-        ex_ready = (lsu_ready || ~ex_lsu_valid) && (load_use_flag == 4'b0);
+        if(reset) begin
+            ex_ready = 1'b0;
+        end
+        else begin
+            ex_ready = (lsu_ready || ~ex_lsu_valid) && (load_use_flag == 4'b0);
+        end
     end
 
     always @(posedge clk) begin

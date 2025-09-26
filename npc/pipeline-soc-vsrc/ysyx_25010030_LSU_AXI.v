@@ -54,7 +54,7 @@ module ysyx_25010030_LSU_AXI (
     // AXI4-Lite 接口信号
     output reg        lsu_axi_arvalid,      
     input             axi_lsu_arready,      
-    output reg [31:0] lsu_axi_araddr,
+    output wire [31:0] lsu_axi_araddr,
     output wire [ 3:0] lsu_axi_arid,
     output wire [ 7:0] lsu_axi_arlen,
     output wire [ 2:0] lsu_axi_arsize,
@@ -66,15 +66,15 @@ module ysyx_25010030_LSU_AXI (
     input      [ 3:0] axi_lsu_rid,
     input             axi_lsu_rlast,         
 
-    output reg [31:0] lsu_axi_awaddr,        
+    output wire [31:0] lsu_axi_awaddr,        
     output reg        lsu_axi_awvalid,      
     input             axi_lsu_awready, 
     output wire [ 3:0] lsu_axi_awid,
     output wire [ 7:0] lsu_axi_awlen,
     output wire [ 2:0] lsu_axi_awsize,
     output wire [ 1:0] lsu_axi_awburst,     
-    output reg [31:0] lsu_axi_wdata,         
-    output reg [ 3:0] lsu_axi_wstrb,         
+    output wire [31:0] lsu_axi_wdata,         
+    output wire [ 3:0] lsu_axi_wstrb,         
     output reg        lsu_axi_wvalid,       
     input             axi_lsu_wready,
     output reg        lsu_axi_wlast,       
@@ -102,7 +102,11 @@ module ysyx_25010030_LSU_AXI (
     localparam AXI_ID            = 4'h0;  
     localparam BURST_LEN         = 4; 
     localparam BLOCK_SIZE        = 16;
-    wire in_sdram = (addr_reg >= SDRAM_BASE) && (addr_reg <= SDRAM_END);
+`ifdef YSYXSOC
+    wire in_sdram = (saved_addr >= SDRAM_BASE) && (saved_addr <= SDRAM_END);
+`else
+    wire in_sdram = 0;
+`endif
 
     localparam BLOCK_OFFSET_WIDTH = 4; 
     // wire [BLOCK_OFFSET_WIDTH-1:0] req_offset  = addr[BLOCK_OFFSET_WIDTH - 1 : 0];  // 块内偏移（0-15）
@@ -118,7 +122,7 @@ module ysyx_25010030_LSU_AXI (
     reg  [ 1:0] addr_off;   
     reg  [31:0] rdata;  
     reg         valid;   
-    reg  [31:0] addr_reg; 
+    reg  [31:0] saved_addr; 
 
     localparam IDLE = 2'b00; 
     localparam RD   = 2'b10; 
@@ -135,20 +139,13 @@ module ysyx_25010030_LSU_AXI (
 
     always @(posedge clk) begin
         // if (rst) begin
-        //     addr_reg <= 32'h0;  
-        // end
-        if (lsu_state == IDLE & req_valid) begin
-            addr_reg <= addr;  
-        end        
-    end
-
-    always @(posedge clk) begin
-        // if (rst) begin
         //     saved_word_offset <= 0;
         //     saved_wdata       <= 0;
         //     saved_wstrb       <= 0;
         // end
         if (lsu_state == IDLE & req_valid) begin
+            addr_off <= addr[1:0];
+            saved_addr <= addr; 
             saved_word_offset <= word_offset;
             // saved_wdata       <= align_write_data(ex_lsu_MemLen, addr[1:0], data_in);
             saved_wdata       <= (ex_lsu_MemLen == `Mem_Bit) ? ({24'b0, data_in[7:0]} << (addr[1:0] * 8)) :
@@ -168,76 +165,36 @@ module ysyx_25010030_LSU_AXI (
         end
     end
 
-    // always @(posedge clk) begin
-    //     if (lsu_state != RD) begin
-    //         burst_cnt <= 0;
-    //     end else if (axi_lsu_rvalid && lsu_axi_rready) begin
-    //         burst_cnt <= burst_cnt + 1;
-    //     end
-    // end
-
-    // always @(posedge clk) begin
-    //     if (lsu_state == WR) begin
-    //         if (lsu_axi_awvalid && axi_lsu_awready) aw_done <= 1'b1;
-    //         if (lsu_axi_wvalid && axi_lsu_wready && lsu_axi_wlast) w_done <= 1'b1;
-    //         if (axi_lsu_bvalid && lsu_axi_bready) b_done <= 1'b1;
-    //     end else begin
-    //         aw_done <= 1'b0;
-    //         w_done  <= 1'b0;
-    //         b_done  <= 1'b0;
-    //     end 
-    // end
-
     always @(*) begin
         case (lsu_state)
-            // IDLE: begin
-            //     if(req_valid) begin
-            //         lsu_next_state = we ? WR : RD;
-            //     end
-            //     else begin
-            //         lsu_next_state = IDLE;
-            //     end
-            // end
             IDLE: lsu_next_state = req_valid ? (we ? WR : RD) : IDLE;
-            RD: lsu_next_state = (axi_lsu_rvalid && lsu_axi_rready && axi_lsu_rlast) ? IDLE : RD;
-            WR: lsu_next_state = (aw_done && w_done && b_done) ? IDLE : WR;
+            RD:   lsu_next_state = (axi_lsu_rvalid && lsu_axi_rready && axi_lsu_rlast) ? IDLE : RD;
+            WR:   lsu_next_state = (aw_done && w_done && b_done) ? IDLE : WR;
             default: lsu_next_state = IDLE;
         endcase
     end
     
     always @(posedge clk) begin
-        if(rst) begin
-            lsu_state <= IDLE;
+        if(lsu_state == IDLE) begin
+            aw_done <= 0;
+            w_done  <= 0;
+            b_done  <= 0;
+            burst_cnt <= 0;
         end
         else begin
-            case(lsu_state)
-                IDLE: begin
-                    aw_done <= 0;
-                    w_done  <= 0;
-                    b_done  <= 0;
-                    burst_cnt <= 0;
-                    // lsu_state <= req_valid ? (we ? WR : RD) : IDLE;
-                end
-                RD: begin
-                    if(axi_lsu_rvalid && lsu_axi_rready) begin
-                        burst_cnt <= burst_cnt + 1;
-                    end
-                    // lsu_state <= (axi_lsu_rvalid && lsu_axi_rready && axi_lsu_rlast) ? IDLE : RD;
-                end
-                WR: begin
-                    if (lsu_axi_awvalid && axi_lsu_awready) aw_done <= 1'b1;
-                    if (lsu_axi_wvalid && axi_lsu_wready && lsu_axi_wlast) w_done <= 1'b1;
-                    if (axi_lsu_bvalid && lsu_axi_bready) b_done <= 1'b1;
-                    // lsu_state <= (aw_done && w_done && b_done) ? IDLE : WR;
-                end
-                default: begin end
-            endcase
+            if(axi_lsu_rvalid && lsu_axi_rready) begin
+                burst_cnt <= burst_cnt + 1;
+            end
+            if (lsu_axi_awvalid && axi_lsu_awready) aw_done <= 1'b1;
+            if (lsu_axi_wvalid && axi_lsu_wready && lsu_axi_wlast) w_done <= 1'b1;
+            if (axi_lsu_bvalid && lsu_axi_bready) b_done <= 1'b1;
         end
     end
 
     reg [BLOCK_SIZE*8-1:0] block_data;
 
     assign lsu_axi_arid    = AXI_ID;
+    assign lsu_axi_araddr  = in_sdram ? {saved_addr[31:BLOCK_OFFSET_WIDTH], {BLOCK_OFFSET_WIDTH{1'b0}}} : saved_addr;
     assign lsu_axi_arburst = in_sdram ? AXI_BURST_INCR : AXI_BURST_FIXED;
     assign lsu_axi_arlen   = in_sdram ? BURST_LEN - 1 : 8'h0;
     assign lsu_axi_arsize  = (ex_lsu_MemLen[3:0] == 4'b0001 ) ? AXI_SIZE_BYTE : 
@@ -248,10 +205,13 @@ module ysyx_25010030_LSU_AXI (
     assign lsu_axi_awid    = AXI_ID;
     assign lsu_axi_awlen   = 8'h0;
     assign lsu_axi_awsize  = (saved_wstrb == 4'b0001 || saved_wstrb == 4'b0010 || 
-                             saved_wstrb == 4'b0100 || saved_wstrb == 4'b1000) ? AXI_SIZE_BYTE :
+                              saved_wstrb == 4'b0100 || saved_wstrb == 4'b1000) ? AXI_SIZE_BYTE :
                              (saved_wstrb == 4'b0011 || saved_wstrb == 4'b1100) ? AXI_SIZE_HALF : 
                              AXI_SIZE_WORD;
-    assign lsu_axi_bready = 1'b1;
+    assign lsu_axi_awaddr  = saved_addr;
+    assign lsu_axi_wstrb   = saved_wstrb;
+    assign lsu_axi_wdata   = saved_wdata;
+    assign lsu_axi_bready  = 1'b1;
 
     always @(posedge clk) begin
         if (rst) begin
@@ -259,85 +219,43 @@ module ysyx_25010030_LSU_AXI (
             lsu_axi_wvalid  <= 1'b0;
             lsu_axi_arvalid <= 1'b0;
         end 
-        else if (lsu_state == RD) begin
+        if (lsu_state == RD) begin
             if (!ar_done && !lsu_axi_arvalid) begin
-                lsu_axi_araddr  <= in_sdram ? {addr_reg[31:BLOCK_OFFSET_WIDTH], {BLOCK_OFFSET_WIDTH{1'b0}}} : addr_reg;
+                // lsu_axi_araddr  <= in_sdram ?  {saved_addr[31:BLOCK_OFFSET_WIDTH], {BLOCK_OFFSET_WIDTH{1'b0}}} : saved_addr;
                 lsu_axi_arvalid <= 1'b1;
             end else if (axi_lsu_arready) begin
                 lsu_axi_arvalid <= 1'b0;  
-                ar_done         <= 1;
+                ar_done         <= 1'b1;
             end
             lsu_axi_rready <= 1'b1;
             if(axi_lsu_rvalid && in_sdram) begin
                 block_data[burst_cnt*32 +: 32] = axi_lsu_rdata;
             end
-        end else begin
+        end 
+        else begin
             lsu_axi_arvalid <= 1'b0; 
             ar_done         <= 1'b0;
         end
 
         if (lsu_state == WR) begin
             if (!lsu_axi_awvalid && !aw_done) begin
-                lsu_axi_awaddr  <= addr_reg;  
+                // lsu_axi_awaddr  <= saved_addr;  
                 lsu_axi_awvalid <= 1'b1;
             end else if (axi_lsu_awready) begin
                 lsu_axi_awvalid <= 1'b0;  // 地址握手完成后清零
             end
 
             if (!lsu_axi_wvalid && !w_done) begin
-                lsu_axi_wdata  <= saved_wdata;  
-                lsu_axi_wstrb  <= saved_wstrb;  
+                // lsu_axi_wdata  <= saved_wdata;  
+                // lsu_axi_wstrb  <= saved_wstrb;  
                 lsu_axi_wvalid <= 1'b1;
                 lsu_axi_wlast  <= 1'b1;         
             end else if (axi_lsu_wready) begin
                 lsu_axi_wvalid <= 1'b0;
                 lsu_axi_wlast  <= 1'b0;
-            end
+            end            
         end
     end
-    
-    // always @(posedge clk) begin
-    //     // if (rst) begin
-    //     //     lsu_axi_awvalid <= 1'b0;
-    //     //     lsu_axi_awaddr  <= 32'h0;
-    //     //     // lsu_axi_awlen   <= 8'h0;     
-    //     //     // lsu_axi_awsize  <= 3'b010;   
-    //     //     // lsu_axi_awburst <= AXI_BURST_FIXED;  
-    //     //     lsu_axi_wvalid  <= 1'b0;
-    //     //     lsu_axi_wdata   <= 32'h0;
-    //     //     lsu_axi_wstrb   <= 4'h0;
-    //     //     lsu_axi_wlast   <= 1'b0;
-    //     //     lsu_axi_bready  <= 1'b0;
-    //     //     // lsu_axi_awid    <= 0;
-    //     // end else 
-    //     if (lsu_state == WR) begin
-    //         if (!lsu_axi_awvalid && !aw_done) begin
-    //             lsu_axi_awaddr  <= addr_reg;  
-    //             lsu_axi_awvalid <= 1'b1;
-    //             // lsu_axi_awid    <= AXI_ID;
-    //             // lsu_axi_awsize  <= (saved_wstrb == 4'b0001 || saved_wstrb == 4'b0010 || 
-    //             //                saved_wstrb == 4'b0100 || saved_wstrb == 4'b1000) ? AXI_SIZE_BYTE :
-    //             //               (saved_wstrb == 4'b0011 || saved_wstrb == 4'b1100) ? AXI_SIZE_HALF : 
-    //             //               (saved_wstrb == 4'b1111) ? AXI_SIZE_WORD : AXI_SIZE_WORD;
-    //         end else if (axi_lsu_awready) begin
-    //             lsu_axi_awvalid <= 1'b0;  // 地址握手完成后清零
-    //         end
-
-    //         if (!lsu_axi_wvalid && !w_done) begin
-    //             lsu_axi_wdata  <= saved_wdata;  
-    //             lsu_axi_wstrb  <= saved_wstrb;  
-    //             lsu_axi_wvalid <= 1'b1;
-    //             lsu_axi_wlast  <= 1'b1;         
-    //         end else if (axi_lsu_wready) begin
-    //             lsu_axi_wvalid <= 1'b0;
-    //             lsu_axi_wlast  <= 1'b0;
-    //         end
-
-    //         // if (!b_done) lsu_axi_bready <= 1;
-    //         // else lsu_axi_bready <= 0;
-            
-    //     end 
-    // end
 
     always @(posedge clk) begin
         if (rst) begin
@@ -345,22 +263,28 @@ module ysyx_25010030_LSU_AXI (
             valid  <= 1'b0;
         end else begin  
             valid <= 1'b0;
-
-            case (lsu_state)
-                // IDLE: begin end
-                RD: begin
-                    if (axi_lsu_rvalid && lsu_axi_rready && axi_lsu_rlast) begin
-                        rdata <= in_sdram ? block_data[saved_word_offset*32 +: 32] : axi_lsu_rdata;
-                        valid <= 1'b1;
-                    end
-                end
-                WR: begin
-                    if(aw_done && w_done && b_done) begin
-                        valid <= 1'b1;
-                    end
-                end
-                default: begin end
-            endcase
+            if (axi_lsu_rvalid && lsu_axi_rready && axi_lsu_rlast) begin
+                rdata <= in_sdram ? block_data[saved_word_offset*32 +: 32] : axi_lsu_rdata;
+                valid <= 1'b1;
+            end
+            if(aw_done && w_done && b_done) begin
+                valid <= 1'b1;
+            end
+            // case (lsu_state)
+            //     // IDLE: begin end
+            //     RD: begin
+            //         if (axi_lsu_rvalid && lsu_axi_rready && axi_lsu_rlast) begin
+            //             rdata <= in_sdram ? block_data[saved_word_offset*32 +: 32] : axi_lsu_rdata;
+            //             valid <= 1'b1;
+            //         end
+            //     end
+            //     WR: begin
+            //         if(aw_done && w_done && b_done) begin
+            //             valid <= 1'b1;
+            //         end
+            //     end
+            //     default: begin end
+            // endcase
         end
     end
 
@@ -368,8 +292,6 @@ module ysyx_25010030_LSU_AXI (
     reg        l_rd_en;           
     reg [3:0]  l_rd_addr;         
     reg [4:0]  l_MemLen;          
-
-    reg        op_complete; // 缓存操作完成
 
     // 前递信号赋值
     assign lsu_ex_forward_rd        = l_rd_addr;
@@ -384,7 +306,7 @@ module ysyx_25010030_LSU_AXI (
             l_rd_addr <= 0;
             l_MemLen  <= 0;
         end 
-        else if (ex_lsu_valid & lsu_ex_ready & (ex_lsu_MemRead | ex_lsu_MemWrite)) begin
+        else if (req_valid) begin
             l_load    <= ex_lsu_MemRead;
             l_rd_en   <= ex_lsu_RegWrite;
             l_rd_addr <= ex_lsu_rd;
@@ -406,42 +328,13 @@ module ysyx_25010030_LSU_AXI (
 
     wire [31:0] byte_data1 = (rdata >> (addr_off*8));
     wire [ 7:0] byte_data = byte_data1[7:0];
-    wire [15:0] half_data = (addr_off == 2'b00) ? (rdata[15:0]) :
-                            (addr_off == 2'b10) ? (rdata[31:16]) : rdata[15:0];
-    wire [31:0] read_lsu_data = (l_MemLen == `Mem_Bit) ? {{24{byte_data[7]}}, byte_data} :
-                                (l_MemLen == `Mem_UBit) ? {24'b0, byte_data} :
-                                (l_MemLen == `Mem_Half) ? {{16{half_data[15]}}, half_data} :
+    wire [15:0] half_data = (addr_off == 2'b10) ? (rdata[31:16]) : rdata[15:0];
+    wire [31:0] read_lsu_data = (l_MemLen == `Mem_Bit  ) ? {{24{byte_data[7]}}, byte_data} :
+                                (l_MemLen == `Mem_UBit ) ? {24'b0, byte_data} :
+                                (l_MemLen == `Mem_Half ) ? {{16{half_data[15]}}, half_data} :
                                 (l_MemLen == `Mem_UHalf) ? {16'b0, half_data} :
                                 rdata;
-    always @(posedge clk) begin
-        // if (rst) begin
-        //     cache_addr    <= 0;
-        //     read_pending  <= 0;
-        //     write_pending <= 0;
-        //     op_complete   <= 0;
-        //     read_lsu_data <= 0;
-        // end else begin
-            op_complete   <= 0;
-            
-            // 处理读请求：发送到缓存
-            if (ex_lsu_valid & lsu_ex_ready & (ex_lsu_MemRead | ex_lsu_MemWrite)) begin
-                // cache_addr     <= addr;
-                addr_off <= addr[1:0];
-            end else if (valid) begin
-                // read_pending  <= 0;
-                op_complete   <= 1;
-                // read_lsu_data <= extract_read_data(l_MemLen, cache_addr[1:0], rdata);
-                // read_lsu_data <= (l_MemLen == `Mem_Bit || l_MemLen == `Mem_UBit) ? 
-                //                  ( (rdata >> (cache_addr[1:0]*8)) & 32'h000000FF ) : 
-                //                  (l_MemLen == `Mem_Half || l_MemLen == `Mem_UHalf) ? 
-                //                  ( (rdata >> (cache_addr[1:0]*8)) & 32'h0000FFFF ) : 
-                //                  rdata;
-            // `ifdef VERILATOR
-            //     counter(7, 0, 1, 0);
-            // `endif
-            end
-    end
-
+                                
     // 写回数据选择
     reg [31:0] rd_data;
     always @(*) begin
@@ -467,7 +360,7 @@ module ysyx_25010030_LSU_AXI (
         if (rst) begin
             lsu_ex_ready <= 1;
         end 
-        else if (ex_lsu_valid & lsu_ex_ready & (ex_lsu_MemRead | ex_lsu_MemWrite)) begin
+        else if (req_valid) begin
             lsu_ex_ready <= 0;
         end 
         else if (lsu_wb_valid & wb_lsu_ready) begin
@@ -479,15 +372,15 @@ module ysyx_25010030_LSU_AXI (
         if (rst) begin
             lsu_wb_valid <= 0;
         end 
-        else if (ex_lsu_valid & lsu_ex_ready & ~(ex_lsu_MemRead | ex_lsu_MemWrite)) begin
+        else if (ex_lsu_valid & lsu_ex_ready) begin
+            lsu_wb_valid <= ~(ex_lsu_MemRead | ex_lsu_MemWrite);
+        end 
+        else if (valid) begin
             lsu_wb_valid <= 1;
         end 
-        else if (op_complete) begin
-            lsu_wb_valid <= 1;
-        end 
-        else if (ex_lsu_valid & lsu_ex_ready & (ex_lsu_MemRead | ex_lsu_MemWrite)) begin
-            lsu_wb_valid <= 0;
-        end 
+        // else if (req_valid) begin
+        //     lsu_wb_valid <= 0;
+        // end 
         else if ((~(ex_lsu_valid && lsu_ex_ready)) && lsu_wb_valid) begin
             lsu_wb_valid <= 0;
         end
@@ -506,11 +399,11 @@ module ysyx_25010030_LSU_AXI (
         //     lsu_wb_csr_wr_data1  <= 0;
         //     lsu_wb_csr_wr_data2  <= 0;
         // end else 
-        if (op_complete) begin
+        if (valid) begin
             lsu_wb_RegWrite      <= l_rd_en;
             lsu_wb_rd            <= l_rd_addr;
             lsu_wb_csr_wen1      <= ex_lsu_csr_wen1;
-            lsu_wb_csr_ecall      <= ex_lsu_csr_ecall;
+            lsu_wb_csr_ecall     <= ex_lsu_csr_ecall;
             lsu_wb_csr_wr_addr1  <= ex_lsu_csr_wr_addr1;
             // lsu_wb_csr_wr_addr2  <= ex_lsu_csr_wr_addr2;
             lsu_wb_csr_wr_data1  <= ex_lsu_csr_wr_data1;
@@ -520,7 +413,7 @@ module ysyx_25010030_LSU_AXI (
             lsu_wb_RegWrite      <= ex_lsu_RegWrite; // 非内存访问指令
             lsu_wb_rd            <= ex_lsu_rd;
             lsu_wb_csr_wen1      <= ex_lsu_csr_wen1;
-            lsu_wb_csr_ecall      <= ex_lsu_csr_ecall;
+            lsu_wb_csr_ecall     <= ex_lsu_csr_ecall;
             lsu_wb_csr_wr_addr1  <= ex_lsu_csr_wr_addr1;
             // lsu_wb_csr_wr_addr2  <= ex_lsu_csr_wr_addr2;
             lsu_wb_csr_wr_data1  <= ex_lsu_csr_wr_data1;

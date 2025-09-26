@@ -16,29 +16,19 @@ module ysyx_25010030_IF_AXI (
 
     // AXI4-Lite 接口信号（与 SRAM 连接）
     output reg        if_axi_arvalid,       // 读地址有效
-    // input             axi_if_arready,       // 读地址就绪
+    input             axi_if_arready,       // 读地址就绪
     output reg [31:0] if_axi_araddr,        // 读地址
     output reg [ 3:0] if_axi_arid,
     output reg [ 7:0] if_axi_arlen,
     output reg [ 2:0] if_axi_arsize,
     output reg [ 1:0] if_axi_arburst,
-    // input      [31:0] axi_if_rdata,         // 读数据
-    // input             axi_if_rvalid,        // 读数据有效
+    input      [31:0] axi_if_rdata,         // 读数据
+    input             axi_if_rvalid,        // 读数据有效
     output reg        if_axi_rready,        // 读数据就绪
-    // input      [ 1:0] axi_if_rresp,         // 读响应
-    // input      [ 3:0] axi_if_rid,
-    // input             axi_if_rlast
-    output wire       is_fencei,
-    output reg [31:0] next_pc,
-    input      [31:0] cache_inst,
-    input             cache_valid,
-    input      [31:0] cache_araddr,
-    input             cache_arvalid,
-    input      [ 3:0] cache_arid,
-    input      [ 7:0] cache_arlen,
-    input      [ 2:0] cache_arsize,
-    input      [ 1:0] cache_arburst,
-    input             cache_rready
+    input      [ 1:0] axi_if_rresp,         // 读响应
+    input      [ 3:0] axi_if_rid,
+    input             axi_if_rlast
+
     // output reg [31:0] ifu_active_cycles
 );
 // `ifdef VERILATOR
@@ -55,50 +45,50 @@ module ysyx_25010030_IF_AXI (
     localparam JAL_OPCODE = 7'b1101111;
 
     // 内部信号
-    // reg [31:0] next_pc;
+    reg [31:0] next_pc;
     // reg cache_req;
     reg flush_once;
     reg once;
     
     // cache接口信号
-    // wire [31:0] cache_inst;
-    // wire        cache_valid;
+    wire [31:0] cache_inst;
+    wire        cache_valid;
 
-    // wire [31:0] cache_araddr;
-    // wire        cache_arvalid;
-    // wire [ 3:0] cache_arid;
-    // wire [ 7:0] cache_arlen;
-    // wire [ 2:0] cache_arsize;
-    // wire [ 1:0] cache_arburst;
-    // wire        cache_rready;
+    wire [31:0] cache_araddr;
+    wire        cache_arvalid;
+    wire [ 3:0] cache_arid;
+    wire [ 7:0] cache_arlen;
+    wire [ 2:0] cache_arsize;
+    wire [ 1:0] cache_arburst;
+    wire        cache_rready;
 
-    assign      is_fencei = (IF_ID_inst == FENCEI);
+    wire        is_fencei = (IF_ID_inst == FENCEI);
     wire        is_jal    = (cache_inst[6:0] == JAL_OPCODE);
     wire [31:0] immJ      = {{12{cache_inst[31]}}, cache_inst[19:12], cache_inst[20], cache_inst[30:21], 1'b0};
     wire [31:0] jal_target = (flush_once ? IF_ID_pc : next_pc) + immJ;
     
     // 实例化iCache模块
-    // ysyx_25010030_iCache u_icache (
-    //     .clk            (clk           ),
-    //     .reset          (reset         ),
-    //     .is_fencei      (is_fencei     ),
-    //     .addr           (next_pc       ),
-    //     .inst           (cache_inst    ),
-    //     .valid          (cache_valid   ),
-    //     .axi_araddr     (cache_araddr  ),
-    //     .axi_arvalid    (cache_arvalid ),
-    //     .axi_arready    (axi_if_arready),
-    //     .axi_arid       (cache_arid    ),  
-    //     .axi_arlen      (cache_arlen   ),  
-    //     .axi_arsize     (cache_arsize  ),  
-    //     .axi_arburst    (cache_arburst ),  
-    //     .axi_rvalid     (axi_if_rvalid ),
-    //     .axi_rready     (cache_rready  ),
-    //     .axi_rdata      (axi_if_rdata  ),
-    //     .axi_rresp      (axi_if_rresp  ),
-    //     .axi_rid        (axi_if_rid    ),  
-    //     .axi_rlast      (axi_if_rlast  )   
-    // );
+    ysyx_25010030_iCache u_icache (
+        .clk            (clk           ),
+        .reset          (reset         ),
+        .is_fencei      (is_fencei     ),
+        .addr           (next_pc       ),
+        .inst           (cache_inst    ),
+        .valid          (cache_valid   ),
+        .axi_araddr     (cache_araddr  ),
+        .axi_arvalid    (cache_arvalid ),
+        .axi_arready    (axi_if_arready),
+        .axi_arid       (cache_arid    ),  
+        .axi_arlen      (cache_arlen   ),  
+        .axi_arsize     (cache_arsize  ),  
+        .axi_arburst    (cache_arburst ),  
+        .axi_rvalid     (axi_if_rvalid ),
+        .axi_rready     (cache_rready  ),
+        .axi_rdata      (axi_if_rdata  ),
+        .axi_rresp      (axi_if_rresp  ),
+        .axi_rid        (axi_if_rid    ),  
+        .axi_rlast      (axi_if_rlast  )   
+    );
 
     // 统计活跃周期
     // always @(posedge clk) begin

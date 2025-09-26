@@ -72,7 +72,12 @@ module ysyx_25010030_ID (
 
     // 握手逻辑
     always @(*) begin
-        id_ready = (ex_ready || ~id_valid) && ~ex_flush;
+        if(reset) begin
+            id_ready = 1'b0;
+        end
+        else begin
+            id_ready = (ex_ready || ~id_valid) && ~ex_flush;
+        end
     end
 
     always @(posedge clk) begin
@@ -89,43 +94,42 @@ module ysyx_25010030_ID (
 
     // 译码逻辑和输出信号赋值
     always @(posedge clk) begin
-        // if (reset) begin
+        if (reset) begin
             // inst_type <= 7;
 
-            // id_ex_RegWrite  <= 1'b0;
-            // id_ex_MemWrite  <= 1'b0;
-            // id_ex_MemRead   <= 1'b0;
-            // id_ex_jal       <= 1'b0;
-            // id_ex_jalr      <= 1'b0;
-            // // id_ex_csr       <= 1'b0;
-            // id_ex_csr_wen1  <= 1'b0;
+            id_ex_RegWrite  <= 1'b0;
+            id_ex_MemWrite  <= 1'b0;
+            id_ex_MemRead   <= 1'b0;
+            id_ex_jal       <= 1'b0;
+            id_ex_jalr      <= 1'b0;
+            // id_ex_csr       <= 1'b0;
+            id_ex_csr_wen1  <= 1'b0;
             // id_ex_csr_wen2  <= 1'b0;
-            // id_ex_csr_ecall <= 1'b0;
-            // id_ex_csr_mret  <= 1'b0;
+            id_ex_csr_ecall <= 1'b0;
+            id_ex_csr_mret  <= 1'b0;
             
-            // id_ex_rd    <= 4'b0;
-            // id_wb_rs1   <= 4'b0;
-            // id_wb_rs2   <= 4'b0;
-            // id_ex_zimm  <= 5'b0;
-            // id_ex_imm   <= 32'b0;
-            // id_ex_shamt <= 6'b0;
+            id_ex_rd    <= 4'b0;
+            id_wb_rs1   <= 4'b0;
+            id_wb_rs2   <= 4'b0;
+            id_ex_zimm  <= 5'b0;
+            id_ex_imm   <= 32'b0;
+            id_ex_shamt <= 6'b0;
             
-            // id_ex_pc   <= 32'b0;
+            id_ex_pc   <= 32'b0;
             // id_ex_inst <= 32'b0;
             
-            // id_ex_alu_op <= `ALU_ADD;
-            // id_ex_MemLen <= `Mem_Word;
-            // id_ex_opcode <= 7'b0;
-            // id_ex_func3  <= 3'b0;
-            // id_ex_csr_op <= `CSR_NONE;
+            id_ex_alu_op <= `ALU_ADD;
+            id_ex_MemLen <= `Mem_Word;
+            id_ex_opcode <= 7'b0;
+            id_ex_func3  <= 3'b0;
+            id_ex_csr_op <= `CSR_NONE;
             
-            // id_ex_csr_wr_addr1 <= 12'b0;
+            id_ex_csr_wr_addr1 <= 12'b0;
             // id_ex_csr_wr_addr2 <= 12'b0;
-            // id_wb_csr_addr1    <= 12'b0;
-            // id_wb_csr_addr2    <= 12'b0;
-        // end
-        // else 
-        if (if_valid && id_ready) begin
+            id_wb_csr_addr1    <= 12'b0;
+            id_wb_csr_addr2    <= 12'b0;
+        end
+        else if (if_valid && id_ready) begin
             // 传递基本信号
             id_ex_pc     <= if_id_pc;
             // id_ex_inst   <= if_id_inst;

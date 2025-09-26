@@ -45,8 +45,8 @@ WAVEFORM = $(IVERILOG_DIR)/waveform.fst
 WAVEFORM_NETLIST = $(IVERILOG_DIR)/waveform_netlist.fst
 MEM_INIT = $(IVERILOG_DIR)/mem_init.hex
 
-# IMG ?= ../am-kernels/benchmarks/microbench/build/microbench-riscv32e-npc.bin
-IMG ?= ../am-kernels/tests/cpu-tests/build/char-test-riscv32e-npc.bin
+IMG ?= ../am-kernels/benchmarks/microbench/build/microbench-riscv32e-npc.bin
+# IMG ?= ../am-kernels/tests/cpu-tests/build/load-store-riscv32e-npc.bin
 
 CELLS ?= ../yosys-sta/nangate45/sim/cells.v
 NETLIST ?= ../yosys-sta/result/ysyx_25010030-250MHz/ysyx_25010030.netlist.fixed.v
@@ -218,6 +218,10 @@ else
 											RTL_FILES="$(shell find $(NPC_HOME)/build -name "ysyx_25010030.v")" \
 											CLK_FREQ_MHZ=250 
 endif
+	cd $(NPC_HOME)
+
+yosys-clean:
+	cd $(NPC_HOMME)/../yosys-sta && make clean
 	cd $(NPC_HOME)
 
 # 伪目标：运行环境准备

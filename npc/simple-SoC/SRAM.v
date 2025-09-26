@@ -87,47 +87,47 @@ module SRAM (
 
         always @(posedge clk or posedge rst) begin
             if (rst) begin
-                state <= IDLE;    
+                state   <= IDLE;    
                 arready <= 1'b1;
-                rvalid <= 1'b0;
-                rresp <= 2'b00;
-                rdata <= 32'h0;
-                rlast <= 1'b0;
-                rid <= 4'h0;
+                rvalid  <= 1'b0;
+                rresp   <= 2'b00;
+                rdata   <= 32'h0;
+                rlast   <= 1'b0;
+                rid     <= 4'h0;
                 awready <= 1'b0;
-                wready <= 1'b0;
-                bvalid <= 1'b0;
-                bresp <= 2'b00;
-                bid <= 4'h0;
-                is_read_req <= 1'b0;
+                wready  <= 1'b0;
+                bvalid  <= 1'b0;
+                bresp   <= 2'b00;
+                bid     <= 4'h0;
+                is_read_req  <= 1'b0;
                 is_write_req <= 1'b0;
-                read_addr <= 32'h0;
+                read_addr  <= 32'h0;
                 write_addr <= 32'h0;
                 write_data <= 32'h0;
                 write_strb <= 4'h0;
-                read_id <= 4'h0;
-                write_id <= 4'h0;
+                read_id    <= 4'h0;
+                write_id   <= 4'h0;
             end else begin
                 state <= next_state;
                 case (state)
                     IDLE: begin
                         rvalid <= 1'b0;
                         bvalid <= 1'b0;
-                        rlast <= 1'b0;
-                        is_read_req <= 1'b0;
+                        rlast  <= 1'b0;
+                        is_read_req  <= 1'b0;
                         is_write_req <= 1'b0;
                         wready <= 1'b0;
                         
                         if (arvalid) begin
-                            read_addr <= araddr;
-                            read_id <= arid;
-                            arready <= 1'b1;
+                            read_addr   <= araddr;
+                            read_id     <= arid;
+                            arready     <= 1'b1;
                             is_read_req <= 1'b1;
                         end else if (awvalid & wvalid) begin
                             write_addr <= awaddr;
-                            write_id <= awid;
-                            awready <= 1'b1;
-                            wready <= 1'b1;
+                            write_id   <= awid;
+                            awready    <= 1'b1;
+                            wready     <= 1'b1;
                             is_write_req <= 1'b1;
                             write_data <= wdata;
                             write_strb <= wstrb;
@@ -136,14 +136,14 @@ module SRAM (
                     BUSY: begin
                         if (is_read_req) begin
                             rvalid <= 1'b1;
-                            rresp <= 2'b00;
-                            rdata <= {b3, b2, b1, b0}; // 大端拼接为32位指令
-                            rlast <= 1'b1;
-                            rid <= read_id;
+                            rresp  <= 2'b00;
+                            rdata  <= {b3, b2, b1, b0}; // 大端拼接为32位指令
+                            rlast  <= 1'b1;
+                            rid    <= read_id;
                             
                             if (rvalid & rready) begin
                                 rvalid <= 1'b0;
-                                rlast <= 1'b0;
+                                rlast  <= 1'b0;
                             end
                         end 
                         else if (is_write_req) begin
@@ -156,12 +156,12 @@ module SRAM (
                                 if (write_strb[3]) sram_array[sram_addr_w + 3] <= write_data[31:24];
                                 
                                 bvalid <= 1'b1;
-                                bresp <= 2'b00;
-                                bid <= write_id;
+                                bresp  <= 2'b00;
+                                bid    <= write_id;
                             end
                             if (bvalid & bready) begin
                                 awready <= 1'b0;
-                                bvalid <= 1'b0;
+                                bvalid  <= 1'b0;
                             end
                         end
                     end
@@ -182,25 +182,25 @@ module SRAM (
         end
         always @(posedge clk or posedge rst) begin
             if (rst) begin
-                state <= IDLE;    
+                state   <= IDLE;    
                 arready <= 1'b1;
-                rvalid <= 1'b0;
-                rresp <= 2'b00;
-                rdata <= 32'h0;
-                rlast <= 1'b0;
-                rid <= 4'h0;
+                rvalid  <= 1'b0;
+                rresp   <= 2'b00;
+                rdata   <= 32'h0;
+                rlast   <= 1'b0;
+                rid     <= 4'h0;
                 awready <= 1'b0;
-                wready <= 1'b0;
-                bvalid <= 1'b0;
-                bresp <= 2'b00;
-                bid <= 4'h0;
-                is_read_req <= 1'b0;
+                wready  <= 1'b0;
+                bvalid  <= 1'b0;
+                bresp   <= 2'b00;
+                bid     <= 4'h0;
+                is_read_req  <= 1'b0;
                 is_write_req <= 1'b0;
-                read_addr <= 32'h0;
+                read_addr    <= 32'h0;
                 write_addr <= 32'h0;
                 write_data <= 32'h0;
                 write_strb <= 4'h0;
-                read_id <= 4'h0;
+                read_id  <= 4'h0;
                 write_id <= 4'h0;
             end else begin
                 state <= next_state;
@@ -208,33 +208,33 @@ module SRAM (
                     IDLE: begin
                         rvalid <= 1'b0;
                         bvalid <= 1'b0;
-                        rlast <= 1'b0;
-                        is_read_req <= 1'b0;
+                        rlast  <= 1'b0;
+                        is_read_req  <= 1'b0;
                         is_write_req <= 1'b0;
                         wready <= 1'b0;
                         if (arvalid) begin
-                            read_addr <= araddr;
-                            read_id <= arid;
-                            arready <= 1'b1;
+                            read_addr   <= araddr;
+                            read_id     <= arid;
+                            arready     <= 1'b1;
                             is_read_req <= 1'b1;
                         end else if (awvalid & wvalid) begin
-                            write_addr <= awaddr;
-                            write_id <= awid;
-                            awready <= 1'b1;
-                            wready <= 1'b1;
+                            write_addr   <= awaddr;
+                            write_id     <= awid;
+                            awready      <= 1'b1;
+                            wready       <= 1'b1;
                             is_write_req <= 1'b1;
                         end
                     end
                     BUSY: begin
                         if (is_read_req) begin
                             rvalid <= 1'b1;
-                            rresp <= 2'b00;
-                            rdata <= pmem_read(read_addr, 4) << ((read_addr & 32'b11) << 3);
-                            rlast <= 1'b1;
-                            rid <= read_id;
+                            rresp  <= 2'b00;
+                            rdata  <= pmem_read(read_addr, 4) << ((read_addr & 32'b11) << 3);
+                            rlast  <= 1'b1;
+                            rid    <= read_id;
                             if (rvalid & rready) begin
                                 rvalid <= 1'b0;
-                                rlast <= 1'b0;
+                                rlast  <= 1'b0;
                             end
                         end 
                         else if (is_write_req) begin
@@ -247,12 +247,12 @@ module SRAM (
                                     default:                            pmem_write(write_addr, wdata >> (addr_off << 3), 4);
                                 endcase
                                 bvalid <= 1'b1;
-                                bresp <= 2'b00;
-                                bid <= write_id;
+                                bresp  <= 2'b00;
+                                bid    <= write_id;
                             end
                             if (bvalid & bready) begin
                                 awready <= 1'b0;
-                                bvalid <= 1'b0;
+                                bvalid  <= 1'b0;
                             end
                         end
                     end

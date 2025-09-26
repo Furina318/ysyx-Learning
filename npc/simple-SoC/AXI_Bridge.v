@@ -65,7 +65,8 @@ module AXI_Bridge (
 
 localparam SRAM_BASE_START = 32'h80000000;
 localparam SRAM_BASE_END   = 32'h8fffffff;
-localparam UART_BASE       = 32'ha0000000;
+localparam UART_BASE_START = 32'ha0000000;
+localparam UART_BASE_END   = 32'ha0000007;
 
 reg is_uart_addr;
 reg is_sram_addr;
@@ -121,8 +122,8 @@ wire        uart_rlast;
 wire [ 3:0] uart_rid;
 
 always @(*) begin
-    is_uart_addr = ((io_master_awaddr == UART_BASE)) 
-                 || ((io_master_araddr == UART_BASE));
+    is_uart_addr = ((io_master_awaddr >= UART_BASE_START) && (io_master_awaddr <= UART_BASE_END))
+                 || ((io_master_araddr >= UART_BASE_START) && (io_master_araddr <= UART_BASE_END));
     
     is_sram_addr = ((io_master_awaddr >= SRAM_BASE_START) && (io_master_awaddr <= SRAM_BASE_END))
                  || ((io_master_araddr >= SRAM_BASE_START) && (io_master_araddr <= SRAM_BASE_END));
