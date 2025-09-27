@@ -90,7 +90,11 @@ module ysyx_25010030_iCache #(
     always @(*) begin
         case (state)
             IDLE: next_state = hit ? IDLE : READ;
+        `ifdef YSYXSOC
             READ: next_state = (axi_rvalid && axi_rready && axi_rlast) ? FILL : READ;
+        `else
+            READ: next_state = (axi_rvalid && axi_rready && axi_rlast) ? IDLE : READ;
+        `endif
             FILL: next_state = IDLE; 
             default: next_state = IDLE;
         endcase
@@ -166,8 +170,13 @@ module ysyx_25010030_iCache #(
                         ar_done <= 1'b1;
                     end
                     if (axi_rvalid) begin
+                    `ifdef YSYXSOC
                         block_data[beat_cnt] <= axi_rdata;
                         beat_cnt <= in_sdram ? beat_cnt + 1'b1 : 2'b0;
+                    `else
+                        inst <= axi_rdata;
+                        valid <= 1'b1;
+                    `endif
                     end
                 end
 

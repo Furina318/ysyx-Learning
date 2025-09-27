@@ -221,7 +221,7 @@ endif
 	cd $(NPC_HOME)
 
 yosys-clean:
-	cd $(NPC_HOMME)/../yosys-sta && make clean
+	cd $(NPC_HOME)/../yosys-sta && make clean
 	cd $(NPC_HOME)
 
 # 伪目标：运行环境准备
