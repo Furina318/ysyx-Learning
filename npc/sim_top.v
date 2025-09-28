@@ -12,46 +12,35 @@ module sim_top();
         `define WAVEFORM_PATH "waveform.fst"
     `endif
 
-
-    // 1. 时钟生成：50MHz（周期20ns，高电平10ns，低电平10ns）
     initial begin
         clk = 1'b0;
         forever #10 clk = ~clk;  // 时钟翻转周期10ns，对应50MHz
     end
 
-
-    // 2. 复位信号生成：低电平复位，复位100ns后释放
     initial begin
-        rst_n = 1'b0;  // 初始复位状态（假设CPU是低电平复位）
-        #100 rst_n = 1'b1;  // 100ns后释放复位，CPU开始运行
+        rst_n = 1'b0; 
+        #100 rst_n = 1'b1;  // 100ns后释放复位
     end
 
-
-    // 3. 例化CPU顶层模块（ysyx_25020037）
     ysyx_25010030_npc u_cpu (
-        .clock(clk),              // 输入：系统时钟
+        .clock(clk),             
     `ifdef __ICARUS__
         .sim_end(sim_end),
     `endif
-        .reset(~rst_n)            // 输入：复位信号（若CPU是高电平复位，此处无需取反）
+        .reset(~rst_n)       
     );
 
-
-    // 4. 核心逻辑：仅当ebreak_end拉高时结束仿真
     initial begin
-        // 打印仿真启动信息
         $display("[SIM] Simulation started. Waiting for endless...");
         $display("[WAVEFORM]PATH = %s, WAVE_EN = %d",`WAVEFORM_PATH, `WAVE);
         // 等待
         wait(sim_end);
         
-        // 收到结束信号后，打印信息并终止仿真
         $display("\033[32m[SIM] sim_end detected! Simulation completed successfully.\033[0m");
         $finish;  // 终止仿真进程
     end
 
 
-    // 5. 波形生成控制（根据WAVE宏决定是否生成波形文件）
     initial begin
 `ifdef WAVE
         if (`WAVE == 1) begin

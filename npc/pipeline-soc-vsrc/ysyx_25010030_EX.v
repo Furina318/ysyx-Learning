@@ -241,25 +241,25 @@ module ysyx_25010030_EX (
     //     end
     // end
 
-    wire [31:0] mstatus;
+    // wire [31:0] mstatus;
     wire [31:0] mpie;
     wire [31:0] zimm;
     assign mpie = (wb_ex_csr_num1 >> 7) & 32'h1;
-    assign mstatus = (((wb_ex_csr_num1 & ~(32'h3 << 11)) & ~(32'h1 << 3)) | (mpie << 3)) | (32'h1 << 7);
+    // assign mstatus = (((wb_ex_csr_num1 & ~(32'h3 << 11)) & ~(32'h1 << 3)) | (mpie << 3)) | (32'h1 << 7);
     assign zimm = {27'b0, id_ex_zimm};
 
     reg [31:0] csr_write_data;
     always @(*) begin
         case(1'b1)
-            (id_ex_csr_op == `CSR_CSRRW && id_ex_func3 == `F3_CSRRW): csr_write_data = src1;
-            (id_ex_csr_op == `CSR_CSRRC && id_ex_func3 == `F3_CSRRC): csr_write_data = (wb_ex_csr_num1 & ~src1);
-            (id_ex_csr_op == `CSR_CSRRS && id_ex_func3 == `F3_CSRRS): csr_write_data = (wb_ex_csr_num1 | src1);
-            (id_ex_csr_op == `CSR_CSRRW && id_ex_func3 == `F3_CSRRWI):csr_write_data = zimm;
-            (id_ex_csr_op == `CSR_CSRRC && id_ex_func3 == `F3_CSRRCI):csr_write_data = wb_ex_csr_num1 & ~zimm;
-            (id_ex_csr_op == `CSR_CSRRS && id_ex_func3 == `F3_CSRRSI):csr_write_data = wb_ex_csr_num1 | zimm;
-            (id_ex_csr_ecall):                                        csr_write_data = 32'd11;
-            (id_ex_csr_mret):                                         csr_write_data = mstatus;
-            default:                                                  csr_write_data = 32'b0;
+            (id_ex_csr_op == `CSR_CSRRW && id_ex_func3 == `F3_CSRRW) : csr_write_data = src1;
+            // (id_ex_csr_op == `CSR_CSRRC && id_ex_func3 == `F3_CSRRC): csr_write_data = (wb_ex_csr_num1 & ~src1);
+            (id_ex_csr_op == `CSR_CSRRS && id_ex_func3 == `F3_CSRRS) : csr_write_data = (wb_ex_csr_num1 | src1);
+            (id_ex_csr_op == `CSR_CSRRW && id_ex_func3 == `F3_CSRRWI): csr_write_data = zimm;
+            // (id_ex_csr_op == `CSR_CSRRC && id_ex_func3 == `F3_CSRRCI):csr_write_data = wb_ex_csr_num1 & ~zimm;
+            (id_ex_csr_op == `CSR_CSRRS && id_ex_func3 == `F3_CSRRSI): csr_write_data = wb_ex_csr_num1 | zimm;
+            (                                        id_ex_csr_ecall): csr_write_data = 32'd11;
+            // (                                         id_ex_csr_mret): csr_write_data = mstatus;
+            default:                                                   csr_write_data = 32'b0;
         endcase
     end
 

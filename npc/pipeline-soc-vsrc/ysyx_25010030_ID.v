@@ -1,26 +1,26 @@
 `include "ysyx_25010030_define.vh"
 module ysyx_25010030_ID (
-    input             clk,                    // 时钟信号
-    input             reset,                  // 复位信号
-    input      [31:0] if_id_pc,               // 从IFU传递的PC值
-    input      [31:0] if_id_inst,             // 从IFU传递的指令
-    input             ex_flush,               // 执行单元的冲刷信号
+    input             clk,                  
+    input             reset,                
+    input      [31:0] if_id_pc,              
+    input      [31:0] if_id_inst,            
+    input             ex_flush,             
 
     // 握手信号
-    input             if_valid,               // IFU到ID的有效信号
-    output reg        id_ready,               // ID到IFU的就绪信号
-    input             ex_ready,               // EXU到ID的就绪信号
-    output reg        id_valid,               // ID到EXU的有效信号
+    input             if_valid,               
+    output reg        id_ready,               
+    input             ex_ready,               
+    output reg        id_valid,               
 
-    output reg [31:0] id_ex_pc,               // 传递到EXU的PC值
-    // output reg [31:0] id_ex_inst,             // 传递到EXU的指令
-    output reg        id_ex_RegWrite,         // 寄存器写使能
-    output reg [ 3:0] id_ex_rd,               // 寄存器写地址
-    output reg [ 3:0] id_wb_rs1,              // 源寄存器1地址
-    output reg [ 3:0] id_wb_rs2,              // 源寄存器2地址
-    output reg [ 4:0] id_ex_zimm,             // CSR立即数（zimm）
-    output reg [31:0] id_ex_imm,              // 立即数值
-    output reg [ 5:0] id_ex_shamt,            // 移位量
+    output reg [31:0] id_ex_pc,             
+    // output reg [31:0] id_ex_inst,         
+    output reg        id_ex_RegWrite,       
+    output reg [ 3:0] id_ex_rd,             
+    output reg [ 3:0] id_wb_rs1,            
+    output reg [ 3:0] id_wb_rs2,            
+    output reg [ 4:0] id_ex_zimm,            
+    output reg [31:0] id_ex_imm,            
+    output reg [ 5:0] id_ex_shamt,         
 
     output reg [ 3:0] id_ex_alu_op,
     output reg [ 4:0] id_ex_MemLen,
@@ -29,20 +29,20 @@ module ysyx_25010030_ID (
     output reg [ 6:0] id_ex_opcode,
     output reg [ 2:0] id_ex_func3,
 
-    output reg        id_ex_jal,              // JAL跳转信号
-    output reg        id_ex_jalr,             // JALR跳转信号
+    output reg        id_ex_jal,              
+    output reg        id_ex_jalr,             
 
-    // output reg        id_ex_csr,              // CSR指令信号
-    output reg        id_ex_csr_wen1,         // CSR写使能1
-    // output reg        id_ex_csr_wen2,         // CSR写使能2
-    output reg        id_ex_csr_ecall,        // ECALL信号
-    output reg        id_ex_csr_mret,         // MRET信号
+    // output reg        id_ex_csr,             
+    output reg        id_ex_csr_wen1,         
+    // output reg        id_ex_csr_wen2,        
+    output reg        id_ex_csr_ecall,        
+    output reg        id_ex_csr_mret,        
     output reg [ 1:0] id_ex_csr_op,
 
-    output reg [11:0] id_ex_csr_wr_addr1,     // CSR写地址1
-    // output reg [11:0] id_ex_csr_wr_addr2,     // CSR写地址2
-    output reg [11:0] id_wb_csr_addr1,        // CSR读地址1
-    output reg [11:0] id_wb_csr_addr2         // CSR读地址2
+    output reg [11:0] id_ex_csr_wr_addr1,     
+    // output reg [11:0] id_ex_csr_wr_addr2,    
+    output reg [11:0] id_wb_csr_addr1,        
+    output reg [11:0] id_wb_csr_addr2         
 );
 `ifdef VERILATOR
     // import "DPI-C" function void counter(input int inst_type, input int ifu_inc, input int lsu_inc, input int exu_inc);
@@ -279,10 +279,10 @@ module ysyx_25010030_ID (
                                 id_ex_RegWrite <= 1'b1;
                                 id_ex_csr_op   <= `CSR_CSRRS;
                             end
-                            `F3_CSRRC: begin
-                                id_ex_RegWrite <= 1'b1;
-                                id_ex_csr_op   <= `CSR_CSRRC;
-                            end
+                            // `F3_CSRRC: begin
+                            //     id_ex_RegWrite <= 1'b1;
+                            //     id_ex_csr_op   <= `CSR_CSRRC;
+                            // end
                             `F3_CSRRWI: begin
                                 id_ex_RegWrite <= 1'b1;
                                 id_ex_csr_op   <= `CSR_CSRRW;
@@ -293,11 +293,11 @@ module ysyx_25010030_ID (
                                 id_ex_csr_op   <= `CSR_CSRRS;
                                 id_ex_imm      <= immCSR;
                             end
-                            `F3_CSRRCI: begin
-                                id_ex_RegWrite <= 1'b1;
-                                id_ex_csr_op   <= `CSR_CSRRC;
-                                id_ex_imm      <= immCSR;
-                            end
+                            // `F3_CSRRCI: begin
+                            //     id_ex_RegWrite <= 1'b1;
+                            //     id_ex_csr_op   <= `CSR_CSRRC;
+                            //     id_ex_imm      <= immCSR;
+                            // end
                             `F3_ECALL: begin
                                 if (if_id_inst == `INST_ECALL) begin
                                     id_ex_csr_ecall <= 1'b1;
@@ -313,7 +313,8 @@ module ysyx_25010030_ID (
                                 
                             end
                         endcase
-                        id_ex_csr_wr_addr1 <= (if_id_inst == `INST_ECALL) ? `MCAUSE : ((if_id_inst == `INST_MRET) ? `MSTATUS : if_id_inst[31:20]);
+                        // id_ex_csr_wr_addr1 <= (if_id_inst == `INST_ECALL) ? `MCAUSE : ((if_id_inst == `INST_MRET) ? `MSTATUS : if_id_inst[31:20]);
+                        id_ex_csr_wr_addr1 <= (if_id_inst == `INST_ECALL) ? `MCAUSE : if_id_inst[31:20];
                         // id_ex_csr_wr_addr2 <= (if_id_inst == `INST_ECALL) ? `MEPC : 12'b0;
                         id_wb_csr_addr1    <= (if_id_inst == `INST_MRET) ? `MSTATUS : ((if_id_inst == `INST_ECALL) ? `MTVEC : if_id_inst[31:20]);
                         id_wb_csr_addr2    <= (if_id_inst == `INST_MRET) ? `MEPC : 12'b0;

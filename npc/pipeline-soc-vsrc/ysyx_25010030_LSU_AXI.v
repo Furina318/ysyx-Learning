@@ -204,9 +204,12 @@ module ysyx_25010030_LSU_AXI (
     assign lsu_axi_awburst = AXI_BURST_FIXED;
     assign lsu_axi_awid    = AXI_ID;
     assign lsu_axi_awlen   = 8'h0;
-    assign lsu_axi_awsize  = (saved_wstrb == 4'b0001 || saved_wstrb == 4'b0010 || 
-                              saved_wstrb == 4'b0100 || saved_wstrb == 4'b1000) ? AXI_SIZE_BYTE :
-                             (saved_wstrb == 4'b0011 || saved_wstrb == 4'b1100) ? AXI_SIZE_HALF : 
+    // assign lsu_axi_awsize  = (saved_wstrb == 4'b0001 || saved_wstrb == 4'b0010 || 
+    //                           saved_wstrb == 4'b0100 || saved_wstrb == 4'b1000) ? AXI_SIZE_BYTE :
+    //                          (saved_wstrb == 4'b0011 || saved_wstrb == 4'b1100) ? AXI_SIZE_HALF : 
+    //                          AXI_SIZE_WORD;
+    assign lsu_axi_awsize  = (l_MemLen[3:0] == 4'b0001 ) ? AXI_SIZE_BYTE : 
+                             (l_MemLen[3:0] == 4'b0011 ) ? AXI_SIZE_HALF : 
                              AXI_SIZE_WORD;
     assign lsu_axi_awaddr  = saved_addr;
     assign lsu_axi_wstrb   = saved_wstrb;
@@ -249,11 +252,11 @@ module ysyx_25010030_LSU_AXI (
                 // lsu_axi_wdata  <= saved_wdata;  
                 // lsu_axi_wstrb  <= saved_wstrb;  
                 lsu_axi_wvalid <= 1'b1;
-                lsu_axi_wlast  <= 1'b1;         
+                lsu_axi_wlast  <= 1'b1; 
             end else if (axi_lsu_wready) begin
                 lsu_axi_wvalid <= 1'b0;
                 lsu_axi_wlast  <= 1'b0;
-            end            
+            end
         end
     end
 

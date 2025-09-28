@@ -1,29 +1,29 @@
 
 module ysyx_25010030_iCache #(
-    parameter CACHE_SIZE = 16,    // 缓存总大小（字节）
-    parameter BLOCK_SIZE = 16     // 块大小（16字节）
+    parameter CACHE_SIZE = 16,   
+    parameter BLOCK_SIZE = 16    
 )(
-    input wire        clk,        // 时钟信号
-    input wire        reset,      // 复位信号
-    input wire        is_fencei,  // 是否为fence.i指令（清空缓存）
-    input wire [31:0] addr,       // 指令地址
-    output reg [31:0] inst,       // 输出指令
-    output reg        valid,      // 指令有效信号
+    input wire        clk,       
+    input wire        reset,     
+    input wire        is_fencei,  
+    input wire [31:0] addr,      
+    output reg [31:0] inst,      
+    output reg        valid,     
 
     // AXI接口信号（支持突发传输）
-    output reg  [31:0] axi_araddr,  // AXI读地址
-    output reg         axi_arvalid, // AXI读地址有效
-    input  wire        axi_arready, // AXI读地址就绪
+    output reg  [31:0] axi_araddr,  
+    output reg         axi_arvalid, 
+    input  wire        axi_arready, 
     output wire [ 3:0] axi_arid,
-    output wire [ 7:0] axi_arlen,   // 突发长度（数量-1）
-    output wire [ 2:0] axi_arsize,  // 数据宽度（字节）
-    output wire [ 1:0] axi_arburst, // 突发类型
-    input  wire        axi_rvalid,  // AXI读数据有效
-    output reg         axi_rready,  // AXI读数据就绪
-    input  wire [31:0] axi_rdata,   // AXI读数据
-    input  wire [ 1:0] axi_rresp,   // AXI读响应
+    output wire [ 7:0] axi_arlen,   
+    output wire [ 2:0] axi_arsize,  
+    output wire [ 1:0] axi_arburst, 
+    input  wire        axi_rvalid,  
+    output reg         axi_rready,  
+    input  wire [31:0] axi_rdata,   
+    input  wire [ 1:0] axi_rresp,   
     input  wire [ 3:0] axi_rid,
-    input  wire        axi_rlast    // 突发传输结束标志
+    input  wire        axi_rlast    
 );
 `ifdef VERILATOR
     // import "DPI-C" function void cache_counter(input bit ihit);

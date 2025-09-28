@@ -31,11 +31,12 @@ module ysyx_25010030_WB #(
   output [31:0]           rdata_csr2     
 );
 // reg [31:0] CSR[2**12-1:0];
-reg [31:0] mstatus;
+// reg [31:0] mstatus;
 reg [31:0] mtvec;
 reg [31:0] mepc;
 // reg [31:0] mcause;
 wire [31:0] mcause = 32'hb;
+wire [31:0] mstatus = 32'h1800;
 // wire [31:0] mvendorid = 32'h79737978;
 // wire [31:0] marchid = 32'h17d9f6e;
 
@@ -83,7 +84,7 @@ always @(posedge clk) begin
         // mvendorid <= 32'h79737978;
         // marchid   <= 32'h17d9f6e;
 
-        mstatus <= 32'h1800;
+        // mstatus <= 32'h1800;
         mtvec   <= 32'h0;
         mepc    <= 32'h0;
         // mcause  <= 32'h0;
@@ -91,7 +92,7 @@ always @(posedge clk) begin
     else if (lsu_wb_valid) begin
         if (wen_csr1) begin
             case(waddr_csr1)
-                MSTATUS: mstatus <= wdata_csr1;
+                // MSTATUS: mstatus <= wdata_csr1;
                 MTVEC:   mtvec   <= wdata_csr1;
                 MEPC:    mepc    <= wdata_csr1;
                 // MCAUSE:  mcause  <= wdata_csr1;

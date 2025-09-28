@@ -57,10 +57,10 @@
 
 `define F3_CSRRW  3'b001
 `define F3_CSRRS  3'b010
-`define F3_CSRRC  3'b011
+// `define F3_CSRRC  3'b011
 `define F3_CSRRWI 3'b101
 `define F3_CSRRSI 3'b110
-`define F3_CSRRCI 3'b111
+// `define F3_CSRRCI 3'b111
 `define F3_ECALL  3'b000
 
 // ALU 操作码
