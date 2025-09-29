@@ -1,8 +1,8 @@
 module ysyx_25010030_npc(
     input wire clock,
-// `ifdef __ICARUS__
-//     output wire sim_end,
-// `endif
+`ifdef __ICARUS__
+    output wire sim_end,
+`endif
     input wire reset
 );
 
@@ -80,9 +80,9 @@ module ysyx_25010030_npc(
         .clock             	(clock              ),
         .reset             	(reset              ),
         .io_interrupt      	(1'b0               ),
-    // `ifdef __ICARUS__
-    //     .sim_end            (sim_end),
-    // `endif
+    `ifdef __ICARUS__
+        .sim_end            (sim_end),
+    `endif
         .io_master_awready 	(io_master_awready  ),
         .io_master_awvalid 	(io_master_awvalid  ),
         .io_master_awaddr  	(io_master_awaddr   ),

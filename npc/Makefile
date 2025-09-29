@@ -76,7 +76,7 @@ $(VERILOG_MERGED): $(wildcard ./pipeline-soc-vsrc/*.v) $(wildcard ./pipeline-soc
 	@echo "Merging core Verilog files into $@..."
 # 	@echo "// Merged Verilog file with PC reset value 0x30000000" > $@
 # 	@echo \`define RESET_VAL 0 >> $@
-# 	@echo \`define __ICARUS__ 0 >> $@
+	@echo \`define __ICARUS__ 0 >> $@
 	@echo "" >> $@
 	
 	@for file in $(wildcard ./pipeline-soc-vsrc/*.vh); do \

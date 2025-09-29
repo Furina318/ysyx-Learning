@@ -4,9 +4,9 @@ module ysyx_25010030 (
     input         clock,
     input         reset,
     input         io_interrupt,
-// `ifdef __ICARUS__
-//     output reg   sim_end,
-// `endif
+`ifdef __ICARUS__
+    output reg   sim_end,
+`endif
 
     //====== AXI Master ======//
     input         io_master_awready,
@@ -658,7 +658,6 @@ module ysyx_25010030 (
 `endif
 
 `ifdef __ICARUS__
-    reg sim_end;
     always @(posedge clock) begin
         if (reset) begin
             sim_end <= 1'b0;
