@@ -195,9 +195,7 @@ module ysyx_25010030_ID (
                         `F3_SW: id_ex_MemLen <= `Mem_Word;
                         `F3_SH: id_ex_MemLen <= `Mem_Half;
                         `F3_SB: id_ex_MemLen <= `Mem_Bit;
-                        default: begin
-
-                        end
+                        default: begin end
                     endcase
                     // inst_type <= 5;
                 end
@@ -212,9 +210,7 @@ module ysyx_25010030_ID (
                         `F3_LB:  id_ex_MemLen <= `Mem_Bit;
                         `F3_LHU: id_ex_MemLen <= `Mem_UHalf;
                         `F3_LBU: id_ex_MemLen <= `Mem_UBit;
-                        default: begin
-                         
-                        end
+                        default: begin end
                     endcase
                     // inst_type <= 3;
                 end
@@ -230,9 +226,7 @@ module ysyx_25010030_ID (
                         `F3_SLT:  id_ex_alu_op <= `ALU_SLT;
                         `F3_RSH:  id_ex_alu_op <= (func7_5) ? `ALU_SRA : `ALU_SRL;
                         `F3_LSH:  id_ex_alu_op <= `ALU_SLL;
-                        default: begin
-                            
-                        end
+                        default: begin end
                     endcase
                     // inst_type <= 0;/
                 end
@@ -248,9 +242,7 @@ module ysyx_25010030_ID (
                         `F3_XORI: id_ex_alu_op <= `ALU_XOR;
                         `F3_RSH:  id_ex_alu_op <= (func7_5) ? `ALU_SRA : `ALU_SRL;
                         `F3_LSH:  id_ex_alu_op <= `ALU_SLL;
-                        default: begin
-                            
-                        end
+                        default: begin end
                     endcase
                     // inst_type <=1;
                 end
@@ -260,9 +252,7 @@ module ysyx_25010030_ID (
                         `F3_BEQ, `F3_BNE:   id_ex_alu_op <= `ALU_SUB;
                         `F3_BLT, `F3_BGE:   id_ex_alu_op <= `ALU_SLT;
                         `F3_BLTU, `F3_BGEU: id_ex_alu_op <= `ALU_SLTU;
-                        default: begin
-                            
-                        end
+                        default: begin end
                     endcase
                     // inst_type <= 4;
                 end
@@ -309,12 +299,10 @@ module ysyx_25010030_ID (
                                     id_ex_imm      <= 32'h0;
                                 end
                             end
-                            default: begin
-                                
-                            end
+                            default: begin end
                         endcase
                         // id_ex_csr_wr_addr1 <= (if_id_inst == `INST_ECALL) ? `MCAUSE : ((if_id_inst == `INST_MRET) ? `MSTATUS : if_id_inst[31:20]);
-                        id_ex_csr_wr_addr1 <= (if_id_inst == `INST_ECALL) ? `MCAUSE : if_id_inst[31:20];
+                        id_ex_csr_wr_addr1 <= if_id_inst[31:20];
                         // id_ex_csr_wr_addr2 <= (if_id_inst == `INST_ECALL) ? `MEPC : 12'b0;
                         id_wb_csr_addr1    <= (if_id_inst == `INST_MRET) ? `MSTATUS : ((if_id_inst == `INST_ECALL) ? `MTVEC : if_id_inst[31:20]);
                         id_wb_csr_addr2    <= (if_id_inst == `INST_MRET) ? `MEPC : 12'b0;

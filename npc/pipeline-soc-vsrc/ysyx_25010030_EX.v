@@ -143,15 +143,29 @@ module ysyx_25010030_EX (
     reg        alu_zero;
     reg        alu_less;
 
+    reg sign1, sign2;
+    reg [31:0] sub_result;
+
     always @(*) begin
+        sign1 = ex_num1[31];
+        sign2 = ex_num2[31];
+        sub_result = ex_num1 - ex_num2;
         case (id_ex_alu_op)
             `ALU_ADD:  process_result = ex_num1 + ex_num2;
-            `ALU_SUB:  process_result = ex_num1 - ex_num2;
+            `ALU_SUB:  process_result = sub_result;
             `ALU_AND:  process_result = ex_num1 & ex_num2;
             `ALU_OR:   process_result = ex_num1 | ex_num2;
             `ALU_XOR:  process_result = ex_num1 ^ ex_num2;
             `ALU_SLTU: process_result = (ex_num1 < ex_num2) ? {31'b0, 1'b1} : 32'b0;
-            `ALU_SLT:  process_result = ($signed(ex_num1) < $signed(ex_num2)) ? {31'b0, 1'b1} : 32'b0;
+            // `ALU_SLT:  process_result = ($signed(ex_num1) < $signed(ex_num2)) ? {31'b0, 1'b1} : 32'b0;
+            `ALU_SLT: begin
+                if(sign1 != sign2) begin
+                    process_result = sign1 ? {31'b0, 1'b1} : 32'b0;
+                end
+                else begin
+                    process_result = sub_result[31] ? {31'b0, 1'b1} : 32'b0;
+                end
+            end
             `ALU_SRA:  process_result = $signed(ex_num1) >>> ex_num2[4:0];
             `ALU_SLL:  process_result = ex_num1 << ex_num2[4:0];
             `ALU_SRL:  process_result = ex_num1 >> ex_num2[4:0];
@@ -279,18 +293,24 @@ module ysyx_25010030_EX (
     wire       forward_las;
     wire [3:0] load_use_flag;
 
-    assign forward_rs1[1] = ex_lsu_RegWrite & (|ex_lsu_rd) & (ex_lsu_rd == id_wb_rs1) & ex_lsu_valid;
-    assign forward_rs1[0] = lsu_wb_RegWrite & (|lsu_wb_rd) & (lsu_wb_rd == id_wb_rs1) & lsu_wb_valid;
-    assign forward_rs2[1] = ex_lsu_RegWrite & (|ex_lsu_rd) & (ex_lsu_rd == id_wb_rs2) & ex_lsu_valid;
-    assign forward_rs2[0] = lsu_wb_RegWrite & (|lsu_wb_rd) & (lsu_wb_rd == id_wb_rs2) & lsu_wb_valid;
+    wire forward_flag1 = ex_lsu_RegWrite & (|ex_lsu_rd) & ex_lsu_valid;
+    wire forward_flag2 = lsu_wb_RegWrite & (|lsu_wb_rd) & lsu_wb_valid;
+    wire use_flag1 = lsu_ex_forward_MemRead & lsu_ex_forward_RegWrite & (|lsu_ex_forward_rd);
+    wire use_flag2 = ex_lsu_MemRead & ex_lsu_RegWrite & (|ex_lsu_rd) & ex_lsu_valid;
+
+
+    assign forward_rs1[1] = forward_flag1 & (ex_lsu_rd == id_wb_rs1);
+    assign forward_rs1[0] = forward_flag2 & (lsu_wb_rd == id_wb_rs1);
+    assign forward_rs2[1] = forward_flag1 & (ex_lsu_rd == id_wb_rs2);
+    assign forward_rs2[0] = forward_flag2 & (lsu_wb_rd == id_wb_rs2);
 
     assign forward_las = id_ex_MemWrite & ex_lsu_MemRead & ex_lsu_RegWrite & ex_lsu_valid &
                          (|ex_lsu_rd) & (ex_lsu_rd != id_wb_rs1) & (ex_lsu_rd == id_wb_rs2);
 
-    assign load_use_flag[3] = lsu_ex_forward_MemRead & lsu_ex_forward_RegWrite & (|lsu_ex_forward_rd) & (lsu_ex_forward_rd == id_wb_rs1);
-    assign load_use_flag[2] = lsu_ex_forward_MemRead & lsu_ex_forward_RegWrite & (|lsu_ex_forward_rd) & (lsu_ex_forward_rd == id_wb_rs2);
-    assign load_use_flag[1] = ex_lsu_MemRead & ex_lsu_RegWrite & (|ex_lsu_rd) & (ex_lsu_rd == id_wb_rs1) & ex_lsu_valid;
-    assign load_use_flag[0] = ex_lsu_MemRead & ex_lsu_RegWrite & ex_lsu_valid & (|ex_lsu_rd) & (ex_lsu_rd == id_wb_rs2);
+    assign load_use_flag[3] = use_flag1 & (lsu_ex_forward_rd == id_wb_rs1);
+    assign load_use_flag[2] = use_flag1 & (lsu_ex_forward_rd == id_wb_rs2);
+    assign load_use_flag[1] = use_flag2 & (ex_lsu_rd == id_wb_rs1);
+    assign load_use_flag[0] = use_flag2 & (ex_lsu_rd == id_wb_rs2);
 
     // 流水线控制
     always @(*) begin

@@ -57,7 +57,7 @@ module ysyx_25010030_LSU_AXI (
     output wire [31:0] lsu_axi_araddr,
     output wire [ 3:0] lsu_axi_arid,
     output wire [ 7:0] lsu_axi_arlen,
-    output wire [ 2:0] lsu_axi_arsize,
+    output reg  [ 2:0] lsu_axi_arsize,
     output wire [ 1:0] lsu_axi_arburst,        
     input      [31:0] axi_lsu_rdata,         
     input             axi_lsu_rvalid,       
@@ -71,7 +71,7 @@ module ysyx_25010030_LSU_AXI (
     input             axi_lsu_awready, 
     output wire [ 3:0] lsu_axi_awid,
     output wire [ 7:0] lsu_axi_awlen,
-    output wire [ 2:0] lsu_axi_awsize,
+    output reg  [ 2:0] lsu_axi_awsize,
     output wire [ 1:0] lsu_axi_awburst,     
     output wire [31:0] lsu_axi_wdata,         
     output wire [ 3:0] lsu_axi_wstrb,         
@@ -148,7 +148,7 @@ module ysyx_25010030_LSU_AXI (
             saved_addr <= addr; 
             saved_word_offset <= word_offset;
             // saved_wdata       <= align_write_data(ex_lsu_MemLen, addr[1:0], data_in);
-            saved_wdata       <= (ex_lsu_MemLen == `Mem_Bit) ? ({24'b0, data_in[7:0]} << (addr[1:0] * 8)) :
+            saved_wdata       <= (ex_lsu_MemLen[3:0] == 4'b0001) ? ({24'b0, data_in[7:0]} << (addr[1:0] * 8)) :
                                  (ex_lsu_MemLen[3:0] == 4'b0011) ? (addr[1:0] == 2'b00 ? {16'b0, data_in[15:0]} :
                                                                     addr[1:0] == 2'b10 ? {data_in[15:0], 16'b0} :
                                                                     data_in) : data_in;
@@ -197,9 +197,9 @@ module ysyx_25010030_LSU_AXI (
     assign lsu_axi_araddr  = in_sdram ? {saved_addr[31:BLOCK_OFFSET_WIDTH], {BLOCK_OFFSET_WIDTH{1'b0}}} : saved_addr;
     assign lsu_axi_arburst = in_sdram ? AXI_BURST_INCR : AXI_BURST_FIXED;
     assign lsu_axi_arlen   = in_sdram ? BURST_LEN - 1 : 8'h0;
-    assign lsu_axi_arsize  = (ex_lsu_MemLen[3:0] == 4'b0001 ) ? AXI_SIZE_BYTE : 
-                             (ex_lsu_MemLen[3:0] == 4'b0011 ) ? AXI_SIZE_HALF : 
-                             AXI_SIZE_WORD;
+    // assign lsu_axi_arsize  = (ex_lsu_MemLen[3:0] == 4'b0001 ) ? AXI_SIZE_BYTE : 
+    //                          (ex_lsu_MemLen[3:0] == 4'b0011 ) ? AXI_SIZE_HALF : 
+    //                          AXI_SIZE_WORD;
     
     assign lsu_axi_awburst = AXI_BURST_FIXED;
     assign lsu_axi_awid    = AXI_ID;
@@ -208,13 +208,26 @@ module ysyx_25010030_LSU_AXI (
     //                           saved_wstrb == 4'b0100 || saved_wstrb == 4'b1000) ? AXI_SIZE_BYTE :
     //                          (saved_wstrb == 4'b0011 || saved_wstrb == 4'b1100) ? AXI_SIZE_HALF : 
     //                          AXI_SIZE_WORD;
-    assign lsu_axi_awsize  = (l_MemLen[3:0] == 4'b0001 ) ? AXI_SIZE_BYTE : 
-                             (l_MemLen[3:0] == 4'b0011 ) ? AXI_SIZE_HALF : 
-                             AXI_SIZE_WORD;
+    // assign lsu_axi_awsize  = (l_MemLen[3:0] == 4'b0001 ) ? AXI_SIZE_BYTE : 
+    //                          (l_MemLen[3:0] == 4'b0011 ) ? AXI_SIZE_HALF : 
+    //                          AXI_SIZE_WORD;
     assign lsu_axi_awaddr  = saved_addr;
     assign lsu_axi_wstrb   = saved_wstrb;
     assign lsu_axi_wdata   = saved_wdata;
     assign lsu_axi_bready  = 1'b1;
+
+    always @(*) begin
+        case(l_MemLen[3:0])
+            4'b0001: lsu_axi_awsize = AXI_SIZE_BYTE;
+            4'b0011: lsu_axi_awsize = AXI_SIZE_HALF;
+            default: lsu_axi_awsize = AXI_SIZE_WORD; 
+        endcase
+        case(l_MemLen[3:0])
+            4'b0001: lsu_axi_arsize = AXI_SIZE_BYTE;
+            4'b0011: lsu_axi_arsize = AXI_SIZE_HALF;
+            default: lsu_axi_arsize = AXI_SIZE_WORD; 
+        endcase
+    end
 
     always @(posedge clk) begin
         if (rst) begin

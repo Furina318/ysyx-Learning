@@ -1,6 +1,6 @@
 
 module ysyx_25010030_iCache #(
-    parameter CACHE_SIZE = 16,   
+    parameter CACHE_SIZE = 32,   
     parameter BLOCK_SIZE = 16    
 )(
     input wire        clk,       
@@ -41,20 +41,20 @@ module ysyx_25010030_iCache #(
     localparam BEATS_PER_BLOCK    = BLOCK_SIZE / 4;           // 每块的32位数据数（16/4=4）
 
     // 存储器定义 
-    reg [TAG_WIDTH-1:0] tag_ram   ;          // 标签存储器
-    reg [         31:0] data_ram  [0:BEATS_PER_BLOCK-1]; // 数据存储器
-    reg [          3:0] valid_ram;          // 有效位       
+    reg [TAG_WIDTH-1:0] tag_ram   [0:NUM_BLOCKS-1];          // 标签存储器
+    reg [         31:0] data_ram  [0:NUM_BLOCKS-1][0:BEATS_PER_BLOCK-1]; // 数据存储器
+    reg                 valid_ram [0:NUM_BLOCKS-1];          // 有效位       
 
     // 地址分解
     wire [         TAG_WIDTH-1:0] req_tag    = addr[31 : 32 - TAG_WIDTH];
-    // wire [       INDEX_WIDTH-1:0] req_index  = addr[INDEX_WIDTH + BLOCK_OFFSET_WIDTH - 1 : BLOCK_OFFSET_WIDTH];
+    wire [       INDEX_WIDTH-1:0] req_index  = addr[INDEX_WIDTH + BLOCK_OFFSET_WIDTH - 1 : BLOCK_OFFSET_WIDTH];
     wire [                   1:0] beat_idx   = addr[3:2];  // 块内32位数据索引
 
     // reg hit;   
 
     // 保存当前请求信息
     reg [         TAG_WIDTH-1:0] saved_tag;      // 保存标签
-    // reg [       INDEX_WIDTH-1:0] saved_index;    // 保存索引
+    reg [       INDEX_WIDTH-1:0] saved_index;    // 保存索引
     reg [                   1:0] saved_beat_idx; // 保存块内数据索引
 
     // 状态机定义
@@ -100,7 +100,7 @@ module ysyx_25010030_iCache #(
         endcase
     end
 
-    wire hit = valid_ram[beat_idx] && (tag_ram == req_tag) && !is_fencei && in_sdram;
+    wire hit = valid_ram[req_index] && (tag_ram[req_index] == req_tag) && !is_fencei && in_sdram;
 
     // AXI突发传输配置与控制
     assign axi_arid    = 4'h0;    // 固定ID
@@ -112,8 +112,9 @@ module ysyx_25010030_iCache #(
     integer idx;
     always @(posedge clk) begin
         if(is_fencei || reset) begin
-            tag_ram   <= {TAG_WIDTH{1'b0}};
-            valid_ram <= 4'b0;
+            for (idx = 0; idx < NUM_BLOCKS; idx = idx + 1) begin
+                valid_ram[idx] <= 1'b0;
+            end
         end
     end
     
@@ -146,11 +147,11 @@ module ysyx_25010030_iCache #(
                     ar_done    <= 1'b0;
 
                     saved_tag      <= req_tag;
-                    // saved_index    <= req_index;
+                    saved_index    <= req_index;
                     saved_beat_idx <= beat_idx; 
                     
                     if (hit) begin
-                        inst  <= data_ram[beat_idx];
+                        inst  <= data_ram[req_index][beat_idx];
                         valid <= 1'b1;
                     end 
                     else begin
@@ -182,10 +183,10 @@ module ysyx_25010030_iCache #(
 
                 FILL: begin
                     axi_rready <= 1'b0;
-                    valid_ram[saved_beat_idx] <= 1'b1;
-                    tag_ram   <= saved_tag;
+                    valid_ram[saved_index] <= 1'b1;
+                    tag_ram[saved_index]   <= saved_tag;
                     for (b = 0; b < BEATS_PER_BLOCK; b = b + 1) begin
-                        data_ram[b] <= block_data[b];
+                        data_ram[saved_index][b] <= block_data[b];
                     end
                     inst  <= in_sdram ? block_data[saved_beat_idx] : block_data[2'b0];
                     valid <= 1'b1;
