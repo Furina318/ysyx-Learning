@@ -87,6 +87,7 @@ module ysyx_25010030_iCache #(
     end
 
     // 状态转换逻辑
+    wire hit;
     always @(*) begin
         case (state)
             IDLE: next_state = hit ? IDLE : READ;
@@ -100,7 +101,7 @@ module ysyx_25010030_iCache #(
         endcase
     end
 
-    wire hit = valid_ram[req_index] && (tag_ram[req_index] == req_tag) && !is_fencei && in_sdram;
+    assign hit = valid_ram[req_index] && (tag_ram[req_index] == req_tag) && !is_fencei && in_sdram;
 
     // AXI突发传输配置与控制
     assign axi_arid    = 4'h0;    // 固定ID

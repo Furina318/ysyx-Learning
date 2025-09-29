@@ -99,6 +99,12 @@ module ysyx_25010030_EX (
     // wire [31:0] src2 = (forward_rs2[1] ? ex_lsu_process_result : 
     //                    (forward_rs2[0] | load_use_flag[0]) ? lsu_wb_wdata : 
     //                    wb_ex_src2);
+    // 前递信号定义
+    wire [1:0] forward_rs1;
+    wire [1:0] forward_rs2;
+    wire       forward_las;
+    wire [3:0] load_use_flag;
+    
     wire [31:0] src1 = (forward_rs1[1])   ? ex_lsu_process_result : 
                        (forward_rs1[0])   ? lsu_wb_wdata : 
                        (load_use_flag[3]) ? lsu_wb_wdata : wb_ex_src1;
@@ -286,12 +292,6 @@ module ysyx_25010030_EX (
     //                              (                                        id_ex_csr_ecall)? 32'd11                                 :
     //                              (                                         id_ex_csr_mret)? mstatus                                :
     //                                                                                         32'b0;
-
-    // 前递信号定义
-    wire [1:0] forward_rs1;
-    wire [1:0] forward_rs2;
-    wire       forward_las;
-    wire [3:0] load_use_flag;
 
     wire forward_flag1 = ex_lsu_RegWrite & (|ex_lsu_rd) & ex_lsu_valid;
     wire forward_flag2 = lsu_wb_RegWrite & (|lsu_wb_rd) & lsu_wb_valid;

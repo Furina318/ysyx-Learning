@@ -1,7 +1,6 @@
 module sim_top();
     reg clk;
     reg rst_n;
-    reg sim_end;
 
 
     // 宏定义：默认路径与配置（可通过Makefile传入参数覆盖）
@@ -24,12 +23,9 @@ module sim_top();
 
     ysyx_25010030_npc u_cpu (
         .clock(clk),             
-    `ifdef __ICARUS__
-        .sim_end(sim_end),
-    `endif
         .reset(~rst_n)       
     );
-
+    wire sim_end = u_cpu.cpu.sim_end;
     initial begin
         $display("[SIM] Simulation started. Waiting for endless...");
         $display("[WAVEFORM]PATH = %s, WAVE_EN = %d",`WAVEFORM_PATH, `WAVE);

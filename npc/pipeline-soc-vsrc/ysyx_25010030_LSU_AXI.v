@@ -192,6 +192,7 @@ module ysyx_25010030_LSU_AXI (
     end
 
     reg [BLOCK_SIZE*8-1:0] block_data;
+    reg [4:0]  l_MemLen;
 
     assign lsu_axi_arid    = AXI_ID;
     assign lsu_axi_araddr  = in_sdram ? {saved_addr[31:BLOCK_OFFSET_WIDTH], {BLOCK_OFFSET_WIDTH{1'b0}}} : saved_addr;
@@ -306,8 +307,7 @@ module ysyx_25010030_LSU_AXI (
 
     reg        l_load;            
     reg        l_rd_en;           
-    reg [3:0]  l_rd_addr;         
-    reg [4:0]  l_MemLen;          
+    reg [3:0]  l_rd_addr;                   
 
     // 前递信号赋值
     assign lsu_ex_forward_rd        = l_rd_addr;
