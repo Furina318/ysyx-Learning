@@ -119,7 +119,8 @@ module ysyx_25010030 (
     wire [ 6:0] id_ex_opcode;     
     wire [ 2:0] id_ex_func3;      
     wire        id_ex_jal;        
-    wire        id_ex_jalr;      
+    wire        id_ex_jalr;
+    wire        id_ex_fencei;      
     // wire        id_ex_csr;      
     wire        id_ex_csr_wen1;  
     // wire        id_ex_csr_wen2; 
@@ -132,7 +133,8 @@ module ysyx_25010030 (
     wire [11:0] id_wb_csr_addr2;  
 
     // wire [31:0] ex_lsu_pc;     
-    // wire [31:0] ex_lsu_inst;   
+    // wire [31:0] ex_lsu_inst;  
+    wire        ex_fencei; 
     wire        ex_lsu_valid;     
     wire        lsu_ex_ready;     
     wire [31:0] ex_lsu_src2;      
@@ -404,6 +406,7 @@ module ysyx_25010030 (
         .reset         (reset         ),
         .EX_flush      (ex_flush      ),
         .EX_flush_pc   (ex_flush_pc   ),
+        .ex_fencei     (ex_fencei     ),
         .ID_ready      (id_ready      ),
         .IF_valid      (IF_valid      ),
         .IF_ID_pc      (IF_ID_pc      ),
@@ -452,6 +455,7 @@ module ysyx_25010030 (
         .id_ex_func3       (id_ex_func3       ),
         .id_ex_jal         (id_ex_jal         ),
         .id_ex_jalr        (id_ex_jalr        ),
+        .id_ex_fencei      (id_ex_fencei      ),
         // .id_ex_csr(id_ex_csr),
         .id_ex_csr_wen1    (id_ex_csr_wen1    ),
         // .id_ex_csr_wen2(id_ex_csr_wen2),
@@ -497,6 +501,8 @@ module ysyx_25010030 (
         .id_ex_alu_op           (id_ex_alu_op           ),
         .id_ex_jal              (id_ex_jal              ),
         .id_ex_jalr             (id_ex_jalr             ),
+        .id_ex_fencei           (id_ex_fencei           ),
+        .ex_fencei              (ex_fencei              ),
         .id_ex_MemRead          (id_ex_MemRead          ),
         .id_ex_MemWrite         (id_ex_MemWrite         ),
         .id_ex_MemLen           (id_ex_MemLen           ),

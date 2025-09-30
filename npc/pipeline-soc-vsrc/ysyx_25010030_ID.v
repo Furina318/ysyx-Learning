@@ -30,7 +30,8 @@ module ysyx_25010030_ID (
     output reg [ 2:0] id_ex_func3,
 
     output reg        id_ex_jal,              
-    output reg        id_ex_jalr,             
+    output reg        id_ex_jalr,
+    output reg        id_ex_fencei,             
 
     // output reg        id_ex_csr,             
     output reg        id_ex_csr_wen1,         
@@ -48,6 +49,7 @@ module ysyx_25010030_ID (
     // import "DPI-C" function void counter(input int inst_type, input int ifu_inc, input int lsu_inc, input int exu_inc);
 `endif
     // 指令字段提取
+    localparam FENCEI = 32'h0000100f;
     wire [6:0] opcode = if_id_inst[ 6: 0];
     wire [3:0] rs1    = if_id_inst[18:15];
     wire [3:0] rs2    = if_id_inst[23:20];
@@ -102,6 +104,7 @@ module ysyx_25010030_ID (
             id_ex_MemRead   <= 1'b0;
             id_ex_jal       <= 1'b0;
             id_ex_jalr      <= 1'b0;
+            id_ex_fencei    <= 1'b0;
             // id_ex_csr       <= 1'b0;
             id_ex_csr_wen1  <= 1'b0;
             // id_ex_csr_wen2  <= 1'b0;
@@ -155,6 +158,7 @@ module ysyx_25010030_ID (
             id_ex_csr_mret  <= 1'b0;
             id_ex_jal       <= 1'b0;
             id_ex_jalr      <= 1'b0;
+            id_ex_fencei    <= (if_id_inst == FENCEI);
 
             id_ex_csr_wr_addr1 <= 12'b0;
             // id_ex_csr_wr_addr2 <= 12'b0;

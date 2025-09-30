@@ -7,6 +7,7 @@ module ysyx_25010030_IF_AXI (
 
     input             EX_flush,
     input      [31:0] EX_flush_pc,
+    input             ex_fencei,
 
     input             ID_ready,
     output reg        IF_valid,
@@ -71,7 +72,7 @@ module ysyx_25010030_IF_AXI (
     ysyx_25010030_iCache u_icache (
         .clk            (clk           ),
         .reset          (reset         ),
-        .is_fencei      (is_fencei     ),
+        .is_fencei      (ex_fencei     ),
         .addr           (next_pc       ),
         .inst           (cache_inst    ),
         .valid          (cache_valid   ),

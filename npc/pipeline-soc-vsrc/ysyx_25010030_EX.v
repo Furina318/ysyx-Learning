@@ -35,6 +35,7 @@ module ysyx_25010030_EX (
 
     input             id_ex_jal,
     input             id_ex_jalr,
+    input             id_ex_fencei,
     input             id_ex_MemRead,
     input             id_ex_MemWrite,
     input      [ 4:0] id_ex_MemLen,
@@ -53,6 +54,7 @@ module ysyx_25010030_EX (
 
     output reg        ex_flush,
     output reg [31:0] ex_flush_pc,
+    output reg        ex_fencei,
 
     // output reg [31:0] ex_lsu_inst,
     // output reg [31:0] ex_lsu_pc,
@@ -190,6 +192,7 @@ module ysyx_25010030_EX (
 
     // 分支和跳转逻辑
     // reg [31:0] jal_target;
+    reg [31:0] fencei_target;
     reg [31:0] jalr_target;
     reg        take_branch;
     reg        ex_flush_condition;
@@ -206,6 +209,8 @@ module ysyx_25010030_EX (
     always @(*) begin
         // jal_target  = id_ex_pc + id_ex_imm;
         ex_flush    = (reset) ? 1'b0 : (ex_flush_condition & (~|load_use_flag));
+        ex_fencei   = id_ex_fencei;
+        fencei_target = id_ex_pc + 32'h4;
         jalr_target = (src1 + id_ex_imm) & 32'hfffffffe;
         take_branch = (id_ex_opcode == `INST_B) && (
                     (id_ex_func3 == `F3_BNE  && !alu_zero) ||  // bne
@@ -220,6 +225,9 @@ module ysyx_25010030_EX (
             //     ex_flush = 1'b0;
             //     ex_flush_pc = 32'h0;
             // end
+            id_ex_fencei: begin
+                ex_flush_pc = fencei_target;
+            end
             id_ex_jalr: begin
                 ex_flush_pc = jalr_target;
             end
