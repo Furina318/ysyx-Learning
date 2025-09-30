@@ -42,7 +42,7 @@ module ysyx_25010030_IF_AXI (
     localparam WAIT_FLUSH = 2'b01;
     localparam WAIT_CACHE = 2'b11;  // 等待缓存响应
 
-    localparam FENCEI = 32'h0000100f;
+    // localparam FENCEI = 32'h0000100f;
     localparam JAL_OPCODE = 7'b1101111;
 
     // 内部信号
@@ -63,7 +63,7 @@ module ysyx_25010030_IF_AXI (
     wire [ 1:0] cache_arburst;
     wire        cache_rready;
 
-    wire        is_fencei = (IF_ID_inst == FENCEI);
+    // wire        is_fencei = (IF_ID_inst == FENCEI);
     wire        is_jal    = (cache_inst[6:0] == JAL_OPCODE);
     wire [31:0] immJ      = {{12{cache_inst[31]}}, cache_inst[19:12], cache_inst[20], cache_inst[30:21], 1'b0};
     wire [31:0] jal_target = (flush_once ? IF_ID_pc : next_pc) + immJ;
