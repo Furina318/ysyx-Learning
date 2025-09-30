@@ -1,7 +1,6 @@
 module sim_top();
     reg clk;
     reg rst_n;
-    reg sim_end;
 
 
     // 宏定义：默认路径与配置（可通过Makefile传入参数覆盖）
@@ -22,11 +21,9 @@ module sim_top();
         #100 rst_n = 1'b1;  // 100ns后释放复位
     end
 
+    wire sim_end = u_cpu.cpu.sim_end;
     ysyx_25010030_npc u_cpu (
-        .clock(clk),             
-    `ifdef __ICARUS__
-        .sim_end(sim_end),
-    `endif
+        .clock(clk),            
         .reset(~rst_n)       
     );
 

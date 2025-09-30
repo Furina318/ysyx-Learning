@@ -4,9 +4,9 @@ module ysyx_25010030 (
     input         clock,
     input         reset,
     input         io_interrupt,
-`ifdef __ICARUS__
-    output reg   sim_end,
-`endif
+// `ifdef __ICARUS__
+//     output reg   sim_end,
+// `endif
 
     //====== AXI Master ======//
     input         io_master_awready,
@@ -134,6 +134,7 @@ module ysyx_25010030 (
 
     // wire [31:0] ex_lsu_pc;     
     // wire [31:0] ex_lsu_inst;  
+    wire        sim_end;
     wire        ex_fencei; 
     wire        ex_lsu_valid;     
     wire        lsu_ex_ready;     
@@ -439,6 +440,7 @@ module ysyx_25010030 (
         .ex_ready          (ex_ready          ),
         .id_valid          (id_valid          ),
         .id_ex_pc          (id_ex_pc          ),
+        .sim_end           (sim_end          ),
         // .id_ex_inst(id_ex_inst),
         .id_ex_RegWrite    (id_ex_RegWrite    ),
         .id_ex_rd          (id_ex_rd          ),
@@ -663,14 +665,15 @@ module ysyx_25010030 (
     end
 `endif
 
-`ifdef __ICARUS__
-    always @(posedge clock) begin
-        if (reset) begin
-            sim_end <= 1'b0;
-        end
-        if (IF_ID_inst == 32'h00100073) begin
-            sim_end <= 1;
-        end
-    end
-`endif
+// `ifdef __ICARUS__
+    // reg sim_end;
+    // always @(posedge clock) begin
+    //     if (reset) begin
+    //         sim_end <= 1'b0;
+    //     end
+    //     if (IF_ID_inst == 32'h00100073) begin
+    //         sim_end <= 1;
+    //     end
+    // end
+// `endif
 endmodule

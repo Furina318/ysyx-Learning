@@ -10,7 +10,9 @@ module ysyx_25010030_ID (
     input             if_valid,               
     output reg        id_ready,               
     input             ex_ready,               
-    output reg        id_valid,               
+    output reg        id_valid,  
+
+    output reg        sim_end,             
 
     output reg [31:0] id_ex_pc,             
     // output reg [31:0] id_ex_inst,         
@@ -98,6 +100,7 @@ module ysyx_25010030_ID (
     always @(posedge clk) begin
         if (reset) begin
             // inst_type <= 7;
+            sim_end         <= 1'b0;
 
             id_ex_RegWrite  <= 1'b0;
             id_ex_MemWrite  <= 1'b0;
@@ -133,6 +136,7 @@ module ysyx_25010030_ID (
             id_wb_csr_addr2    <= 12'b0;
         end
         else if (if_valid && id_ready) begin
+            sim_end <= (if_id_inst == 32'h00100073);
             // 传递基本信号
             id_ex_pc     <= if_id_pc;
             // id_ex_inst   <= if_id_inst;
