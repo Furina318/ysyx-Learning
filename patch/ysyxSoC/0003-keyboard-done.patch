@@ -1,7 +1,7 @@
 From 935539f65ef37935bf3bdea947192a15fb3520a8 Mon Sep 17 00:00:00 2001
 From: Furina318 <1145676148@qq.com>
 Date: Sat, 20 Sep 2025 23:11:50 +0800
-Subject: [PATCH 3/5] keyboard done
+Subject: [PATCH 3/6] keyboard done
 
 ---
  .metals/metals.lock.db |      6 -

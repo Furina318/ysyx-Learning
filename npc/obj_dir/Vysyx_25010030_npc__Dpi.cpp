@@ -6,11 +6,11 @@
 // function names, you will get multiple definition link errors from here.
 // This is an unfortunate result of the DPI specification.
 // To solve this, either
-//    1. Call VysyxSoCFull::{export_function} instead,
+//    1. Call Vysyx_25010030_npc::{export_function} instead,
 //       and do not even bother to compile this file
 // or 2. Compile all __Dpi.cpp files in the same compiler run,
 //       and #ifdefs already inserted here will sort everything out.
 
-#include "VysyxSoCFull__Dpi.h"
-#include "VysyxSoCFull.h"
+#include "Vysyx_25010030_npc__Dpi.h"
+#include "Vysyx_25010030_npc.h"
 

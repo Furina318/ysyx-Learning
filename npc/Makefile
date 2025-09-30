@@ -12,6 +12,7 @@ else
 $(error 不支持的架构：$(ARCH).支持的架构: riscv32e-ysyxsoc, riscv32e-npc)
 endif
 
+nvboard ?= 1
 # 源文件路径和定义
 # NPC_HOME = /home/furina/ysyx-workbench/npc
 # NVBOARD_HOME = /home/furina/ysyx-workbench/nvboard

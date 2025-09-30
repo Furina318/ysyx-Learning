@@ -20,6 +20,10 @@ extern VysyxSoCFull *top;
 #include "../obj_dir/Vysyx_25010030_npc___024root.h"
 extern Vysyx_25010030_npc *top;
 #endif
+
+#ifdef NVBOARD
+#include <nvboard.h>
+#endif
 /********extern functions or variables********/
 
 extern void single_cycle(void);
@@ -258,6 +262,10 @@ static void execute_once() {
     last_pc = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__IF_ID_pc;
     do{
       single_cycle();
+      single_cycle();
+      #ifdef NVBOARD
+      nvboard_update();
+      #endif
       cycle_sum++;
     } while (last_pc == top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__IF_ID_pc);
     #else
@@ -265,6 +273,7 @@ static void execute_once() {
     PCSet.inst = top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__IF_ID_inst;
     last_pc = top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__IF_ID_pc;
     do{
+      single_cycle();
       single_cycle();
       cycle_sum++;
     } while (last_pc == top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__IF_ID_pc);

@@ -214,18 +214,19 @@ int main(int argc, char *argv[]) {
     nvboard_bind_all_pins(top);
     nvboard_init();
 
-    Verilated::commandArgs(argc, argv); // 处理命令行参数
-    init_verilator();
+    // Verilated::commandArgs(argc, argv); // 处理命令行参数
+    // init_verilator();
 
-    reset();
-    init_monitor(argc, argv);
-    while(1) {
-        nvboard_update();
-        single_cycle();
-        // single_cycle();
-        // if(top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__asic__DOT__cpu__DOT__cpu__DOT__pc == 0xa0000074) break;
-    }
-#else
+    // reset();
+    // init_monitor(argc, argv);
+    // while(1) {
+    //     // nvboard_update();
+    //     single_cycle();
+    //     single_cycle();
+    //     nvboard_update();
+    //     // if(top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__asic__DOT__cpu__DOT__cpu__DOT__pc == 0xa0000074) break;
+    // }
+#endif
     Verilated::commandArgs(argc, argv); // 处理命令行参数
     /* Initialize the monitor. */
     init_monitor(argc, argv);
@@ -244,5 +245,4 @@ int main(int argc, char *argv[]) {
     delete top;
 
     return is_exit_status_bad();
-#endif
 }
