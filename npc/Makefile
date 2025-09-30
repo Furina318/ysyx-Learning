@@ -7,6 +7,7 @@ CXXFLAGS += -DYSYXSOC
 NXDC_FILES = ./constr/ysyxSoCFull.nxdc
 else ifeq ($(ARCH), riscv32e-npc)
 TOP_MODULE = ysyx_25010030_npc
+CXXFLAGS += -DNPC
 YOSYS_TOP = ysyx_25010030
 else
 $(error 不支持的架构：$(ARCH).支持的架构: riscv32e-ysyxsoc, riscv32e-npc)
@@ -54,13 +55,15 @@ NETLIST ?= ../yosys-sta/result/ysyx_25010030-250MHz/ysyx_25010030.netlist.fixed.
 IVERILOG_BIN = $(IVERILOG_DIR)/sim
 IVERILOG_BIN_NETLIST = $(IVERILOG_DIR)/sim_netlist
 IVERILOG_FLAGS += -Wall -g2012 -s sim_top -o $(IVERILOG_BIN) \
-    -I./vsrc/core \
+    -I./pipeline-soc-vsrc \
+	-DNPC \
     -DWAVE=$(WAVE) \
     -DMEM_INIT_PATH=\"$(MEM_INIT)\" \
     -DWAVEFORM_PATH=\"$(WAVEFORM)\"
 
 IVERILOG_NETLIST_FLAGS += -Wall -g2012 -s sim_top -o $(IVERILOG_BIN) \
-    -I./vsrc/core \
+    -I./pipeline-soc-vsrc \
+	-DNPC \
     -DWAVE=$(WAVE) \
     -DMEM_INIT_PATH=\"$(MEM_INIT)\" \
     -DWAVEFORM_PATH=\"$(WAVEFORM_NETLIST)\"
@@ -119,6 +122,8 @@ ifeq ($(ARCH), riscv32e-ysyxsoc)
 VERILATOR_FLAGS += +incdir+../ysyxSoC/perip/uart16550/rtl +incdir+../ysyxSoC/perip/spi/rtl 
 VERILATOR_FLAGS += --timescale "1ns/1ns" --no-timing
 VERILATOR_FLAGS += -DYSYXSOC
+else
+VERILATOR_FLAGS += -DNPC
 endif
 VERILATOR_FLAGS += --build -Mdir $(OBJ_DIR)
 VERILATOR_FLAGS += -I$(NPC_HOME)/pipeline-soc-vsrc #可修改

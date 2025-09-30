@@ -63,6 +63,22 @@ module SRAM (
         assign byte3 = sram_array[3];
         assign init_inst = {byte3, byte2, byte1, byte0};
 
+        localparam TARGET_PC1 = 32'h30000000;
+        localparam INSTR1     = 32'h800000b7;      // lui ra 0x80000
+        localparam TARGET_PC2 = 32'h30000004;
+        localparam INSTR2     = 32'h00008067;      // jalr ra
+        //填充4条指令
+        localparam TARGET_PC3 = 32'h30000008;
+        localparam TARGET_PC4 = 32'h3000000c;
+
+        wire [31:0] sram_rdata = {b3, b2, b1, b0};
+        wire [31:0] final_rdata;
+        assign final_rdata = (araddr == TARGET_PC1) ? INSTR1 :
+                             (araddr == TARGET_PC2) ? INSTR2 :
+                             (araddr == TARGET_PC3) ? INSTR1 :
+                             (araddr == TARGET_PC4) ? INSTR1 :
+                              sram_rdata;
+
         `ifndef MEM_INIT_PATH
             `define MEM_INIT_PATH "../build/iverilog/mem_init.hex"
         `endif
@@ -137,7 +153,8 @@ module SRAM (
                         if (is_read_req) begin
                             rvalid <= 1'b1;
                             rresp  <= 2'b00;
-                            rdata  <= {b3, b2, b1, b0}; // 大端拼接为32位指令
+                            rdata <= final_rdata;
+                            // rdata  <= {b3, b2, b1, b0}; // 大端拼接为32位指令
                             rlast  <= 1'b1;
                             rid    <= read_id;
                             

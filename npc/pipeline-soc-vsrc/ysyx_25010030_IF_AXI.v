@@ -1,6 +1,5 @@
 `include "ysyx_25010030_define.vh"
 
-// 带iCache的取指模块
 module ysyx_25010030_IF_AXI (
     input             clk,
     input             reset,
@@ -124,12 +123,12 @@ module ysyx_25010030_IF_AXI (
     // 主控制逻辑
     always @(posedge clk) begin
         if (reset) begin
-        `ifdef YSYXSOC
-            IF_ID_pc   <= `RESET_FLASH_PC;
-            next_pc    <= `RESET_FLASH_PC;
-        `else
+        `ifdef NPC
             IF_ID_pc   <= `RESET_PC;
             next_pc    <= `RESET_PC;
+        `else
+            IF_ID_pc   <= `RESET_FLASH_PC;
+            next_pc    <= `RESET_FLASH_PC;
         `endif
             IF_ID_inst <= 0;
             IF_valid   <= 0;

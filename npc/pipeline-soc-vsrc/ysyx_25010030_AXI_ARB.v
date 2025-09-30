@@ -1,3 +1,4 @@
+
 module ysyx_25010030_AXI_ARB (
     input  wire         clk,
     input  wire         reset,
@@ -92,13 +93,13 @@ module ysyx_25010030_AXI_ARB (
 );
 
 localparam CLINT_BASE      = 16'h0200; // 0200_0000-0200_ffff
-`ifdef YSYXSOC
+// `ifdef YSYXSOC
 localparam CLINT_BASE_START= 32'h02000000;
 localparam CLINT_BASE_END  = 32'h0200ffff;
-`else
-localparam CLINT_BASE_START= 32'ha0002000;
-localparam CLINT_BASE_END  = 32'ha0002007;
-`endif
+// `else
+// localparam CLINT_BASE_START= 32'ha0002000;
+// localparam CLINT_BASE_END  = 32'ha0002007;
+// `endif
 
 localparam IDLE        = 2'b00;
 localparam IFU_ACCESS  = 2'b01;
