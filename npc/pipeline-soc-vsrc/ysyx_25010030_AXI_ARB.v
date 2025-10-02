@@ -135,8 +135,8 @@ always @(*) begin
         IDLE         : next_master = (lsu_arvalid) ? LSU_R_ACCESS  :
                                      (lsu_awvalid) ? LSU_W_ACCESS  :
                                      (ifu_arvalid) ? IFU_ACCESS    : IDLE;
-        IFU_ACCESS   : next_master = ifu_rlast ? IDLE : IFU_ACCESS;
-        LSU_R_ACCESS : next_master = ((lsu_rlast) | (clint_rvalid & clint_rready)) ? IDLE : LSU_R_ACCESS;
+        IFU_ACCESS   : next_master = (ifu_rvalid && ifu_rready && ifu_rlast) ? IDLE : IFU_ACCESS;
+        LSU_R_ACCESS : next_master = ((lsu_rvalid && lsu_rready && lsu_rlast) | (clint_rvalid & clint_rready)) ? IDLE : LSU_R_ACCESS;
         LSU_W_ACCESS : next_master = (io_master_bvalid & io_master_bready) ? IDLE : LSU_W_ACCESS;
         default      : next_master = IDLE;
     endcase
