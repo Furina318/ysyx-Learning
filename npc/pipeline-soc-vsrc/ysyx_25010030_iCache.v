@@ -111,36 +111,33 @@ module ysyx_25010030_iCache #(
     
     // FENCE.I指令处理：清空所有缓存块的有效位
     integer idx;
-    always @(posedge clk) begin
-        if(is_fencei || reset) begin
-            for (idx = 0; idx < NUM_BLOCKS; idx = idx + 1) begin
-                valid_ram[idx] <= 1'b0;
-            end
-        end
-    end
+    // always @(posedge clk) begin
+    //     if(is_fencei || reset) begin
+    //         for (idx = 0; idx < NUM_BLOCKS; idx = idx + 1) begin
+    //             valid_ram[idx] <= 1'b0;
+    //         end
+    //     end
+    // end
     
     // 缓存初始化、命中处理、填充处理（无LRU逻辑）
     integer b;
     always @(posedge clk) begin
         if (reset) begin
             // 初始化缓存：所有块无效
-            // for (idx = 0; idx < NUM_BLOCKS; idx = idx + 1) begin
-            //     // valid_ram[idx] <= 1'b0;
-            //     tag_ram[idx]   <= {TAG_WIDTH{1'b0}};
-            //     for (b = 0; b < BEATS_PER_BLOCK; b = b + 1) begin
-            //         data_ram[idx][b] <= 32'h0;
-            //     end
-            // end
+            for (idx = 0; idx < NUM_BLOCKS; idx = idx + 1) begin
+                valid_ram[idx] <= 1'b0;
+            end
             inst  <= 32'h0;
             valid <= 1'b0;
 
             axi_rready <= 1'b0;
             axi_arvalid <= 1'b0;
-            // axi_araddr  <= 32'h0;
-            // // for (i = 0; i < BEATS_PER_BLOCK; i++) begin
-            // //     block_data[i] <= 32'h0;
-            // // end
         end else begin
+            if (is_fencei) begin
+                for (idx = 0; idx < NUM_BLOCKS; idx = idx + 1) begin
+                    valid_ram[idx] <= 1'b0;
+                end
+            end
             case (state)
                 IDLE: begin
                     axi_rready <= 1'b0;
