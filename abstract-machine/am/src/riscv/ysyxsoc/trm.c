@@ -33,9 +33,9 @@ void putch(char ch) {
 
 static void uart_init(){
 	outb(UART_LCR, inb(UART_LCR) | 0x80); //LCR寄存器最高位，使能分频系数寄存器
-	outb(UART_TX, 0x01);
+	outb(UART_LSB, 0x01);
 	outb(UART_LCR, inb(UART_LCR) & 0x7f); //恢复LCR寄存器的值，关闭分频系数寄存器，可正常收发数据
-	outb(UART_IC, 0xc7);
+	outb(UART_IER, 0xc7);
 }
 
 // static void uart_init(uint32_t baud_rate) {

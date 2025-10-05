@@ -76,7 +76,9 @@ module ysyx_25010030_EX (
 
     output reg        ex_lsu_csr_ecall,
     output reg        ex_lsu_csr_mret,
-
+    //FOR DIFFTEST//
+    output reg [31:0] ex_lsu_pc,
+    ////////////////
     output reg [31:0] ex_lsu_process_result
 
 );
@@ -361,6 +363,9 @@ module ysyx_25010030_EX (
             ex_lsu_csr_rdata      <= 32'h0;
             ex_lsu_csr_ecall      <= 1'b0;
             ex_lsu_csr_mret       <= 1'b0;
+            //FOR DIFFTEST//
+            ex_lsu_pc            <= 32'h0;
+            ////////////////
         end
         else if (id_valid && ex_ready) begin
             ex_lsu_src2           <= src2;
@@ -379,6 +384,9 @@ module ysyx_25010030_EX (
             ex_lsu_csr_rdata      <= wb_ex_csr_num1;
             ex_lsu_csr_ecall      <= id_ex_csr_ecall;
             ex_lsu_csr_mret       <= id_ex_csr_mret;
+            //FOR DIFFTEST//
+            ex_lsu_pc            <= id_ex_pc;
+            ////////////////
         end
     end
 endmodule

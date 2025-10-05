@@ -42,7 +42,7 @@ extern void display_iringbuf(void);
 extern void difftest_step(vaddr_t pc, vaddr_t npc);
 extern void difftest_skip_ref();
 // extern void update_cpu_state(CPU_state *cpu);
-extern void (*ref_difftest_regcpy)(void *dut, bool direction);
+// extern void (*ref_difftest_regcpy)(void *dut, bool direction);
 #endif
 
 // extern vluint64_t main_time;
@@ -252,8 +252,26 @@ static void statistic() {
 }
 //===============================================================================//
 
-uint64_t last_pc;
+static void check_resp() {
+#ifdef YSYXSOC
+#define lsu_rresp top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__axi_lsu_rresp
+#define lsu_bresp top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__axi_lsu_bresp
+#define ifu_rresp top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__axi_if_rresp
+#else
+#define lsu_rresp top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__axi_lsu_rresp
+#define lsu_bresp top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__axi_lsu_bresp
+#define ifu_rresp top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__axi_if_rresp
+// #define clint_ar_addr top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__clint_araddr
+// #define clint_ar_valid top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__clint_arvalid
+#endif
+if(lsu_rresp != 0) printf("LSU <R> CHANNEL ACCESS FAULT!\n");
+if(lsu_bresp != 0) printf("LSU <W> CHANNEL ACCESS FAULT!\n");
+if(ifu_rresp != 0) printf("IFU <R> CHANNEL ACCESS FAULT!\n");
+// if((clint_ar_addr <= 0x02000000 || clint_ar_addr >= 0x0200ffff) && clint_ar_valid) printf("CLINT <R> CHANNEL ACCESS FAULLT!\n");
+}
 
+uint64_t last_pc;
+static void trace_and_difftest();
 static void execute_once() {
     #ifdef YSYXSOC
     PCSet.pc = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__IF_ID_pc;
@@ -261,6 +279,8 @@ static void execute_once() {
     // printf("pc=0x%08x | inst=0x%08x\n",PCSet.pc,PCSet.inst);
     last_pc = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__IF_ID_pc;
     do{
+      check_resp();
+      
       single_cycle();
       single_cycle();
       #ifdef NVBOARD
@@ -273,9 +293,13 @@ static void execute_once() {
     PCSet.inst = top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__IF_ID_inst;
     last_pc = top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__IF_ID_pc;
     do{
+      trace_and_difftest();
+      check_resp();
+
       single_cycle();
       single_cycle();
       cycle_sum++;
+      // trace_and_difftest();
     } while (last_pc == top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__IF_ID_pc);
     #endif
 
@@ -304,13 +328,6 @@ static void execute_once() {
 
 }
 
-// 用于跟踪流水线状态的全局变量
-static bool prev_ex_flush = false;
-static vaddr_t prev_ex_flush_pc = 0;
-static bool wb_valid_delayed = false;
-static vaddr_t wb_pc_delayed = 0;
-static vaddr_t wb_inst_delayed = 0;
-
 static bool first_step = true; // 用于第一次执行时的特殊处理
 
 static void trace_and_difftest() {
@@ -322,21 +339,41 @@ static void trace_and_difftest() {
     }
 
 #ifdef CONFIG_DIFFTEST
-    // // 获取流水线信号
-    // bool wb_valid = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__wb_valid;       // WB 阶段指令有效
-    // bool ex_flush = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__ex_flush;       // EX 阶段冲刷
-    // vaddr_t wb_pc = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__lsu_wb_pc;      // WB 阶段 PC
-    // vaddr_t ex_flush_pc = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__ex_flush_pc; // EX 冲刷目标 PC
-    // vaddr_t wb_inst = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__lsu_wb_inst;  // WB 阶段指令
+#ifdef YSYXSOC
+    // bool wb_valid = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__wb_valid;
+    // vaddr_t diff_pc = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__wb_pc;
+    // vaddr_t lsu_araddr = top->rootp->ysyxSoCFull__DOT__asic__DOT___cpu_auto_master_out_araddr;
+    // vaddr_t lsu_awaddr = top->rootp->ysyxSoCFull__DOT__asic__DOT___cpu_auto_master_out_awaddr;
+    // bool lsu_arvalid = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__lsu_axi_arvalid;
+    // bool lsu_awvalid = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__lsu_axi_awvalid;
 
-    // int reset_once = 1;
+    // if((((lsu_araddr < 0x30000000) | (lsu_araddr > 0x3fffffff)) & lsu_arvalid) & 
+    //    (((lsu_araddr < 0x0f000000) | (lsu_araddr > 0x0f002000)) & lsu_arvalid) & 
+    //    (((lsu_araddr < 0xa0000000) | (lsu_araddr > 0xbfffffff)) & lsu_arvalid)) {difftest_skip_ref();}
+    // if((((lsu_awaddr < 0x30000000) | (lsu_awaddr > 0x3fffffff)) & lsu_awvalid) & 
+    //    (((lsu_awaddr < 0x0f000000) | (lsu_awaddr > 0x0f002000)) & lsu_awvalid) & 
+    //    (((lsu_awaddr < 0xa0000000) | (lsu_awaddr > 0xbfffffff)) & lsu_awvalid)) {difftest_skip_ref();}
+#else
+    // bool if_valid = top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__IF_valid;
+    bool wb_valid = top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__wb_valid;
+    vaddr_t diff_pc = top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__wb_pc;
+    bool master_arvalid = top->rootp->ysyx_25010030_npc__DOT__io_master_arvalid;
+    bool clint_arvalid = top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__clint_arvalid;
+    bool master_awvalid = top->rootp->ysyx_25010030_npc__DOT__io_master_awvalid;
+    vaddr_t master_araddr = top->rootp->ysyx_25010030_npc__DOT__io_master_araddr;
+    vaddr_t clint_araddr = top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__clint_araddr;
+    vaddr_t master_awaddr = top->rootp->ysyx_25010030_npc__DOT__io_master_awaddr;
 
-    // if(wb_valid){
-    //   difftest_step(PCSet.pc, PCSet.next_pc);
-    // }
-    // else {
-    //   reset_once = 0;
-    // }
+    if(((master_araddr < 0x80000000) | (master_araddr > 0x90000000)) & master_arvalid) {difftest_skip_ref();}
+    if(((clint_araddr < 0x80000000) | (clint_araddr > 0x90000000)) & clint_arvalid) {difftest_skip_ref();}
+    if(((master_awaddr < 0x80000000) | (master_awaddr > 0x90000000)) & master_awvalid) {difftest_skip_ref();}
+#endif
+
+    if(wb_valid){
+      // if(first_step) first_step = false;
+      // else difftest_step(diff_pc, diff_pc);
+      difftest_step(diff_pc, diff_pc);
+    }
 #endif
 
 #ifdef CONFIG_WATCHPOINTS
@@ -367,7 +404,7 @@ static void execute(uint64_t n) {
         execute_once();
         // if(!top->reset && last_pc != top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__IF_ID_pc) g_nr_guest_inst++;
         // g_nr_guest_inst++;
-        trace_and_difftest();
+        // trace_and_difftest();
         if (npc_state.state != NPC_RUNNING){
             break;
         }

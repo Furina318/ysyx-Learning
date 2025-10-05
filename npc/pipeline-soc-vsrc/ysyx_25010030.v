@@ -278,6 +278,13 @@ module ysyx_25010030 (
     wire [ 1:0] cache_arburst;
     wire        cache_rready;
 
+    //FOR DIFFTEST//
+    wire [31:0] ex_lsu_pc;
+    wire [31:0] lsu_wb_pc;
+    wire        wb_valid;
+    wire [31:0] wb_pc;
+    ////////////////
+
     ysyx_25010030_CLINT clint (
         .clk    (clock        ),
         .reset  (reset        ),
@@ -580,6 +587,9 @@ module ysyx_25010030 (
         .ex_lsu_csr_ecall       (ex_lsu_csr_ecall       ),
         .ex_lsu_csr_mret        (ex_lsu_csr_mret        ),
         // .exu_active_cycles(exu_active_cycles),
+        //FOR DIFFTEST//
+        .ex_lsu_pc              (ex_lsu_pc              ),
+        ////////////////
         .ex_lsu_process_result  (ex_lsu_process_result  )
     );
 
@@ -597,7 +607,10 @@ module ysyx_25010030 (
         .ex_lsu_MemRead         (ex_lsu_MemRead         ),
         .ex_lsu_MemWrite        (ex_lsu_MemWrite        ),
         .ex_lsu_MemLen          (ex_lsu_MemLen          ),
-        // .ex_lsu_pc(ex_lsu_pc),
+        //FOR DIFFTEST//
+        .ex_lsu_pc              (ex_lsu_pc              ),
+        .lsu_wb_pc              (lsu_wb_pc              ),
+        ////////////////
         .addr                   (ex_lsu_process_result  ), // 从 EX 传入的内存地址
         .data_in                (ex_lsu_src2            ), // 从 EX 传入的写数据
         .lsu_ex_forward_rd      (lsu_ex_forward_rd      ),
@@ -668,7 +681,11 @@ module ysyx_25010030 (
         .rs2         (id_wb_rs2           ),
         .src1        (wb_ex_src1          ),
         .src2        (wb_ex_src2          ),
-        // .wb_valid(wb_valid),
+        //FOR DIFFTEST//
+        .wb_valid    (wb_valid            ),
+        .lsu_wb_pc   (lsu_wb_pc           ),
+        .wb_pc       (wb_pc               ),
+        ////////////////
         .raddr_csr1  (id_wb_csr_addr1     ),
         .raddr_csr2  (id_wb_csr_addr2     ),
         .wen_csr1    (lsu_wb_csr_wen1     ),

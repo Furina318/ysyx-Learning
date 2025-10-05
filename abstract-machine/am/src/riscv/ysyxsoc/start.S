@@ -1,4 +1,4 @@
-.section .bl.f, "ax"
+.section .bl.f, "ax"      #将bl.s段从flash加载到sram
 .weak _start
 .type _start, @function
 _start:
@@ -28,7 +28,7 @@ _start:
   la ra, _do_bl_ss
   jalr ra
 
-.section .bl.s, "ax"
+.section .bl.s, "ax"      #将.text/.data段从flash加载到sdram，并清零.bss段和初始化栈指针
 .globl _do_bl_ss
 .type _do_bl_ss, @function
 _do_bl_ss:

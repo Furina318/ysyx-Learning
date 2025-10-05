@@ -8,19 +8,26 @@
 #include "VysyxSoCFull.h"
 #include "../obj_dir/VysyxSoCFull___024root.h"
 extern VysyxSoCFull *top;
+#define top_pc top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__IF_ID_pc
 #define top_regs top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__wbu__DOT__regs
 #else
 #include "Vysyx_25010030_npc.h"
 #include "../obj_dir/Vysyx_25010030_npc___024root.h"
 extern Vysyx_25010030_npc *top;
+#define top_pc top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__IF_ID_pc;
 #define top_regs top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__wbu__DOT__regs
 #endif
 
-/********extern functions or variables********/
-
 extern NPCState npc_state;
 extern uint8_t* guest_to_host(paddr_t paddr);
-/*********************************************/
+
+static bool is_skip_ref = false;
+static int skip_dut_nr_inst = 0;
+
+// extern "C" void difftest_skip_ref() {
+//   is_skip_ref = true;
+//   skip_dut_nr_inst = 0;
+// }
 
 #ifdef CONFIG_DIFFTEST
 
@@ -28,6 +35,7 @@ CPU_state cpu;
 static int skip_cnt_ref = 0;   // the amount to skip the ref
 static bool skip_flag = false; // the flag   to skip the ref 
 static bool rst_flag = true;
+vaddr_t last_ref_pc;
 
 void (*ref_difftest_memcpy)(paddr_t addr, void *buf, size_t n, bool direction) = NULL;
 void (*ref_difftest_regcpy)(void *dut, bool direction) = NULL;
@@ -35,8 +43,9 @@ void (*ref_difftest_exec)(uint64_t n) = NULL;
 
 void difftest_skip_ref() {
 //   skip_cnt_ref++;
-    skip_flag = true;
+    is_skip_ref = true;
 }
+
 
 const char *ref_regs[] = {
   "$0", "ra", "sp", "gp", "tp", "t0", "t1", "t2",
@@ -48,7 +57,8 @@ const char *ref_regs[] = {
 
 void update_cpu_state(CPU_state *cpu)
 {
-    cpu->pc = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__IF_ID_pc;
+    cpu->pc = top_pc;
+    last_ref_pc = cpu->pc;
     for(int i = 0; i < 16; i++)
         cpu->gpr[i] = top_regs[i];
 }
@@ -56,7 +66,7 @@ void update_cpu_state(CPU_state *cpu)
 
 void init_difftest(char *ref_so_file, long img_size, int port) 
 {
-    update_cpu_state(&cpu);
+    // update_cpu_state(&cpu);
     // printf("%s\n",ref_so_file);
     assert(ref_so_file != NULL);
     // printf("%s\n",ref_so_file);
@@ -89,7 +99,12 @@ void init_difftest(char *ref_so_file, long img_size, int port)
 
     ref_difftest_init(port);
     ref_difftest_memcpy(RESET_VECTOR, guest_to_host(RESET_VECTOR), img_size, DIFFTEST_TO_REF);
-    // ref_difftest_regcpy(&cpu, DIFFTEST_TO_REF);
+
+    CPU_state ref_r;
+    ref_r.pc = CONFIG_MBASE;//复位的时候默认为npc架构
+    last_ref_pc = CONFIG_MBASE;
+    for(int i = 0; i < 16; i++)
+        ref_r.gpr[i] = 0;
 }
 
 
@@ -98,12 +113,13 @@ bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc)
     bool success = true;
 
     //check pc
-    if(ref_r->pc != pc)
+    if(last_ref_pc != pc)
     {
         _Log(ANSI_FG_YELLOW "[difftest]" ANSI_NONE   ANSI_FG_RED "pc" 
-             ANSI_NONE "  dut:0x%08x   ref:0x%08x\n", pc, ref_r->pc);
+             ANSI_NONE "  dut:0x%08x   ref:0x%08x\n", pc, last_ref_pc);
         success = false;
     }
+    last_ref_pc = ref_r->pc;
 
     //check general purpose registers
     for(int i = 0; i < 16; i++)
@@ -117,46 +133,38 @@ bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc)
     return success;
 }
 
-static void checkregs(CPU_state *ref, vaddr_t pc, vaddr_t npc) 
+static void checkregs(CPU_state *ref, vaddr_t pc) 
 {
-    if (!isa_difftest_checkregs(ref, npc)) 
+    if (!isa_difftest_checkregs(ref, pc)) 
     {
         npc_state.state = NPC_ABORT;
         npc_state.halt_pc = pc;
         Log("Differential test %s at pc = 0x%08x." , (ANSI_FMT("fails", ANSI_FG_RED)), npc_state.halt_pc);
-        printf("\033[33m[REF->GPR]\033[0m\n");
+        printf("\033[33m[DUT->GPR]\t\t[REF->GPR]\033[0m\n");
         for(int i = 0; i < 16; i++)
         {
-            printf("%s:\t0x%08x\n", ref_regs[i], ref->gpr[i]);
+            printf("%s:\t0x%08x\t0x%08x\n", ref_regs[i], top_regs[i], ref->gpr[i]);
         }
+        printf("\npc:\t0x%08x\t0x%08x\n", pc, ref->pc);
     }
 }
 
 
 void difftest_step(vaddr_t pc, vaddr_t npc) 
 {
-    CPU_state ref_r;
-    // update_cpu_state(&cpu);
-    // if(rst_flag == true){
-    //     rst_flag = false;
-    // }else{
-    //     if(skip_flag){
-    //         ref_difftest_regcpy(&cpu, DIFFTEST_TO_REF);
-    //         skip_flag = false;
-    //         return;
-    //     }
-    //     ref_difftest_exec(1);
-    //     ref_difftest_regcpy(&cpu, DIFFTEST_TO_DUT);
-
-    //     checkregs(&cpu, pc, npc);
-    // }
+    if(is_skip_ref){
+        CPU_state ref_r;
+        update_cpu_state(&ref_r);
+        ref_difftest_regcpy(&ref_r, DIFFTEST_TO_REF);
+        is_skip_ref = false;
+        return;
+    }
     ref_difftest_exec(1);
-    ref_difftest_regcpy(&ref_r, DIFFTEST_TO_DUT);
-
-    checkregs(&ref_r, pc, npc);
+    ref_difftest_regcpy(&cpu, DIFFTEST_TO_DUT);
+    checkregs(&cpu, pc);
 }
-
 
 #else
 void init_difftest(char *ref_so_file, long img_size, int port) { }
+void difftest_skip_ref() { }
 #endif

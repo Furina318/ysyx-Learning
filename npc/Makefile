@@ -47,8 +47,8 @@ WAVEFORM = $(IVERILOG_DIR)/waveform.fst
 WAVEFORM_NETLIST = $(IVERILOG_DIR)/waveform_netlist.fst
 MEM_INIT = $(IVERILOG_DIR)/mem_init.hex
 
+# IMG ?=
 IMG ?= ../am-kernels/benchmarks/microbench/build/microbench-riscv32e-npc.bin
-# IMG ?= ../am-kernels/tests/cpu-tests/build/load-store-riscv32e-npc.bin
 
 CELLS ?= ../yosys-sta/nangate45/sim/cells.v
 NETLIST ?= ../yosys-sta/result/ysyx_25010030-250MHz/ysyx_25010030.netlist.fixed.v
@@ -142,13 +142,14 @@ LIBS += -lSDL2     # 添加 SDL2 库链接, 图形显示库
 LIBS += -lSDL2_image
 LDFLAGS += $(LIBS)
 
+ifeq ($(CONFIG_DIFFTEST), 1)
+DIFF_REF_PATH = /home/furina/ysyx-workbench/nemu/build
+DIFF_REF_SO = $(DIFF_REF_PATH)/riscv32-nemu-interpreter-so
+ARGS_DIFF = --diff=$(DIFF_REF_SO)
+endif
 
-# DIFF_REF_PATH = /home/furina/ysyx-workbench/nemu/build
-# DIFF_REF_SO = $(DIFF_REF_PATH)/riscv32-nemu-interpreter-so
-# ARGS_DIFF = --diff=$(DIFF_REF_SO)
-
-# $(DIFF_REF_SO):
-# 	$(MAKE) -s -C $(DIFF_REF_PATH)
+$(DIFF_REF_SO):
+	$(MAKE) -s -C $(DIFF_REF_PATH)
 
 # 参数设置
 
