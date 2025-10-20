@@ -39,11 +39,7 @@ module ysyx_25010030_IF_AXI (
     input      [ 2:0] cache_arsize,
     input      [ 1:0] cache_arburst,
     input             cache_rready
-    // output reg [31:0] ifu_active_cycles
 );
-// `ifdef VERILATOR
-    // import "DPI-C" function void counter(input int inst_type, input int ifu_inc, input int lsu_inc, input int exu_inc);
-// `endif
 
     // 状态机定义
     reg [1:0] ifu_state;
@@ -55,63 +51,16 @@ module ysyx_25010030_IF_AXI (
     localparam JAL_OPCODE = 7'b1101111;
 
     // 内部信号
-    // reg [31:0] next_pc;
-    // reg cache_req;
     reg flush_once;
     reg once;
-    
-    // cache接口信号
-    // wire [31:0] cache_inst;
-    // wire        cache_valid;
-
-    // wire [31:0] cache_araddr;
-    // wire        cache_arvalid;
-    // wire [ 3:0] cache_arid;
-    // wire [ 7:0] cache_arlen;
-    // wire [ 2:0] cache_arsize;
-    // wire [ 1:0] cache_arburst;
-    // wire        cache_rready;
 
     // wire        is_fencei = (IF_ID_inst == FENCEI);
     wire        is_jal    = (cache_inst[6:0] == JAL_OPCODE);
     wire [31:0] immJ      = {{12{cache_inst[31]}}, cache_inst[19:12], cache_inst[20], cache_inst[30:21], 1'b0};
     wire [31:0] jal_target = (flush_once ? IF_ID_pc : next_pc) + immJ;
-    
-    // 实例化iCache模块
-    // ysyx_25010030_iCache u_icache (
-    //     .clk            (clk           ),
-    //     .reset          (reset         ),
-    //     .is_fencei      (ex_fencei     ),
-    //     .addr           (next_pc       ),
-    //     .inst           (cache_inst    ),
-    //     .valid          (cache_valid   ),
-    //     .axi_araddr     (cache_araddr  ),
-    //     .axi_arvalid    (cache_arvalid ),
-    //     .axi_arready    (axi_if_arready),
-    //     .axi_arid       (cache_arid    ),  
-    //     .axi_arlen      (cache_arlen   ),  
-    //     .axi_arsize     (cache_arsize  ),  
-    //     .axi_arburst    (cache_arburst ),  
-    //     .axi_rvalid     (axi_if_rvalid ),
-    //     .axi_rready     (cache_rready  ),
-    //     .axi_rdata      (axi_if_rdata  ),
-    //     .axi_rresp      (axi_if_rresp  ),
-    //     .axi_rid        (axi_if_rid    ),  
-    //     .axi_rlast      (axi_if_rlast  )   
-    // );
-
-    // 统计活跃周期
-    // always @(posedge clk) begin
-    //     if (reset) begin
-    //         ifu_active_cycles <= 0;
-    //     end else if (ifu_state != IDLE || cache_arvalid) begin
-    //         ifu_active_cycles <= ifu_active_cycles + 1;
-    //     end
-    // end
 
     // AXI信号转发（缓存 -> 外部总线）
     always @(*) begin
-        // if (cache_arvalid || cache_rready) begin
             if_axi_arvalid = cache_arvalid;
             if_axi_araddr  = cache_araddr;
             if_axi_rready  = cache_rready;
@@ -119,15 +68,6 @@ module ysyx_25010030_IF_AXI (
             if_axi_arlen   = cache_arlen;
             if_axi_arsize  = cache_arsize;
             if_axi_arburst = cache_arburst;
-        // end else begin
-        //     if_axi_arvalid = 0;
-        //     if_axi_araddr  = 0;
-        //     if_axi_rready  = 0;
-        //     if_axi_arid    = 0;
-        //     if_axi_arlen   = 0;
-        //     if_axi_arsize  = 0;
-        //     if_axi_arburst = 0;
-        // end
     end
 
     // 主控制逻辑
@@ -180,10 +120,6 @@ module ysyx_25010030_IF_AXI (
                             IF_valid   <= (flush_once) ? 0 : 1;
                             next_pc    <= (flush_once) ? next_pc : (is_jal) ? jal_target : next_pc + 4;
                             ifu_state  <= IDLE;
-                        // `ifdef VERILATOR
-                        //     // 统计指令
-                        //     counter(7, 1, 0, 0);
-                        // `endif
                         end
                         
                     end
