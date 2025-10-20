@@ -47,5 +47,8 @@ void display_iringbuf(void)
            iringbuf.inst_buf[iringbuf.tail]);
     log_write("[ITRACE] ----> %s\n", iringbuf.inst_buf[iringbuf.tail]); 
 }
+#else
+void append_iringbuf(char *s) {}
+void display_iringbuf(void) {}
 #endif
 /******************************************************************/

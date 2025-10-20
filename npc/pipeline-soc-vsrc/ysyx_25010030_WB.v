@@ -16,11 +16,11 @@ module ysyx_25010030_WB #(
   output [DATA_WIDTH-1:0] src1,     
   output [DATA_WIDTH-1:0] src2,     
   
-  //FOR DIFFTEST//
+`ifdef DIFFTEST
   output reg              wb_valid,
   input  [31:0]           lsu_wb_pc,
   output reg [31:0]       wb_pc,
-  ////////////////
+`endif
 
   input  [11:0]           raddr_csr1,   
   input  [11:0]           raddr_csr2,   
@@ -67,14 +67,7 @@ always @(posedge clk) begin
     end
 end
 
-//FOR DIFFTEST//
-// reg wb_valid;
-// reg [31:0] wb_pc;
-// always @(posedge clk) begin
-//     if(lsu_wb_valid && wb_lsu_ready) begin
-//         wb_pc <= lsu_wb_pc;
-//     end
-// end
+`ifdef DIFFTEST
 always @(posedge clk) begin
     wb_pc <= lsu_wb_pc;
     if (rst) begin
@@ -90,7 +83,7 @@ always @(posedge clk) begin
         wb_valid <= 1'b0;
     end
 end
-////////////////
+`endif
 
 assign src1 = (rs1 == 4'b0) ? 32'b0 : regs[rs1];
 assign src2 = (rs2 == 4'b0) ? 32'b0 : regs[rs2];

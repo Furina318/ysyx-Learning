@@ -2,7 +2,7 @@ ENTRY(_start)
 
 MEMORY {
   mrom  (r x) : ORIGIN = 0x20000000, LENGTH = 4K
-  flash (rwx) : ORIGIN = 0x30000000, LENGTH = 16M
+  flash (r x) : ORIGIN = 0x30000000, LENGTH = 16M
   sram  (rwx) : ORIGIN = 0x0f000000, LENGTH = 8K
   psram (rwx) : ORIGIN = 0x80000000, LENGTH = 4M
   sdram (rwx) : ORIGIN = 0xa0000000, LENGTH = 64M
@@ -82,6 +82,7 @@ SECTIONS {
     *(__am_apps.data*)
     *(__am_apps.sdata*)
     __am_apps_data_end = .;
+
     _data_end = .;
   } > sdram AT> flash
   _data_load_lma = LOADADDR(.data);
@@ -92,11 +93,13 @@ SECTIONS {
     *(.sbss*)
     *(.scommon)
     . = ALIGN(4);
+
     __am_apps_bss_start = .;
     *(__am_apps.bss*)
     *(__am_apps.sbss*)
     *(__am_apps.scommon*)
     __am_apps_bss_end = .;
+
     _bss_end = .;
   } > sdram AT> flash
 

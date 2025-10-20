@@ -14,6 +14,7 @@ $(error 不支持的架构：$(ARCH).支持的架构: riscv32e-ysyxsoc, riscv32e
 endif
 
 nvboard ?= 1
+diff ?= 0
 # 源文件路径和定义
 # NPC_HOME = /home/furina/ysyx-workbench/npc
 # NVBOARD_HOME = /home/furina/ysyx-workbench/nvboard
@@ -128,12 +129,18 @@ endif
 VERILATOR_FLAGS += --build -Mdir $(OBJ_DIR)
 VERILATOR_FLAGS += -I$(NPC_HOME)/pipeline-soc-vsrc #可修改
 
+ifeq ($(diff), 1)
+VERILATOR_FLAGS += -DDIFFTEST
+CXXFLAGS += -DCONFIG_DIFFTEST
+endif
+
 OBJ_DIR = ./obj_dir
 BIN = $(OBJ_DIR)/V$(TOP_MODULE)
 
 INC_PATH = $(NPC_HOME)/include/
 INCFLAGS = $(addprefix -I, $(INC_PATH))
 CXXFLAGS += $(INCFLAGS) -DTOP_NAME="\"V$(TOP_MODULE)\""
+CXXFLAGS += -g
 
 # 链接的库
 LIBS = -lreadline  # 链接 readline 库, 命令行交互库
@@ -142,7 +149,7 @@ LIBS += -lSDL2     # 添加 SDL2 库链接, 图形显示库
 LIBS += -lSDL2_image
 LDFLAGS += $(LIBS)
 
-ifeq ($(CONFIG_DIFFTEST), 1)
+ifeq ($(diff), 1)
 DIFF_REF_PATH = /home/furina/ysyx-workbench/nemu/build
 DIFF_REF_SO = $(DIFF_REF_PATH)/riscv32-nemu-interpreter-so
 ARGS_DIFF = --diff=$(DIFF_REF_SO)

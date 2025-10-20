@@ -18,10 +18,10 @@ module ysyx_25010030_LSU_AXI (
     input         ex_lsu_MemRead,     
     input         ex_lsu_MemWrite,    
     input  [ 4:0] ex_lsu_MemLen,
-    //FOR DIFFTEST//         
+`ifdef DIFFTEST       
     input  [31:0] ex_lsu_pc,
     output reg [31:0] lsu_wb_pc,
-    ////////////////          
+`endif        
     input  [31:0] addr,               
     input  [31:0] data_in,              
 
@@ -310,8 +310,7 @@ module ysyx_25010030_LSU_AXI (
 
     reg        l_load;            
     reg        l_rd_en;           
-    reg [3:0]  l_rd_addr;
-    reg [31:0] l_pc;//FOR DIFFTEST//                   
+    reg [3:0]  l_rd_addr;                  
 
     // 前递信号赋值
     assign lsu_ex_forward_rd        = l_rd_addr;
@@ -325,30 +324,44 @@ module ysyx_25010030_LSU_AXI (
             l_rd_en   <= 0;
             l_rd_addr <= 0;
             l_MemLen  <= 0;
-            l_pc      <= 0;//FOR DIFFTEST//
         end 
         else if (req_valid) begin
             l_load    <= ex_lsu_MemRead;
             l_rd_en   <= ex_lsu_RegWrite;
             l_rd_addr <= ex_lsu_rd;
             l_MemLen  <= ex_lsu_MemLen;
-            l_pc      <= ex_lsu_pc;//FOR DIFFTEST//
         end 
         else if (lsu_wb_valid & wb_lsu_ready) begin
             l_load    <= 0;
             l_rd_en   <= ex_lsu_RegWrite;
             l_rd_addr <= ex_lsu_rd;
             l_MemLen  <= ex_lsu_MemLen;
-            l_pc      <= ex_lsu_pc;//FOR DIFFTEST//
         end 
         else if (ex_lsu_valid & lsu_ex_ready & ~(ex_lsu_MemRead | ex_lsu_MemWrite)) begin // 非访存指令
             l_load    <= 0;
             l_rd_en   <= ex_lsu_RegWrite;
             l_rd_addr <= ex_lsu_rd;
             l_MemLen  <= ex_lsu_MemLen;
+        end 
+    end
+
+`ifdef DIFFTEST
+    reg [31:0] l_pc;
+    always @(posedge clk) begin
+        if (rst) begin
+            l_pc      <= 0;//FOR DIFFTEST//
+        end 
+        else if (req_valid) begin
+            l_pc      <= ex_lsu_pc;//FOR DIFFTEST//
+        end 
+        else if (lsu_wb_valid & wb_lsu_ready) begin
+            l_pc      <= ex_lsu_pc;//FOR DIFFTEST//
+        end 
+        else if (ex_lsu_valid & lsu_ex_ready & ~(ex_lsu_MemRead | ex_lsu_MemWrite)) begin // 非访存指令
             l_pc      <= ex_lsu_pc;//FOR DIFFTEST//
         end 
     end
+`endif
 
     wire [31:0] byte_data1 = (rdata >> (addr_off*8));
     wire [ 7:0] byte_data = byte_data1[7:0];
@@ -434,7 +447,9 @@ module ysyx_25010030_LSU_AXI (
             lsu_wb_csr_wr_data1  <= ex_lsu_csr_wr_data1;
             lsu_wb_csr_wr_data2  <= ex_lsu_csr_wr_data2;
             lsu_wb_write_rd_data <= rd_data;
+`ifdef DIFFTEST
             lsu_wb_pc <= l_pc; // FOR DIFFTEST//
+`endif
         end else if (ex_lsu_valid & lsu_ex_ready & ~(ex_lsu_MemRead | ex_lsu_MemWrite)) begin
             lsu_wb_RegWrite      <= ex_lsu_RegWrite; // 非内存访问指令
             lsu_wb_rd            <= ex_lsu_rd;
@@ -445,7 +460,9 @@ module ysyx_25010030_LSU_AXI (
             lsu_wb_csr_wr_data1  <= ex_lsu_csr_wr_data1;
             lsu_wb_csr_wr_data2  <= ex_lsu_csr_wr_data2;
             lsu_wb_write_rd_data <= rd_data;
+`ifdef DIFFTEST
             lsu_wb_pc <= ex_lsu_pc; // FOR DIFFTEST//
+`endif
         end
     end
 

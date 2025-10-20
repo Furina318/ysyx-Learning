@@ -14,8 +14,11 @@ extern VysyxSoCFull *top;
 #include "Vysyx_25010030_npc.h"
 #include "../obj_dir/Vysyx_25010030_npc___024root.h"
 extern Vysyx_25010030_npc *top;
-#define top_pc top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__IF_ID_pc;
+#define top_pc top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__IF_ID_pc
 #define top_regs top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__wbu__DOT__regs
+// #define top_mepc top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__wbu__DOT__mepc
+// #define top_mtvec top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__wbu__DOT__mtvec
+
 #endif
 
 extern NPCState npc_state;
@@ -61,6 +64,8 @@ void update_cpu_state(CPU_state *cpu)
     last_ref_pc = cpu->pc;
     for(int i = 0; i < 16; i++)
         cpu->gpr[i] = top_regs[i];
+    // cpu->csr.mcause = 0xb;
+    // cpu->csr.mstatus = 0x1800;
 }
 
 
@@ -105,6 +110,8 @@ void init_difftest(char *ref_so_file, long img_size, int port)
     last_ref_pc = CONFIG_MBASE;
     for(int i = 0; i < 16; i++)
         ref_r.gpr[i] = 0;
+    // ref_r.csr.mstatus = 0x1800;
+    // ref_r.csr.mcause = 0xb;
 }
 
 
@@ -129,7 +136,7 @@ bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc)
                  ANSI_NONE "  dut:0x%08x   ref:0x%08x\n", ref_regs[i], top_regs[i], ref_r->gpr[i]);
             success = false;
         }
-        
+    
     return success;
 }
 
@@ -145,6 +152,10 @@ static void checkregs(CPU_state *ref, vaddr_t pc)
         {
             printf("%s:\t0x%08x\t0x%08x\n", ref_regs[i], top_regs[i], ref->gpr[i]);
         }
+        // printf("mepc   :\t0x%08x\t0x%08x\n", top_mepc, ref->csr.mepc);
+        // printf("mtvec  :\t0x%08x\t0x%08x\n", top_mtvec, ref->csr.mtvec);
+        // printf("mcause :\t0x%08x\t0x%08x\n", 0xb, ref->csr.mcause);
+        // printf("mstatus:\t0x%08x\t0x%08x\n", 0x1800, ref->csr.mstatus);
         printf("\npc:\t0x%08x\t0x%08x\n", pc, ref->pc);
     }
 }

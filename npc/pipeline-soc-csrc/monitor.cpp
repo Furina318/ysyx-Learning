@@ -114,7 +114,8 @@ static long load_img() {//load_img函数用于加载镜像文件
   fseek(fp, 0, SEEK_END);
   long size = ftell(fp);
 
-  Log("The image is %s, size = %ld", img_file, size);
+  // Log("The image is %s, size = %ld", img_file, size);
+  printf("The image is \033[33m%s\033[0m, size = \033[33m%ld\033[0m\n", img_file, size);
 
   fseek(fp, 0, SEEK_SET);
   
