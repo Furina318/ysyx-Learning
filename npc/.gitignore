@@ -13,4 +13,5 @@ build/
 !*.nxdc
 !*.scala
 !*.vh
+!*.sh
 !build.sc
