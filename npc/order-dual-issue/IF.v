@@ -9,9 +9,9 @@ module IF(
     input              clk,
     input              rst,
 
-    input              is_full,
-    input       [63:0] inst_get,
-    output wire [31:0] inst_addr,
+    input              stop,
+    input       [63:0] inst_get,  //icahce取回的两条指令
+    output wire [31:0] inst_addr, //icache请求的地址
 
     output wire [31:0] pc_out1,
     output wire [31:0] npc_out1,
@@ -29,8 +29,6 @@ module IF(
     reg [31:0] pc;//始终默认为双发两条指令中执行的第一条指令
     reg [31:0] npc;
 
-    initial pc <= 32'h8000_0000;
-
     always @(posedge clk) begin
         if(rst) begin
             pc <= 32'h8000_0000;
@@ -44,11 +42,12 @@ module IF(
         if(is_flush) begin
             npc <= flush_pc;
         end
-        if(is_full) begin
+        if(stop) begin
             npc <= pc;
         end
         else begin
             npc <= {pc[31:3] + 1, 3'b000};//取两条指令
+            // npc <= pc + 8;
         end
     end
 
@@ -58,10 +57,13 @@ module IF(
     end
 
     assign inst_addr = pc;
+
     assign pc_out1   = {pc[31:3], 3'b000};
     assign npc_out1  = {pc[31:3], 3'b100};
     assign inst_out1 = inst_get[63:32];
+
     assign pc_out2   = {pc[31:3], 3'b100};
     assign npc_out2  = {pc[31:3] + 1, 3'b000};
     assign inst_out2 = inst_get[31:0];
+    
 endmodule

@@ -1,10 +1,10 @@
 module ALU (
-    input      [3:0]   alu_op,
+    input      [ 3:0]  alu_op,
     input      [31:0]  a,
     input      [31:0]  b,
     output reg [31:0]  result,
-    output             zero,
-    output             less
+    output reg         zero,
+    output reg         less
 );
     // ALU 操作码
     localparam ALU_ADD   = 4'b0000;
@@ -23,7 +23,7 @@ module ALU (
         case(alu_op)
             ALU_SLT:  less=($signed(a) < $signed(b)) ? 1'b1 : 1'b0;//有符号比较
             ALU_SLTU: less=(a < b) ? 1'b1 : 1'b0;//无符号比较
-            default:   less=($signed(a) < $signed(b)) ? 1'b1 : 1'b0;
+            default:  less=($signed(a) < $signed(b)) ? 1'b1 : 1'b0;
         endcase
         case (alu_op)
             ALU_ADD:  result = a + b;  // 加法 (add, addi)

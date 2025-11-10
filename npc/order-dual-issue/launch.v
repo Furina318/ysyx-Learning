@@ -36,7 +36,7 @@ module LAUNCH(#
     output reg [            31:0] out_inst2,
     output reg [DECODE_WIDTH-1:0] out_decode2,
 
-    output reg [3:0]  launch_flag 
+    output reg [             3:0] launch_flag 
 );
 ////////////////////////////////////
 //

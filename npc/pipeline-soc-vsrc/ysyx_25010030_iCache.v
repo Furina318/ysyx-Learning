@@ -72,7 +72,8 @@ module ysyx_25010030_iCache #(
     localparam SDRAM_BASE        = 32'hA0000000;  
     localparam SDRAM_END         = 32'hBFFFFFFF;
 `ifdef YSYXSOC
-    wire in_sdram = (addr >= SDRAM_BASE) && (addr <= SDRAM_END);
+    // wire in_sdram = (addr >= SDRAM_BASE) && (addr <= SDRAM_END);
+    wire in_sdram = 1;
 `else
     wire in_sdram = 0;
 `endif

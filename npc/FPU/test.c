@@ -100,7 +100,7 @@ int main() {
 	//fesetround(FE_DOWNWARD);   //2
 	//fesetround(FE_UPWARD);    //3
 
-	FILE *fout = fopen("/home/irving/Desktop/easy_fpu/fpu_test_vector.hex", "w");
+	FILE *fout = fopen("./fpu_test_vector.hex", "w");
 	if(!fout) {
 		perror("fopen");
 		return 1;

@@ -25,6 +25,7 @@ _start:
   mv t0, zero
   mv t1, zero
   mv t2, zero
+  fence.i
   la ra, _do_bl_ss
   jalr ra
 
@@ -61,6 +62,7 @@ _do_bl_ss:
   mv t0, zero
   mv t1, zero
   mv t2, zero
+  fence.i
   la sp, _stack_pointer
   la ra, _trm_init
   jalr ra
@@ -80,5 +82,5 @@ _bl_ss_load_align4:
   addi t0, t0, 4
   j 0b
 1:
-
+  fence.i
   ret

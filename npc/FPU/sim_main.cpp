@@ -161,7 +161,7 @@ int main(int argc, char **argv) {
 
     // 加载测试向量
     std::vector<TestVector> test_vectors;
-    if (!load_test_vectors("/home/irving/Desktop/easy_fpu/fpu_test_vector.hex", test_vectors)) {
+    if (!load_test_vectors("./fpu_test_vector.hex", test_vectors)) {
         tfp->close();
         delete tfp;
         delete tb;

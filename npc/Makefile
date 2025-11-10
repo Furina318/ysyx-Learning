@@ -129,6 +129,11 @@ endif
 VERILATOR_FLAGS += --build -Mdir $(OBJ_DIR)
 VERILATOR_FLAGS += -I$(NPC_HOME)/pipeline-soc-vsrc #可修改
 
+dcache ?= 0
+ifeq ($(dcache), 1)
+VERILATOR_FLAGS += -DDCACHE
+endif
+
 ifeq ($(diff), 1)
 VERILATOR_FLAGS += -DDIFFTEST
 CXXFLAGS += -DCONFIG_DIFFTEST
@@ -280,6 +285,7 @@ clean:
 	rm -rf $(BUILD_DIR)
 	rm -rf wave.vcd
 	rm -rf ./log/*
+	rm -rf mtrace.log
 
 .PHONY: wave
 wave:

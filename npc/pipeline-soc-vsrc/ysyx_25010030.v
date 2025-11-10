@@ -285,6 +285,51 @@ module ysyx_25010030 (
     wire [31:0] wb_pc;
 `endif
 
+`ifdef DCACHE
+    wire [31:0] lsu_dcache_addr;
+    wire        lsu_dcache_wen;
+    wire        lsu_dcache_req;
+    wire        dcache_valid;
+    wire [31:0] dcache_rdata;
+    wire [31:0] lsu_dcache_wdata;
+    wire [ 3:0] lsu_dcache_wstrb;
+    wire [ 2:0] lsu_dcache_arsize;
+    wire [ 2:0] lsu_dcache_awsize;
+
+    wire        dcache_axi_arvalid;
+    wire        axi_dcache_arready;
+    wire [31:0] dcache_axi_araddr;
+    wire [ 3:0] dcache_axi_arid;
+    wire [ 7:0] dcache_axi_arlen;
+    wire [ 2:0] dcache_axi_arsize;
+    wire [ 1:0] dcache_axi_arburst;
+    wire        axi_dcache_rvalid;
+    wire        dcache_axi_rready;
+    wire [31:0] axi_dcache_rdata;
+    wire [ 3:0] axi_dcache_rid;
+    wire        axi_dcache_rlast;
+    wire [ 1:0] axi_dcache_rresp;
+
+    wire        dcache_axi_awvalid;
+    wire        axi_dcache_awready;
+    wire [31:0] dcache_axi_awaddr;
+    wire [ 3:0] dcache_axi_awid;
+    wire [ 7:0] dcache_axi_awlen;
+    wire [ 2:0] dcache_axi_awsize;
+    wire [ 1:0] dcache_axi_awburst;
+    wire        dcache_axi_wvalid;
+    wire        axi_dcache_wready;
+    wire [31:0] dcache_axi_wdata;
+    wire [ 3:0] dcache_axi_wstrb;
+    wire        dcache_axi_wlast;
+
+    wire        axi_dcache_bvalid;
+    wire        dcache_axi_bready;
+    wire [ 1:0] axi_dcache_bresp;
+    wire [ 3:0] axi_dcache_bid;
+`endif
+
+
     ysyx_25010030_CLINT clint (
         .clk    (clock        ),
         .reset  (reset        ),
@@ -318,6 +363,38 @@ module ysyx_25010030 (
         .ifu_rlast        (axi_if_rlast     ),
         .ifu_rid          (axi_if_rid       ),
 
+`ifdef DCACHE
+        .lsu_awready      (axi_dcache_awready  ),
+        .lsu_awvalid      (dcache_axi_awvalid  ),
+        .lsu_awaddr       (dcache_axi_awaddr   ),
+        .lsu_awid         (dcache_axi_awid     ),
+        .lsu_awlen        (dcache_axi_awlen    ),
+        .lsu_awsize       (dcache_axi_awsize   ),
+        .lsu_awburst      (dcache_axi_awburst  ),
+        .lsu_wready       (axi_dcache_wready   ),
+        .lsu_wvalid       (dcache_axi_wvalid   ),
+        .lsu_wdata        (dcache_axi_wdata    ),
+        .lsu_wstrb        (dcache_axi_wstrb    ),
+        .lsu_wlast        (dcache_axi_wlast    ),
+        .lsu_bready       (dcache_axi_bready   ),
+        .lsu_bvalid       (axi_dcache_bvalid   ),
+        .lsu_bresp        (axi_dcache_bresp    ),
+        .lsu_bid          (axi_dcache_bid      ),
+
+        .lsu_arready      (axi_dcache_arready  ),
+        .lsu_arvalid      (dcache_axi_arvalid  ),
+        .lsu_araddr       (dcache_axi_araddr   ),
+        .lsu_arid         (dcache_axi_arid     ),
+        .lsu_arlen        (dcache_axi_arlen    ),
+        .lsu_arsize       (dcache_axi_arsize   ),
+        .lsu_arburst      (dcache_axi_arburst  ),
+        .lsu_rready       (dcache_axi_rready   ),
+        .lsu_rvalid       (axi_dcache_rvalid   ),
+        .lsu_rresp        (axi_dcache_rresp    ),
+        .lsu_rdata        (axi_dcache_rdata    ),
+        .lsu_rlast        (axi_dcache_rlast    ),
+        .lsu_rid          (axi_dcache_rid      ),
+`else
         // LSU master 接口（写通道）
         .lsu_awready      (axi_lsu_awready  ),
         .lsu_awvalid      (lsu_axi_awvalid  ),
@@ -350,6 +427,7 @@ module ysyx_25010030 (
         .lsu_rdata        (axi_lsu_rdata    ),
         .lsu_rlast        (axi_lsu_rlast    ),
         .lsu_rid          (axi_lsu_rid      ),
+`endif
 
         // IO master 接口（写通道）
         .io_master_awready(io_master_awready),
@@ -419,25 +497,25 @@ module ysyx_25010030 (
     );
 
     ysyx_25010030_iCache u_icache (
-        .clk            (clock         ),
-        .reset          (reset         ),
-        .is_fencei      (ex_fencei     ),
-        .addr           (next_pc       ),
-        .inst           (cache_inst    ),
-        .valid          (cache_valid   ),
-        .axi_araddr     (cache_araddr  ),
-        .axi_arvalid    (cache_arvalid ),
-        .axi_arready    (axi_if_arready),
-        .axi_arid       (cache_arid    ),  
-        .axi_arlen      (cache_arlen   ),  
-        .axi_arsize     (cache_arsize  ),  
-        .axi_arburst    (cache_arburst ),  
-        .axi_rvalid     (axi_if_rvalid ),
-        .axi_rready     (cache_rready  ),
-        .axi_rdata      (axi_if_rdata  ),
-        .axi_rresp      (axi_if_rresp  ),
-        .axi_rid        (axi_if_rid    ),  
-        .axi_rlast      (axi_if_rlast  )   
+        .clk            (clock                    ),
+        .reset          (reset                    ),
+        .is_fencei      (ex_fencei & ex_flush     ),
+        .addr           (next_pc                  ),
+        .inst           (cache_inst               ),
+        .valid          (cache_valid              ),
+        .axi_araddr     (cache_araddr             ),
+        .axi_arvalid    (cache_arvalid            ),
+        .axi_arready    (axi_if_arready           ),
+        .axi_arid       (cache_arid               ),  
+        .axi_arlen      (cache_arlen              ),  
+        .axi_arsize     (cache_arsize             ),  
+        .axi_arburst    (cache_arburst            ),  
+        .axi_rvalid     (axi_if_rvalid            ),
+        .axi_rready     (cache_rready             ),
+        .axi_rdata      (axi_if_rdata             ),
+        .axi_rresp      (axi_if_rresp             ),
+        .axi_rid        (axi_if_rid               ),  
+        .axi_rlast      (axi_if_rlast             )   
     );
 
     // IF（指令获取）模块
@@ -593,7 +671,55 @@ module ysyx_25010030 (
         .ex_lsu_process_result  (ex_lsu_process_result  )
     );
 
-    // MEM（内存访问）模块
+`ifdef DCACHE
+    ysyx_25010030_dCache u_dcache (
+        .clk                   (clock               ),
+        .rst                   (reset               ),
+        .lsu_addr              (lsu_dcache_addr     ),
+        .lsu_we                (lsu_dcache_wen      ),
+        .lsu_req               (lsu_dcache_req      ),
+        .lsu_wdata             (lsu_dcache_wdata    ),
+        .dcache_valid          (dcache_valid        ),
+        .dcache_rdata          (dcache_rdata        ),
+        .lsu_wstrb             (lsu_dcache_wstrb    ),
+        .lsu_arsize            (lsu_dcache_arsize   ),
+        .lsu_awsize            (lsu_dcache_awsize   ),
+        .is_fencei             (ex_fencei           ),
+
+        .dcache_axi_arvalid    (dcache_axi_arvalid  ),
+        .axi_dcache_arready    (axi_dcache_arready  ),
+        .dcache_axi_araddr     (dcache_axi_araddr   ),
+        .dcache_axi_arid       (dcache_axi_arid     ),
+        .dcache_axi_arlen      (dcache_axi_arlen    ),
+        .dcache_axi_arsize     (dcache_axi_arsize   ),
+        .dcache_axi_arburst    (dcache_axi_arburst  ),
+        .axi_dcache_rvalid     (axi_dcache_rvalid   ),
+        .dcache_axi_rready     (dcache_axi_rready   ),
+        .axi_dcache_rdata      (axi_dcache_rdata    ),
+        .axi_dcache_rid        (axi_dcache_rid      ),
+        .axi_dcache_rlast      (axi_dcache_rlast    ),
+        .axi_dcache_rresp      (axi_dcache_rresp    ),
+
+        .dcache_axi_awvalid    (dcache_axi_awvalid  ),
+        .axi_dcache_awready    (axi_dcache_awready  ),
+        .dcache_axi_awaddr     (dcache_axi_awaddr   ),
+        .dcache_axi_awid       (dcache_axi_awid     ),
+        .dcache_axi_awlen      (dcache_axi_awlen    ),
+        .dcache_axi_awsize     (dcache_axi_awsize   ),
+        .dcache_axi_awburst    (dcache_axi_awburst  ),
+        .dcache_axi_wvalid     (dcache_axi_wvalid   ),
+        .axi_dcache_wready     (axi_dcache_wready   ),
+        .dcache_axi_wdata      (dcache_axi_wdata    ),
+        .dcache_axi_wstrb      (dcache_axi_wstrb    ),
+        .dcache_axi_wlast      (dcache_axi_wlast    ),
+
+        .axi_dcache_bvalid     (axi_dcache_bvalid   ),
+        .dcache_axi_bready     (dcache_axi_bready   ),
+        .axi_dcache_bresp      (axi_dcache_bresp    ),
+        .axi_dcache_bid        (axi_dcache_bid      )
+    );
+`endif
+
     ysyx_25010030_LSU_AXI lsu (
         .clk                    (clock                  ),
         .rst                    (reset                  ),
@@ -635,6 +761,17 @@ module ysyx_25010030 (
         .lsu_wb_csr_ecall       (lsu_wb_csr_ecall       ),
         .lsu_wb_RegWrite        (lsu_wb_RegWrite        ),
         .lsu_wb_rd              (lsu_wb_rd              ),
+`ifdef DCACHE
+        .lsu_dcache_addr      (lsu_dcache_addr        ),
+        .lsu_dcache_wen       (lsu_dcache_wen         ),
+        .lsu_dcache_req       (lsu_dcache_req         ),
+        .lsu_dcache_wdata     (lsu_dcache_wdata       ),
+        .dcache_valid         (dcache_valid           ),
+        .dcache_rdata         (dcache_rdata           ),
+        .lsu_dcache_wstrb     (lsu_dcache_wstrb       ),
+        .lsu_dcache_arsize    (lsu_dcache_arsize      ),
+        .lsu_dcache_awsize    (lsu_dcache_awsize      ),
+`else
         .lsu_axi_arvalid        (lsu_axi_arvalid        ),
         .axi_lsu_arready        (axi_lsu_arready        ),
         .lsu_axi_araddr         (lsu_axi_araddr         ),
@@ -664,6 +801,7 @@ module ysyx_25010030 (
         .axi_lsu_bvalid         (axi_lsu_bvalid         ),
         .lsu_axi_bready         (lsu_axi_bready         ),
         .axi_lsu_bid            (axi_lsu_bid            ),
+`endif
         // .lsu_active_cycles(lsu_active_cycles),
         .lsu_wb_write_rd_data   (lsu_wb_write_rd_data   )
     );
