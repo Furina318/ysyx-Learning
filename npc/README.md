@@ -5,9 +5,11 @@
    - 特性：集成 RAS（返回地址栈）分支预测器  
    - 备注：为第九届集创赛竞业达赛道参赛代码，编写时未学习 B 阶段知识，存在数据前递路径过长、面积偏大问题，后续将优化。
 2. **适配SoC 五级流水线模块（pipeline-soc-vsrc）**  
-   - 特性：在基础五级流水线基础上，支持突发传输，可对接 SoC 系统。目前接入了iCache，正在集成分支预测器和dCache模块...
+   - 特性：在基础五级流水线基础上，支持突发传输，可对接 SoC 系统。目前接入了iCache、dCache模块（dCache模块在当前测试并不具备明显优势，故添加相关开关，如何使用参考Makefile），正在集成分支预测器...
    - 备注：已经通过iverilog四值仿真、网表仿真和一生一芯的CI流片测试
    -      同时可通过makefile完成riscv32e-ysyxsoc和riscv32e-npc之间的切换。两者共用一个cpu内核，但是riscv32e-npc接上本人自己编写的simple-SoC，主要是用于测试仿真
+   -      启用的使用可以通过键入 make ARCH=riscv32e-ysyxsoc -C ${NPC_HOME}/../am-kernels/tests/cpu-tests run nvboard=1 dcache=0 (开启nvboard，关闭dcache)
+   -      键入make ARCH=riscv32e-npc -C ${NPC_HOME}/../am-kernels/tests/cpu-tests run diff=1 (开启difftest功能，目前只能运行在npc架构)
 3. **多周期模块（mul-vsrc）**  
    - 特性：基于 AXI4-Lite 总线协议实现，适用于对时序要求较高、面积受限的场景。
    - 备注：不包含CSR指令，无法运行rtt
@@ -36,4 +38,3 @@
 ## 四、开发进度
 - 已完成模块：上述 1-7 项核心模块及辅助工具。其中适配SoC的五级流水线模块完成度最高。  
 - 开发中模块：**顺序双发射代码（order-dual-issue）**，当前仍在编写调试阶段。
--    **pipeline-soc-vsrc的dCache模块**，当前处于最后的调试测试阶段

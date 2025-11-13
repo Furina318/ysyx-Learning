@@ -156,7 +156,7 @@ module ysyx_25010030_dCache #(
                 next_state = (aw_done && w_done && b_done) ? FENCEI_DIRTY : FENCEI_WB;
 
             MISS_LOAD:
-                next_state = (axi_dcache_rvalid && dcache_axi_rready && axi_dcache_rlast) ? LOOKUP : MISS_LOAD;
+                next_state = (axi_dcache_rvalid && dcache_axi_rready && axi_dcache_rlast) ? (in_dmem ? LOOKUP : IDLE) : MISS_LOAD;
 
             FENCEI_DIRTY: begin
                 if (fencei_cnt < CACHE_LINES) begin
@@ -296,14 +296,20 @@ module ysyx_25010030_dCache #(
                     burst_cnt <= burst_cnt + 1;
                 end
                 else begin
-                    cache_data[req_index][req_offset*8 +: 32] <= axi_dcache_rdata;
+                    // cache_data[req_index][req_offset*8 +: 32] <= axi_dcache_rdata;
+                    dcache_rdata <= axi_dcache_rdata;
                 end
 
                 if (axi_dcache_rlast) begin
-                    cache_tag[req_index]   <= req_tag;
-                    cache_valid[req_index] <= 1;
-                    cache_dirty[req_index] <= 0;
-                    burst_cnt              <= 0;
+                    if (in_dmem) begin
+                        cache_tag[req_index]   <= req_tag;
+                        cache_valid[req_index] <= 1;
+                        cache_dirty[req_index] <= 0;
+                        burst_cnt              <= 0;
+                    end
+                    else begin
+                        dcache_valid <= 1;
+                    end
                 end
             end
         end
