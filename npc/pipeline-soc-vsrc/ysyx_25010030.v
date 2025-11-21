@@ -329,6 +329,13 @@ module ysyx_25010030 (
     wire [ 3:0] axi_dcache_bid;
 `endif
 
+`ifdef FPU
+    wire        id_ex_is_div;
+    wire        id_ex_is_rem;
+    wire        id_ex_is_signed;
+    wire        ex_stop;
+`endif
+
 
     ysyx_25010030_CLINT clint (
         .clk    (clock        ),
@@ -584,6 +591,12 @@ module ysyx_25010030 (
         .id_ex_jal         (id_ex_jal         ),
         .id_ex_jalr        (id_ex_jalr        ),
         .id_ex_fencei      (id_ex_fencei      ),
+`ifdef FPU
+        .id_ex_is_div      (id_ex_is_div      ),
+        .id_ex_is_rem      (id_ex_is_rem      ),
+        .id_ex_is_signed   (id_ex_is_signed   ),
+        .ex_stop           (ex_stop           ),
+`endif
         // .id_ex_csr(id_ex_csr),
         .id_ex_csr_wen1    (id_ex_csr_wen1    ),
         // .id_ex_csr_wen2(id_ex_csr_wen2),
@@ -646,6 +659,12 @@ module ysyx_25010030 (
         .id_ex_csr_op           (id_ex_csr_op           ),
         .ex_flush               (ex_flush               ),
         .ex_flush_pc            (ex_flush_pc            ),
+`ifdef FPU
+        .id_ex_is_div           (id_ex_is_div           ),
+        .id_ex_is_rem           (id_ex_is_rem           ),
+        .id_ex_is_signed        (id_ex_is_signed        ),
+        .ex_stop                (ex_stop                ),
+`endif
         // .ex_lsu_inst(ex_lsu_inst),
         // .ex_lsu_pc(ex_lsu_pc),
         .ex_lsu_src2            (ex_lsu_src2            ),

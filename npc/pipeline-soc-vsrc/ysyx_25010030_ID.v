@@ -34,7 +34,14 @@ module ysyx_25010030_ID (
 
     output reg        id_ex_jal,              
     output reg        id_ex_jalr,
-    output reg        id_ex_fencei,             
+    output reg        id_ex_fencei,    
+
+`ifdef FPU
+    output reg        id_ex_is_div,
+    output reg        id_ex_is_rem,
+    output reg        id_ex_is_signed,
+    input             ex_stop,
+`endif         
 
     // output reg        id_ex_csr,             
     output reg        id_ex_csr_wen1,         
@@ -74,6 +81,34 @@ module ysyx_25010030_ID (
     wire [31:0] immCSR = {27'b0, if_id_inst[19:15]};
 
     // reg [31:0] inst_type;
+`ifdef FPU
+    wire [6:0] func7  = if_id_inst[31:25];
+    wire       is_div = (get_opcode == `INST_TYPE_R) && (func7 == 7'b0000001) && (func3[2]);
+    wire       is_rem = is_div && (func3[1]);
+    wire       is_signed = is_div && (!func3[0]);
+
+    always @(*) begin
+        if(reset) begin
+            id_ready = 1'b0;
+        end
+        else begin
+            id_ready = (ex_ready || ~id_valid) && ~ex_flush && ~ex_stop;
+        end
+    end
+
+        always @(posedge clk) begin
+        if (reset) begin
+            id_valid <= 1'b0;
+        end
+        else if ((if_valid && id_ready) && (ex_ready || ~id_valid)) begin
+            id_valid <= 1'b1;
+        end
+        else if ((~(if_valid && id_ready)) && ex_ready) begin
+            id_valid <= 1'b0;
+        end
+    end
+
+`else
 
     // 握手逻辑
     always @(*) begin
@@ -96,6 +131,7 @@ module ysyx_25010030_ID (
             id_valid <= 1'b0;
         end
     end
+`endif
 
     // 译码逻辑和输出信号赋值
     always @(posedge clk) begin
@@ -114,6 +150,11 @@ module ysyx_25010030_ID (
             // id_ex_csr_wen2  <= 1'b0;
             id_ex_csr_ecall <= 1'b0;
             id_ex_csr_mret  <= 1'b0;
+`ifdef FPU
+            id_ex_is_div    <= 1'b0;
+            id_ex_is_rem    <= 1'b0;
+            id_ex_is_signed <= 1'b0;
+`endif
             
             id_ex_rd    <= 4'b0;
             id_wb_rs1   <= 4'b0;
@@ -164,6 +205,11 @@ module ysyx_25010030_ID (
             id_ex_jal       <= 1'b0;
             id_ex_jalr      <= 1'b0;
             id_ex_fencei    <= (if_id_inst == FENCEI);
+`ifdef FPU
+            id_ex_is_div    <= is_div;
+            id_ex_is_rem    <= is_rem;
+            id_ex_is_signed <= is_signed;
+`endif
 
             id_ex_csr_wr_addr1 <= 12'b0;
             // id_ex_csr_wr_addr2 <= 12'b0;
@@ -204,7 +250,9 @@ module ysyx_25010030_ID (
                         `F3_SW: id_ex_MemLen <= `Mem_Word;
                         `F3_SH: id_ex_MemLen <= `Mem_Half;
                         `F3_SB: id_ex_MemLen <= `Mem_Bit;
-                        default: begin end
+                        default: begin 
+                            $display("[ID]: Unknown inst with func3=%b in S-type", func3);
+                        end
                     endcase
                     // inst_type <= 5;
                 end
@@ -219,7 +267,9 @@ module ysyx_25010030_ID (
                         `F3_LB:  id_ex_MemLen <= `Mem_Bit;
                         `F3_LHU: id_ex_MemLen <= `Mem_UHalf;
                         `F3_LBU: id_ex_MemLen <= `Mem_UBit;
-                        default: begin end
+                        default: begin 
+                            $display("[ID]: Unknown inst with func3=%b in L-type", func3);
+                        end
                     endcase
                     // inst_type <= 3;
                 end
@@ -235,7 +285,9 @@ module ysyx_25010030_ID (
                         `F3_SLT:  id_ex_alu_op <= `ALU_SLT;
                         `F3_RSH:  id_ex_alu_op <= (func7_5) ? `ALU_SRA : `ALU_SRL;
                         `F3_LSH:  id_ex_alu_op <= `ALU_SLL;
-                        default: begin end
+                        default: begin 
+                            $display("[ID]: Unknown inst with func3=%b in R-type", func3);
+                        end
                     endcase
                     // inst_type <= 0;/
                 end
@@ -251,7 +303,9 @@ module ysyx_25010030_ID (
                         `F3_XORI: id_ex_alu_op <= `ALU_XOR;
                         `F3_RSH:  id_ex_alu_op <= (func7_5) ? `ALU_SRA : `ALU_SRL;
                         `F3_LSH:  id_ex_alu_op <= `ALU_SLL;
-                        default: begin end
+                        default: begin 
+                            $display("[ID]: Unknown inst with func3=%b in I-type", func3);
+                        end
                     endcase
                     // inst_type <=1;
                 end
@@ -261,7 +315,9 @@ module ysyx_25010030_ID (
                         `F3_BEQ, `F3_BNE:   id_ex_alu_op <= `ALU_SUB;
                         `F3_BLT, `F3_BGE:   id_ex_alu_op <= `ALU_SLT;
                         `F3_BLTU, `F3_BGEU: id_ex_alu_op <= `ALU_SLTU;
-                        default: begin end
+                        default: begin 
+                            $display("[ID]: Unknown inst with func3=%b in B-type", func3);
+                        end
                     endcase
                     // inst_type <= 4;
                 end

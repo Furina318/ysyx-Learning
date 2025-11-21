@@ -19,8 +19,8 @@
 #include <locale.h>
 #include <memory/paddr.h>
 #include <common.h>
-#include "/home/furina/ysyx-workbench/nemu/src/monitor/sdb/watchpoint.h"
-#include "/home/furina/ysyx-workbench/nemu/src/monitor/sdb/sdb.h"
+#include "../monitor/sdb/watchpoint.h"
+#include "../monitor/sdb/sdb.h"
 
 /* The assembly code of instructions executed is only output to the screen
  * when the number of instructions executed is less than this value.

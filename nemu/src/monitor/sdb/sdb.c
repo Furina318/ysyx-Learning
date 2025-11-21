@@ -205,8 +205,8 @@ static int cmd_ext(){
   uint32_t fail_count=0;
   bool success=true;
 
-  char *filename = "/home/furina/ysyx-workbench/nemu/tools/gen-expr/build/input";
-  char *error_filename = "/home/furina/ysyx-workbench/nemu/tools/gen-expr/build/error_expr";
+  char *filename = "../../../tools/gen-expr/build/input";
+  char *error_filename = "../../../tools/gen-expr/build/error_expr";
 
   file = fopen(filename, "r");
   assert(file!=NULL);

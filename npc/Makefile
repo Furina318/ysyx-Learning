@@ -130,8 +130,13 @@ VERILATOR_FLAGS += --build -Mdir $(OBJ_DIR)
 VERILATOR_FLAGS += -I$(NPC_HOME)/pipeline-soc-vsrc #可修改
 
 dcache ?= 0
+fpu ?= 0
 ifeq ($(dcache), 1)
 VERILATOR_FLAGS += -DDCACHE
+endif
+ifeq ($(fpu), 1)
+VERILATOR_FLAGS += -DFPU
+CXXFLAGS += -DFPU
 endif
 
 ifeq ($(diff), 1)
@@ -155,7 +160,7 @@ LIBS += -lSDL2_image
 LDFLAGS += $(LIBS)
 
 ifeq ($(diff), 1)
-DIFF_REF_PATH = /home/furina/ysyx-workbench/nemu/build
+DIFF_REF_PATH = $(NEMU_HOME)/build
 DIFF_REF_SO = $(DIFF_REF_PATH)/riscv32-nemu-interpreter-so
 ARGS_DIFF = --diff=$(DIFF_REF_SO)
 endif

@@ -55,6 +55,12 @@ module ysyx_25010030_EX (
     output reg        ex_flush,
     output reg [31:0] ex_flush_pc,
     output reg        ex_fencei,
+`ifdef FPU
+    input             id_ex_is_div,
+    input             id_ex_is_rem,
+    input             id_ex_is_signed,
+    output reg        ex_stop,
+`endif
 
     // output reg [31:0] ex_lsu_inst,
     // output reg [31:0] ex_lsu_pc,
@@ -192,6 +198,38 @@ module ysyx_25010030_EX (
         alu_less = process_result[0];
     end
 
+`ifdef FPU
+    reg         div_start;  
+    reg         div_computing;  
+    wire [31:0] div_quotient;  // 从divider输出的商
+    wire [31:0] div_remainder;  // 从divider输出的余数
+    wire        div_valid;  
+
+    always @(posedge clk) begin
+        if (reset) begin
+            div_start     <= 1'b0;
+            div_computing <= 1'b0;
+            ex_stop       <= 1'b0;
+        end else begin
+            div_start     <= (id_valid && ex_ready && id_ex_is_div && !div_computing); 
+            div_computing <= (id_valid && ex_ready && id_ex_is_div) || (div_computing && !div_valid); 
+            ex_stop       <= div_computing;  
+        end
+    end
+
+    ysyx_25010030_divider u_divider (
+        .clk      (clk & (div_start | div_computing | reset)),   // 除法器时钟，在开始除法运算时启动
+        .reset    (reset                                    ),
+        .start    (div_start                                ),
+        .dividend (src1                                     ),   // 被除数
+        .divisor  (src2                                     ),   // 除数
+        .is_signed(id_ex_is_signed                          ),
+        .quotient (div_quotient                             ),   // 商
+        .remainder(div_remainder                            ),   // 余数
+        .valid    (div_valid                                )
+    );
+`endif
+
     // 分支和跳转逻辑
     // reg [31:0] jal_target;
     reg [31:0] fencei_target;
@@ -323,6 +361,28 @@ module ysyx_25010030_EX (
     assign load_use_flag[0] = use_flag2 & (ex_lsu_rd == id_wb_rs2);
 
     // 流水线控制
+`ifdef FPU
+    always @(*) begin
+        if(reset) begin
+            ex_ready = 1'b0;
+        end
+        else begin
+            ex_ready = (lsu_ready || ~ex_lsu_valid) && (load_use_flag == 4'b0) && (!div_computing || div_valid);
+        end
+    end
+
+    always @(posedge clk) begin
+        if (reset) begin
+            ex_lsu_valid <= 1'b0;
+        end
+        else if (((id_valid && ex_ready && !id_ex_is_div) || (div_valid))&& (lsu_ready || ~ex_lsu_valid)) begin
+            ex_lsu_valid <= 1'b1;
+        end
+        else if (~(id_valid && ex_ready) && lsu_ready) begin
+            ex_lsu_valid <= 1'b0;
+        end
+    end
+`else
     always @(*) begin
         if(reset) begin
             ex_ready = 1'b0;
@@ -343,6 +403,7 @@ module ysyx_25010030_EX (
             ex_lsu_valid <= 1'b0;
         end
     end
+`endif
 
     // 输出信号赋值
     always @(posedge clk) begin
@@ -374,7 +435,11 @@ module ysyx_25010030_EX (
             ex_lsu_MemRead        <= id_ex_MemRead;
             ex_lsu_MemWrite       <= id_ex_MemWrite;
             ex_lsu_MemLen         <= id_ex_MemLen;
+`ifdef FPU
+            ex_lsu_process_result <= (div_valid ? (id_ex_is_rem ? div_remainder : div_quotient) : process_result);
+`else
             ex_lsu_process_result <= process_result;
+`endif
             ex_lsu_forward_las    <= forward_las;
             ex_lsu_csr            <= (id_ex_csr_wen1 | id_ex_csr_ecall | id_ex_csr_mret);
             ex_lsu_csr_wen1       <= id_ex_csr_wen1;

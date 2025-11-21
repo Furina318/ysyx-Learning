@@ -10,13 +10,13 @@ AM_SRCS := riscv/ysyxsoc/start.S \
            platform/dummy/vme.c \
            platform/dummy/mpe.c
 
-CFLAGS    += -fdata-sections -ffunction-sections
+CFLAGS    += -fdata-sections -ffunction-sections #每个函数（function-sections）和全局变量（data-sections）单独编译到一个目标文件段（section）中
 CFLAGS    += -I$(AM_HOME)/am/src/riscv/ysyxsoc/include
 LDSCRIPTS += $(AM_HOME)/scripts/linker-ysyxsoc.ld
 # LDFLAGS   += --defsym=_pmem_start=0x20000000 --defsym=_entry_offset=0x0
 # LDFLAGS   += --defsym=_rom_start=0x20000000 --defsym=_sram_start=0x0f000000 --defsym=_stack_size=0x1000
 LDFLAGS   += --defsym=_stack_size=2K --defsym=_entry_offset=0x0
-LDFLAGS   += --gc-sections -e _start
+LDFLAGS   += --gc-sections -e _start #配合前面 CFLAGS 的 -fdata-sections，剔除未使用的函数 / 变量，减小镜像体积; 同时指定程序入口为 _start
 NPCFLAGS += -l $(shell dirname $(IMAGE).elf)/ysyxsoc-log.txt
 NPCFLAGS += -e $(IMAGE).elf
 NPCFLAGS += -b
