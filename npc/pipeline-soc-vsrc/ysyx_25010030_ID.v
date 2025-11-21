@@ -250,9 +250,7 @@ module ysyx_25010030_ID (
                         `F3_SW: id_ex_MemLen <= `Mem_Word;
                         `F3_SH: id_ex_MemLen <= `Mem_Half;
                         `F3_SB: id_ex_MemLen <= `Mem_Bit;
-                        default: begin 
-                            $display("[ID]: Unknown inst with func3=%b in S-type", func3);
-                        end
+                        default: begin end
                     endcase
                     // inst_type <= 5;
                 end
@@ -267,9 +265,7 @@ module ysyx_25010030_ID (
                         `F3_LB:  id_ex_MemLen <= `Mem_Bit;
                         `F3_LHU: id_ex_MemLen <= `Mem_UHalf;
                         `F3_LBU: id_ex_MemLen <= `Mem_UBit;
-                        default: begin 
-                            $display("[ID]: Unknown inst with func3=%b in L-type", func3);
-                        end
+                        default: begin end
                     endcase
                     // inst_type <= 3;
                 end
@@ -285,9 +281,7 @@ module ysyx_25010030_ID (
                         `F3_SLT:  id_ex_alu_op <= `ALU_SLT;
                         `F3_RSH:  id_ex_alu_op <= (func7_5) ? `ALU_SRA : `ALU_SRL;
                         `F3_LSH:  id_ex_alu_op <= `ALU_SLL;
-                        default: begin 
-                            $display("[ID]: Unknown inst with func3=%b in R-type", func3);
-                        end
+                        default: begin end
                     endcase
                     // inst_type <= 0;/
                 end
@@ -303,9 +297,7 @@ module ysyx_25010030_ID (
                         `F3_XORI: id_ex_alu_op <= `ALU_XOR;
                         `F3_RSH:  id_ex_alu_op <= (func7_5) ? `ALU_SRA : `ALU_SRL;
                         `F3_LSH:  id_ex_alu_op <= `ALU_SLL;
-                        default: begin 
-                            $display("[ID]: Unknown inst with func3=%b in I-type", func3);
-                        end
+                        default: begin end
                     endcase
                     // inst_type <=1;
                 end
@@ -315,9 +307,7 @@ module ysyx_25010030_ID (
                         `F3_BEQ, `F3_BNE:   id_ex_alu_op <= `ALU_SUB;
                         `F3_BLT, `F3_BGE:   id_ex_alu_op <= `ALU_SLT;
                         `F3_BLTU, `F3_BGEU: id_ex_alu_op <= `ALU_SLTU;
-                        default: begin 
-                            $display("[ID]: Unknown inst with func3=%b in B-type", func3);
-                        end
+                        default: begin end
                     endcase
                     // inst_type <= 4;
                 end
