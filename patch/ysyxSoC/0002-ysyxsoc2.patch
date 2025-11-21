@@ -1,7 +1,7 @@
 From 9929b1625b7efaf6d992b7cbfcb0f7e093093672 Mon Sep 17 00:00:00 2001
 From: Furina318 <1145676148@qq.com>
 Date: Sat, 20 Sep 2025 16:49:24 +0800
-Subject: [PATCH 2/7] ysyxsoc2
+Subject: [PATCH 2/8] ysyxsoc2
 
 ---
  .metals/metals.lock.db           |   6 +++---

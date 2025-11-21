@@ -1,7 +1,7 @@
 From 43a38a1ef060cbc01a3a06647ed55666e43562d6 Mon Sep 17 00:00:00 2001
 From: Furina318 <1145676148@qq.com>
 Date: Sun, 28 Sep 2025 16:12:00 +0800
-Subject: [PATCH 5/7] fix gitignore
+Subject: [PATCH 5/8] fix gitignore
 
 ---
  .gitignore             |    1 -
