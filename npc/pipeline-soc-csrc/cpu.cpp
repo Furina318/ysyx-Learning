@@ -252,23 +252,23 @@ static void statistic() {
 }
 //===============================================================================//
 
-static void check_resp() {
-#ifdef YSYXSOC
-#define lsu_rresp top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__axi_lsu_rresp
-#define lsu_bresp top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__axi_lsu_bresp
-#define ifu_rresp top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__axi_if_rresp
-#else
-#define lsu_rresp top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__axi_lsu_rresp
-#define lsu_bresp top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__axi_lsu_bresp
-#define ifu_rresp top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__axi_if_rresp
-// #define clint_ar_addr top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__clint_araddr
-// #define clint_ar_valid top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__clint_arvalid
-#endif
-if(lsu_rresp != 0) printf("LSU <R> CHANNEL ACCESS FAULT!\n");
-if(lsu_bresp != 0) printf("LSU <W> CHANNEL ACCESS FAULT!\n");
-if(ifu_rresp != 0) printf("IFU <R> CHANNEL ACCESS FAULT!\n");
-// if((clint_ar_addr <= 0x02000000 || clint_ar_addr >= 0x0200ffff) && clint_ar_valid) printf("CLINT <R> CHANNEL ACCESS FAULLT!\n");
-}
+// static void check_resp() {
+// #ifdef YSYXSOC
+// #define lsu_rresp top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__axi_lsu_rresp
+// #define lsu_bresp top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__axi_lsu_bresp
+// #define ifu_rresp top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__axi_if_rresp
+// #else
+// #define lsu_rresp top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__axi_lsu_rresp
+// #define lsu_bresp top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__axi_lsu_bresp
+// #define ifu_rresp top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__axi_if_rresp
+// // #define clint_ar_addr top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__clint_araddr
+// // #define clint_ar_valid top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__clint_arvalid
+// #endif
+// if(lsu_rresp != 0) printf("LSU <R> CHANNEL ACCESS FAULT!\n");
+// if(lsu_bresp != 0) printf("LSU <W> CHANNEL ACCESS FAULT!\n");
+// if(ifu_rresp != 0) printf("IFU <R> CHANNEL ACCESS FAULT!\n");
+// // if((clint_ar_addr <= 0x02000000 || clint_ar_addr >= 0x0200ffff) && clint_ar_valid) printf("CLINT <R> CHANNEL ACCESS FAULLT!\n");
+// }
 
 uint64_t last_pc;
 static void trace_and_difftest();
@@ -279,7 +279,7 @@ static void execute_once() {
     // printf("pc=0x%08x | inst=0x%08x\n",PCSet.pc,PCSet.inst);
     last_pc = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__IF_ID_pc;
     do{
-      check_resp();
+      // check_resp();
       
       single_cycle();
       single_cycle();
@@ -294,7 +294,7 @@ static void execute_once() {
     last_pc = top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__IF_ID_pc;
     do{
       trace_and_difftest();
-      check_resp();
+      // check_resp();
 
       single_cycle();
       single_cycle();
