@@ -24,15 +24,15 @@ module ysyx_25010030_CLINT(
 
     localparam IDLE         = 1'b0;
     localparam BUSY         = 1'b1;
-    reg          state, next_state;
+    reg state, next_state;
 
     always @(posedge clk) begin
         if (reset) begin
-            state <= IDLE;   
+            state   <= IDLE;   
             arready <= 1'b1;
-            rvalid <= 1'b0;
-            mtimel <= 32'h0;
-            mtimeh <= 32'h0;
+            rvalid  <= 1'b0;
+            mtimel  <= 32'h0;
+            mtimeh  <= 32'h0;
         end else begin
             state <= next_state;
             if (mtimel == 32'hFFFFFFFF) begin
@@ -44,7 +44,7 @@ module ysyx_25010030_CLINT(
             case (state)
                 IDLE: begin
                     rvalid <= 1'b0;
-                    rlast <= 1'b0;
+                    rlast  <= 1'b0;
                     if (arvalid & arready) begin
                         arready <= 1'b0;
                     end
@@ -52,12 +52,12 @@ module ysyx_25010030_CLINT(
                 
                 BUSY: begin
                     arready <= 1'b1;
-                    rdata <= (clint_offset == 4'h0) ? mtimel :
-                             (clint_offset == 4'h4) ? mtimeh :
-                             32'b0;
-                    rvalid <= 1'b1;
-                    rlast <= 1'b1;
-                    rresp <= 2'b00;
+                    rdata   <= (clint_offset == 4'h0) ? mtimel :
+                               (clint_offset == 4'h4) ? mtimeh :
+                               32'b0;
+                    rvalid  <= 1'b1;
+                    rlast   <= 1'b1;
+                    rresp   <= 2'b00;
                 end
             endcase
         end
@@ -65,8 +65,8 @@ module ysyx_25010030_CLINT(
 
     always @(*) begin
         case (state)
-            IDLE: next_state = (arvalid) ? BUSY : IDLE;      
-            BUSY: next_state = (rready & rlast) ? IDLE : BUSY; 
+            IDLE:    next_state = (arvalid) ? BUSY : IDLE;      
+            BUSY:    next_state = (rready & rlast) ? IDLE : BUSY; 
             default: next_state = IDLE;
         endcase
     end

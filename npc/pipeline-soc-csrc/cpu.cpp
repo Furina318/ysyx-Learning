@@ -143,8 +143,8 @@ const char *get_func_name(vaddr_t addr){
 static void ftrace_handle() {
     // 获取当前流水线级信号
     #ifdef YSYXSOC
-    uint32_t pc = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__id_ex_pc;
-    uint32_t instr = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__id_ex_inst;
+    uint32_t pc = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__IF_ID_pc;
+    uint32_t instr = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__IF_ID_inst;
     uint32_t opcode = instr & 0x7F;
     uint32_t target = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__ex_flush_pc;
     #else
