@@ -9,9 +9,20 @@
 # define Elf_Phdr Elf32_Phdr
 #endif
 
+extern size_t ramdisk_read(void *buf, size_t offset, size_t len);
+
 static uintptr_t loader(PCB *pcb, const char *filename) {
-  TODO();
-  return 0;
+  Elf_Ehdr ehdr;
+  ramdisk_read(&ehdr, 0, sizeof(ehdr));                                                            //从ramdisk读取elf头部信息
+  Elf_Phdr phdr[ehdr.e_phnum];                                                                     //创建用于存储elf文件的程序头表信息
+  ramdisk_read(phdr, ehdr.e_ehsize, ehdr.e_phnum * sizeof(Elf_Phdr));
+  for (int i = 0; i < ehdr.e_phnum; i ++) {
+    if (phdr[i].p_type == PT_LOAD) {                                                               //检查程序头表的类型是否为可加载段
+      ramdisk_read((void *)phdr[i].p_vaddr, phdr[i].p_offset, phdr[i].p_memsz);
+      memset((void *)(phdr[i].p_vaddr + phdr[i].p_filesz), 0, phdr[i].p_memsz - phdr[i].p_filesz); //将未初始化的bss段清零
+    }
+  }
+  return ehdr.e_entry;  //返回程序入口地址，用于加载并准备执行的程序入口点
 }
 
 void naive_uload(PCB *pcb, const char *filename) {
