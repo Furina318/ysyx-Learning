@@ -244,7 +244,7 @@ module ysyx_25010030_EX (
 `endif
 
     // 分支和跳转逻辑
-    // reg [31:0] jal_target;
+    reg [31:0] jal_target;
     reg [31:0] fencei_target;
     reg [31:0] jalr_target;
     reg        take_branch;
@@ -262,6 +262,8 @@ module ysyx_25010030_EX (
 `ifdef BPU
     always @(*) begin
         fencei_target = id_ex_pc + 32'h4;
+        ex_fencei   = id_ex_fencei;
+        jal_target  = id_ex_pc + id_ex_imm;
         jalr_target = (src1 + id_ex_imm) & 32'hfffffffe;
         take_branch = (id_ex_opcode == `INST_B) && (
                       (id_ex_func3  == `F3_BNE  && !alu_zero) ||  // bne
@@ -270,15 +272,15 @@ module ysyx_25010030_EX (
                       (!alu_less && (id_ex_func3 == `F3_BGE || id_ex_func3 == `F3_BGEU))    // bge/bgeu 
         );
         case(1'b1)
-            // id_ex_jal: begin
-            //     ex_bpu_update  = 1'b1;
-            //     ex_bpu_pc      = id_ex_pc;
-            //     ex_bpu_taken   = 1'b1;
-            //     ex_bpu_target  = id_ex_pc + id_ex_imm;
-            //     ex_bpu_correct = (id_ex_predict_taken && (id_ex_predict_target == (id_ex_pc + id_ex_imm)));
-            //     ex_flush       = !ex_bpu_correct & ex_flush_condition & (~|load_use_flag);
-            //     ex_flush_pc    = id_ex_pc + id_ex_imm;
-            // end
+            id_ex_jal: begin
+                ex_bpu_update  = 1'b1;
+                ex_bpu_pc      = id_ex_pc;
+                ex_bpu_taken   = 1'b1;
+                ex_bpu_target  = jal_target;
+                ex_bpu_correct = (id_ex_predict_taken && (id_ex_predict_target == jal_target));
+                ex_flush       = !ex_bpu_correct & ex_flush_condition & (~|load_use_flag);
+                ex_flush_pc    = jal_target;
+            end
             id_ex_fencei: begin
                 ex_flush_pc = fencei_target;
                 ex_flush    = 1'b1 & ex_flush_condition & (~|load_use_flag);

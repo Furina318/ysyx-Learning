@@ -123,8 +123,7 @@ module ysyx_25010030_IF_AXI (
                             IF_ID_pc   <= (flush_once) ? IF_ID_pc : next_pc;
                             IF_valid   <= (flush_once) ? 0 : 1;
                         `ifdef BPU
-                            next_pc    <= (flush_once) ? next_pc : (is_jal) ? jal_target :
-                                          (predict_taken & (predict_target != 32'h0)) ? predict_target : next_pc + 4;
+                            next_pc    <= (flush_once) ? next_pc : (predict_taken & (predict_target != 32'h0)) ? predict_target : next_pc + 4;
                                         //   (predict_taken && (is_branch || is_jalr)) ? predict_target : next_pc + 4;
                         `else
                             next_pc    <= (flush_once) ? next_pc : (is_jal) ? jal_target : next_pc + 4;

@@ -5,7 +5,7 @@
    - 特性：集成 RAS（返回地址栈）分支预测器  
    - 备注：为第九届集创赛竞业达赛道参赛代码，编写时未学习 B 阶段知识，存在数据前递路径过长、面积偏大问题，后续将优化。
 2. **适配SoC 五级流水线模块（pipeline-soc-vsrc）**  
-   - 特性：在基础五级流水线基础上，支持突发传输，可对接 SoC 系统。目前接入了iCache、dCache模块（dCache模块在当前测试并不具备明显优势，故添加相关开关，如何使用参考Makefile）和BPU分支预测器（microbench测试中有一个FAIL且不能与dcache双开，正在调试；目前测试分支预测率可达90以上），目前正在集成运算器oper(浮点运算单元、除法器、乘法器)...
+   - 特性：在基础五级流水线基础上，支持突发传输，可对接 SoC 系统。目前接入了iCache、dCache模块（dCache模块在当前测试并不具备明显优势，故添加相关开关，如何使用参考Makefile）和可控防递归的结合RAS和BTB的分支预测器，目前正在集成运算器oper(浮点运算单元、除法器、乘法器)...
    - 备注：已经通过iverilog四值仿真、网表仿真和一生一芯的CI流片测试
    -      同时可通过makefile完成riscv32e-ysyxsoc和riscv32e-npc之间的切换。两者共用一个cpu内核，但是riscv32e-npc接上本人自己编写的simple-SoC，主要是用于测试仿真
    -      启用的使用可以通过键入 make ARCH=riscv32e-ysyxsoc -C ${NPC_HOME}/../am-kernels/tests/cpu-tests run nvboard=1 dcache=0 (开启nvboard，关闭dcache)
@@ -27,7 +27,7 @@
 
 
 ## 二、辅助工具
-- **logo_creat.py**：ASCII 艺术字转数组工具，可生成自定义数组用于 NPC（Next Program Counter）的欢迎界面显示。
+- **logo_creat.py**：ASCII 艺术字转数组工具，可生成自定义数组用于 NPC 的logo欢迎界面显示。
 - **run_test.sh**: 一键自动测试脚本，用于提高测试效率，收集报错的信息等功能。目前仍在完善中...
 
 
