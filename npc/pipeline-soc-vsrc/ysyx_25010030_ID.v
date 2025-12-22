@@ -41,7 +41,14 @@ module ysyx_25010030_ID (
     output reg        id_ex_is_rem,
     output reg        id_ex_is_signed,
     input             ex_stop,
-`endif         
+`endif   
+
+`ifdef BPU
+    input             predict_taken,
+    input      [31:0] predict_target,
+    output reg        id_ex_predict_taken,
+    output reg [31:0] id_ex_predict_target,
+`endif
 
     // output reg        id_ex_csr,             
     output reg        id_ex_csr_wen1,         
@@ -133,6 +140,21 @@ module ysyx_25010030_ID (
     end
 `endif
 
+`ifdef BPU
+    reg        id_ex_predict_taken_reg;
+    reg [31:0] id_ex_predict_target_reg;
+    always @(posedge clk) begin
+        if (reset) begin
+            id_ex_predict_taken_reg  <= 1'b0;
+            id_ex_predict_target_reg <= 32'b0;
+        end
+        else if (id_ready) begin
+            id_ex_predict_taken_reg  <= predict_taken;
+            id_ex_predict_target_reg <= predict_target;
+        end
+    end
+`endif
+
     // 译码逻辑和输出信号赋值
     always @(posedge clk) begin
         if (reset) begin
@@ -150,11 +172,17 @@ module ysyx_25010030_ID (
             // id_ex_csr_wen2  <= 1'b0;
             id_ex_csr_ecall <= 1'b0;
             id_ex_csr_mret  <= 1'b0;
-`ifdef FPU
+
+        `ifdef FPU
             id_ex_is_div    <= 1'b0;
             id_ex_is_rem    <= 1'b0;
             id_ex_is_signed <= 1'b0;
-`endif
+        `endif
+
+        `ifdef BPU
+            id_ex_predict_taken  <= 1'b0;
+            id_ex_predict_target <= 32'b0;
+        `endif
             
             id_ex_rd    <= 4'b0;
             id_wb_rs1   <= 4'b0;
@@ -205,11 +233,20 @@ module ysyx_25010030_ID (
             id_ex_jal       <= 1'b0;
             id_ex_jalr      <= 1'b0;
             id_ex_fencei    <= (if_id_inst == FENCEI);
-`ifdef FPU
+
+        `ifdef FPU
             id_ex_is_div    <= is_div;
             id_ex_is_rem    <= is_rem;
             id_ex_is_signed <= is_signed;
-`endif
+        `endif
+
+        `ifdef BPU
+            // id_ex_predict_taken_reg  <= predict_taken && (get_opcode == `INST_TYPE_B || (opcode == `INST_JALR && func3 == 3'b000) || opcode == `INST_JAL);
+            // id_ex_predict_taken_reg  <= predict_taken;
+            // id_ex_predict_target_reg <= predict_target;
+            id_ex_predict_taken  <= id_ex_predict_taken_reg;
+            id_ex_predict_target <= id_ex_predict_target_reg;
+        `endif
 
             id_ex_csr_wr_addr1 <= 12'b0;
             // id_ex_csr_wr_addr2 <= 12'b0;

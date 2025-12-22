@@ -3,7 +3,7 @@
 module ysyx_25010030_EX (
     input             clk,
     input             reset,
-    // input             id_ready,        // ID -> IF
+    // input             id_ready,     
     input             id_valid,
     output reg        ex_ready,
     input             lsu_ready,
@@ -55,11 +55,22 @@ module ysyx_25010030_EX (
     output reg        ex_flush,
     output reg [31:0] ex_flush_pc,
     output reg        ex_fencei,
+
 `ifdef FPU
     input             id_ex_is_div,
     input             id_ex_is_rem,
     input             id_ex_is_signed,
     output reg        ex_stop,
+`endif
+
+`ifdef BPU
+    input      [31:0] id_ex_predict_target,
+    input            id_ex_predict_taken,
+    output reg       ex_bpu_update,
+    output reg [31:0] ex_bpu_pc,
+    output reg        ex_bpu_taken,
+    output reg [31:0] ex_bpu_target,
+    output reg        ex_bpu_correct,
 `endif
 
     // output reg [31:0] ex_lsu_inst,
@@ -82,9 +93,11 @@ module ysyx_25010030_EX (
 
     output reg        ex_lsu_csr_ecall,
     output reg        ex_lsu_csr_mret,
+
 `ifdef DIFFTEST
     output reg [31:0] ex_lsu_pc,
 `endif
+
     output reg [31:0] ex_lsu_process_result
 
 );
@@ -246,6 +259,79 @@ module ysyx_25010030_EX (
     //                     (id_ex_func3 == `F3_BLTU &&  alu_less) ||  
     //                     (id_ex_func3 == `F3_BGEU && !alu_less));
 
+`ifdef BPU
+    always @(*) begin
+        fencei_target = id_ex_pc + 32'h4;
+        jalr_target = (src1 + id_ex_imm) & 32'hfffffffe;
+        take_branch = (id_ex_opcode == `INST_B) && (
+                      (id_ex_func3  == `F3_BNE  && !alu_zero) ||  // bne
+                      (id_ex_func3  == `F3_BEQ  &&  alu_zero) ||  // beq
+                      ( alu_less && (id_ex_func3 == `F3_BLT || id_ex_func3 == `F3_BLTU)) || // blt/bltu
+                      (!alu_less && (id_ex_func3 == `F3_BGE || id_ex_func3 == `F3_BGEU))    // bge/bgeu 
+        );
+        case(1'b1)
+            // id_ex_jal: begin
+            //     ex_bpu_update  = 1'b1;
+            //     ex_bpu_pc      = id_ex_pc;
+            //     ex_bpu_taken   = 1'b1;
+            //     ex_bpu_target  = id_ex_pc + id_ex_imm;
+            //     ex_bpu_correct = (id_ex_predict_taken && (id_ex_predict_target == (id_ex_pc + id_ex_imm)));
+            //     ex_flush       = !ex_bpu_correct & ex_flush_condition & (~|load_use_flag);
+            //     ex_flush_pc    = id_ex_pc + id_ex_imm;
+            // end
+            id_ex_fencei: begin
+                ex_flush_pc = fencei_target;
+                ex_flush    = 1'b1 & ex_flush_condition & (~|load_use_flag);
+            end
+            id_ex_jalr: begin
+                ex_bpu_update  = 1'b1;
+                ex_bpu_pc      = id_ex_pc;
+                ex_bpu_taken   = 1'b1;
+                ex_bpu_target  = jalr_target;
+                ex_bpu_correct = (id_ex_predict_taken && (id_ex_predict_target == jalr_target));
+                ex_flush       = !ex_bpu_correct & ex_flush_condition & (~|load_use_flag);
+                ex_flush_pc    = jalr_target;
+            end
+            id_ex_csr_ecall : begin
+                ex_flush_pc = wb_ex_csr_num1;
+                ex_flush    = 1'b1 & ex_flush_condition & (~|load_use_flag);
+            end
+            id_ex_csr_mret: begin
+                ex_flush_pc = wb_ex_csr_num2;
+                ex_flush    = 1'b1 & ex_flush_condition & (~|load_use_flag);
+            end
+            take_branch: begin
+                ex_bpu_update  = 1'b1;
+                ex_bpu_pc      = id_ex_pc;
+                ex_bpu_taken   = 1'b1;
+                ex_bpu_target  = id_ex_pc + id_ex_imm;
+                ex_bpu_correct = (id_ex_predict_taken && (id_ex_predict_target == (id_ex_pc + id_ex_imm)));
+                ex_flush       = !ex_bpu_correct & ex_flush_condition & (~|load_use_flag);
+                ex_flush_pc    = id_ex_pc + id_ex_imm;   
+            end
+            default: begin
+                if(id_ex_predict_taken) begin
+                    ex_bpu_update  = 1'b1;
+                    ex_bpu_pc      = id_ex_pc;
+                    ex_bpu_taken   = 1'b0;
+                    ex_bpu_target  = 32'h0;
+                    ex_bpu_correct = 1'b0;
+                    ex_flush       = 1'b1 & ex_flush_condition & (~|load_use_flag);
+                    ex_flush_pc    = id_ex_pc + 32'd4;
+                end
+                else begin
+                    ex_bpu_update  = 1'b0;
+                    ex_bpu_pc      = 32'h0;
+                    ex_bpu_taken   = 1'b0;
+                    ex_bpu_target  = 32'h0;
+                    ex_bpu_correct = 1'b0;
+                    ex_flush       = 1'b0;
+                    ex_flush_pc    = 32'h0;
+                end
+            end
+        endcase
+    end
+`else
     always @(*) begin
         // jal_target  = id_ex_pc + id_ex_imm;
         ex_flush    = (reset) ? 1'b0 : (ex_flush_condition & (~|load_use_flag));
@@ -286,6 +372,7 @@ module ysyx_25010030_EX (
             end
         endcase
     end
+`endif
     
     always @(posedge clk)begin
         if(reset)begin

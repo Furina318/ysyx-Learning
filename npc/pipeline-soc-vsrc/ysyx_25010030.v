@@ -336,6 +336,18 @@ module ysyx_25010030 (
     wire        ex_stop;
 `endif
 
+`ifdef BPU
+    wire        id_ex_predict_taken;
+    wire [31:0] id_ex_predict_target;
+    wire        ex_bpu_update;
+    wire [31:0] ex_bpu_pc;
+    wire        ex_bpu_taken;
+    wire [31:0] ex_bpu_target;
+    wire        ex_bpu_correct;
+    wire        predict_taken;
+    wire [31:0] predict_target;
+`endif
+
 
     ysyx_25010030_CLINT clint (
         .clk    (clock        ),
@@ -525,40 +537,51 @@ module ysyx_25010030 (
         .axi_rlast      (axi_if_rlast             )   
     );
 
+`ifdef BPU
+    ysyx_25010030_BPU bpu (
+        .clk                (clock              ),
+        .reset              (reset              ),
+        .ifu_pc             (next_pc            ),
+        .predict_taken      (predict_taken      ),
+        .predict_target     (predict_target     ),
+        .ex_bpu_update      (ex_bpu_update      ),
+        .ex_bpu_pc          (ex_bpu_pc          ),
+        .ex_bpu_taken       (ex_bpu_taken       ),
+        .ex_bpu_target      (ex_bpu_target      )
+    );
+`endif
+
     // IF（指令获取）模块
     ysyx_25010030_IF_AXI ifu (
-        .clk           (clock         ),
-        .reset         (reset         ),
-        .EX_flush      (ex_flush      ),
-        .EX_flush_pc   (ex_flush_pc   ),
-        // .ex_fencei     (ex_fencei     ),
-        .ID_ready      (id_ready      ),
-        .IF_valid      (IF_valid      ),
-        .IF_ID_pc      (IF_ID_pc      ),
-        .IF_ID_inst    (IF_ID_inst    ),
-        .if_axi_arvalid(if_axi_arvalid),
-        // .axi_if_arready(axi_if_arready),
-        .if_axi_araddr (if_axi_araddr ),
-        .if_axi_arid   (if_axi_arid   ),
-        .if_axi_arlen  (if_axi_arlen  ),
-        .if_axi_arsize (if_axi_arsize ),
-        .if_axi_arburst(if_axi_arburst),
-        // .axi_if_rdata  (axi_if_rdata  ),
-        // .axi_if_rvalid (axi_if_rvalid ),
-        .if_axi_rready (if_axi_rready ),
-        // .axi_if_rresp  (axi_if_rresp  ),
-        // .axi_if_rid    (axi_if_rid    ),
-        // .axi_if_rlast  (axi_if_rlast  )
-        .next_pc       (next_pc       ),
-        .cache_inst    (cache_inst    ),
-        .cache_valid   (cache_valid   ),
-        .cache_araddr  (cache_araddr  ),
-        .cache_arvalid (cache_arvalid ),
-        .cache_arid    (cache_arid    ),
-        .cache_arlen   (cache_arlen   ),
-        .cache_arsize  (cache_arsize  ),
-        .cache_arburst (cache_arburst ),
-        .cache_rready  (cache_rready  )
+        .clk            (clock         ),
+        .reset          (reset         ),
+        .EX_flush       (ex_flush      ),
+        .EX_flush_pc    (ex_flush_pc   ),
+        .ID_ready       (id_ready      ),
+        .IF_valid       (IF_valid      ),
+        .IF_ID_pc       (IF_ID_pc      ),
+        .IF_ID_inst     (IF_ID_inst    ),
+        .if_axi_arvalid (if_axi_arvalid),
+        .if_axi_araddr  (if_axi_araddr ),
+        .if_axi_arid    (if_axi_arid   ),
+        .if_axi_arlen   (if_axi_arlen  ),
+        .if_axi_arsize  (if_axi_arsize ),
+        .if_axi_arburst (if_axi_arburst),
+        .if_axi_rready  (if_axi_rready ),
+`ifdef BPU
+        .predict_taken  (predict_taken ),
+        .predict_target (predict_target),
+`endif
+        .next_pc        (next_pc       ),
+        .cache_inst     (cache_inst    ),
+        .cache_valid    (cache_valid   ),
+        .cache_araddr   (cache_araddr  ),
+        .cache_arvalid  (cache_arvalid ),
+        .cache_arid     (cache_arid    ),
+        .cache_arlen    (cache_arlen   ),
+        .cache_arsize   (cache_arsize  ),
+        .cache_arburst  (cache_arburst ),
+        .cache_rready   (cache_rready  )
     );
 
     // ID（指令解码）模块
@@ -596,6 +619,12 @@ module ysyx_25010030 (
         .id_ex_is_rem      (id_ex_is_rem      ),
         .id_ex_is_signed   (id_ex_is_signed   ),
         .ex_stop           (ex_stop           ),
+`endif
+`ifdef BPU
+        .id_ex_predict_taken  (id_ex_predict_taken  ),
+        .id_ex_predict_target (id_ex_predict_target ),
+        .predict_taken        (predict_taken        ),
+        .predict_target       (predict_target       ),
 `endif
         // .id_ex_csr(id_ex_csr),
         .id_ex_csr_wen1    (id_ex_csr_wen1    ),
@@ -664,6 +693,15 @@ module ysyx_25010030 (
         .id_ex_is_rem           (id_ex_is_rem           ),
         .id_ex_is_signed        (id_ex_is_signed        ),
         .ex_stop                (ex_stop                ),
+`endif
+`ifdef BPU
+        .id_ex_predict_taken    (id_ex_predict_taken    ),
+        .id_ex_predict_target   (id_ex_predict_target   ),
+        .ex_bpu_update          (ex_bpu_update          ),
+        .ex_bpu_pc              (ex_bpu_pc              ),
+        .ex_bpu_taken           (ex_bpu_taken           ),
+        .ex_bpu_target          (ex_bpu_target          ),
+        .ex_bpu_correct         (ex_bpu_correct         ),
 `endif
         // .ex_lsu_inst(ex_lsu_inst),
         // .ex_lsu_pc(ex_lsu_pc),

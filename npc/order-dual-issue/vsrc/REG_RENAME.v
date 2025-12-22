@@ -1,10 +1,6 @@
 /* ******************
     * 寄存器重命名模块
-    * 核心功能：
-    * 1. 双指令并行重命名，支持源/目的寄存器映射
-    * 2. 空闲物理寄存器池管理（环形分配）
-    * 3. 按序提交，更新架构映射表
-    * 4. 支持刷新（flush）和精准异常处理
+
 ****************** */
 module reg_rename #(
     parameter ARCH_REG_NUM  = 16,    // 架构寄存器数量（
@@ -15,32 +11,31 @@ module reg_rename #(
     input                     clk,         
     input                     rst,         
 
-    input                     flush,        // 刷新信号（异常/分支预测错误）
-    input                     commit_en,    // 提交使能（ROB按序提交）
-    input                     stall,        // 流水线暂停（重命名级）
+    input                     flush,      
+    // input                     commit_en,    // 提交使能（ROB按序提交）
+    input                     stall,        // 流水线暂停
 
     input      [INST_WIDTH-1:0] inst1,      
-    input      [           4:0] rs1_1,       // 指令1源寄存器1
-    input      [           4:0] rs2_1,       // 指令1源寄存器2
-    input      [           4:0] rd_1,        // 指令1目的寄存器
-    input                       wen_1,       // 指令1写使能
-
+    input      [           4:0] rs1_1,       
+    input      [           4:0] rs2_1,       
+    input      [           4:0] rd_1,        
+    input                       wen_1,       
 
     input      [INST_WIDTH-1:0] inst2,       
-    input      [           4:0] rs1_2,       // 指令2源寄存器1
-    input      [           4:0] rs2_2,       // 指令2源寄存器2
-    input      [           4:0] rd_2,        // 指令2目的寄存器
-    input                       wen_2,       // 指令2写使能
+    input      [           4:0] rs1_2,      
+    input      [           4:0] rs2_2,      
+    input      [           4:0] rd_2,       
+    input                       wen_2,      
 
-    output reg [           5:0] phy_rs1_1,   // 指令1源1物理寄存器
-    output reg [           5:0] phy_rs2_1,   // 指令1源2物理寄存器
-    output reg [           5:0] phy_rd_1,    // 指令1目的物理寄存器
+    output reg [           5:0] phy_rs1_1,   
+    output reg [           5:0] phy_rs2_1,   
+    output reg [           5:0] phy_rd_1,    
 
-    output reg [           5:0] phy_rs1_2,   // 指令2源1物理寄存器
-    output reg [           5:0] phy_rs2_2,   // 指令2源2物理寄存器
-    output reg [           5:0] phy_rd_2,    // 指令2目的物理寄存器
+    output reg [           5:0] phy_rs1_2,   
+    output reg [           5:0] phy_rs2_2,   
+    output reg [           5:0] phy_rd_2,    
 
-    output reg                  rename_done, // 重命名成功（双指令均完成）
+    output reg                  rename_done, // 重命名成功
 
     // ROB交互接口（提交阶段更新映射）
     input      [          4:0] rob_arch_rd, // ROB提交的架构寄存器
@@ -75,7 +70,6 @@ always @(*) begin
     rename_done = !stall && !frp_empty && !flush;
 end
 
-// ---------------------- 初始化与复位 ----------------------
 integer i;
 always @(posedge clk) begin
     if (rst) begin
@@ -96,7 +90,6 @@ always @(posedge clk) begin
         phy_rs1_2 <= '0;  phy_rs2_2 <= '0;  phy_rd_2 <= '0;
     end else begin
         if (flush) begin
-            // ---------------------- Flush处理：恢复初始映射 ----------------------
             for (i = 0; i < ARCH_REG_NUM; i = i + 1) begin
                 arch_map[i] <= i[PHY_REG_WIDTH-1:0];
             end
@@ -125,7 +118,7 @@ always @(posedge clk) begin
             end
 
             // ========== 指令2重命名 ==========
-            // 源寄存器重命名：处理指令1和指令2的写后读冲突（指令1写→指令2读）
+            // 源寄存器重命名：处理指令1和指令2的写后读冲突(RAW)
             if (wen_1 && (rd_1 == rs1_2) && (rd_1 != 5'b0)) begin
                 phy_rs1_2 <= frp[frp_rd_ptr - 1'b1]; // 指令2读指令1刚分配的物理寄存器
             end else begin
@@ -149,12 +142,12 @@ always @(posedge clk) begin
 
             // ---------------------- ROB提交：更新架构映射表 ----------------------
             if (rob_commit && (rob_arch_rd != 5'b0)) begin
-                // 1. 释放旧的物理寄存器到空闲池
+                // 释放旧的物理寄存器到空闲池
                 frp[frp_wr_ptr] <= arch_map[rob_arch_rd];
                 phy_reg_occupy[arch_map[rob_arch_rd]] <= 1'b0;
                 frp_wr_ptr <= frp_wr_ptr + 1'b1;
 
-                // 2. 更新架构映射表为新的物理寄存器
+                // 更新架构映射表为新的物理寄存器
                 arch_map[rob_arch_rd] <= rob_phy_rd;
             end
         end

@@ -46,11 +46,13 @@ module ysyx_25010030_divider (
 
             // 除零检测
             if (divisor == 32'b0) begin
+                $dispaly("除零错误！");
                 quotient  <= 32'hFFFFFFFF;
                 remainder <= dividend;
                 valid     <= 1'b0;
             end else if (is_signed && dividend == 32'h80000000 && divisor == 32'hFFFFFFFF) begin
                 // 溢出 MIN_INT / -1
+                $dispaly("溢出错误！");
                 quotient  <= 32'h80000000;
                 remainder <= 32'b0;
                 valid     <= 1'b0;

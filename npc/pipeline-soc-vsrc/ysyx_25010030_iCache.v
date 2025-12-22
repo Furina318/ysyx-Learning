@@ -1,6 +1,7 @@
 
 module ysyx_25010030_iCache #(
-    parameter CACHE_SIZE = 32,   
+    // parameter CACHE_SIZE = 64,   
+    parameter CACHE_SIZE = 128,
     parameter BLOCK_SIZE = 16    
 )(
     input wire        clk,       

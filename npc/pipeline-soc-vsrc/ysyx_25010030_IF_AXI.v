@@ -1,5 +1,4 @@
 `include "ysyx_25010030_define.vh"
-// `include "./ysyx_25010030_iCache.v"
 
 module ysyx_25010030_IF_AXI (
     input             clk,
@@ -15,7 +14,12 @@ module ysyx_25010030_IF_AXI (
     output reg [31:0] IF_ID_pc,
     output reg [31:0] IF_ID_inst,
 
-    // AXI4-Lite 接口信号（与 SRAM 连接）
+`ifdef BPU
+    input             predict_taken,
+    input      [31:0] predict_target,
+`endif
+
+    // ========== AXI4-Lite ========== 
     output reg        if_axi_arvalid,       // 读地址有效
     // input             axi_if_arready,       // 读地址就绪
     output reg [31:0] if_axi_araddr,        // 读地址
@@ -42,10 +46,17 @@ module ysyx_25010030_IF_AXI (
 );
 
     // 状态机定义
-    reg [1:0] ifu_state;
+    reg [ 1:0] ifu_state;
     localparam IDLE       = 2'b00;
     localparam WAIT_FLUSH = 2'b01;
     localparam WAIT_CACHE = 2'b11;  // 等待缓存响应
+
+`ifdef BPU
+    localparam JALR_OPCODE   = 7'b1100111;
+    localparam BRANCH_OPCODE = 7'b1100011;
+    wire is_branch = (cache_inst[6:0] == BRANCH_OPCODE);
+    wire is_jalr   = (cache_inst[6:0] == JALR_OPCODE) && (cache_inst[14:12] == 3'b000);
+`endif
 
     // localparam FENCEI = 32'h0000100f;
     localparam JAL_OPCODE = 7'b1101111;
@@ -55,19 +66,19 @@ module ysyx_25010030_IF_AXI (
     reg once;
 
     // wire        is_fencei = (IF_ID_inst == FENCEI);
-    wire        is_jal    = (cache_inst[6:0] == JAL_OPCODE);
-    wire [31:0] immJ      = {{12{cache_inst[31]}}, cache_inst[19:12], cache_inst[20], cache_inst[30:21], 1'b0};
+    wire        is_jal     = (cache_inst[6:0] == JAL_OPCODE);
+    wire [31:0] immJ       = {{12{cache_inst[31]}}, cache_inst[19:12], cache_inst[20], cache_inst[30:21], 1'b0};
     wire [31:0] jal_target = (flush_once ? IF_ID_pc : next_pc) + immJ;
 
     // AXI信号转发（缓存 -> 外部总线）
     always @(*) begin
-            if_axi_arvalid = cache_arvalid;
-            if_axi_araddr  = cache_araddr;
-            if_axi_rready  = cache_rready;
-            if_axi_arid    = cache_arid;
-            if_axi_arlen   = cache_arlen;
-            if_axi_arsize  = cache_arsize;
-            if_axi_arburst = cache_arburst;
+        if_axi_arvalid = cache_arvalid;
+        if_axi_araddr  = cache_araddr;
+        if_axi_rready  = cache_rready;
+        if_axi_arid    = cache_arid;
+        if_axi_arlen   = cache_arlen;
+        if_axi_arsize  = cache_arsize;
+        if_axi_arburst = cache_arburst;
     end
 
     // 主控制逻辑
@@ -83,12 +94,10 @@ module ysyx_25010030_IF_AXI (
             IF_ID_inst <= 0;
             IF_valid   <= 0;
             ifu_state  <= IDLE;
-            // cache_req  <= 0;
             flush_once <= 0;
             once       <= 1;
         end
         else begin
-            // 处理冲刷信号
             if (EX_flush) begin
                 IF_valid   <= 0;
                 next_pc    <= EX_flush_pc;
@@ -98,11 +107,9 @@ module ysyx_25010030_IF_AXI (
             else begin
                 case (ifu_state)
                     IDLE: begin
-                        // 准备新的取指请求
                         if ((IF_valid && ID_ready) || flush_once || once) begin
                             once       <= 0;
                             flush_once <= 0;
-                            // cache_req  <= 1;
                             IF_valid   <= 0;
                             ifu_state  <= WAIT_FLUSH;
                         end
@@ -110,15 +117,18 @@ module ysyx_25010030_IF_AXI (
                     WAIT_FLUSH: begin
                         ifu_state <= WAIT_CACHE;
                     end
-                    WAIT_CACHE: begin
-                        // cache_req <= 0;
-                        
-                        // 缓存命中
+                    WAIT_CACHE: begin       
                         if (cache_valid) begin
                             IF_ID_inst <= cache_inst;
                             IF_ID_pc   <= (flush_once) ? IF_ID_pc : next_pc;
                             IF_valid   <= (flush_once) ? 0 : 1;
+                        `ifdef BPU
+                            next_pc    <= (flush_once) ? next_pc : (is_jal) ? jal_target :
+                                          (predict_taken & (predict_target != 32'h0)) ? predict_target : next_pc + 4;
+                                        //   (predict_taken && (is_branch || is_jalr)) ? predict_target : next_pc + 4;
+                        `else
                             next_pc    <= (flush_once) ? next_pc : (is_jal) ? jal_target : next_pc + 4;
+                        `endif
                             ifu_state  <= IDLE;
                         end
                         

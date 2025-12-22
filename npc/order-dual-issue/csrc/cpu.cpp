@@ -27,12 +27,16 @@ extern Vysyx_25010030_npc *top;
 /********extern functions or variables********/
 
 extern void single_cycle(void);
+// extern NPCState npc_state;
 extern VerilatedVcdC *tfp;
+// extern vluint64_t main_time;
 extern void die();
 extern word_t expr(char *e);
 
+// #ifdef CONFIG_ITRACE 
 extern void append_iringbuf(char *s);
 extern void display_iringbuf(void);
+// #endif
 
 #ifdef CONFIG_DIFFTEST
 extern void difftest_step(vaddr_t pc, vaddr_t npc);
@@ -41,6 +45,7 @@ extern void difftest_skip_ref();
 // extern void (*ref_difftest_regcpy)(void *dut, bool direction);
 #endif
 
+// extern vluint64_t main_time;
 int run_time = 0;
 #define start_time 10
 bool once = false;
@@ -110,7 +115,6 @@ static void statistic() {
     //        exu_done, total ? (double)exu_done / total : 0.0, exu_ratio);
     // printf("+----------------+------------+----------------------+------------+\n");
 }
-
 //===============================================================================//
 
 // static void check_resp() {
@@ -140,7 +144,6 @@ static void execute_once() {
     // printf("pc=0x%08x | inst=0x%08x\n",PCSet.pc,PCSet.inst);
     last_pc = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__IF_ID_pc;
     do{
-      trace_and_difftest();
       // check_resp();
       
       single_cycle();
@@ -198,19 +201,19 @@ static void trace_and_difftest() {
 
 #ifdef CONFIG_DIFFTEST
 #ifdef YSYXSOC
-    bool wb_valid = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__wb_valid;
-    vaddr_t diff_pc = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__wb_pc;
-    vaddr_t lsu_araddr = top->rootp->ysyxSoCFull__DOT__asic__DOT___cpu_auto_master_out_araddr;
-    vaddr_t lsu_awaddr = top->rootp->ysyxSoCFull__DOT__asic__DOT___cpu_auto_master_out_awaddr;
-    bool lsu_arvalid = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__lsu_axi_arvalid;
-    bool lsu_awvalid = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__lsu_axi_awvalid;
+    // bool wb_valid = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__wb_valid;
+    // vaddr_t diff_pc = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__wb_pc;
+    // vaddr_t lsu_araddr = top->rootp->ysyxSoCFull__DOT__asic__DOT___cpu_auto_master_out_araddr;
+    // vaddr_t lsu_awaddr = top->rootp->ysyxSoCFull__DOT__asic__DOT___cpu_auto_master_out_awaddr;
+    // bool lsu_arvalid = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__lsu_axi_arvalid;
+    // bool lsu_awvalid = top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__lsu_axi_awvalid;
 
-    if((((lsu_araddr < 0x30000000) | (lsu_araddr > 0x3fffffff)) & lsu_arvalid) & 
-       (((lsu_araddr < 0x0f000000) | (lsu_araddr > 0x0f002000)) & lsu_arvalid) & 
-       (((lsu_araddr < 0xa0000000) | (lsu_araddr > 0xbfffffff)) & lsu_arvalid)) {difftest_skip_ref();}
-    if((((lsu_awaddr < 0x30000000) | (lsu_awaddr > 0x3fffffff)) & lsu_awvalid) & 
-       (((lsu_awaddr < 0x0f000000) | (lsu_awaddr > 0x0f002000)) & lsu_awvalid) & 
-       (((lsu_awaddr < 0xa0000000) | (lsu_awaddr > 0xbfffffff)) & lsu_awvalid)) {difftest_skip_ref();}
+    // if((((lsu_araddr < 0x30000000) | (lsu_araddr > 0x3fffffff)) & lsu_arvalid) & 
+    //    (((lsu_araddr < 0x0f000000) | (lsu_araddr > 0x0f002000)) & lsu_arvalid) & 
+    //    (((lsu_araddr < 0xa0000000) | (lsu_araddr > 0xbfffffff)) & lsu_arvalid)) {difftest_skip_ref();}
+    // if((((lsu_awaddr < 0x30000000) | (lsu_awaddr > 0x3fffffff)) & lsu_awvalid) & 
+    //    (((lsu_awaddr < 0x0f000000) | (lsu_awaddr > 0x0f002000)) & lsu_awvalid) & 
+    //    (((lsu_awaddr < 0xa0000000) | (lsu_awaddr > 0xbfffffff)) & lsu_awvalid)) {difftest_skip_ref();}
 #else
     // bool if_valid = top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__IF_valid;
     bool wb_valid = top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__wb_valid;

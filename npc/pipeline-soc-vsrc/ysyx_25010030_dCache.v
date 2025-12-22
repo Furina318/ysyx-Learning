@@ -127,6 +127,8 @@ module ysyx_25010030_dCache #(
     // 当前写回使用的索引
     wire [INDEX_WIDTH-1:0] wb_index = wb_is_fencei ? fencei_index : req_index;
 
+    reg hit = (cache_valid[req_index] && cache_tag[req_index] == req_tag);// 用来检测命中，没什么具体用处
+
     always @(posedge clk) begin
         if (rst) state <= IDLE;
         else     state <= next_state;
