@@ -1,19 +1,19 @@
 
 module ysyx_25010030_CLINT(
-    input  wire         clk,
-    input  wire         reset,
+    input  wire         clk   ,
+    input  wire         reset ,
 
-    output reg          arready,
-    input  wire         arvalid,
-    input  wire [31: 0] araddr,
+    output reg          arready ,
+    input  wire         arvalid ,
+    input  wire [31: 0] araddr  ,
     // input  wire [ 3: 0] arid,
     // input  wire [ 7: 0] arlen,
     // input  wire [ 2: 0] arsize,
     // input  wire [ 1: 0] arburst,
-    input  wire         rready,
-    output reg          rvalid,
-    output reg  [ 1: 0] rresp,
-    output reg  [31: 0] rdata,
+    input  wire         rready  ,
+    output reg          rvalid  ,
+    output reg  [ 1: 0] rresp   ,
+    output reg  [31: 0] rdata   ,
     output reg          rlast
     // output reg  [ 3: 0] rid
 );
@@ -22,8 +22,8 @@ module ysyx_25010030_CLINT(
     wire [ 3: 0] clint_offset;
     assign  clint_offset = araddr[3:0];
 
-    localparam IDLE         = 1'b0;
-    localparam BUSY         = 1'b1;
+    localparam IDLE = 1'b0;
+    localparam BUSY = 1'b1;
     reg state, next_state;
 
     always @(posedge clk) begin

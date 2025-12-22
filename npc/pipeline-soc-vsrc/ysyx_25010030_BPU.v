@@ -6,16 +6,16 @@ module ysyx_25010030_BPU #(
     parameter PHT_SIZE        = 256,    // 模式历史表大小
     parameter RAS_DEPTH       = 8       // 返回地址栈深度
 )(
-    input             clk,
-    input             reset,
-    input      [31:0] ifu_pc,              // 当前取指PC
-    output reg        predict_taken,       // 预测是否跳转
-    output reg [31:0] predict_target,      // 预测目标地址
+    input             clk            ,
+    input             reset          ,
+    input      [31:0] ifu_pc         ,      // 当前取指PC
+    output reg        predict_taken  ,      // 预测是否跳转
+    output reg [31:0] predict_target ,      // 预测目标地址
 
-    input             ex_bpu_update,       // EX阶段更新信号
-    input      [31:0] ex_bpu_pc,           // EX阶段分支指令的PC
-    input             ex_bpu_taken,        // EX阶段实际跳转结果
-    input      [31:0] ex_bpu_target        // EX阶段实际目标地址
+    input             ex_bpu_update  ,       // EX阶段更新信号
+    input      [31:0] ex_bpu_pc      ,       // EX阶段分支指令的PC
+    input             ex_bpu_taken   ,       // EX阶段实际跳转结果
+    input      [31:0] ex_bpu_target          // EX阶段实际目标地址
     // === FOR STATISTICS ONLY ===
     // input             ex_bpu_correct,      // 是否预测正确
     // output reg [31:0] correct_predictions, // 正确预测次数

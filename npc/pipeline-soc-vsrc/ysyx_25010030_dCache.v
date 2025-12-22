@@ -3,8 +3,8 @@ module ysyx_25010030_dCache #(
     // fencei冲刷的时候在这个size无法完成冲刷，有脏块无法写回。
     // 应该通过暂停流水线直到脏块完全写回为止，但是目前dcache对流水线的提升不明显，暂不进行处理
     
-    parameter CACHE_SIZE = 128,
-    // parameter CACHE_SIZE = 64,
+    // parameter CACHE_SIZE = 128,
+    parameter CACHE_SIZE = 64,
     parameter BLOCK_SIZE = 16
 )(
     input              clk                ,
