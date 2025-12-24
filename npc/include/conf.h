@@ -45,11 +45,17 @@
 // #define CONFIG_TRACE 1
 // #define CONFIG_FTRACE 1
 // #define CONFIG_MTRACE 1
-// #define CONFIG_DIFFTEST 1
 // #define CONFIG_ITRACE 1
-// #define CONFIG_TARGET_AM 1
-// #define CONFIG_WAVE 1
+
+// #define CONFIG_DIFFTEST 1
+
 #define CONFIG_WATCHPOINTS 1
 
-// #define CONFIG_NVBOARD 1
+#define CONFIG_WAVE 1
+#define WAVE_START_TIME 0
+#define WAVE_END_TIME 60000
+#define CONFIG_WAVE_MAX_UPDATE_CYCLES 10000
+#define CONFIG_WAVE_MODE 0  //0:从复位开始记录波形，直到结束； 
+                            //1:从WAVE_START_TIME开始记录波形，到WAVE_END_TIME结束； 
+                            //2:当记录波形周期大于CONFIG_WAVE_MAX_UPDATE_CYCLES时更新波形文件重新记录
 #endif

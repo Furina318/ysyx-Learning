@@ -292,7 +292,7 @@ clean:
 	rm -rf .stamp.*
 	rm -rf $(OBJ_DIR)
 	rm -rf $(BUILD_DIR)
-	rm -rf wave.vcd
+	rm -rf *.vcd
 	rm -rf ./log/*
 	rm -rf mtrace.log
 

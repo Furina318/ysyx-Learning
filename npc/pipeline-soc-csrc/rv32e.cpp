@@ -176,7 +176,59 @@ void single_cycle(void) {
 
         top->eval(); // 执行仿真
     #ifdef CONFIG_WAVE
-        tfp->dump(main_time); // 记录波形
+        if(CONFIG_WAVE_MODE == 0) tfp->dump(main_time); // 记录波形
+        else if((CONFIG_WAVE_MODE == 1) && (main_time >= WAVE_START_TIME) && (main_time <= WAVE_END_TIME))
+            tfp->dump(main_time); // 记录波形
+        else if(CONFIG_WAVE_MODE == 2) {
+            static int wave_file_index = 0;
+            static vluint64_t current_wave_start = 0;
+            
+            // 检查是否在记录时间范围内
+            if (main_time >= WAVE_START_TIME && main_time < WAVE_END_TIME) {
+                // 检查是否需要开始新的波形文件
+                if ((main_time - WAVE_START_TIME) % CONFIG_WAVE_MAX_UPDATE_CYCLES == 0) {
+
+                    // 关闭并销毁当前波形追踪对象，避免重复注册模型到同一个trace实例
+                    if (tfp) {
+                        tfp->close();
+                        delete tfp;
+                        tfp = NULL;
+                    }
+
+                    // 创建新的波形文件名
+                    char new_filename[256];
+                    if (wave_file_index == 0) {
+                        snprintf(new_filename, sizeof(new_filename), "wave.vcd");
+                    } else {
+                        snprintf(new_filename, sizeof(new_filename), "wave_%d.vcd", wave_file_index);
+                    }
+
+                    // 创建新的 trace 对象并注册模型
+                    tfp = new VerilatedVcdC();
+                    Verilated::traceEverOn(true);
+                    top->trace(tfp, 0);
+
+                    // 打开新的波形文件
+                    tfp->open(new_filename);
+                    wave_file_index++;
+                    current_wave_start = main_time;
+
+                    printf("Starting new wave file: %s at cycle %lu\n", new_filename, main_time);
+                }
+                
+                // 记录波形数据
+                tfp->dump(main_time);
+            }
+            // 如果超过了结束时间，关闭并销毁波形文件对象
+            else if (main_time >= WAVE_END_TIME && wave_file_index > 0) {
+                if (tfp) {
+                    tfp->close();
+                    delete tfp;
+                    tfp = NULL;
+                }
+                wave_file_index = 0; // 重置索引
+            }
+        }
     #endif
         main_time++; // 推进仿真时间
     }
@@ -210,23 +262,12 @@ void die(){
 }
 
 int main(int argc, char *argv[]) {
+
 #ifdef NVBOARD
     nvboard_bind_all_pins(top);
     nvboard_init();
-
-    // Verilated::commandArgs(argc, argv); // 处理命令行参数
-    // init_verilator();
-
-    // reset();
-    // init_monitor(argc, argv);
-    // while(1) {
-    //     // nvboard_update();
-    //     single_cycle();
-    //     single_cycle();
-    //     nvboard_update();
-    //     // if(top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__asic__DOT__cpu__DOT__cpu__DOT__pc == 0xa0000074) break;
-    // }
 #endif
+
     Verilated::commandArgs(argc, argv); // 处理命令行参数
     /* Initialize the monitor. */
     init_monitor(argc, argv);
@@ -239,9 +280,16 @@ int main(int argc, char *argv[]) {
 
     /* End the simulation */
     top->final();
+
 #ifdef CONFIG_WAVE
-    tfp->close();
+    // tfp->close();
+    if (tfp) {
+        tfp->close();
+        delete tfp;
+        tfp = NULL;
+    }
 #endif
+
     delete top;
 
     return is_exit_status_bad();

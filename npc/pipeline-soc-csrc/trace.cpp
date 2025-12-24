@@ -49,7 +49,7 @@ void display_iringbuf(void)
 }
 #else
 void append_iringbuf(char *s) {}
-void display_iringbuf(void) {}
+void display_iringbuf(void) { TODO(); }
 #endif
 /******************************************************************/
 

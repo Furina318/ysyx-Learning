@@ -6,6 +6,7 @@
    - 备注：为第九届集创赛竞业达赛道参赛代码，编写时未学习 B 阶段知识，存在数据前递路径过长、面积偏大问题，后续将优化。
 2. **适配SoC 五级流水线模块（pipeline-soc-vsrc）**  
    - 特性：在基础五级流水线基础上，支持突发传输，可对接 SoC 系统。目前接入了iCache、dCache模块（dCache模块在当前测试并不具备明显优势，故添加相关开关，如何使用参考Makefile）和可控防递归的结合RAS和BTB的分支预测器，目前正在集成运算器oper(浮点运算单元、除法器、乘法器)...
+   - 工具：添加波形模式，支持三种不同的波形记录方式.（0:从复位开始记录波形，直到结束；1:从WAVE_START_TIME开始记录波形，到WAVE_END_TIME结束； 2:当记录波形周期大于CONFIG_WAVE_MAX_UPDATE_CYCLES时更新波形文件重新记录）可以通过include/conf.h中控制。
    - 备注：已经通过iverilog四值仿真、网表仿真和一生一芯的CI流片测试
    -      同时可通过makefile完成riscv32e-ysyxsoc和riscv32e-npc之间的切换。两者共用一个cpu内核，但是riscv32e-npc接上本人自己编写的simple-SoC，主要是用于测试仿真
    -      启用的使用可以通过键入 make ARCH=riscv32e-ysyxsoc -C ${NPC_HOME}/../am-kernels/tests/cpu-tests run nvboard=1 dcache=0 (开启nvboard，关闭dcache)
