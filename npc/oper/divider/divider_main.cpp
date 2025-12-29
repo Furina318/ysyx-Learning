@@ -61,7 +61,7 @@ void run_test(Vdivider* dut, const TestCase& t) {
                 (dut->valid     == t.expected_valid);
     std::cout << "Test: " << t.test_name << " - ";
     if (pass) {
-        std::cout << "\033[32m**PASS**\033[0m\n";
+        std::cout << "\033[32m**PASS**\033[0m";
         ++pass_cnt;
     } else {
         std::cout << "\033[31m**FAIL**\033[0m\n";
@@ -93,7 +93,47 @@ int main(int argc, char** argv) {
     // Generate 100 random test cases
     std::vector<TestCase> tests;
     tests.reserve(100);
-    for (int i = 0; i < 10000; ++i) {
+    // Add some small-number randomized test cases (count and max value controllable)
+    auto add_small_tests = [](std::vector<TestCase>& tests, int count, int max_value = 200){
+        for (int i = 0; i < count; ++i) {
+            int32_t a = (std::rand() % max_value) + 1; // 1..max_value
+            int32_t b = (std::rand() % max_value) + 1; // ensure non-zero
+            bool is_signed = (std::rand() & 1) != 0;
+            // Occasionally make operands negative for signed tests
+            if (is_signed && (std::rand() % 3 == 0)) a = -a;
+            if (is_signed && (std::rand() % 4 == 0)) b = -b;
+
+            bool overflow = false;
+            int32_t q = 0, r = 0;
+            if (b == 0) {
+                q = is_signed ? -1 : static_cast<int32_t>(0xFFFFFFFF);
+                r = a;
+            } else if (is_signed && a == INT32_MIN && b == -1) {
+                overflow = true;
+                q = a; r = 0;
+            } else {
+                if (is_signed) {
+                    q = a / b;
+                    r = a % b;
+                } else {
+                    uint32_t ua = static_cast<uint32_t>(a);
+                    uint32_t ub = static_cast<uint32_t>(b);
+                    q = static_cast<int32_t>(ua / ub);
+                    r = static_cast<int32_t>(ua % ub);
+                }
+            }
+
+            char* namebuf = new char[64];
+            std::snprintf(namebuf, 64, "SMALL %03d: %c %d / %d", i+1, is_signed ? 'S' : 'U', a, b);
+            tests.push_back({a, b, is_signed, q, r, (!overflow && b!=0), namebuf});
+        }
+    };
+
+    // 插入 1000 个小数字测试，数值上限 200
+    add_small_tests(tests, 1000, 200);
+
+    // Add random full-range test cases(大数测试)
+    for (int i = 0; i < 1000; ++i) {
         int32_t a = (std::rand() << 16) | (std::rand() & 0xFFFF);
         int32_t b;
         do {

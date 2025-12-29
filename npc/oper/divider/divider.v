@@ -1,4 +1,3 @@
-//非恢复除法算法 + 早停机制
 module divider (
     input              clk,
     input              reset,
@@ -16,11 +15,34 @@ module divider (
     reg        quotient_sign;     //商的符号
     reg        remainder_sign;    //余数的符号
     reg [5:0]  cycle_count;       //计数器
+    reg [5:0]  total_cycles;      //总迭代次数
     reg        computing;         //正在计算标志
     reg [31:0] pos_mask;          //位掩码
-
-    wire [31:0] abs_divisor_comb  = (is_signed && divisor[31])  ? (~divisor + 1) : divisor; //用于早停判断对比
+    reg        early_stop;        //早停标志
+    
+    // 前导零计算逻辑
+    // reg  [ 5:0]  leading_zeros;     //被除数绝对值的前导零个数
     wire [31:0] abs_dividend_comb = (is_signed && dividend[31]) ? (~dividend + 1) : dividend;
+    wire [31:0] abs_divisor_comb  = (is_signed && divisor[31])  ? (~divisor + 1) : divisor;
+
+    // 计算32位数的前导零
+    wire [5:0] leading_zeros = count_leading_zeros(abs_dividend_comb);
+
+    function [5:0] count_leading_zeros;
+        input [31:0] data;
+        integer i;
+        reg [5:0] result;
+        begin
+            result = 6'd32;
+            for (i = 31; i >= 0; i = i - 1) begin
+                if (data[i] == 1'b1) begin
+                    result = 6'd31 - i[5:0];
+                    break;
+                end
+            end
+            count_leading_zeros = result;
+        end
+    endfunction
 
     always @(posedge clk) begin
         if (reset) begin
@@ -33,39 +55,63 @@ module divider (
             remainder_sign <= 1'b0;
             valid          <= 1'b0;
             cycle_count    <= 6'b0;
+            total_cycles   <= 6'd32;
             computing      <= 1'b0;
+            early_stop     <= 1'b0;
+            // leading_zeros  <= 6'd0;
         end else if (!computing) begin
             quotient       <= 32'b0;
             remainder      <= 32'b0;
             temp_quotient  <= 32'b0;
             pos_mask       <= 32'h80000000;
             cycle_count    <= 6'b0;
+            total_cycles   <= 6'd32;
             valid          <= 1'b0;
+            early_stop     <= 1'b0;
+            // leading_zeros  <= 6'd0;
 
             // 除零检测
             if (divisor == 32'b0) begin
                 quotient  <= 32'hFFFFFFFF;
                 remainder <= dividend;
-                valid     <= 1'b0;
+                valid     <= 1'b1;
+                $display("除零错误");
             end else if (is_signed && dividend == 32'h80000000 && divisor == 32'hFFFFFFFF) begin
                 // 溢出 MIN_INT / -1
                 quotient  <= 32'h80000000;
                 remainder <= 32'b0;
-                valid     <= 1'b0;
+                valid     <= 1'b1;
+                $display("溢出错误");
             end else begin
                 // 初始化绝对值和符号
                 abs_divisor    <= (is_signed && divisor[31]) ? (~divisor + 1) : divisor;
                 quotient_sign  <= is_signed && (dividend[31] ^ divisor[31]);
                 remainder_sign <= is_signed && dividend[31];
-                temp_dividend  <= {32'b0, (is_signed && dividend[31]) ? (~dividend + 1) : dividend};
-                // computing      <= 1'b1;
-                if (abs_dividend_comb < abs_divisor_comb) begin
-                    // 被除数小于除数，商为0，余数为被除数
+                
+                if (leading_zeros == 6'd32) begin
+                    // 被除数为0
                     quotient  <= 32'b0;
-                    remainder <= dividend;
+                    remainder <= 32'b0;
                     valid     <= 1'b1;
                 end else begin
-                    computing <= 1'b1;
+
+                    // 计算实际需要的迭代次数
+                    total_cycles <= 6'd31 - leading_zeros + 6'd1; // 因为最高有效位也需要一次迭代
+                    
+                    // 将有效数据左移，跳过前导零
+                    temp_dividend <= {32'b0, abs_dividend_comb} << leading_zeros;
+                    
+                    // 调整位掩码的起始位置
+                    pos_mask <= 32'h80000000 >> leading_zeros;
+
+                    if (abs_dividend_comb < abs_divisor_comb) begin
+                        // 被除数小于除数，商为0，余数为被除数
+                        quotient  <= 32'b0;
+                        remainder <= dividend;
+                        valid     <= 1'b1;
+                    end else begin
+                        computing <= 1'b1;
+                    end
                 end
             end
         end else begin
@@ -73,6 +119,7 @@ module divider (
             reg [63:0] temp_dividend_shifted;
             reg [31:0] next_remainder;
             reg [31:0] next_quotient;
+            
             temp_dividend_shifted = {temp_dividend[62:0], 1'b0};
             next_quotient = temp_quotient; // 默认保持当前商
 
@@ -88,12 +135,17 @@ module divider (
             end
             // $display("中间余数：  %h", next_remainder);
 
+            // 早停检测：如果余数为0且被除数剩余部分为0，可以提前结束
+            if (next_remainder == 32'b0 && temp_dividend_shifted[31:0] == 32'b0) begin
+                early_stop <= 1'b1;
+            end
+
             temp_quotient <= next_quotient;
             pos_mask      <= pos_mask >> 1;
             cycle_count   <= cycle_count + 1;
 
-            if (cycle_count == 6'd31) begin
-                // $display("最终临时商: %h", next_quotient);
+            // 使用动态计算的总迭代次数，而不是固定的32次
+            if (cycle_count == (total_cycles - 6'd1) || early_stop) begin
                 quotient  <= quotient_sign ? (~next_quotient + 1) : next_quotient;
                 remainder <= remainder_sign ? (~next_remainder + 1) : next_remainder;
                 valid     <= 1'b1;
