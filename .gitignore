@@ -13,3 +13,4 @@
 /fceux-am
 !/patch/rt-thread-am/*.patch
 !/patch/ysyxSoC/*.patch
+!/EMU/*
