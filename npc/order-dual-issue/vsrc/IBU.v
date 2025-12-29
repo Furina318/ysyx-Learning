@@ -1,8 +1,3 @@
-/* ******************
-    * IBU指令缓冲单元（双发射适配）
-    * 替代IF, ID之间的流水线寄存器
-    * TODO
-****************** */
 module IBU (
     input             clk,       
     input             rst,              
@@ -31,7 +26,6 @@ module IBU (
     output reg        ibu_full          // IBU缓冲满（反馈给IF级）
 );
 
-// ---------------------- 内部参数与信号定义 ----------------------
 localparam BUF_DEPTH = 2;
 localparam BUF_ADDR_WIDTH = $clog2(BUF_DEPTH);
 
@@ -81,7 +75,6 @@ always @(posedge clk or posedge rst) begin
         send_flag2 <= 1'b0;
 
     end else begin
-        // ---------------------- 通道1：指令接收（IF → IBU） ----------------------
         if (is_flush1) begin
             // Flush1触发：清空通道1所有缓冲
             for (i = 0; i < BUF_DEPTH; i = i + 1) begin
@@ -98,7 +91,6 @@ always @(posedge clk or posedge rst) begin
             wr_ptr1              <= wr_ptr1 + 1'b1;  // 写指针自增
         end
 
-        // ---------------------- 通道1：指令发送（IBU → ID） ----------------------
         if (launch_flag1) begin
             // ID级确认发射：清空当前输出，更新读指针
             send_flag1           <= 1'b0;
@@ -114,7 +106,6 @@ always @(posedge clk or posedge rst) begin
             send_flag1 <= 1'b0;
         end
 
-        // ---------------------- 通道2：指令接收（IF → IBU） ----------------------
         if (is_flush2) begin
             // Flush2触发：清空通道2所有缓冲
             for (i = 0; i < BUF_DEPTH; i = i + 1) begin
@@ -131,7 +122,6 @@ always @(posedge clk or posedge rst) begin
             wr_ptr2              <= wr_ptr2 + 1'b1;  // 写指针自增
         end
 
-        // ---------------------- 通道2：指令发送（IBU → ID） ----------------------
         if (launch_flag2) begin
             // ID级确认发射：清空当前输出，更新读指针
             send_flag2           <= 1'b0;

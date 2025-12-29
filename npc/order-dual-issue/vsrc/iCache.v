@@ -1,7 +1,3 @@
-/*
-* I-Cache模块：支持双地址请求的直接映射缓存
-* TODO：尚未进行相关的测试
-*/
 module iCache #(
     parameter CACHE_SIZE = 128,   
     parameter BLOCK_SIZE = 16    
@@ -18,7 +14,7 @@ module iCache #(
     output reg [31:0] inst2,   
     output reg        valid2,   
 
-    // AXI接口信号（支持突发传输）
+    // AXI4-lite接口（非完全）
     output reg  [31:0] axi_araddr,  
     output reg         axi_arvalid, 
     input  wire        axi_arready, 
@@ -63,7 +59,6 @@ module iCache #(
     reg [       INDEX_WIDTH-1:0] saved_index1, saved_index2;
     reg [                   1:0] saved_beat_idx1, saved_beat_idx2;
 
-    // 状态机定义（适配双发射）
     localparam IDLE    = 3'b000;
     localparam READ1   = 3'b001;
     localparam READ2   = 3'b010; 
@@ -78,9 +73,9 @@ module iCache #(
     reg        is_same_block;                     // 两个地址是否在同一Block
 
     // 地址范围判断（双地址），一般情况下无需修改，主要用于Debug作用
+    // 一般用于控制是否准许突发传输，简化设计
     wire in_sdram1 = 1'b1; 
     wire in_sdram2 = 1'b1; 
-
 
     // 命中判断
     wire hit1 = valid_ram[req_index1] && (tag_ram[req_index1] == req_tag1) && !is_fencei && in_sdram1;

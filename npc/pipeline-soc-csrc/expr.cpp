@@ -36,7 +36,7 @@ static struct rule {
   {"-", '-'},           // 减法
   {"-", TK_NEG},        //负号，处理多元减号
   {"0x[0-9a-fA-F]+",TK_0x},
-  {"[0-9]+", TK_NUM},   // 数字
+  {"[0-9]+", TK_NUM},   // 数字，十进制与十六进制设计一个匹配顺序的问题
   {"!=",TK_NEQ},        //不等号
   {"&&",TK_AND},
   {"\\$",TK_$},
@@ -198,14 +198,14 @@ static bool make_token(char *e) {
 }
 
 static bool check_parentheses(int p,int q){
-  int cnt=0;
+  int cnt = 0;
   if(tokens[p].type!='(' || tokens[q].type!=')') return false;
-  for(int i=p;i<=q;i++){
+  for(int i = p; i <= q; i++){
     if(tokens[i].type=='(') cnt++;
     if(tokens[i].type==')') cnt--;
-    if(cnt==0&&i<q) return false;
+    if((cnt == 0) && (i < q)) return false;
   }
-  if(cnt!=0) return false;
+  if(cnt != 0) return false;
   else return true;
 }
 
@@ -255,35 +255,35 @@ static int find_main_operator(int p,int q){
 
 word_t eval(int p,int q){
   int op;
-  if(p>q){
+  if(p > q){
     return 0;
-  }else if(p==q){
-    if(tokens[p].type!=TK_NUM){
+  }else if(p == q){
+    if(tokens[p].type != TK_NUM){
       return -1;
     }
     return atoi(tokens[p].str);
-  }else if(check_parentheses(p,q)==true){//查找两端的括号并丢弃
-    return eval(p+1,q-1);
+  }else if(check_parentheses(p, q) == true){//查找两端的括号并丢弃
+    return eval(p + 1, q - 1);
   }else{
-    op=find_main_operator(p,q);
-    if(op==-1 || op<p || op>q){
+    op = find_main_operator(p, q);
+    if((op == -1) || (op < p) || (op > q)){
       return -1;
     }
     if (tokens[op].type == TK_NEG) {
       int neg_count = 0;//计算连续的一元减号数量
-      for (int j=op;j<=q && tokens[j].type == TK_NEG;j++,neg_count++);
-      word_t val=eval(op+neg_count,q); //跳过所有的一元减号
+      for (int j = op; (j <= q) && (tokens[j].type == TK_NEG); j++, neg_count++);
+      word_t val = eval(op + neg_count, q); //跳过所有的一元减号
       return (neg_count%2 == 0) ? val : -val; //根据奇偶性决定最终是加还是减
     }
     if (tokens[op].type == TK_PO) {//解指针操作，假设后面跟着的是一个有效的内存地址
-      if (op+1<=q && (tokens[op+1].type==TK_NUM || tokens[op+1].type=='(')) {
-        if(tokens[op+1].type==TK_NUM){
-          word_t addr=atoi(tokens[op+1].str); //将字符串转换为整数作为地址
-          word_t val=pmem_read(addr,sizeof(word_t)); //取地址处的值
+      if ((op + 1 <= q) && (tokens[op+1].type==TK_NUM || tokens[op+1].type=='(')) {
+        if(tokens[op+1].type == TK_NUM){
+          word_t addr = atoi(tokens[op+1].str); //将字符串转换为整数作为地址
+          word_t val = pmem_read(addr,sizeof(word_t)); //取地址处的值
           return val;
-        }else if(tokens[op+1].type=='('){
-          word_t addr0=eval(op+1,q);
-          word_t val0=pmem_read(addr0,sizeof(word_t));
+        }else if(tokens[op+1].type == '('){
+          word_t addr0 = eval(op+1, q);
+          word_t val0 = pmem_read(addr0,sizeof(word_t));
           return val0;
         }
       } else {
@@ -291,22 +291,22 @@ word_t eval(int p,int q){
         return -1;
       }
     }
-    word_t val1=eval(p,op-1);
-    word_t val2=eval(op+1,q);
+    word_t val1 = eval(p,op-1);
+    word_t val2 = eval(op+1,q);
       switch(tokens[op].type){
-        case '+':return val1+val2;
-        case '-':return val1-val2;
-        case '*':return val1*val2;
+        case '+':return val1 + val2;
+        case '-':return val1 - val2;
+        case '*':return val1 * val2;
         case '/':
-          if(val2==0){
+          if(val2 == 0){
             printf("The denominator can't be zero!\n");
             return 0;
           }
-          return val1/val2;
-        case TK_NEQ:return val1 != val2?1:0;
-        case TK_EQ:return val1 == val2?1:0;
-        case TK_AND:return val1 && val2?1:0;
-        default:return 0;
+          return val1 / val2;
+        case TK_NEQ: return val1 != val2 ? 1 : 0;
+        case TK_EQ:  return val1 == val2 ? 1 : 0;
+        case TK_AND: return val1 && val2 ? 1 : 0;
+        default:     return 0;
     }
   }
 }
@@ -316,7 +316,7 @@ word_t expr(char *e) {//分治递归算法
     return -1;
   }
   /* TODO: Insert codes to evaluate the expression. */
-  word_t result=eval(0,nr_token-1);
+  word_t result = eval(0, nr_token-1);
   //TODO();
 
   return result;

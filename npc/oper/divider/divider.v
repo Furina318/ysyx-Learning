@@ -1,4 +1,4 @@
-//非恢复除法算法
+//非恢复除法算法 + 早停机制
 module divider (
     input              clk,
     input              reset,
@@ -18,6 +18,9 @@ module divider (
     reg [5:0]  cycle_count;       //计数器
     reg        computing;         //正在计算标志
     reg [31:0] pos_mask;          //位掩码
+
+    wire [31:0] abs_divisor_comb  = (is_signed && divisor[31])  ? (~divisor + 1) : divisor; //用于早停判断对比
+    wire [31:0] abs_dividend_comb = (is_signed && dividend[31]) ? (~dividend + 1) : dividend;
 
     always @(posedge clk) begin
         if (reset) begin
@@ -55,7 +58,15 @@ module divider (
                 quotient_sign  <= is_signed && (dividend[31] ^ divisor[31]);
                 remainder_sign <= is_signed && dividend[31];
                 temp_dividend  <= {32'b0, (is_signed && dividend[31]) ? (~dividend + 1) : dividend};
-                computing      <= 1'b1;
+                // computing      <= 1'b1;
+                if (abs_dividend_comb < abs_divisor_comb) begin
+                    // 被除数小于除数，商为0，余数为被除数
+                    quotient  <= 32'b0;
+                    remainder <= dividend;
+                    valid     <= 1'b1;
+                end else begin
+                    computing <= 1'b1;
+                end
             end
         end else begin
             // 计算移位值
@@ -88,9 +99,7 @@ module divider (
                 valid     <= 1'b1;
                 computing <= 1'b0;
             end
-            if(temp_dividend[63]) begin
-                
-            end
+            if(temp_dividend[63]) begin end
         end
     end
 endmodule

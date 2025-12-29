@@ -10,6 +10,9 @@
 
 int pass_cnt = 0;
 int total_cnt = 0;
+long long total_cycles = 0;
+int max_cycles = 0;
+int min_cycles = INT_MAX;
 
 struct TestCase {
     int32_t  dividend;
@@ -37,14 +40,18 @@ void run_test(Vdivider* dut, const TestCase& t) {
     dut->divisor   = t.divisor;
     dut->is_signed = t.is_signed;
 
+    // Count cycles used by this division
+    int cycles = 0;
     // Single-cycle for divide-by-zero or overflow
     if (t.divisor == 0 ||
        (t.is_signed && t.dividend == INT32_MIN && t.divisor == -1)) {
         clock_cycle(dut);
+        cycles = 1;
     } else {
         // Up to 32 cycles for regular division
         for (int cycle = 0; cycle < 33 && !dut->valid; ++cycle) {
             clock_cycle(dut);
+            ++cycles;
         }
     }
 
@@ -68,6 +75,11 @@ void run_test(Vdivider* dut, const TestCase& t) {
         std::cout << "  Expected Valid: " << t.expected_valid
                   << ", Got: " << (int)dut->valid << "\n";
     }
+    std::cout << "  Cycles: " << cycles << "\n";
+    // update global cycle stats
+    total_cycles += cycles;
+    if (cycles > max_cycles) max_cycles = cycles;
+    if (cycles < min_cycles) min_cycles = cycles;
     ++total_cnt;
 }
 
@@ -133,6 +145,11 @@ int main(int argc, char** argv) {
     // Summary
     std::printf("\nTest Summary: Pass %d / Total %d\n",
                 pass_cnt, total_cnt);
+    if (total_cnt > 0) {
+        double avg = (double)total_cycles / (double)total_cnt;
+        std::printf("Cycles: total %lld, avg %.2f, min %d, max %d\n",
+                    total_cycles, avg, min_cycles, max_cycles);
+    }
 
     delete dut;
     return 0;
