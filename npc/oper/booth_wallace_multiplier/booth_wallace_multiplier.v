@@ -19,10 +19,10 @@ wire signed [34:0] multiplier_ext = is_signed ? {{2{multiplier_signed[31]}}, mul
 //wire signed [67:0] multiplicand_ext= is_signed? {{36{multiplicand[31]}}, multiplicand} : {36'd0, multiplicand};//{{36{multiplicand[31]}}, multiplicand}
 //wire signed [34:0] multiplier_ext = is_signed ? {{2{multiplier[31]}}, multiplier,1'b0} :  {2'b0, multiplier,1'b0};  //{{2{multiplier[31]}}, multiplier} 
 // Booth两位乘法部分积生成模块
-initial begin
-    $display("multiplicand = %h, multiplier = %h, is_signed = %b", 
-             multiplicand, multiplier, is_signed);
-end
+// initial begin
+//     $display("multiplicand = %h, multiplier = %h, is_signed = %b", 
+//              multiplicand, multiplier, is_signed);
+// end
 wire signed [67:0] partial_products [16:0];
 genvar i;
 generate
@@ -64,18 +64,23 @@ generate
         assign cout2[l]=cout[l];
     end
 endgenerate
+wire [68:0] sum_temp = {{1'b0, s} + {cout2, 1'b0}};
 always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
         product <= 64'd0;
         valid <= 1'b0;
     end else begin
         if (is_signed) begin
-            product <= $signed({{1'b0, s} + {cout2, 1'b0}}[63:0]); // 有符号截断
+            // product <= $signed({{1'b0, s} + {cout2, 1'b0}}[63:0]); // 有符号截断
+            product <= $signed(sum_temp[63:0]); // 有符号截断
         end else begin
-            product <= {{1'b0, s} + {cout2, 1'b0}}[63:0]; // 无符号截断
+            // product <= {{1'b0, s} + {cout2, 1'b0}}[63:0]; // 无符号截断
+            product <= sum_temp[63:0]; // 无符号截断
         end
         valid <= 1'b1;
     end
+
+    if (sum_temp[68:64] != 5'b0) begin end
 end
 endmodule
 /* verilator lint_off DECLFILENAME */

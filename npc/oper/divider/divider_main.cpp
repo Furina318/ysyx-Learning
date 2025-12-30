@@ -130,10 +130,15 @@ int main(int argc, char** argv) {
     };
 
     // 插入 1000 个小数字测试，数值上限 200
-    add_small_tests(tests, 1000, 200);
+    add_small_tests(tests, 10000, 200);
+
+    // 添加特殊测试用例，验证有符号除法的边界和符号处理
+    tests.push_back({INT32_MIN, -1, true, INT32_MIN, 0, false, "SPECIAL: S INT32_MIN / -1 (overflow)"});
+    tests.push_back({INT32_MIN, 1,  true, INT32_MIN, 0, true,  "SPECIAL: S INT32_MIN / 1"});
+    tests.push_back({100, 0,    true, -1, 100, false, "SPECIAL: S 100 / 0 (div by zero)"});
 
     // Add random full-range test cases(大数测试)
-    for (int i = 0; i < 1000; ++i) {
+    for (int i = 0; i < 10000; ++i) {
         int32_t a = (std::rand() << 16) | (std::rand() & 0xFFFF);
         int32_t b;
         do {

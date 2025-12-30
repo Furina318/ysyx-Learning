@@ -12,8 +12,9 @@ module divider (
     reg [31:0] abs_divisor;       //除数绝对值
     reg [63:0] temp_dividend;     //64位临时被除数
     reg [31:0] temp_quotient;     //临时商
-    reg        quotient_sign;     //商的符号
-    reg        remainder_sign;    //余数的符号
+    // 商和余数的符号作为组合信号，避免在同一个时钟周期里使用未更新的寄存器值
+    wire       quotient_sign;     //商的符号
+    wire       remainder_sign;    //余数的符号
     reg [5:0]  cycle_count;       //计数器
     reg [5:0]  total_cycles;      //总迭代次数
     reg        computing;         //正在计算标志
@@ -27,6 +28,9 @@ module divider (
 
     // 计算32位数的前导零
     wire [5:0] leading_zeros = count_leading_zeros(abs_dividend_comb);
+
+    assign quotient_sign = is_signed && (dividend[31] ^ divisor[31]);
+    assign remainder_sign = is_signed && dividend[31];
 
     function [5:0] count_leading_zeros;
         input [31:0] data;
@@ -51,8 +55,6 @@ module divider (
             temp_quotient  <= 32'b0;
             temp_dividend  <= 64'b0;
             pos_mask       <= 32'h80000000;
-            quotient_sign  <= 1'b0;
-            remainder_sign <= 1'b0;
             valid          <= 1'b0;
             cycle_count    <= 6'b0;
             total_cycles   <= 6'd32;
@@ -74,19 +76,16 @@ module divider (
             if (divisor == 32'b0) begin
                 quotient  <= 32'hFFFFFFFF;
                 remainder <= dividend;
-                valid     <= 1'b1;
+                valid     <= 1'b0;
                 $display("除零错误");
             end else if (is_signed && dividend == 32'h80000000 && divisor == 32'hFFFFFFFF) begin
                 // 溢出 MIN_INT / -1
                 quotient  <= 32'h80000000;
                 remainder <= 32'b0;
-                valid     <= 1'b1;
+                valid     <= 1'b0;
                 $display("溢出错误");
             end else begin
-                // 初始化绝对值和符号
                 abs_divisor    <= (is_signed && divisor[31]) ? (~divisor + 1) : divisor;
-                quotient_sign  <= is_signed && (dividend[31] ^ divisor[31]);
-                remainder_sign <= is_signed && dividend[31];
                 
                 if (leading_zeros == 6'd32) begin
                     // 被除数为0
@@ -109,7 +108,21 @@ module divider (
                         quotient  <= 32'b0;
                         remainder <= dividend;
                         valid     <= 1'b1;
-                    end else begin
+                    end
+                    else if (abs_dividend_comb == abs_divisor_comb) begin 
+                        // 被除数等于除数，商为1或-1，余数为0
+                        quotient  <= quotient_sign ? 32'hFFFFFFFF : 32'b1;
+                        remainder <= 32'b0;
+                        valid     <= 1'b1;
+                    end
+                    else if (abs_divisor_comb == 32'b1) begin
+                        // 除数为1或-1：使用被除数的绝对值作为绝对商，再根据符号决定正负
+                        // 这样能正确处理 -x / -1 => +x 的情况
+                        quotient  <= quotient_sign ? (~abs_dividend_comb + 1) : abs_dividend_comb;
+                        remainder <= 32'b0;
+                        valid     <= 1'b1;
+                    end
+                    else begin
                         computing <= 1'b1;
                     end
                 end

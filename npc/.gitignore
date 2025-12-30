@@ -16,3 +16,5 @@ build/
 !*.sh
 !build.sc
 !/oper/divider/doc/*.png
+!/oper/booth_wallace_multiplier/doc/*.png
+!*.sdc
