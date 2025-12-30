@@ -32,16 +32,28 @@ module divider (
     assign quotient_sign = is_signed && (dividend[31] ^ divisor[31]);
     assign remainder_sign = is_signed && dividend[31];
 
+    // 组合逻辑：计算中间值
+    wire [63:0] temp_dividend_shifted = {temp_dividend[62:0], 1'b0};
+    wire [31:0] next_remainder = (temp_dividend_shifted[63:32] >= abs_divisor) 
+                               ? (temp_dividend_shifted[63:32] - abs_divisor)
+                               : temp_dividend_shifted[63:32];
+    wire [31:0] next_quotient = (temp_dividend_shifted[63:32] >= abs_divisor)
+                              ? (temp_quotient | pos_mask)
+                              : temp_quotient;
+    wire early_stop_cond = (next_remainder == 32'b0 && temp_dividend_shifted[31:0] == 32'b0);
+
     function [5:0] count_leading_zeros;
         input [31:0] data;
         integer i;
         reg [5:0] result;
+        reg found;
         begin
             result = 6'd32;
+            found = 1'b0;
             for (i = 31; i >= 0; i = i - 1) begin
-                if (data[i] == 1'b1) begin
+                if (!found && data[i] == 1'b1) begin
                     result = 6'd31 - i[5:0];
-                    break;
+                    found = 1'b1;
                 end
             end
             count_leading_zeros = result;
@@ -77,13 +89,13 @@ module divider (
                 quotient  <= 32'hFFFFFFFF;
                 remainder <= dividend;
                 valid     <= 1'b0;
-                $display("除零错误");
+                // $display("除零错误");
             end else if (is_signed && dividend == 32'h80000000 && divisor == 32'hFFFFFFFF) begin
                 // 溢出 MIN_INT / -1
                 quotient  <= 32'h80000000;
                 remainder <= 32'b0;
                 valid     <= 1'b0;
-                $display("溢出错误");
+                // $display("溢出错误");
             end else begin
                 abs_divisor    <= (is_signed && divisor[31]) ? (~divisor + 1) : divisor;
                 
@@ -128,34 +140,19 @@ module divider (
                 end
             end
         end else begin
-            // 计算移位值
-            reg [63:0] temp_dividend_shifted;
-            reg [31:0] next_remainder;
-            reg [31:0] next_quotient;
-            
-            temp_dividend_shifted = {temp_dividend[62:0], 1'b0};
-            next_quotient = temp_quotient; // 默认保持当前商
-
-            // 比较和减法
+            // 更新寄存器
             if (temp_dividend_shifted[63:32] >= abs_divisor) begin
-                next_remainder = temp_dividend_shifted[63:32] - abs_divisor;
-                temp_dividend  <= {next_remainder, temp_dividend_shifted[31:0]};
-                next_quotient  = temp_quotient | pos_mask;
-                // $display("中间临时商: %h", next_quotient);
+                temp_dividend <= {next_remainder, temp_dividend_shifted[31:0]};
             end else begin
-                next_remainder = temp_dividend_shifted[63:32];
-                temp_dividend  <= temp_dividend_shifted;
-            end
-            // $display("中间余数：  %h", next_remainder);
-
-            // 早停检测：如果余数为0且被除数剩余部分为0，可以提前结束
-            if (next_remainder == 32'b0 && temp_dividend_shifted[31:0] == 32'b0) begin
-                early_stop <= 1'b1;
+                temp_dividend <= temp_dividend_shifted;
             end
 
             temp_quotient <= next_quotient;
             pos_mask      <= pos_mask >> 1;
             cycle_count   <= cycle_count + 1;
+            
+            // 更新早停标志
+            early_stop <= early_stop_cond;
 
             // 使用动态计算的总迭代次数，而不是固定的32次
             if (cycle_count == (total_cycles - 6'd1) || early_stop) begin
