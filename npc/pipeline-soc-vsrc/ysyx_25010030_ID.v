@@ -39,8 +39,12 @@ module ysyx_25010030_ID (
 `ifdef FPU
     output reg        id_ex_is_div,
     output reg        id_ex_is_rem,
-    output reg        id_ex_is_signed,
+    output reg        id_ex_is_signed_div,
     input             ex_stop,
+
+    // output reg        id_ex_mul,
+    // output reg        id_ex_is_signed_mul, 
+    // output reg        id_ex_is_su_mul,
 `endif   
 
 `ifdef BPU
@@ -92,7 +96,11 @@ module ysyx_25010030_ID (
     wire [6:0] func7  = if_id_inst[31:25];
     wire       is_div = (get_opcode == `INST_TYPE_R) && (func7 == 7'b0000001) && (func3[2]);
     wire       is_rem = is_div && (func3[1]);
-    wire       is_signed = is_div && (!func3[0]);
+    wire       is_signed = is_div && (!func3[0]); // div/divu, rem/remu
+
+    // wire       is_mul = (get_opcode == `INST_TYPE_R) && (func7 == 7'b0000001) && (!func3[2]);
+    // wire       is_signed_mul = is_mul && (!func3[1]); // mul/mulu
+    // wire       is_su_mul = is_mul && (func3 == 3'b010); // mulhsu，有符号乘无符号，不是单纯的有符号或无符号
 
     always @(*) begin
         if(reset) begin
@@ -176,7 +184,10 @@ module ysyx_25010030_ID (
         `ifdef FPU
             id_ex_is_div    <= 1'b0;
             id_ex_is_rem    <= 1'b0;
-            id_ex_is_signed <= 1'b0;
+            id_ex_is_signed_div <= 1'b0;
+            // id_ex_is_mul        <= 1'b0;
+            // id_ex_is_signed_mul <= 1'b0;
+            // id_ex_is_su_mul     <= 1'b0;
         `endif
 
         `ifdef BPU
@@ -237,7 +248,11 @@ module ysyx_25010030_ID (
         `ifdef FPU
             id_ex_is_div    <= is_div;
             id_ex_is_rem    <= is_rem;
-            id_ex_is_signed <= is_signed;
+            id_ex_is_signed_div <= is_signed;
+
+            // id_ex_is_mul        <= is_mul;
+            // id_ex_is_signed_mul <= is_signed_mul;
+            // id_ex_is_su_mul     <= is_su_mul;
         `endif
 
         `ifdef BPU

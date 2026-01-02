@@ -30,17 +30,54 @@ uint8_t pmem[CONFIG_MSIZE] PG_ALIGN = {};
 //riscv指令集在线反汇编工具
 //https://luplab.gitlab.io/rvcodecjs/#q=34179073&abi=false&isa=AUTO
 static const uint32_t img [] = {
-  // 测试1：divu 10 / 3 → 商=3（0x3），写入地址0x10000000
+  // 测试1：divu 10 / 3 → 商=3（0x3）
   0xa00007b7, // lui a5, 0x10000      // a5 = 0x10000000（目标内存基地址）
   0x00a00613, // addi a2, zero, 10    // a2 = 10（被除数）
   0x00300593, // addi a1, zero, 3     // a1 = 3（除数）
-  // 0x00560433, // divu a0, a2, a1      // a0 = 10 / 3（无符号商=3）
-  // 0x03e50513, // addi a0, a0, 38      // a0 = 商 + 38 = 41 (ASCII 'A')
-  // 0x00a78023, // sb a0, 0(a5)   
   0x02b656b3, // divu a3, a2, a1      // a3 = 10 / 3（无符号商=3）
-  0x03e50693, // addi a3, a3, 62      // a3 = 商 + 62 = 65 (ASCII 'A')
+  0x03e68693, // addi a3, a3, 62      // a3 = 商 + 62 = 65 (ASCII 'A')
   0x00d78023, // sb a3, 0(a5)         // 商3写入0x10000000
   
+  // 测试2：div -10 / 3 → 商=-3（0xFFFF_FFFD）
+  0xff600613, // addi a2, zero, -10   // a2 = 被除数=-10（补码：0xfffffff6）
+  0x00300593, // addi a1, zero, 3     // a1 = 除数=3
+  0x02b646b3, // div a3, a2, a1       // a3 = -10/3 有符号商=-3（RISC-V除法向零取整）
+  0x04568693, // addi a3, a3, 69      // -3+69=66 → ASCII 'B'
+  0x00d78023, // sb a3, 0(a5)         
+
+  // 测试3：divu连续除法
+  0x01400613, // addi a2, zero, 20    // a2 = 20
+  0x00400593, // addi a1, zero, 4     // a1 = 4
+  0x01500713, // addi a4, zero, 21    // a4 = 21
+  0x02b656b3, // divu a3, a2, a1      // a3 = 20/4=5
+  0x02d755b3, // divu a1, a4, a3      // a1 = 21/5=4
+  0x00d00633, // add  a2, zero, a3    // a2 = 5（上一步的商）
+  0x02b656b3, // divu a3, a2, a1      // a3 = 5/4=1
+  0x04268693, // addi a3, a3, 66      // 1+66=67 → ASCII 'C'(0x43)
+  0x00d78023, // sb a3, 0(a5)   
+  
+  // 测试4：remu 10 % 3 → 余数=1（0x1）
+  0x00a00613, // addi a2, zero, 10    // a2 = 被除数=10
+  0x00300593, // addi a1, zero, 3     // a1 = 除数=3
+  0x02b67733, // remu a4, a2, a1      // a4 = 10%3 无符号余数=1
+  0x04370713, // addi a4, a4, 67      // 1+67=68 → ASCII 'D'(0x44)
+  0x00e78023, // sb a4, 0(a5)     
+  
+  // 测试5：rem -10 % 3 → 余数=-1（0xFFFF_FFFF）
+  0xff600613, // addi a2, zero, -10   // a2 = 被除数=-10（补码：0xfffffff6）
+  0x00300593, // addi a1, zero, 3     // a1 = 除数=3
+  0x02b66733, // rem a4, a2, a1       // a4 = -10%3 有符号余数=-1
+  0x04670713, // addi a4, a4, 70      // -1+70=69 → ASCII 'E'
+  0x00e78023, // sb a4, 0(a5) 
+
+  0x00f00613, // addi a2, zero, 15    // a2 = 被除数=15
+  0x00400593, // addi a1, zero, 4     // a1 = 除数=4
+  0x02b656b3, // divu a3, a2, a1      // a3 = 15/4 无符号商=3
+  0x00168693, // addi a3, a3, 1       // a3 = 3+1=4
+  0x02d67733, // remu a4, a2, a3      // a4 = 15%4 无符号余数=3
+  0x04370713, // addi a4, a4, 67      // 3+67=70 → ASCII 'F'
+  0x00e78023, // sb a4, 0(a5)
+
   0x00100073, // 系统调用/退出指令    
 
   // // 输出 'A' (ASCII码 65)

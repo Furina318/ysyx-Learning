@@ -59,7 +59,7 @@ module ysyx_25010030_EX (
 `ifdef FPU
     input             id_ex_is_div,
     input             id_ex_is_rem,
-    input             id_ex_is_signed,
+    input             id_ex_is_signed_div,
     output reg        ex_stop,
 `endif
 
@@ -214,7 +214,8 @@ module ysyx_25010030_EX (
 `ifdef FPU
     reg         div_start;  
     reg         div_computing;  
-    wire [31:0] div_quotient;  // 从divider输出的商
+    reg         div_clr;        // 计算后清除除法器内部信号
+    wire [31:0] div_quotient;   // 从divider输出的商
     wire [31:0] div_remainder;  // 从divider输出的余数
     wire        div_valid;  
 
@@ -223,23 +224,24 @@ module ysyx_25010030_EX (
             div_start     <= 1'b0;
             div_computing <= 1'b0;
             ex_stop       <= 1'b0;
+            div_clr       <= 1'b1;
         end else begin
             div_start     <= (id_valid && ex_ready && id_ex_is_div && !div_computing); 
             div_computing <= (id_valid && ex_ready && id_ex_is_div) || (div_computing && !div_valid); 
             ex_stop       <= div_computing;  
+            div_clr       <= (div_valid) ? 1'b1 : 1'b0;  // 计算完成后清除除法器内部信号
         end
     end
 
     ysyx_25010030_divider u_divider (
-        .clk      (clk & (div_start | div_computing | reset)),   // 除法器时钟，在开始除法运算时启动
-        .reset    (reset                                    ),
-        .start    (div_start                                ),
-        .dividend (src1                                     ),   // 被除数
-        .divisor  (src2                                     ),   // 除数
-        .is_signed(id_ex_is_signed                          ),
-        .quotient (div_quotient                             ),   // 商
-        .remainder(div_remainder                            ),   // 余数
-        .valid    (div_valid                                )
+        .clk      (clk & (div_start | div_computing | reset | div_clr)),   // 除法器时钟，在开始除法运算时启动
+        .reset    (reset | div_clr                                    ),
+        .dividend (src1                                               ),   // 被除数
+        .divisor  (src2                                               ),   // 除数
+        .is_signed(id_ex_is_signed_div                                ),
+        .quotient (div_quotient                                       ),   // 商
+        .remainder(div_remainder                                      ),   // 余数
+        .valid    (div_valid                                          )
     );
 `endif
 
@@ -495,6 +497,53 @@ module ysyx_25010030_EX (
 `endif
 
     // 输出信号赋值
+`ifdef FPU
+    always @(posedge clk) begin
+        if (reset) begin
+            ex_lsu_src2           <= 32'h0;
+            ex_lsu_RegWrite       <= 1'b0;
+            ex_lsu_rd             <= 4'b0;
+            ex_lsu_MemRead        <= 1'b0;
+            ex_lsu_MemWrite       <= 1'b0;
+            ex_lsu_MemLen         <= 5'b0;
+            ex_lsu_process_result <= 32'h0;
+            ex_lsu_forward_las    <= 1'b0;
+            ex_lsu_csr            <= 1'b0;
+            ex_lsu_csr_wen1       <= 1'b0;
+            ex_lsu_csr_wr_addr1   <= 12'b0;
+            ex_lsu_csr_wr_data1   <= 32'h0;
+            ex_lsu_csr_wr_data2   <= 32'h0;
+            ex_lsu_csr_rdata      <= 32'h0;
+            ex_lsu_csr_ecall      <= 1'b0;
+            ex_lsu_csr_mret       <= 1'b0;
+`ifdef DIFFTEST
+            ex_lsu_pc            <= 32'h0;
+`endif
+        end
+        else if ((id_valid && ex_ready) || div_valid) begin
+            ex_lsu_src2           <= src2;
+            ex_lsu_RegWrite       <= id_ex_RegWrite;
+            ex_lsu_rd             <= id_ex_rd;
+            ex_lsu_MemRead        <= id_ex_MemRead;
+            ex_lsu_MemWrite       <= id_ex_MemWrite;
+            ex_lsu_MemLen         <= id_ex_MemLen;
+            // ex_lsu_process_result <= process_result;
+            ex_lsu_process_result <= (div_valid? (id_ex_is_rem ? div_remainder : div_quotient) : process_result);
+            ex_lsu_forward_las    <= forward_las;
+            ex_lsu_csr            <= (id_ex_csr_wen1 | id_ex_csr_ecall | id_ex_csr_mret);
+            ex_lsu_csr_wen1       <= id_ex_csr_wen1;
+            ex_lsu_csr_wr_addr1   <= id_ex_csr_wr_addr1;
+            ex_lsu_csr_wr_data1   <= csr_write_data;
+            ex_lsu_csr_wr_data2   <= (id_ex_csr_ecall) ? id_ex_pc : 32'b0;
+            ex_lsu_csr_rdata      <= wb_ex_csr_num1;
+            ex_lsu_csr_ecall      <= id_ex_csr_ecall;
+            ex_lsu_csr_mret       <= id_ex_csr_mret;
+`ifdef DIFFTEST
+            ex_lsu_pc            <= id_ex_pc;
+`endif
+        end
+    end
+`else
     always @(posedge clk) begin
         if (reset) begin
             ex_lsu_src2           <= 32'h0;
@@ -524,11 +573,7 @@ module ysyx_25010030_EX (
             ex_lsu_MemRead        <= id_ex_MemRead;
             ex_lsu_MemWrite       <= id_ex_MemWrite;
             ex_lsu_MemLen         <= id_ex_MemLen;
-`ifdef FPU
-            ex_lsu_process_result <= (div_valid ? (id_ex_is_rem ? div_remainder : div_quotient) : process_result);
-`else
             ex_lsu_process_result <= process_result;
-`endif
             ex_lsu_forward_las    <= forward_las;
             ex_lsu_csr            <= (id_ex_csr_wen1 | id_ex_csr_ecall | id_ex_csr_mret);
             ex_lsu_csr_wen1       <= id_ex_csr_wen1;
@@ -543,4 +588,5 @@ module ysyx_25010030_EX (
 `endif
         end
     end
+`endif
 endmodule
