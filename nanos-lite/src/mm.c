@@ -1,14 +1,20 @@
 #include <memory.h>
+#include <proc.h>
 
 static void *pf = NULL;
 
 void* new_page(size_t nr_page) {
-  return NULL;
+  // return NULL;
+  void *old = pf;
+  memset(old, 0, nr_page * PGSIZE);
+  pf += nr_page * PGSIZE;
+  return old;
 }
 
 #ifdef HAS_VME
 static void* pg_alloc(int n) {
-  return NULL;
+  // return NULL;
+  return new_page(n / PGSIZE);
 }
 #endif
 
@@ -18,6 +24,7 @@ void free_page(void *p) {
 
 /* The brk() system call handler. */
 int mm_brk(uintptr_t brk) {
+  TODO();
   return 0;
 }
 

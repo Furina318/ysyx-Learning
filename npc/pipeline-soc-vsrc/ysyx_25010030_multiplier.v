@@ -9,17 +9,14 @@ module ysyx_25010030_multiplier (
 );
 // 扩展被乘数和乘数
 wire signed [31:0] multiplicand_signed = multiplicand[31:0];
-wire signed [31:0] multiplier_signed = multiplier[31:0];
+wire signed [31:0] multiplier_signed   = multiplier[31:0];
 
 wire signed [67:0] multiplicand_ext = is_signed ? {{36{multiplicand_signed[31]}}, multiplicand_signed}
                                                 : {36'd0, multiplicand[31:0]};
-wire signed [34:0] multiplier_ext = is_signed ? {{2{multiplier_signed[31]}}, multiplier_signed, 1'b0}
-                                              : {2'b0, multiplier[31:0], 1'b0};
-
-//wire signed [67:0] multiplicand_ext= is_signed? {{36{multiplicand[31]}}, multiplicand} : {36'd0, multiplicand};//{{36{multiplicand[31]}}, multiplicand}
-//wire signed [34:0] multiplier_ext = is_signed ? {{2{multiplier[31]}}, multiplier,1'b0} :  {2'b0, multiplier,1'b0};  //{{2{multiplier[31]}}, multiplier} 
-
+wire signed [34:0] multiplier_ext   = is_signed ? {{2{multiplier_signed[31]}}, multiplier_signed, 1'b0}
+                                                : {2'b0, multiplier[31:0], 1'b0};
 wire signed [67:0] partial_products [16:0];
+
 genvar i;
 generate
     for (i = 0; i < 17; i = i + 1) begin : gen_partial_products
@@ -28,12 +25,13 @@ generate
         
         wire sel_negative, sel_double_negative, sel_positive, sel_double_positive;
         assign {sel_negative, sel_double_negative, sel_positive, sel_double_positive} = 
-            {y_group[2] & (y_group[1] ^ y_group[0]), y_group[2] & ~y_group[1] & ~y_group[0], 
-             ~y_group[2] & (y_group[1] ^ y_group[0]), ~y_group[2] & y_group[1] & y_group[0]};
-        assign partial_products[i] = (sel_negative? -x_shifted : (sel_double_negative? (-x_shifted) << 1 : 
-                                 (sel_positive? x_shifted : (sel_double_positive? (x_shifted << 1) : 68'd0))));
+            {y_group[2] & (y_group[1] ^ y_group[0]),  y_group[2] & ~y_group[1] & ~y_group[0], 
+            ~y_group[2] & (y_group[1] ^ y_group[0]), ~y_group[2] &  y_group[1] &  y_group[0]};
+        assign partial_products[i] = (sel_negative ? -x_shifted : (sel_double_negative? (-x_shifted) << 1 : 
+                                     (sel_positive ?  x_shifted : (sel_double_positive? (x_shifted << 1) : 68'd0))));
     end
 endgenerate
+
 wire [16:0] switch_outputs [67:0];
 genvar j, k;
 generate
@@ -43,28 +41,30 @@ generate
         end
     end
 endgenerate
+
 wire [13:0] cout_group [67:0];
-wire  cout  [67:0];
+wire        cout [67:0];
 wire [67:0] cout2  ;
 wire [67:0] s ;
 genvar l;
 generate
     for (l = 0; l < 68; l = l + 1) begin : gen_wallace
         walloc_17bits uut (
-           .src_in(switch_outputs[l]),
-           .cin(l ==0? 14'd0: cout_group[l-1] ),
-           .cout_group(cout_group[l]),
-           .cout(cout[l]),
-           .s(s[l])
+           .src_in    (switch_outputs[l]                ),
+           .cin       (l == 0 ? 14'd0 : cout_group[l-1] ),
+           .cout_group(cout_group[l]                    ),
+           .cout      (cout[l]                          ),
+           .s         (s[l]                             )
         );
-        assign cout2[l]=cout[l];
+        assign cout2[l] = cout[l];
     end
 endgenerate
+
 wire [68:0] sum_temp = {{1'b0, s} + {cout2, 1'b0}};
 always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
         product <= 64'd0;
-        valid <= 1'b0;
+        valid   <= 1'b0;
     end else begin
         if (is_signed) begin
             // product <= $signed({{1'b0, s} + {cout2, 1'b0}}[63:0]); // 有符号截断
@@ -95,19 +95,19 @@ module walloc_17bits(
     csa csa3 (.in (src_in[07:05]),.cout (c[1]),.s (first_s[1]) );
     csa csa4 (.in (src_in[04:02]),.cout (c[0]),.s (first_s[0]) );
     wire [3:0] secnod_s;
-    csa csa5 (.in ({first_s[4:2]}),.cout (c[8]),.s (secnod_s[3]));
-    csa csa6 (.in ({first_s[1:0],src_in[1]}),.cout (c[7]),.s (secnod_s[2]));
-    csa csa7 (.in ({src_in[0],cin[4:3]}),.cout (c[6]),.s (secnod_s[1]));
-    csa csa8 (.in ({cin[2:0]}),.cout (c[5]),.s (secnod_s[0]));
+    csa csa5 (.in ({first_s[4:2]}           ),.cout (c[8]),.s (secnod_s[3]));
+    csa csa6 (.in ({first_s[1:0], src_in[1]}),.cout (c[7]),.s (secnod_s[2]));
+    csa csa7 (.in ({src_in[0], cin[4:3]}    ),.cout (c[6]),.s (secnod_s[1]));
+    csa csa8 (.in ({cin[2:0]}               ),.cout (c[5]),.s (secnod_s[0]));
     wire [1:0] thrid_s;
-    csa csa9 (.in (secnod_s[3:1]),.cout (c[10]),.s (thrid_s[1]));
-    csa csaA (.in ({secnod_s[0],cin[6:5]}),.cout (c[09]),.s (thrid_s[0]));
+    csa csa9 (.in (secnod_s[3:1]          ),.cout (c[10]),.s (thrid_s[1]));
+    csa csaA (.in ({secnod_s[0], cin[6:5]}),.cout (c[09]),.s (thrid_s[0]));
     wire [1:0] fourth_s;
-    csa csaB (.in ({thrid_s[1:0],cin[10]}),.cout (c[12]),.s (fourth_s[1]));
-    csa csaC (.in ({cin[9:7]}),.cout (c[11]),.s (fourth_s[0]));
+    csa csaB (.in ({thrid_s[1:0], cin[10]}),.cout (c[12]),.s (fourth_s[1]));
+    csa csaC (.in ({cin[9:7]}             ),.cout (c[11]),.s (fourth_s[0]));
     wire fifth_s;
-    csa csaD (.in ({fourth_s[1:0],cin[11]}),.cout (c[13]),.s (fifth_s));
-    csa csaE (.in ({fifth_s,cin[13:12]}),.cout (cout),.s (s));
+    csa csaD (.in ({fourth_s[1:0], cin[11]}),.cout (c[13]),.s (fifth_s));
+    csa csaE (.in ({fifth_s, cin[13:12]}   ),.cout (cout ),.s (s      ));
     assign cout_group = c;
 endmodule
 
