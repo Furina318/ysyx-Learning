@@ -14,6 +14,9 @@ typedef struct {
 
 enum {FD_STDIN, FD_STDOUT, FD_STDERR, FD_FB};
 
+extern size_t ramdisk_read(void *buf, size_t offset, size_t len);
+extern size_t ramdisk_write(const void *buf, size_t offset, size_t len);
+
 size_t invalid_read(void *buf, size_t offset, size_t len) {
   panic("should not reach here");
   return 0;
@@ -32,11 +35,13 @@ static Finfo file_table[] __attribute__((used)) = {  //__attribute__((used))：G
 #include "files.h"
 };
 
-#define File_Size sizeof(file_table) / sizeof(file_table[0]);
+#define File_Size sizeof(file_table) / sizeof(file_table[0])
 
 int fs_open(const char *pathname, int flags, int mode){
+  Log("Try to open file %s ....", pathname);
   int ret = -1;
-  for (int i = FD_FB; i <= File_Size; i++){
+  // for (int i = FD_FB; i <= File_Size; i++){
+  for (int i = 0; i<= File_Size; i++){
     if (strcmp(pathname, file_table[i].name) == 0){
       file_table[i].open_offset = 0;
       ret = i;
@@ -83,7 +88,7 @@ size_t fs_write(int fd, const void *buf, size_t len){
     ret = file_table[fd].write(buf, file_table[fd].open_offset, len);
   }
   else {
-    Assert(file_table[fd].open_offset <= file_table[fd].size, "[fs_read] File %d open_offset bigger than size", fd);
+    Assert(file_table[fd].open_offset <= file_table[fd].size, "[fs_write] File %d open_offset bigger than size", fd);
 
     if (file_table[fd].open_offset + len > file_table[fd].size){
       len = file_table[fd].size - file_table[fd].open_offset; 
