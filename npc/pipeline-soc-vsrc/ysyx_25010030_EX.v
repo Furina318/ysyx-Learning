@@ -100,12 +100,7 @@ module ysyx_25010030_EX (
 
     output reg [31:0] ex_lsu_process_result
 
-);
-// `ifdef VERILATOR
-    // import "DPI-C" function void ebreak(input int station, input int inst);
-    // import "DPI-C" function void counter(input int inst_type, input int ifu_inc, input int lsu_inc, input int exu_inc);
-// `endif
-    
+);  
     // EXU 活跃周期计数
     // always @(posedge clk) begin
     //     if (reset) begin
@@ -517,7 +512,7 @@ module ysyx_25010030_EX (
             ex_lsu_csr_ecall      <= 1'b0;
             ex_lsu_csr_mret       <= 1'b0;
 `ifdef DIFFTEST
-            ex_lsu_pc            <= 32'h0;
+            ex_lsu_pc             <= 32'h0;
 `endif
         end
         else if ((id_valid && ex_ready) || div_valid) begin
@@ -539,7 +534,7 @@ module ysyx_25010030_EX (
             ex_lsu_csr_ecall      <= id_ex_csr_ecall;
             ex_lsu_csr_mret       <= id_ex_csr_mret;
 `ifdef DIFFTEST
-            ex_lsu_pc            <= id_ex_pc;
+            ex_lsu_pc             <= id_ex_pc;
 `endif
         end
     end
@@ -563,7 +558,7 @@ module ysyx_25010030_EX (
             ex_lsu_csr_ecall      <= 1'b0;
             ex_lsu_csr_mret       <= 1'b0;
 `ifdef DIFFTEST
-            ex_lsu_pc            <= 32'h0;
+            ex_lsu_pc             <= 32'h0;
 `endif
         end
         else if (id_valid && ex_ready) begin
@@ -584,7 +579,7 @@ module ysyx_25010030_EX (
             ex_lsu_csr_ecall      <= id_ex_csr_ecall;
             ex_lsu_csr_mret       <= id_ex_csr_mret;
 `ifdef DIFFTEST
-            ex_lsu_pc            <= id_ex_pc;
+            ex_lsu_pc             <= id_ex_pc;
 `endif
         end
     end

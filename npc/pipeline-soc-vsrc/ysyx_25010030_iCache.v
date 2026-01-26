@@ -26,10 +26,6 @@ module ysyx_25010030_iCache #(
     input  wire [ 3:0] axi_rid,
     input  wire        axi_rlast    
 );
-`ifdef VERILATOR
-    // import "DPI-C" function void cache_counter(input bit ihit);
-`endif
-
     // 地址划分 - 直接映射结构（块大小16字节）
     // 31           标签         直接映射索引    块内偏移(4位)  0
     // +-------------+-----------+------------+
@@ -160,7 +156,7 @@ module ysyx_25010030_iCache #(
                 end
 
                 READ: begin
-                    valid <= 1'b0;
+                    valid      <= 1'b0;
                     axi_rready <= 1'b1;
                     if(!axi_arvalid && !ar_done) begin 
                         axi_arvalid <= 1'b1;
@@ -168,21 +164,21 @@ module ysyx_25010030_iCache #(
                     end
                     else if(axi_arready) begin
                         axi_arvalid <= 1'b0;
-                        ar_done <= 1'b1;
+                        ar_done     <= 1'b1;
                     end
                     if (axi_rvalid) begin
                     `ifdef YSYXSOC
                         block_data[beat_cnt] <= axi_rdata;
                         beat_cnt <= in_sdram ? beat_cnt + 1'b1 : 2'b0;
                     `else
-                        inst <= axi_rdata;
+                        inst  <= axi_rdata;
                         valid <= 1'b1;
                     `endif
                     end
                 end
 
                 FILL: begin
-                    axi_rready <= 1'b0;
+                    axi_rready             <= 1'b0;
                     valid_ram[saved_index] <= 1'b1;
                     tag_ram[saved_index]   <= saved_tag;
                     for (b = 0; b < BEATS_PER_BLOCK; b = b + 1) begin

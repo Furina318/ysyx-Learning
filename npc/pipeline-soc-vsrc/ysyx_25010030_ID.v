@@ -202,7 +202,7 @@ module ysyx_25010030_ID (
             id_ex_imm   <= 32'b0;
             id_ex_shamt <= 6'b0;
             
-            id_ex_pc   <= 32'b0;
+            id_ex_pc    <= 32'b0;
             // id_ex_inst <= 32'b0;
             
             id_ex_alu_op <= `ALU_ADD;
@@ -246,8 +246,8 @@ module ysyx_25010030_ID (
             id_ex_fencei    <= (if_id_inst == FENCEI);
 
         `ifdef FPU
-            id_ex_is_div    <= is_div;
-            id_ex_is_rem    <= is_rem;
+            id_ex_is_div        <= is_div;
+            id_ex_is_rem        <= is_rem;
             id_ex_is_signed_div <= is_signed;
 
             // id_ex_is_mul        <= is_mul;
@@ -273,26 +273,22 @@ module ysyx_25010030_ID (
                 `INST_TYPE_LUI: begin
                     id_ex_imm      <= immU;
                     id_ex_RegWrite <= 1'b1;
-                    // inst_type      <= 1;
                 end
                 `INST_TYPE_AUIPC: begin
                     id_ex_imm      <= immU;
                     id_ex_RegWrite <= 1'b1;
                     id_ex_alu_op   <= `ALU_ADD;  // PC + imm
-                    // inst_type      <= 1;
                 end
                 `INST_TYPE_JAL: begin
                     id_ex_imm      <= immJ;
                     id_ex_RegWrite <= 1'b1;
                     id_ex_jal      <= 1'b1;
-                    // inst_type      <= 2;
                 end
                 `INST_TYPE_JALR: begin
                     if (func3 == 3'b000) begin
                         id_ex_imm      <= immI;
                         id_ex_RegWrite <= 1'b1;
                         id_ex_jalr     <= 1'b1;
-                        // inst_type      <= 2;
                     end
                 end
                 `INST_TYPE_S: begin
@@ -306,7 +302,6 @@ module ysyx_25010030_ID (
                             $display("[ID]: Unknown inst with func3=%b in S-type", func3);
                         end
                     endcase
-                    // inst_type <= 5;
                 end
                 `INST_TYPE_L: begin
                     id_ex_imm      <= immI;
@@ -323,7 +318,6 @@ module ysyx_25010030_ID (
                             $display("[ID]: Unknown inst with func3=%b in L-type", func3);
                         end
                     endcase
-                    // inst_type <= 3;
                 end
                 `INST_TYPE_R: begin
                     id_ex_imm      <= immR;
@@ -341,7 +335,6 @@ module ysyx_25010030_ID (
                             $display("[ID]: Unknown inst with func3=%b in R-type", func3);
                         end
                     endcase
-                    // inst_type <= 0;/
                 end
                 `INST_TYPE_I: begin
                     id_ex_imm <= immI;
@@ -359,7 +352,6 @@ module ysyx_25010030_ID (
                             $display("[ID]: Unknown inst with func3=%b in I-type", func3);
                         end
                     endcase
-                    // inst_type <=1;
                 end
                 `INST_TYPE_B: begin
                     id_ex_imm <= immB;
@@ -371,7 +363,6 @@ module ysyx_25010030_ID (
                             $display("[ID]: Unknown inst with func3=%b in B-type", func3);
                         end
                     endcase
-                    // inst_type <= 4;
                 end
                 `INST_TYPE_E: begin
                     if (opcode == `INST_CSR) begin
@@ -423,18 +414,10 @@ module ysyx_25010030_ID (
                         // id_ex_csr_wr_addr2 <= (if_id_inst == `INST_ECALL) ? `MEPC : 12'b0;
                         id_wb_csr_addr1    <= (if_id_inst == `INST_MRET) ? `MSTATUS : ((if_id_inst == `INST_ECALL) ? `MTVEC : if_id_inst[31:20]);
                         id_wb_csr_addr2    <= (if_id_inst == `INST_MRET) ? `MEPC : 12'b0;
-                        // inst_type <= 6;
                     end
                 end
-                default: begin
-                    // inst_type <= 7;
-                end
+                default: begin end
             endcase
-        // `ifdef VERILATOR
-        //     if(inst_type != 7) begin
-        //         counter(inst_type, 0, 0, 0);
-        //     end
-        // `endif
         end
     end
 endmodule
