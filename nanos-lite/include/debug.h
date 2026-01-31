@@ -30,7 +30,7 @@
 #define Assert(cond, format, ...) \
   do { \
     if (!(cond)) { \
-      Log("\33[1;31m[%s,%d,%s] " format "\33[0m\n", \
+      Log("\33[1;31m[%s,%d,%s] " format "\33[0m", \
           __FILE__, __LINE__, __func__, ## __VA_ARGS__); \
     } \
   } while (0)

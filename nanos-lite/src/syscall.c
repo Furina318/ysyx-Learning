@@ -1,6 +1,7 @@
 #include <common.h>
 #include <memory.h>
 #include "syscall.h"
+#include <fs.h>
 
 #ifdef STRACE
 #define SYSCALL_TRACE(...) Log(__VA_ARGS__)
@@ -56,6 +57,22 @@ void do_syscall(Context *c) {
     case SYS_brk:
       SYSCALL_TRACE("syscall: brk (addr=%p)", (void*)a[1]);
       c->GPRx = mm_brk(a[1]);
+      break;
+    case SYS_read:
+      SYSCALL_TRACE("syscall: read (fd=%d, buf=%p, len=%d)", a[1], (void*)a[2], a[3]);
+      c->GPRx = fs_read(a[1], (void*)a[2], a[3]);
+      break;
+    case SYS_open:
+      SYSCALL_TRACE("syscall: open (pathname=%p, flags=%d, mode=%d)", (void*)a[1], a[2], a[3]);
+      c->GPRx = fs_open((const char*)a[1], a[2], a[3]);
+      break;
+    case SYS_close:
+      SYSCALL_TRACE("syscall: close (fd=%d)", a[1]);
+      c->GPRx = fs_close(a[1]);
+      break;
+    case SYS_lseek:
+      SYSCALL_TRACE("syscall: lseek (fd=%d, offset=%d, whence=%d)", a[1], a[2], a[3]);
+      c->GPRx = fs_lseek(a[1], a[2], a[3]);
       break;
     default: panic("Unhandled syscall ID = %d", a[0]);
   }

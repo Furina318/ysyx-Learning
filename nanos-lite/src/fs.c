@@ -29,7 +29,7 @@ size_t invalid_write(const void *buf, size_t offset, size_t len) {
 
 /* This is the information about all files in disk. */
 static Finfo file_table[] __attribute__((used)) = {  //__attribute__((used))：GCC 编译器扩展属性，强制编译器保留这个数组，避免被优化掉
-  [FD_STDIN]  = {"stdin", 0, 0, invalid_read, invalid_write},
+  [FD_STDIN ] = {"stdin",  0, 0, invalid_read, invalid_write},
   [FD_STDOUT] = {"stdout", 0, 0, invalid_read, invalid_write},
   [FD_STDERR] = {"stderr", 0, 0, invalid_read, invalid_write},
 #include "files.h"
@@ -41,7 +41,7 @@ int fs_open(const char *pathname, int flags, int mode){
   Log("Try to open file %s ....", pathname);
   int ret = -1;
   // for (int i = FD_FB; i <= File_Size; i++){
-  for (int i = 0; i<= File_Size; i++){
+  for (int i = 0; i <= File_Size; i++){
     if (strcmp(pathname, file_table[i].name) == 0){
       file_table[i].open_offset = 0;
       ret = i;
@@ -49,6 +49,7 @@ int fs_open(const char *pathname, int flags, int mode){
     }
   }
   Assert(ret != -1, "[fs_open] File %s not found!", pathname);
+  Log("File %s opened with fd %d", pathname, ret);
   return ret;
 }
 
