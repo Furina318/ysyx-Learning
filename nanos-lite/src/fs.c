@@ -1,4 +1,11 @@
 #include <fs.h>
+#include <device.h>
+
+#ifdef FSTRACE
+#define FS_TRACE(...) Log(__VA_ARGS__)
+#else
+#define FS_TRACE(...)
+#endif
 
 typedef size_t (*ReadFn) (void *buf, size_t offset, size_t len);
 typedef size_t (*WriteFn) (const void *buf, size_t offset, size_t len);
@@ -30,15 +37,20 @@ size_t invalid_write(const void *buf, size_t offset, size_t len) {
 /* This is the information about all files in disk. */
 static Finfo file_table[] __attribute__((used)) = {  //__attribute__((used))：GCC 编译器扩展属性，强制编译器保留这个数组，避免被优化掉
   [FD_STDIN ] = {"stdin",  0, 0, invalid_read, invalid_write},
-  [FD_STDOUT] = {"stdout", 0, 0, invalid_read, invalid_write},
-  [FD_STDERR] = {"stderr", 0, 0, invalid_read, invalid_write},
+  // [FD_STDOUT] = {"stdout", 0, 0, invalid_read, invalid_write},
+  // [FD_STDERR] = {"stderr", 0, 0, invalid_read, invalid_write},
+  [FD_STDOUT] = {"stdout", 0, 0, invalid_read, serial_write},
+  [FD_STDERR] = {"stderr", 0, 0, invalid_read, serial_write},
+  [FD_FB    ] = {"/dev/fb", 0, 0, invalid_read, fb_write},
+  {"/dev/events", 0, 0, events_read, invalid_write},
+  {"/proc/dispinfo", 128, 0, dispinfo_read, invalid_write},
 #include "files.h"
 };
 
 #define File_Size sizeof(file_table) / sizeof(file_table[0])
 
 int fs_open(const char *pathname, int flags, int mode){
-  Log("Try to open file %s ....", pathname);
+  FS_TRACE("Try to open file %s ....", pathname);
   int ret = -1;
   // for (int i = FD_FB; i <= File_Size; i++){
   for (int i = 0; i <= File_Size; i++){
@@ -49,7 +61,7 @@ int fs_open(const char *pathname, int flags, int mode){
     }
   }
   Assert(ret != -1, "[fs_open] File %s not found!", pathname);
-  Log("File %s opened with fd %d", pathname, ret);
+  FS_TRACE("File %s opened with fd %d", pathname, ret);
   return ret;
 }
 
@@ -58,7 +70,8 @@ int fs_close(int fd){
 }
 
 void init_fs() {
-  // TODO: initialize the size of /dev/fb
+  file_table[FD_FB].size = io_read(AM_GPU_CONFIG).width * io_read(AM_GPU_CONFIG).height * sizeof(uint32_t);
+  FS_TRACE("Frame buffer size set to %d", file_table[FD_FB].size);
 }
 
 size_t fs_read(int fd, void *buf, size_t len){

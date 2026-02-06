@@ -2,6 +2,7 @@
 #include <memory.h>
 #include "syscall.h"
 #include <fs.h>
+#include <sys/time.h>
 
 #ifdef STRACE
 #define SYSCALL_TRACE(...) Log(__VA_ARGS__)
@@ -20,7 +21,7 @@ void sys_exit(int code){
 
 size_t sys_write(int fd, const void *buf, size_t len) {
   // 仅处理stdout(1)和stderr(2)
-  assert(fd == 1 || fd == 2);
+  Assert(fd == 1 || fd == 2, "[sys_write] fd %d not supported!", fd);
 
   if (len == 0 || buf == NULL) {
     return 0;
@@ -32,6 +33,13 @@ size_t sys_write(int fd, const void *buf, size_t len) {
   }
 
   return len; //返回成功写入字节数
+}
+
+int sys_gettimeofday(struct timeval *tv, struct timezone *tz) {
+    uint64_t us = io_read(AM_TIMER_UPTIME).us;
+    tv->tv_sec = us / 1000000;
+    tv->tv_usec = us - us / 1000000 * 1000000;
+    return 0;
 }
 
 void do_syscall(Context *c) {
@@ -52,7 +60,13 @@ void do_syscall(Context *c) {
       break;
     case SYS_write:
       SYSCALL_TRACE("syscall: write (fd=%d, buf=%p, len=%d)", a[1], (void*)a[2], a[3]);
-      c->GPRx = sys_write(a[1], (const void*)a[2], a[3]);
+      // c->GPRx = sys_write(a[1], (const void*)a[2], a[3]);
+      c->GPRx = fs_write(a[1], (const void*)a[2], a[3]);
+      // if (a[1] == 1 || a[1] == 2) {
+      //   c->GPRx = sys_write(a[1], (const void*)a[2], a[3]);
+      // } else {
+      //   c->GPRx = fs_write(a[1], (const void*)a[2], a[3]);
+      // }
       break;
     case SYS_brk:
       SYSCALL_TRACE("syscall: brk (addr=%p)", (void*)a[1]);
@@ -73,6 +87,10 @@ void do_syscall(Context *c) {
     case SYS_lseek:
       SYSCALL_TRACE("syscall: lseek (fd=%d, offset=%d, whence=%d)", a[1], a[2], a[3]);
       c->GPRx = fs_lseek(a[1], a[2], a[3]);
+      break;
+    case SYS_gettimeofday:
+      SYSCALL_TRACE("syscall: gettimeofday (tv=%p, tz=%p)", (void*)a[1], (void*)a[2]);
+      c->GPRx = sys_gettimeofday((struct timeval *)a[1], (struct timezone *)a[2]);
       break;
     default: panic("Unhandled syscall ID = %d", a[0]);
   }

@@ -68,6 +68,12 @@
  * SUCH DAMAGE.
  */
 
+
+// 31  30                           8          0
+// +----+---------------------------+----------+
+// |sign|          integer          | fraction |
+// +----+---------------------------+----------+
+
 #ifndef FIXEDPT_BITS
 #define FIXEDPT_BITS	32
 #endif
@@ -78,6 +84,7 @@
 extern "C" {
 #endif
 
+// fixedptd（双倍位宽类型）是为了应对乘法 / 移位运算中的溢出问题
 #if FIXEDPT_BITS == 32
 typedef int32_t fixedpt;
 typedef	int64_t	fixedptd;
@@ -102,17 +109,25 @@ typedef	__uint128_t fixedptud;
 
 #define FIXEDPT_VCSID "$Id$"
 
+// 小数部分位宽（8）
 #define FIXEDPT_FBITS	(FIXEDPT_BITS - FIXEDPT_WBITS)
+// 小数部分的掩码：用于提取定点数的小数部分
 #define FIXEDPT_FMASK	(((fixedpt)1 << FIXEDPT_FBITS) - 1)
 
+// 浮点数->定点数
 #define fixedpt_rconst(R) ((fixedpt)((R) * FIXEDPT_ONE + ((R) >= 0 ? 0.5 : -0.5)))
+// 整数->定点数
 #define fixedpt_fromint(I) ((fixedptd)(I) << FIXEDPT_FBITS)
+// 定点数->整数
 #define fixedpt_toint(F) ((F) >> FIXEDPT_FBITS)
 #define fixedpt_add(A,B) ((A) + (B))
 #define fixedpt_sub(A,B) ((A) - (B))
+// 提取定点数的小数部分
 #define fixedpt_fracpart(A) ((fixedpt)(A) & FIXEDPT_FMASK)
 
+// 定点数表示整数1
 #define FIXEDPT_ONE	((fixedpt)((fixedpt)1 << FIXEDPT_FBITS))
+// 定点数，0.5
 #define FIXEDPT_ONE_HALF (FIXEDPT_ONE >> 1)
 #define FIXEDPT_TWO	(FIXEDPT_ONE + FIXEDPT_ONE)
 #define FIXEDPT_PI	fixedpt_rconst(3.14159265358979323846)
@@ -123,39 +138,48 @@ typedef	__uint128_t fixedptud;
 /* fixedpt is meant to be usable in environments without floating point support
  * (e.g. microcontrollers, kernels), so we can't use floating point types directly.
  * Putting them only in macros will effectively make them optional. */
+// 定点数->浮点数
 #define fixedpt_tofloat(T) ((float) ((T)*((float)(1)/(float)(1L << FIXEDPT_FBITS))))
 
 /* Multiplies a fixedpt number with an integer, returns the result. */
 static inline fixedpt fixedpt_muli(fixedpt A, int B) {
-	return 0;
+	return (fixedpt)((fixedptd)A * B);
 }
 
 /* Divides a fixedpt number with an integer, returns the result. */
 static inline fixedpt fixedpt_divi(fixedpt A, int B) {
-	return 0;
+	return (fixedpt)((fixedptd)A / B);
 }
 
 /* Multiplies two fixedpt numbers, returns the result. */
 static inline fixedpt fixedpt_mul(fixedpt A, fixedpt B) {
-	return 0;
+	// return (fixedpt)((((fixedptd)A * B)) >> FIXEDPT_FBITS);
+	return (fixedpt)((((fixedptd)A * B)) / FIXEDPT_ONE);
 }
 
 
 /* Divides two fixedpt numbers, returns the result. */
 static inline fixedpt fixedpt_div(fixedpt A, fixedpt B) {
-	return 0;
+	// return (fixedpt)((((fixedptd)(A)) << FIXEDPT_FBITS) / ((fixedptd)(B)));
+	return (fixedpt)(((fixedpt)A * FIXEDPT_ONE) / B);
 }
 
 static inline fixedpt fixedpt_abs(fixedpt A) {
-	return 0;
+	return (fixedpt)((A < 0) ? -A : A);
 }
 
 static inline fixedpt fixedpt_floor(fixedpt A) {
-	return 0;
+	// return fixedpt_fromint(fixedpt_toint(A));
+	fixedptd frac = A % FIXEDPT_ONE;
+	return (fixedpt)( (A < 0 && frac != 0) ? ((fixedptd)A / FIXEDPT_ONE - 1) * FIXEDPT_ONE : (fixedptd)A / FIXEDPT_ONE * FIXEDPT_ONE );
 }
 
 static inline fixedpt fixedpt_ceil(fixedpt A) {
-	return 0;
+	// fixedpt frac = fixedpt_fracpart(A);
+	// if (frac == 0) return A;
+	// else return fixedpt_fromint(fixedpt_toint(A) + 1);
+	fixedptd frac = A % FIXEDPT_ONE;
+	return (fixedpt)( (A > 0 && frac != 0) ? ((fixedptd)A / FIXEDPT_ONE + 1) * FIXEDPT_ONE : (fixedptd)A / FIXEDPT_ONE * FIXEDPT_ONE );
 }
 
 /*
