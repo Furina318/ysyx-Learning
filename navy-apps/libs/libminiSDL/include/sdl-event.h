@@ -14,7 +14,7 @@
 
 enum SDL_Keys {
   SDLK_NONE = 0,
-  _KEYS(enumdef)
+  _KEYS(enumdef) // 展开为：SDLK_XXX，把 _KEYS 中的每个按键名，通过 enumdef 转换成 SDLK_XXX 枚举值
 };
 
 enum SDL_EventType {
@@ -23,21 +23,22 @@ enum SDL_EventType {
   SDL_USEREVENT,
 };
 
+// 事件掩码生成宏：用于筛选特定类型的事件
 #define SDL_EVENTMASK(ev_type) (1u << (ev_type))
 
 enum SDL_EventAction {
-  SDL_ADDEVENT,
-  SDL_PEEKEVENT,
-  SDL_GETEVENT,
+  SDL_ADDEVENT,   // 按下
+  SDL_PEEKEVENT,  // 抬起
+  SDL_GETEVENT,   // 自定义
 };
 
 typedef struct {
-  uint8_t sym;
+  uint8_t sym;   // 按键符号 
 } SDL_keysym;
 
 typedef struct {
-  uint8_t type;
-  SDL_keysym keysym;
+  uint8_t type;      // 事件类型
+  SDL_keysym keysym; // 按键
 } SDL_KeyboardEvent;
 
 typedef struct {
@@ -45,7 +46,7 @@ typedef struct {
   int code;
   void *data1;
   void *data2;
-} SDL_UserEvent;
+} SDL_UserEvent;  // 自定义事件结构体
 
 typedef union {
   uint8_t type;

@@ -7,12 +7,55 @@
 void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect) {
   assert(dst && src);
   assert(dst->format->BitsPerPixel == src->format->BitsPerPixel);
+
+  int src_x = (srcrect == NULL ? 0 : srcrect->x);
+  int src_y = (srcrect == NULL ? 0 : srcrect->y);
+  int src_w = (srcrect == NULL ? src->w : srcrect->w);
+  int src_h = (srcrect == NULL ? src->h : srcrect->h);
+
+  int dst_x = (dstrect == NULL ? 0 : dstrect->x);
+  int dst_y = (dstrect == NULL ? 0 : dstrect->y);
+  int dst_w = (dstrect == NULL ? dst->w : dstrect->w);
+  int dst_h = (dstrect == NULL ? dst->h : dstrect->h);
+
+  // 
+  for (int y = 0; y < src_h && y + dst_y < dst->h; y ++) {
+    for (int x = 0; x < src_w && x + dst_x < dst->w; x ++) {
+      uint8_t *src_pixel = src->pixels + (src_y + y) * src->pitch + (src_x + x) * src->format->BytesPerPixel;
+      uint8_t *dst_pixel = dst->pixels + (dst_y + y) * dst->pitch + (dst_x + x) * dst->format->BytesPerPixel;
+      memcpy(dst_pixel, src_pixel, src->format->BytesPerPixel);
+    }
+  }
 }
 
 void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
+  int bytes = dst->format->BytesPerPixel;
+  int dst_x = (dstrect == NULL ? 0 : dstrect->x);
+  int dst_y = (dstrect == NULL ? 0 : dstrect->y);
+  int dst_w = (dstrect == NULL ? dst->w : dstrect->w);
+  int dst_h = (dstrect == NULL ? dst->h : dstrect->h);
+
+  uint8_t color_buf[4];
+  for (int i = 0; i < bytes; i++) {
+    color_buf[i] = (color >> (8 * i)) & 0xFF;
+  }
+
+  for (int i = 0; i < dst_h; ++i) {
+    uint8_t *temp = dst->pixels + (dst_y + i) * dst->pitch + dst_x * bytes;
+    for (int j = 0; j < dst_w; ++j) {
+      uint8_t *pixel = temp + j * bytes;
+      memcpy(pixel, color_buf, bytes);
+    }
+  }
 }
 
 void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
+  if(x == 0 && y == 0 && w == 0 && h == 0) {
+    NDL_DrawRect((uint32_t *)s->pixels, 0, 0, s->w, s->h);
+  }
+  else {
+    NDL_DrawRect((uint32_t *)s->pixels, x, y, w, h);
+  }
 }
 
 // APIs below are already implemented.
