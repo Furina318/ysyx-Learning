@@ -51,11 +51,11 @@
 
 #define CONFIG_WATCHPOINTS 1
 
-// #define CONFIG_WAVE 1
+#define CONFIG_WAVE 0
 #define WAVE_START_TIME 0
-#define WAVE_END_TIME 60000
+#define WAVE_END_TIME 100000
 #define CONFIG_WAVE_MAX_UPDATE_CYCLES 10000
-#define CONFIG_WAVE_MODE 0  //0:从复位开始记录波形，直到结束； 
+#define CONFIG_WAVE_MODE 1  //0:从复位开始记录波形，直到结束； 
                             //1:从WAVE_START_TIME开始记录波形，到WAVE_END_TIME结束； 
                             //2:当记录波形周期大于CONFIG_WAVE_MAX_UPDATE_CYCLES时更新波形文件重新记录
 #endif

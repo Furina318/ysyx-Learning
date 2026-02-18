@@ -61,6 +61,9 @@ module ysyx_25010030_EX (
     input             id_ex_is_rem,
     input             id_ex_is_signed_div,
     output reg        ex_stop,
+
+    input             id_ex_is_mul,
+    input      [ 3:0] id_ex_mul_op,
 `endif
 
 `ifdef BPU
@@ -101,14 +104,6 @@ module ysyx_25010030_EX (
     output reg [31:0] ex_lsu_process_result
 
 );  
-    // EXU 活跃周期计数
-    // always @(posedge clk) begin
-    //     if (reset) begin
-    //         exu_active_cycles <= 0;
-    //     end else if (id_valid && ex_ready) begin
-    //         exu_active_cycles <= exu_active_cycles + 1;
-    //     end
-    // end
 
     // 前递后的源寄存器值
     // wire [31:0] src1 = (forward_rs1[1] ? ex_lsu_process_result : 
@@ -195,9 +190,6 @@ module ysyx_25010030_EX (
             `ALU_SRL:  process_result = ex_num1 >> ex_num2[4:0];
             default:   begin 
                 process_result = 32'b0; 
-            // `ifdef VERILATOR
-            //     $display("Unkonw alu_op"); 
-            // `endif
             end
         endcase
         alu_zero = (process_result == 32'b0);
@@ -214,17 +206,29 @@ module ysyx_25010030_EX (
     wire [31:0] div_remainder;  // 从divider输出的余数
     wire        div_valid;  
 
+    reg         mul_start;
+    reg         mul_computing;
+    reg         mul_clr;
+
     always @(posedge clk) begin
         if (reset) begin
             div_start     <= 1'b0;
             div_computing <= 1'b0;
             ex_stop       <= 1'b0;
             div_clr       <= 1'b1;
+
+            mul_start     <= 1'b0;
+            mul_computing <= 1'b0;
+            mul_clr       <= 1'b0;
         end else begin
             div_start     <= (id_valid && ex_ready && id_ex_is_div && !div_computing); 
             div_computing <= (id_valid && ex_ready && id_ex_is_div) || (div_computing && !div_valid); 
-            ex_stop       <= div_computing;  
+            ex_stop       <= div_computing | mul_computing;  
             div_clr       <= (div_valid) ? 1'b1 : 1'b0;  // 计算完成后清除除法器内部信号
+
+            mul_start     <= (id_valid && ex_ready && id_ex_is_mul && !mul_computing);
+            mul_computing <= (id_valid && ex_ready && id_ex_is_mul) || (mul_computing && !mul_valid);
+            mul_clr       <= (mul_valid) ? 1'b1 : 1'b0;
         end
     end
 
@@ -238,6 +242,24 @@ module ysyx_25010030_EX (
         .remainder(div_remainder                                      ),   // 余数
         .valid    (div_valid                                          )
     );
+
+    reg [63:0] mul_product;
+    reg        mul_valid;
+
+    wire [31:0] multiplicand  = id_ex_mul_op[3] ? $unsigned(src1) : $signed(src1); // mulhu?
+    wire [31:0] multiplier    = (id_ex_mul_op[2] | id_ex_mul_op[3]) ? $unsigned(src2) : $signed(src2); // mulhu|mulhsu?
+    wire        is_signed_mul = ~id_ex_mul_op[3]; // 非mulhu
+    
+    ysyx_25010030_multiplier u_mul(
+        .clk          	(clk & (mul_start | mul_computing | reset | mul_clr)),
+        .rst_n        	(~(reset | mul_clr)                                 ),
+        .multiplicand 	(multiplicand                                       ),
+        .multiplier   	(multiplier                                         ),
+        .is_signed    	(is_signed_mul                                      ),
+        .product      	(mul_product                                        ),
+        .valid        	(mul_valid                                          )
+    );
+    
 `endif
 
     // 分支和跳转逻辑
@@ -453,7 +475,7 @@ module ysyx_25010030_EX (
             ex_ready = 1'b0;
         end
         else begin
-            ex_ready = (lsu_ready || ~ex_lsu_valid) && (load_use_flag == 4'b0) && (!div_computing || div_valid);
+            ex_ready = (lsu_ready || ~ex_lsu_valid) && (load_use_flag == 4'b0) && (!div_computing || div_valid) && (!mul_computing || mul_valid);
         end
     end
 
@@ -461,7 +483,7 @@ module ysyx_25010030_EX (
         if (reset) begin
             ex_lsu_valid <= 1'b0;
         end
-        else if (((id_valid && ex_ready && !id_ex_is_div) || (div_valid))&& (lsu_ready || ~ex_lsu_valid)) begin
+        else if (((id_valid && ex_ready && !id_ex_is_div && !id_ex_is_mul) || (div_valid) || (mul_valid)) && (lsu_ready || ~ex_lsu_valid)) begin
             ex_lsu_valid <= 1'b1;
         end
         else if (~(id_valid && ex_ready) && lsu_ready) begin
@@ -515,7 +537,7 @@ module ysyx_25010030_EX (
             ex_lsu_pc             <= 32'h0;
 `endif
         end
-        else if ((id_valid && ex_ready) || div_valid) begin
+        else if ((id_valid && ex_ready) || div_valid || mul_valid) begin
             ex_lsu_src2           <= src2;
             ex_lsu_RegWrite       <= id_ex_RegWrite;
             ex_lsu_rd             <= id_ex_rd;
@@ -523,7 +545,9 @@ module ysyx_25010030_EX (
             ex_lsu_MemWrite       <= id_ex_MemWrite;
             ex_lsu_MemLen         <= id_ex_MemLen;
             // ex_lsu_process_result <= process_result;
-            ex_lsu_process_result <= (div_valid? (id_ex_is_rem ? div_remainder : div_quotient) : process_result);
+            ex_lsu_process_result <= (div_valid ? (id_ex_is_rem    ? div_remainder     : div_quotient      ) 
+                                   : (mul_valid ? (id_ex_mul_op[0] ? mul_product[31:0] : mul_product[63:32]) 
+                                   : process_result));
             ex_lsu_forward_las    <= forward_las;
             ex_lsu_csr            <= (id_ex_csr_wen1 | id_ex_csr_ecall | id_ex_csr_mret);
             ex_lsu_csr_wen1       <= id_ex_csr_wen1;

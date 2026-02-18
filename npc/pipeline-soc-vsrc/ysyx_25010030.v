@@ -334,6 +334,8 @@ module ysyx_25010030 (
     wire        id_ex_is_rem;
     wire        id_ex_is_signed_div;
     wire        ex_stop;
+    wire        id_ex_is_mul;
+    wire [ 3:0] id_ex_mul_op;
 `endif
 
 `ifdef BPU
@@ -619,6 +621,8 @@ module ysyx_25010030 (
         .id_ex_is_rem          (id_ex_is_rem          ),
         .id_ex_is_signed_div   (id_ex_is_signed_div   ),
         .ex_stop               (ex_stop               ),
+        .id_ex_is_mul          (id_ex_is_mul          ),
+        .id_ex_mul_op          (id_ex_mul_op          ),
 `endif
 `ifdef BPU
         .id_ex_predict_taken  (id_ex_predict_taken  ),
@@ -693,6 +697,8 @@ module ysyx_25010030 (
         .id_ex_is_rem           (id_ex_is_rem           ),
         .id_ex_is_signed_div    (id_ex_is_signed_div    ),
         .ex_stop                (ex_stop                ),
+        .id_ex_is_mul           (id_ex_is_mul           ),
+        .id_ex_mul_op           (id_ex_mul_op           ),
 `endif
 `ifdef BPU
         .id_ex_predict_taken    (id_ex_predict_taken    ),

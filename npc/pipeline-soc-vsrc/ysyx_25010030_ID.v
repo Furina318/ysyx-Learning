@@ -42,9 +42,8 @@ module ysyx_25010030_ID (
     output reg        id_ex_is_signed_div,
     input             ex_stop,
 
-    // output reg        id_ex_mul,
-    // output reg        id_ex_is_signed_mul, 
-    // output reg        id_ex_is_su_mul,
+    output reg        id_ex_is_mul,
+    output reg [ 3:0] id_ex_mul_op,
 `endif   
 
 `ifdef BPU
@@ -66,9 +65,6 @@ module ysyx_25010030_ID (
     output reg [11:0] id_wb_csr_addr1,        
     output reg [11:0] id_wb_csr_addr2         
 );
-`ifdef VERILATOR
-    // import "DPI-C" function void counter(input int inst_type, input int ifu_inc, input int lsu_inc, input int exu_inc);
-`endif
     // 指令字段提取
     localparam FENCEI = 32'h0000100f;
     wire [6:0] opcode = if_id_inst[ 6: 0];
@@ -91,16 +87,19 @@ module ysyx_25010030_ID (
     wire [31:0] immR   = 32'b0;
     wire [31:0] immCSR = {27'b0, if_id_inst[19:15]};
 
-    // reg [31:0] inst_type;
 `ifdef FPU
     wire [6:0] func7  = if_id_inst[31:25];
     wire       is_div = (get_opcode == `INST_TYPE_R) && (func7 == 7'b0000001) && (func3[2]);
     wire       is_rem = is_div && (func3[1]);
     wire       is_signed = is_div && (!func3[0]); // div/divu, rem/remu
 
-    // wire       is_mul = (get_opcode == `INST_TYPE_R) && (func7 == 7'b0000001) && (!func3[2]);
-    // wire       is_signed_mul = is_mul && (!func3[1]); // mul/mulu
-    // wire       is_su_mul = is_mul && (func3 == 3'b010); // mulhsu，有符号乘无符号，不是单纯的有符号或无符号
+    wire       is_mul = (get_opcode == `INST_TYPE_R) && (func7 == 7'b0000001) && (!func3[2]);
+    wire [3:0] mul_op;
+    assign mul_op[0] = is_mul & (func3[1:0] == 2'b00); //mul
+    assign mul_op[1] = is_mul & (func3[1:0] == 2'b01); //mulh
+    assign mul_op[2] = is_mul & (func3[1:0] == 2'b10); //mulhsu
+    assign mul_op[3] = is_mul & (func3[1:0] == 2'b11); //mulhu
+    
 
     always @(*) begin
         if(reset) begin
@@ -185,9 +184,8 @@ module ysyx_25010030_ID (
             id_ex_is_div    <= 1'b0;
             id_ex_is_rem    <= 1'b0;
             id_ex_is_signed_div <= 1'b0;
-            // id_ex_is_mul        <= 1'b0;
-            // id_ex_is_signed_mul <= 1'b0;
-            // id_ex_is_su_mul     <= 1'b0;
+            id_ex_is_mul        <= 1'b0;
+            id_ex_mul_op        <= 4'b0;
         `endif
 
         `ifdef BPU
@@ -250,9 +248,8 @@ module ysyx_25010030_ID (
             id_ex_is_rem        <= is_rem;
             id_ex_is_signed_div <= is_signed;
 
-            // id_ex_is_mul        <= is_mul;
-            // id_ex_is_signed_mul <= is_signed_mul;
-            // id_ex_is_su_mul     <= is_su_mul;
+            id_ex_is_mul        <= is_mul;
+            id_ex_mul_op        <= mul_op;
         `endif
 
         `ifdef BPU
