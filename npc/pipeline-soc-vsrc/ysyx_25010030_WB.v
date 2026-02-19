@@ -18,7 +18,7 @@ module ysyx_25010030_WB #(
   
 `ifdef DIFFTEST
   output reg              wb_valid,
-  input  [31:0]           lsu_wb_pc,
+  input      [31:0]       lsu_wb_pc,
   output reg [31:0]       wb_pc,
 `endif
 
