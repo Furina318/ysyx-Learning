@@ -88,14 +88,14 @@ module ysyx_25010030_divider (
             if (divisor == 32'b0) begin
                 quotient  <= 32'hFFFFFFFF;
                 remainder <= dividend;
-                valid     <= 1'b0;
-                // $display("除零错误");
+                valid     <= 1'b1;
+                $display("除零错误");
             end else if (is_signed && dividend == 32'h80000000 && divisor == 32'hFFFFFFFF) begin
                 // 溢出 MIN_INT / -1
                 quotient  <= 32'h80000000;
                 remainder <= 32'b0;
-                valid     <= 1'b0;
-                // $display("溢出错误");
+                valid     <= 1'b1;
+                $display("溢出错误");
             end else begin
                 abs_divisor    <= (is_signed && divisor[31]) ? (~divisor + 1) : divisor;
                 

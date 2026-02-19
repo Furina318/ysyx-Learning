@@ -3,7 +3,8 @@ module ysyx_25010030_multiplier (
     input wire               rst_n,
     input wire signed [31:0] multiplicand,//X
     input wire signed [31:0] multiplier,//Y
-    input wire               is_signed,  // 1表示有符号乘法，0表示无符号乘法
+    input wire               x_is_signed,  // 1表示有符号乘法，0表示无符号乘法
+    input wire               y_is_signed,
     output reg signed [63:0] product,
     output reg               valid
 );
@@ -11,9 +12,9 @@ module ysyx_25010030_multiplier (
 wire signed [31:0] multiplicand_signed = multiplicand[31:0];
 wire signed [31:0] multiplier_signed   = multiplier[31:0];
 
-wire signed [67:0] multiplicand_ext = is_signed ? {{36{multiplicand_signed[31]}}, multiplicand_signed}
+wire signed [67:0] multiplicand_ext = x_is_signed ? {{36{multiplicand_signed[31]}}, multiplicand_signed}
                                                 : {36'd0, multiplicand[31:0]};
-wire signed [34:0] multiplier_ext   = is_signed ? {{2{multiplier_signed[31]}}, multiplier_signed, 1'b0}
+wire signed [34:0] multiplier_ext   = y_is_signed ? {{2{multiplier_signed[31]}}, multiplier_signed, 1'b0}
                                                 : {2'b0, multiplier[31:0], 1'b0};
 wire signed [67:0] partial_products [16:0];
 
@@ -66,7 +67,7 @@ always @(posedge clk or negedge rst_n) begin
         product <= 64'd0;
         valid   <= 1'b0;
     end else begin
-        if (is_signed) begin
+        if (x_is_signed | y_is_signed) begin
             // product <= $signed({{1'b0, s} + {cout2, 1'b0}}[63:0]); // 有符号截断
             product <= $signed(sum_temp[63:0]); // 有符号截断
         end else begin
@@ -123,6 +124,3 @@ module csa(
     assign s = a ^ b ^ cin;
     assign cout = a & b | b & cin | a & cin;
 endmodule
-
-
-

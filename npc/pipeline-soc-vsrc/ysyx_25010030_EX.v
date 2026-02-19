@@ -246,16 +246,18 @@ module ysyx_25010030_EX (
     reg [63:0] mul_product;
     reg        mul_valid;
 
-    wire [31:0] multiplicand  = id_ex_mul_op[3] ? $unsigned(src1) : $signed(src1); // mulhu?
-    wire [31:0] multiplier    = (id_ex_mul_op[2] | id_ex_mul_op[3]) ? $unsigned(src2) : $signed(src2); // mulhu|mulhsu?
-    wire        is_signed_mul = ~id_ex_mul_op[3]; // 非mulhu
+    // wire [31:0] multiplicand  = id_ex_mul_op[3] ? $unsigned(src1) : $signed(src1); // mulhu?
+    // wire [31:0] multiplier    = (id_ex_mul_op[2] | id_ex_mul_op[3]) ? $unsigned(src2) : $signed(src2); // mulhu|mulhsu?
+    wire [31:0] multiplicand  = src1;
+    wire [31:0] multiplier    = src2;
     
     ysyx_25010030_multiplier u_mul(
         .clk          	(clk & (mul_start | mul_computing | reset | mul_clr)),
         .rst_n        	(~(reset | mul_clr)                                 ),
-        .multiplicand 	(multiplicand                                       ),
-        .multiplier   	(multiplier                                         ),
-        .is_signed    	(is_signed_mul                                      ),
+        .multiplicand 	(multiplicand                                       ), // x
+        .multiplier   	(multiplier                                         ), // y
+        .x_is_signed    (~id_ex_mul_op[3]                                   ),
+        .y_is_signed    (~(id_ex_mul_op[2] | id_ex_mul_op[3])               ),
         .product      	(mul_product                                        ),
         .valid        	(mul_valid                                          )
     );
