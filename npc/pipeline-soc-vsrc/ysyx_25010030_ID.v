@@ -38,12 +38,12 @@ module ysyx_25010030_ID (
 
 `ifdef FPU
     output reg        id_ex_is_div,
-    output reg        id_ex_is_rem,
-    output reg        id_ex_is_signed_div,
+    // output reg        id_ex_is_rem,
+    // output reg        id_ex_is_signed_div,
     input             ex_stop,
 
     output reg        id_ex_is_mul,
-    output reg [ 3:0] id_ex_mul_op,
+    output reg [ 7:0] id_ex_mdu_op,
 `endif   
 
 `ifdef BPU
@@ -90,15 +90,19 @@ module ysyx_25010030_ID (
 `ifdef FPU
     wire [6:0] func7  = if_id_inst[31:25];
     wire       is_div = (get_opcode == `INST_TYPE_R) && (func7 == 7'b0000001) && (func3[2]);
-    wire       is_rem = is_div && (func3[1]);
-    wire       is_signed = is_div && (!func3[0]); // div/divu, rem/remu
+    // wire       is_rem = is_div && (func3[1]);
+    // wire       is_signed = is_div && (!func3[0]); // div/divu, rem/remu
 
     wire       is_mul = (get_opcode == `INST_TYPE_R) && (func7 == 7'b0000001) && (!func3[2]);
-    wire [3:0] mul_op;
-    assign mul_op[0] = is_mul & (func3[1:0] == 2'b00); //mul
-    assign mul_op[1] = is_mul & (func3[1:0] == 2'b01); //mulh
-    assign mul_op[2] = is_mul & (func3[1:0] == 2'b10); //mulhsu
-    assign mul_op[3] = is_mul & (func3[1:0] == 2'b11); //mulhu
+    wire [7:0] mdu_op;
+    assign mdu_op[0] = is_mul & (func3[1:0] == 2'b00); //mul
+    assign mdu_op[1] = is_mul & (func3[1:0] == 2'b01); //mulh
+    assign mdu_op[2] = is_mul & (func3[1:0] == 2'b10); //mulhsu
+    assign mdu_op[3] = is_mul & (func3[1:0] == 2'b11); //mulhu
+    assign mdu_op[4] = is_div & (func3[1:0] == 2'b00); //div
+    assign mdu_op[5] = is_div & (func3[1:0] == 2'b01); //divu
+    assign mdu_op[6] = is_div & (func3[1:0] == 2'b10); //rem
+    assign mdu_op[7] = is_div & (func3[1:0] == 2'b11); //remu
     
 
     always @(*) begin
@@ -182,10 +186,10 @@ module ysyx_25010030_ID (
 
         `ifdef FPU
             id_ex_is_div    <= 1'b0;
-            id_ex_is_rem    <= 1'b0;
-            id_ex_is_signed_div <= 1'b0;
+            // id_ex_is_rem    <= 1'b0;
+            // id_ex_is_signed_div <= 1'b0;
             id_ex_is_mul        <= 1'b0;
-            id_ex_mul_op        <= 4'b0;
+            id_ex_mdu_op        <= 8'b0;
         `endif
 
         `ifdef BPU
@@ -245,11 +249,11 @@ module ysyx_25010030_ID (
 
         `ifdef FPU
             id_ex_is_div        <= is_div;
-            id_ex_is_rem        <= is_rem;
-            id_ex_is_signed_div <= is_signed;
+            // id_ex_is_rem        <= is_rem;
+            // id_ex_is_signed_div <= is_signed;
 
             id_ex_is_mul        <= is_mul;
-            id_ex_mul_op        <= mul_op;
+            id_ex_mdu_op        <= mdu_op;
         `endif
 
         `ifdef BPU

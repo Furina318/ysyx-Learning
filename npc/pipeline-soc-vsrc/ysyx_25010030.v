@@ -331,11 +331,11 @@ module ysyx_25010030 (
 
 `ifdef FPU
     wire        id_ex_is_div;
-    wire        id_ex_is_rem;
-    wire        id_ex_is_signed_div;
+    // wire        id_ex_is_rem;
+    // wire        id_ex_is_signed_div;
     wire        ex_stop;
     wire        id_ex_is_mul;
-    wire [ 3:0] id_ex_mul_op;
+    wire [ 7:0] id_ex_mdu_op;
 `endif
 
 `ifdef BPU
@@ -618,11 +618,11 @@ module ysyx_25010030 (
         .id_ex_fencei      (id_ex_fencei      ),
 `ifdef FPU
         .id_ex_is_div          (id_ex_is_div          ),
-        .id_ex_is_rem          (id_ex_is_rem          ),
-        .id_ex_is_signed_div   (id_ex_is_signed_div   ),
+        // .id_ex_is_rem          (id_ex_is_rem          ),
+        // .id_ex_is_signed_div   (id_ex_is_signed_div   ),
         .ex_stop               (ex_stop               ),
         .id_ex_is_mul          (id_ex_is_mul          ),
-        .id_ex_mul_op          (id_ex_mul_op          ),
+        .id_ex_mdu_op          (id_ex_mdu_op          ),
 `endif
 `ifdef BPU
         .id_ex_predict_taken  (id_ex_predict_taken  ),
@@ -694,11 +694,11 @@ module ysyx_25010030 (
         .ex_flush_pc            (ex_flush_pc            ),
 `ifdef FPU
         .id_ex_is_div           (id_ex_is_div           ),
-        .id_ex_is_rem           (id_ex_is_rem           ),
-        .id_ex_is_signed_div    (id_ex_is_signed_div    ),
+        // .id_ex_is_rem           (id_ex_is_rem           ),
+        // .id_ex_is_signed_div    (id_ex_is_signed_div    ),
         .ex_stop                (ex_stop                ),
         .id_ex_is_mul           (id_ex_is_mul           ),
-        .id_ex_mul_op           (id_ex_mul_op           ),
+        .id_ex_mdu_op           (id_ex_mdu_op           ),
 `endif
 `ifdef BPU
         .id_ex_predict_taken    (id_ex_predict_taken    ),
