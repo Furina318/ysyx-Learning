@@ -53,16 +53,17 @@ void difftest_skip_ref() {
 const char *ref_regs[] = {
   "$0", "ra", "sp", "gp", "tp", "t0", "t1", "t2",
   "s0", "s1", "a0", "a1", "a2", "a3", "a4", "a5",
-//   "a6", "a7", "s2", "s3", "s4", "s5", "s6", "s7",
-//   "s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6"
+  "a6", "a7", "s2", "s3", "s4", "s5", "s6", "s7",
+  "s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6"
 };
 
+#define REG_NUM sizeof(ref_regs) / sizeof(ref_regs[0])
 
 void update_cpu_state(CPU_state *cpu)
 {
     cpu->pc = top_pc;
     last_ref_pc = cpu->pc;
-    for(int i = 0; i < 16; i++)
+    for(int i = 0; i < REG_NUM; i++)
         cpu->gpr[i] = top_regs[i];
     // cpu->csr.mcause = 0xb;
     // cpu->csr.mstatus = 0x1800;
@@ -108,7 +109,7 @@ void init_difftest(char *ref_so_file, long img_size, int port)
     CPU_state ref_r;
     ref_r.pc = CONFIG_MBASE;//复位的时候默认为npc架构
     last_ref_pc = CONFIG_MBASE;
-    for(int i = 0; i < 16; i++)
+    for(int i = 0; i < REG_NUM; i++)
         ref_r.gpr[i] = 0;
     // ref_r.csr.mstatus = 0x1800;
     // ref_r.csr.mcause = 0xb;
@@ -129,7 +130,7 @@ bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc)
     last_ref_pc = ref_r->pc;
 
     //check general purpose registers
-    for(int i = 0; i < 16; i++)
+    for(int i = 0; i < REG_NUM; i++)
         if(top_regs[i] != ref_r->gpr[i])
         {
             _Log(ANSI_FG_YELLOW "[difftest]" ANSI_NONE   ANSI_FG_RED "%s" 
@@ -148,7 +149,7 @@ static void checkregs(CPU_state *ref, vaddr_t pc)
         npc_state.halt_pc = pc;
         Log("Differential test %s at pc = 0x%08x." , (ANSI_FMT("fails", ANSI_FG_RED)), npc_state.halt_pc);
         printf("\033[33m[DUT->GPR]\t\t[REF->GPR]\033[0m\n");
-        for(int i = 0; i < 16; i++)
+        for(int i = 0; i < REG_NUM; i++)
         {
             printf("%s:\t0x%08x\t0x%08x\n", ref_regs[i], top_regs[i], ref->gpr[i]);
         }

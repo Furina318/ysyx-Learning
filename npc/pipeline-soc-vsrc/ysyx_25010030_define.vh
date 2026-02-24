@@ -107,3 +107,5 @@
 `define RESET_PC       32'h8000_0000
 `define RESET_MROM_PC  32'h2000_0000
 `define RESET_FLASH_PC 32'h3000_0000
+`define REG_ADDR_WD    5
+`define REG_NUM        2**`REG_ADDR_WD

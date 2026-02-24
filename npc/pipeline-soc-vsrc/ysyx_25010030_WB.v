@@ -1,7 +1,8 @@
 `include "ysyx_25010030_define.vh"
 
 module ysyx_25010030_WB #(
-  parameter ADDR_WIDTH = 4,
+  parameter ADDR_WIDTH = 5,
+  parameter REG_NUM    = 2**ADDR_WIDTH,
   parameter DATA_WIDTH = 32)(
   input 		  clk,
   input 		  rst,
@@ -51,18 +52,18 @@ localparam MCAUSE  = 12'h342;
 // localparam MVENDORID = 12'hf11;
 // localparam MARCHID   = 12'hf12;
 
-reg [DATA_WIDTH-1:0] regs [2**ADDR_WIDTH-1:0];
+reg [DATA_WIDTH-1:0] regs [REG_NUM-1:0];
 
 assign wb_lsu_ready = 1;
 
 integer i;
 always @(posedge clk) begin
     if(rst)begin
-        for(i = 0; i < 16; i = i + 1)begin
+        for(i = 0; i < REG_NUM; i = i + 1)begin
             regs[i] <= 32'b0;
         end
     end
-    else if (lsu_wb_valid & wen & (waddr != 4'b0)) begin
+    else if (lsu_wb_valid & wen & (waddr != {ADDR_WIDTH{1'b0}})) begin
         regs[waddr] <= wdata;
     end
 end
@@ -85,8 +86,8 @@ always @(posedge clk) begin
 end
 `endif
 
-assign src1 = (rs1 == 4'b0) ? 32'b0 : regs[rs1];
-assign src2 = (rs2 == 4'b0) ? 32'b0 : regs[rs2];
+assign src1 = (rs1 == {ADDR_WIDTH{1'b0}}) ? 32'b0 : regs[rs1];
+assign src2 = (rs2 == {ADDR_WIDTH{1'b0}}) ? 32'b0 : regs[rs2];
 
 always @(posedge clk) begin
     if (rst) begin

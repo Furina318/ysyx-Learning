@@ -14,7 +14,7 @@ module ysyx_25010030_LSU_AXI (
     // EX 阶段输入信号
     input              ex_lsu_forward_las,
     input              ex_lsu_RegWrite,    
-    input       [ 3:0] ex_lsu_rd,          
+    input       [ 4:0] ex_lsu_rd,          
     input              ex_lsu_MemRead,     
     input              ex_lsu_MemWrite,    
     input       [ 4:0] ex_lsu_MemLen,
@@ -37,7 +37,7 @@ module ysyx_25010030_LSU_AXI (
     input       [31:0] ex_lsu_process_result,
 
     // 前递信号
-    output      [ 3:0] lsu_ex_forward_rd,         
+    output      [ 4:0] lsu_ex_forward_rd,         
     output             lsu_ex_forward_RegWrite,   
     output             lsu_ex_forward_MemRead,    
 
@@ -48,7 +48,7 @@ module ysyx_25010030_LSU_AXI (
     output reg         lsu_wb_csr_wen1,
     output reg         lsu_wb_csr_ecall,
     output reg         lsu_wb_RegWrite,        
-    output reg  [ 3:0] lsu_wb_rd,              
+    output reg  [ 4:0] lsu_wb_rd,              
     output reg  [31:0] lsu_wb_write_rd_data,   
 
 `ifdef DCACHE
@@ -352,7 +352,7 @@ module ysyx_25010030_LSU_AXI (
 
     reg        l_load;            
     reg        l_rd_en;           
-    reg [3:0]  l_rd_addr;                  
+    reg [4:0]  l_rd_addr;                  
 
     // 前递信号赋值
     assign lsu_ex_forward_rd        = l_rd_addr;

@@ -1,47 +1,40 @@
 `include "ysyx_25010030_define.vh"
 
 module ysyx_25010030_IF_AXI (
-    input             clk,
-    input             reset,
+    input             clk         ,
+    input             reset       ,
 
-    input             EX_flush,
-    input      [31:0] EX_flush_pc,
-    // input             ex_fencei,
+    input             EX_flush    ,
+    input      [31:0] EX_flush_pc ,
 
-    input             ID_ready,
-    output reg        IF_valid,
+    input             ID_ready    ,
+    output reg        IF_valid    ,
 
-    output reg [31:0] IF_ID_pc,
-    output reg [31:0] IF_ID_inst,
+    output reg [31:0] IF_ID_pc    ,
+    output reg [31:0] IF_ID_inst  ,
 
 `ifdef BPU
-    input             predict_taken,
+    input             predict_taken ,
     input      [31:0] predict_target,
 `endif
 
     // ========== AXI4-Lite ========== 
-    output reg        if_axi_arvalid,       // 读地址有效
-    // input             axi_if_arready,       // 读地址就绪
-    output reg [31:0] if_axi_araddr,        // 读地址
-    output reg [ 3:0] if_axi_arid,
-    output reg [ 7:0] if_axi_arlen,
-    output reg [ 2:0] if_axi_arsize,
-    output reg [ 1:0] if_axi_arburst,
-    // input      [31:0] axi_if_rdata,         // 读数据
-    // input             axi_if_rvalid,        // 读数据有效
-    output reg        if_axi_rready,        // 读数据就绪
-    // input      [ 1:0] axi_if_rresp,         // 读响应
-    // input      [ 3:0] axi_if_rid,
-    // input             axi_if_rlast
-    output reg [31:0] next_pc,
-    input      [31:0] cache_inst,
-    input             cache_valid,
-    input      [31:0] cache_araddr,
-    input             cache_arvalid,
-    input      [ 3:0] cache_arid,
-    input      [ 7:0] cache_arlen,
-    input      [ 2:0] cache_arsize,
-    input      [ 1:0] cache_arburst,
+    output reg        if_axi_arvalid ,       
+    output reg [31:0] if_axi_araddr  ,      
+    output reg [ 3:0] if_axi_arid    ,
+    output reg [ 7:0] if_axi_arlen   ,
+    output reg [ 2:0] if_axi_arsize  ,
+    output reg [ 1:0] if_axi_arburst ,      
+    output reg        if_axi_rready  ,  
+    output reg [31:0] next_pc        ,
+    input      [31:0] cache_inst     ,
+    input             cache_valid    ,
+    input      [31:0] cache_araddr   ,
+    input             cache_arvalid  ,
+    input      [ 3:0] cache_arid     ,
+    input      [ 7:0] cache_arlen    ,
+    input      [ 2:0] cache_arsize   ,
+    input      [ 1:0] cache_arburst  ,
     input             cache_rready
 );
 
@@ -58,30 +51,43 @@ module ysyx_25010030_IF_AXI (
     wire is_jalr   = (cache_inst[6:0] == JALR_OPCODE) && (cache_inst[14:12] == 3'b000);
 `endif
 
-    // localparam FENCEI = 32'h0000100f;
     localparam JAL_OPCODE = 7'b1101111;
 
     // 内部信号
     reg flush_once;
     reg once;
 
-    // wire        is_fencei = (IF_ID_inst == FENCEI);
     wire        is_jal     = (cache_inst[6:0] == JAL_OPCODE);
     wire [31:0] immJ       = {{12{cache_inst[31]}}, cache_inst[19:12], cache_inst[20], cache_inst[30:21], 1'b0};
     wire [31:0] jal_target = (flush_once ? IF_ID_pc : next_pc) + immJ;
 
     // AXI信号转发（缓存 -> 外部总线）
     always @(*) begin
-        if_axi_arvalid = cache_arvalid;
-        if_axi_araddr  = cache_araddr;
-        if_axi_rready  = cache_rready;
-        if_axi_arid    = cache_arid;
-        if_axi_arlen   = cache_arlen;
-        if_axi_arsize  = cache_arsize;
-        if_axi_arburst = cache_arburst;
+        if_axi_arvalid = cache_arvalid ;
+        if_axi_araddr  = cache_araddr  ;
+        if_axi_rready  = cache_rready  ;
+        if_axi_arid    = cache_arid    ;
+        if_axi_arlen   = cache_arlen   ;
+        if_axi_arsize  = cache_arsize  ;
+        if_axi_arburst = cache_arburst ;
     end
 
-    // 主控制逻辑
+`ifdef C_EXPAND
+    // 目前只是提供了相关接口，注意C拓展后pc的递增核跳转！！！
+    wire [15:0] c_inst;
+    wire [31:0] inst;
+    wire        pc_add_2;
+    wire        ctrans_valid;
+    ysyx_25010030_C_Decode ctrans_decode (
+        .clk      (clk          ),
+        .reset    (reset        ),
+        .c_inst   (c_inst       ),
+        .inst     (inst         ),
+        .pc_add_2 (pc_add_2     ),
+        .valid    (ctrans_valid )
+    );
+`endif
+
     always @(posedge clk) begin
         if (reset) begin
         `ifdef NPC
@@ -124,7 +130,6 @@ module ysyx_25010030_IF_AXI (
                             IF_valid   <= (flush_once) ? 0 : 1;
                         `ifdef BPU
                             next_pc    <= (flush_once) ? next_pc : (predict_taken & (predict_target != 32'h0)) ? predict_target : next_pc + 4;
-                                        //   (predict_taken && (is_branch || is_jalr)) ? predict_target : next_pc + 4;
                         `else
                             next_pc    <= (flush_once) ? next_pc : (is_jal) ? jal_target : next_pc + 4;
                         `endif

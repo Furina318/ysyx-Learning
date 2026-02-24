@@ -9,13 +9,13 @@ module ysyx_25010030_EX (
     input             lsu_ready,
     output reg        ex_lsu_valid,
 
-    input      [ 3:0] id_wb_rs1,
-    input      [ 3:0] id_wb_rs2,
-    input      [ 3:0] lsu_ex_forward_rd,
+    input      [ 4:0] id_wb_rs1,
+    input      [ 4:0] id_wb_rs2,
+    input      [ 4:0] lsu_ex_forward_rd,
     input             lsu_ex_forward_RegWrite,
     input             lsu_ex_forward_MemRead,
     input      [31:0] lsu_wb_wdata,
-    input      [ 3:0] lsu_wb_rd,
+    input      [ 4:0] lsu_wb_rd,
     input             lsu_wb_RegWrite,
     input             lsu_wb_valid,
     output reg        ex_lsu_forward_las,
@@ -28,7 +28,7 @@ module ysyx_25010030_EX (
     input      [31:0] wb_ex_src1,
     input      [31:0] wb_ex_src2,
     input             id_ex_RegWrite,
-    input      [ 3:0] id_ex_rd,
+    input      [ 4:0] id_ex_rd,
     input      [ 6:0] id_ex_opcode,
     input      [ 2:0] id_ex_func3,
     input      [ 3:0] id_ex_alu_op,
@@ -78,7 +78,7 @@ module ysyx_25010030_EX (
     // output reg [31:0] ex_lsu_pc,
     output reg [31:0] ex_lsu_src2,
     output reg        ex_lsu_RegWrite,
-    output reg [ 3:0] ex_lsu_rd,
+    output reg [ 4:0] ex_lsu_rd,
     output reg        ex_lsu_MemRead,
     output reg        ex_lsu_MemWrite,
     output reg [ 4:0] ex_lsu_MemLen,
@@ -489,7 +489,7 @@ module ysyx_25010030_EX (
         if (reset) begin
             ex_lsu_src2           <= 32'h0;
             ex_lsu_RegWrite       <= 1'b0;
-            ex_lsu_rd             <= 4'b0;
+            ex_lsu_rd             <= 5'b0;
             ex_lsu_MemRead        <= 1'b0;
             ex_lsu_MemWrite       <= 1'b0;
             ex_lsu_MemLen         <= 5'b0;
@@ -535,7 +535,7 @@ module ysyx_25010030_EX (
         if (reset) begin
             ex_lsu_src2           <= 32'h0;
             ex_lsu_RegWrite       <= 1'b0;
-            ex_lsu_rd             <= 4'b0;
+            ex_lsu_rd             <= 5'b0;
             ex_lsu_MemRead        <= 1'b0;
             ex_lsu_MemWrite       <= 1'b0;
             ex_lsu_MemLen         <= 5'b0;

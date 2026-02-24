@@ -20,14 +20,16 @@ extern Vysyx_25010030_npc *top;
 static const char *regs[] = {
     "$0", "ra", "sp", "gp", "tp", "t0", "t1", "t2",
     "s0", "s1", "a0", "a1", "a2", "a3", "a4", "a5",
-    // "a6", "a7", "s2", "s3", "s4", "s5", "s6", "s7",
-    // "s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6"
+    "a6", "a7", "s2", "s3", "s4", "s5", "s6", "s7",
+    "s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6"
 };
+
+#define REG_NUM sizeof(regs) / sizeof(regs[0])
 
 void regs_display() 
 {
     _Log(ANSI_FG_RED "RegName  Hex_Value       Dec_Value\n" ANSI_NONE);
-    for(int i = 0; i < 16; i++)
+    for(int i = 0; i < REG_NUM; i++)
     {
         _Log(ANSI_FG_YELLOW "$%s\t " ANSI_NONE, regs[i]);
         _Log("0x%08x\t %010u\n", gpr[i], gpr[i]);
@@ -53,7 +55,7 @@ word_t single_reg_display(char *reg_name)
     }
 
     //others
-    for(i = 0; i < 16; i++)
+    for(i = 0; i < REG_NUM; i++)
         if(strcmp(reg_name, regs[i]) == 0)
         {
             _Log(ANSI_FG_YELLOW "$%s\t" ANSI_NONE " 0x%08x\t %010u\t   %010d\n", 
@@ -87,7 +89,7 @@ word_t reg_str2val(const char *s, bool *success)
         return gpr[0];
         
     //others
-    for(i = 1; i < 16; i++)
+    for(i = 1; i < REG_NUM; i++)
         if(strcmp(s, regs[i]) == 0)
         return gpr[i];
 

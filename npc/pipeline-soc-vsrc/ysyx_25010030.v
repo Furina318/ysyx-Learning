@@ -106,9 +106,9 @@ module ysyx_25010030 (
     wire        id_valid;         
     wire        ex_ready;         
     wire        id_ex_RegWrite;
-    wire [ 3:0] id_ex_rd;      
-    wire [ 3:0] id_wb_rs1;      
-    wire [ 3:0] id_wb_rs2;      
+    wire [ 4:0] id_ex_rd;      
+    wire [ 4:0] id_wb_rs1;      
+    wire [ 4:0] id_wb_rs2;      
     wire [ 4:0] id_ex_zimm;      
     wire [31:0] id_ex_imm;        
     wire [ 5:0] id_ex_shamt;      
@@ -140,7 +140,7 @@ module ysyx_25010030 (
     wire        lsu_ex_ready;     
     wire [31:0] ex_lsu_src2;      
     wire        ex_lsu_RegWrite;  
-    wire [ 3:0] ex_lsu_rd;        
+    wire [ 4:0] ex_lsu_rd;        
     wire        ex_lsu_MemRead;   
     wire        ex_lsu_MemWrite;  
     wire [ 4:0] ex_lsu_MemLen;    
@@ -161,7 +161,7 @@ module ysyx_25010030 (
     wire        lsu_wb_valid;     
     wire        wb_lsu_ready;     
     wire        lsu_wb_RegWrite;  
-    wire [ 3:0] lsu_wb_rd;        
+    wire [ 4:0] lsu_wb_rd;        
     wire [31:0] lsu_wb_write_rd_data;  
     wire [31:0] lsu_wb_csr_wr_data1;   
     wire [31:0] lsu_wb_csr_wr_data2;   
@@ -177,7 +177,7 @@ module ysyx_25010030 (
     wire [31:0] wb_ex_csr_num2;   
 
     // 前递信号
-    wire [ 3:0] lsu_ex_forward_rd;        
+    wire [ 4:0] lsu_ex_forward_rd;        
     wire        lsu_ex_forward_RegWrite;  
     wire        lsu_ex_forward_MemRead;   
     wire        ex_lsu_forward_las;       

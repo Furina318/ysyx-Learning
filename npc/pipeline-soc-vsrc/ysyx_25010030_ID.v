@@ -18,9 +18,9 @@ module ysyx_25010030_ID (
     output reg [31:0] id_ex_pc,             
     // output reg [31:0] id_ex_inst,         
     output reg        id_ex_RegWrite,       
-    output reg [ 3:0] id_ex_rd,             
-    output reg [ 3:0] id_wb_rs1,            
-    output reg [ 3:0] id_wb_rs2,            
+    output reg [ 4:0] id_ex_rd,             
+    output reg [ 4:0] id_wb_rs1,            
+    output reg [ 4:0] id_wb_rs2,            
     output reg [ 4:0] id_ex_zimm,            
     output reg [31:0] id_ex_imm,            
     output reg [ 5:0] id_ex_shamt,         
@@ -68,9 +68,9 @@ module ysyx_25010030_ID (
     // 指令字段提取
     localparam FENCEI = 32'h0000100f;
     wire [6:0] opcode = if_id_inst[ 6: 0];
-    wire [3:0] rs1    = if_id_inst[18:15];
-    wire [3:0] rs2    = if_id_inst[23:20];
-    wire [3:0] rd     = if_id_inst[10: 7];
+    wire [4:0] rs1    = if_id_inst[19:15];
+    wire [4:0] rs2    = if_id_inst[24:20];
+    wire [4:0] rd     = if_id_inst[11: 7];
     wire [2:0] func3  = if_id_inst[14:12];
     // wire [6:0] func7  = if_id_inst[31:25];
     wire       func7_5 = if_id_inst[30];
@@ -197,9 +197,9 @@ module ysyx_25010030_ID (
             id_ex_predict_target <= 32'b0;
         `endif
             
-            id_ex_rd    <= 4'b0;
-            id_wb_rs1   <= 4'b0;
-            id_wb_rs2   <= 4'b0;
+            id_ex_rd    <= 5'b0;
+            id_wb_rs1   <= 5'b0;
+            id_wb_rs2   <= 5'b0;
             id_ex_zimm  <= 5'b0;
             id_ex_imm   <= 32'b0;
             id_ex_shamt <= 6'b0;
