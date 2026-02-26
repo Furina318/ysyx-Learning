@@ -66,14 +66,17 @@ module ysyx_25010030_EX (
 
 `ifdef BPU
     input      [31:0] id_ex_predict_target,
-    input            id_ex_predict_taken,
-    output reg       ex_bpu_update,
+    input             id_ex_predict_taken,
+    output reg        ex_bpu_update,
     output reg [31:0] ex_bpu_pc,
     output reg        ex_bpu_taken,
     output reg [31:0] ex_bpu_target,
     output reg        ex_bpu_correct,
 `endif
 
+`ifdef C_EXPAND
+    input wire       id_ex_is_c_inst,
+`endif
     // output reg [31:0] ex_lsu_inst,
     // output reg [31:0] ex_lsu_pc,
     output reg [31:0] ex_lsu_src2,
@@ -137,7 +140,12 @@ module ysyx_25010030_EX (
         end
         else if (id_ex_jal | id_ex_jalr) begin
             ex_num1 = id_ex_pc;
+            // ex_num2 = 32'd4;
+        `ifdef C_EXPAND
+            ex_num2 = id_ex_is_c_inst ? 32'd2 : 32'd4;
+        `else
             ex_num2 = 32'd4;
+        `endif
         end
         else if(id_ex_opcode == `INST_LUI) begin
             ex_num1 = id_ex_imm;

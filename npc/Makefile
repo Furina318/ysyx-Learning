@@ -132,15 +132,23 @@ VERILATOR_FLAGS += -I$(NPC_HOME)/pipeline-soc-vsrc #可修改
 dcache ?= 0
 fpu ?= 0
 bpu ?= 0
+c ?= 0
+
 ifeq ($(dcache), 1)
 VERILATOR_FLAGS += -DDCACHE
 endif
+
 ifeq ($(fpu), 1)
 VERILATOR_FLAGS += -DFPU
 CXXFLAGS += -DFPU
 endif
+
 ifeq ($(bpu), 1)
 VERILATOR_FLAGS += -DBPU
+endif
+
+ifeq ($(c), 1)
+VERILATOR_FLAGS += -DC_EXPAND
 endif
 
 ifeq ($(diff), 1)

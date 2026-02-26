@@ -2,7 +2,7 @@
  * C拓展转译模块
  * 将C拓展指令转译为正常32位指令
 */
-module ysyx_25010030_C_Dcode (
+module ysyx_25010030_C_Decode (
     input  wire        clk      ,
     input  wire        reset    ,
     input  wire [15:0] c_inst   ,
@@ -34,7 +34,6 @@ module ysyx_25010030_C_Dcode (
     wire [ 4:0] rs1    ;
     wire [ 4:0] rs2    ;
     wire [ 4:0] rd     ;
-    wire [ 2:0] func3  ;
     wire [31:0] imm    ;
 
     assign c_opcode = c_inst[ 1: 0];
@@ -167,7 +166,7 @@ module ysyx_25010030_C_Dcode (
     wire need_offset9  ;
     wire need_offset12 ;
 
-    assign need_imm0     = inst_jr;
+    assign need_imm0     = inst_c_jr;
     assign need_imm6     = inst_c_addi | inst_c_andi | inst_c_li;
     assign need_imm10    = inst_c_addi16sp;
     assign need_imm18    = inst_c_lui;
@@ -208,9 +207,9 @@ module ysyx_25010030_C_Dcode (
                   ({32{inst_c_or    }} & {7'b0000000, rs2, rs1, 3'b110, rd, OPCODE_R}) |
                   ({32{inst_c_xor   }} & {7'b0000000, rs2, rs1, 3'b100, rd, OPCODE_R}) |
                   ({32{inst_c_sub   }} & {7'b0100000, rs2, rs1, 3'b000, rd, OPCODE_R}) |
-                  ({32{inst_c_slli  }} & {7'b0000000, imm[5:0], rs1, 3'b001, rd, OPCODE_I}) |
-                  ({32{inst_c_srai  }} & {7'b0100000, imm[5:0], rs1, 3'b101, rd, OPCODE_I}) |
-                  ({32{inst_c_srli  }} & {7'b0000000, imm[5:0], rs1, 3'b101, rd, OPCODE_I}) |
+                  ({32{inst_c_slli  }} & {6'b000000, imm[5:0], rs1, 3'b001, rd, OPCODE_I}) |
+                  ({32{inst_c_srai  }} & {6'b010000, imm[5:0], rs1, 3'b101, rd, OPCODE_I}) |
+                  ({32{inst_c_srli  }} & {6'b000000, imm[5:0], rs1, 3'b101, rd, OPCODE_I}) |
                   ({32{inst_c_beqz  }} & {imm[12], imm[10:5], 5'b00000, rs1, 3'b000, imm[4:1], imm[11], OPCODE_B}) |
                   ({32{inst_c_bnez  }} & {imm[12], imm[10:5], 5'b00000, rs1, 3'b001, imm[4:1], imm[11], OPCODE_B}) |
                   ({32{(inst_c_lw   | inst_c_lwsp)}} & {imm[11:0], rs1, 3'b010, rd, OPCODE_L}                        ) |

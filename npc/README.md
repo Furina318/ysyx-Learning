@@ -4,7 +4,7 @@
 1. **五级流水线模块（pipeline-vsrc）**  
    - 特性：集成 RAS（返回地址栈）分支预测器  
    - 备注：为第九届集创赛竞业达赛道参赛代码，编写时未学习 B 阶段知识，存在数据前递路径过长、面积偏大问题，后续将优化。
-2. **适配SoC 五级流水线模块（pipeline-soc-vsrc）**  
+2. **适配SoC 五级流水线模块（pipeline-soc-vsrc）（支持rv32imc）**  
    - 特性：在基础五级流水线基础上，支持突发传输，可对接 SoC 系统。目前接入了iCache、dCache模块（dCache模块在当前测试并不具备明显优势，故添加相关开关，如何使用参考Makefile）和可控防递归的结合RAS和BTB的分支预测器，接入MDU乘除法单元（通过传参fpu=1开启，能通过riscv-test测试）
    - 工具：添加波形模式，支持三种不同的波形记录方式.（0:从复位开始记录波形，直到结束；1:从WAVE_START_TIME开始记录波形，到WAVE_END_TIME结束； 2:当记录波形周期大于CONFIG_WAVE_MAX_UPDATE_CYCLES时更新波形文件重新记录）可以通过include/conf.h中控制。
    - 备注：已经通过iverilog四值仿真、网表仿真和一生一芯的CI流片测试
@@ -36,6 +36,7 @@
 运行不同功能模块（如单周期/五级流水线/SoC 版本），需通过修改项目根目录的 `makefile` 配置实现（具体修改对应模块的编译入口、链接参数等）。
 
 
-## 四、开发进度
-- 已完成模块：上述 1-7 项核心模块及辅助工具。其中适配SoC的五级流水线模块完成度最高。  
-- 开发中模块：**顺序双发射代码（order-dual-issue）**，当前仍在编写调试阶段。
+## 四、现存问题和TODO
+- 当platform为ysyxsoc时，开着分支预测器（bpu=1）:采用stdio(1)跑cpu-test在自己写的str-mem-cpy测试fail，以及rt-thread跑飞;
+stdio(2)会导致microbench卡在dinic测试，且通过rt-thread运行microbench会在ssort测试fail。   
+- 当编译架构为riscv32im时候，icache开突发跑microbench和rt-thread会失败，不开突发则可以通过所有测试

@@ -350,6 +350,10 @@ module ysyx_25010030 (
     wire [31:0] predict_target;
 `endif
 
+`ifdef C_EXPAND
+    wire        if_id_is_c_inst;
+    wire        id_ex_is_c_inst;
+`endif
 
     ysyx_25010030_CLINT clint (
         .clk    (clock        ),
@@ -574,6 +578,9 @@ module ysyx_25010030 (
         .predict_taken  (predict_taken ),
         .predict_target (predict_target),
 `endif
+`ifdef C_EXPAND
+        .is_c_inst      (if_id_is_c_inst),
+`endif
         .next_pc        (next_pc       ),
         .cache_inst     (cache_inst    ),
         .cache_valid    (cache_valid   ),
@@ -629,6 +636,10 @@ module ysyx_25010030 (
         .id_ex_predict_target (id_ex_predict_target ),
         .predict_taken        (predict_taken        ),
         .predict_target       (predict_target       ),
+`endif
+`ifdef C_EXPAND
+        .if_id_is_c_inst (if_id_is_c_inst ),
+        .id_ex_is_c_inst (id_ex_is_c_inst ),
 `endif
         // .id_ex_csr(id_ex_csr),
         .id_ex_csr_wen1    (id_ex_csr_wen1    ),
@@ -708,6 +719,9 @@ module ysyx_25010030 (
         .ex_bpu_taken           (ex_bpu_taken           ),
         .ex_bpu_target          (ex_bpu_target          ),
         .ex_bpu_correct         (ex_bpu_correct         ),
+`endif
+`ifdef C_EXPAND
+        .id_ex_is_c_inst        (id_ex_is_c_inst        ),
 `endif
         // .ex_lsu_inst(ex_lsu_inst),
         // .ex_lsu_pc(ex_lsu_pc),

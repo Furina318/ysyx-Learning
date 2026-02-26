@@ -107,21 +107,34 @@ module ysyx_25010030_iCache #(
     assign axi_arburst = in_sdram ? 2'b01 : 2'b00;   // 递增突发
     assign axi_arsize  = 3'b010;  // 4字节
     
-    // FENCE.I指令处理：清空所有缓存块的有效位
-    integer idx;
-    // always @(posedge clk) begin
-    //     if(is_fencei || reset) begin
-    //         for (idx = 0; idx < NUM_BLOCKS; idx = idx + 1) begin
-    //             valid_ram[idx] <= 1'b0;
-    //         end
-    //     end
-    // end
-    
+// `ifdef VERILATOR
+//     reg [63:0] icache_total_access ;
+//     reg [63:0] icache_hit          ;
+//     reg [63:0] icache_miss         ;
+//     always @(posedge clk) begin
+//         if (reset) begin
+//             icache_total_access <= 64'h0;
+//             icache_hit          <= 64'h0;
+//             icache_miss         <= 64'h0;
+//         end
+//         else if(state == IDLE) begin
+//             if (!is_fencei) begin
+//                 icache_total_access <= icache_total_access + 1'b1; // 总访问+1
+//                 if (hit) begin
+//                     icache_hit <= icache_hit + 1'b1; // 命中+1
+//                 end else begin
+//                     icache_miss <= icache_miss + 1'b1; // 缺失+1
+//                 end
+//             end
+//         end
+//     end
+// `endif 
+
     // 缓存初始化、命中处理、填充处理（无LRU逻辑）
+    integer idx;
     integer b;
     always @(posedge clk) begin
         if (reset) begin
-            // 初始化缓存：所有块无效
             for (idx = 0; idx < NUM_BLOCKS; idx = idx + 1) begin
                 valid_ram[idx] <= 1'b0;
             end

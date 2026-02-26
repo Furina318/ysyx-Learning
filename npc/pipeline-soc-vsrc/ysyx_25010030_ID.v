@@ -7,6 +7,11 @@ module ysyx_25010030_ID (
     input      [31:0] if_id_inst,            
     input             ex_flush,             
 
+`ifdef C_EXPAND
+    input wire        if_id_is_c_inst,
+    output reg        id_ex_is_c_inst,
+`endif
+
     // 握手信号
     input             if_valid,               
     output reg        id_ready,               
@@ -196,6 +201,10 @@ module ysyx_25010030_ID (
             id_ex_predict_taken  <= 1'b0;
             id_ex_predict_target <= 32'b0;
         `endif
+
+        `ifdef C_EXPAND
+            id_ex_is_c_inst <= 1'b0;
+        `endif
             
             id_ex_rd    <= 5'b0;
             id_wb_rs1   <= 5'b0;
@@ -257,11 +266,12 @@ module ysyx_25010030_ID (
         `endif
 
         `ifdef BPU
-            // id_ex_predict_taken_reg  <= predict_taken && (get_opcode == `INST_TYPE_B || (opcode == `INST_JALR && func3 == 3'b000) || opcode == `INST_JAL);
-            // id_ex_predict_taken_reg  <= predict_taken;
-            // id_ex_predict_target_reg <= predict_target;
             id_ex_predict_taken  <= id_ex_predict_taken_reg;
             id_ex_predict_target <= id_ex_predict_target_reg;
+        `endif
+
+        `ifdef C_EXPAND
+            id_ex_is_c_inst <= if_id_is_c_inst;
         `endif
 
             id_ex_csr_wr_addr1 <= 12'b0;
