@@ -16,6 +16,8 @@ module ysyx_25010030_C_Decode (
     wire [ 4:0] c_rd     ;
     wire [ 4:0] c_rs1    ;
     wire [ 4:0] c_rs2    ;
+    wire [ 2:0] c_rd_4_2 ; 
+    wire [ 2:0] c_rs1_9_7;
     wire [ 2:0] c_rd_s   ;
     wire [ 2:0] c_rs1_s  ;
     wire [ 2:0] c_rs2_s  ;
@@ -42,6 +44,8 @@ module ysyx_25010030_C_Decode (
     assign c_rd     = c_inst[11: 7];
     assign c_rs1    = c_inst[11: 7];
     assign c_rs2    = c_inst[ 6: 2];
+    assign c_rd_4_2 = c_inst[ 4: 2];
+    assign c_rs1_9_7= c_inst[ 9: 7];
     assign c_rd_s   = c_inst[ 9: 7];
     assign c_rs1_s  = c_inst[ 9: 7];
     assign c_rs2_s  = c_inst[ 4: 2];
@@ -105,7 +109,7 @@ module ysyx_25010030_C_Decode (
     assign inst_c_srai     = (c_func3 == 3'b100) & (c_opcode == 2'b01) & (c_inst[11:10] == 2'b01);
     assign inst_c_srli     = (c_func3 == 3'b100) & (c_opcode == 2'b01) & (c_inst[11:10] == 2'b00);
     assign inst_c_li       = (c_func3 == 3'b010) & (c_opcode == 2'b01);
-    assign inst_c_lui      = (c_func3 == 3'b011) & (c_opcode == 2'b01);
+    assign inst_c_lui      = (c_func3 == 3'b011) & (c_opcode == 2'b01) & (c_rd != 5'b00010) & (c_imm18 != 18'b0);
     assign inst_c_lw       = (c_func3 == 3'b010) & (c_opcode == 2'b00);
     assign inst_c_lwsp     = (c_func3 == 3'b010) & (c_opcode == 2'b10) & (c_rd != 5'b00000);
     assign inst_c_sw       = (c_func3 == 3'b110) & (c_opcode == 2'b00);
@@ -125,31 +129,38 @@ module ysyx_25010030_C_Decode (
                          inst_c_sub      |
                          inst_c_srai     |
                          inst_c_srli     |
-                         inst_c_lw       |
                          inst_c_sw       ;
 
     wire rd_is_sp;
     wire rd_is_ra;
     wire rd_is_x0; //0号寄存器
+    wire rd_is_4_2;
+
     wire rs1_is_sp;
     wire rs1_is_ra;
     wire rs1_is_x0;
+    wire rs1_is_9_7;
 
     assign rd_is_sp  = inst_c_addi16sp;
     assign rd_is_ra  = inst_c_jal | inst_c_jalr;
     assign rd_is_x0  = inst_c_j | inst_c_jr;
+    assign rd_is_4_2 = inst_c_lw | inst_c_addi4spn;
+
     assign rs1_is_sp = inst_c_addi16sp | inst_c_addi4spn | inst_c_lwsp | inst_c_swsp;
     assign rs1_is_ra = inst_c_jr;
     assign rs1_is_x0 = inst_c_mv | inst_c_li;
+    assign rs1_is_9_7 = inst_c_lw;
 
     assign rd  = rd_is_sp    ? 5'b00010 : //sp
                  rd_is_ra    ? 5'b00001 : //ra
                  rd_is_x0    ? 5'b00000 :
+                 rd_is_4_2  ? ({2'b00, c_rd_4_2} + 8) :
                  need_switch ? ({2'b00, c_rd_s} + 8) : c_rd;
 
     assign rs1 = rs1_is_sp   ? 5'b00010 : //sp
                  rs1_is_ra   ? 5'b00001 : //ra
                  rs1_is_x0   ? 5'b00000 :
+                 rs1_is_9_7  ? ({2'b00, c_rs1_9_7} + 8) :
                  need_switch ? ({2'b00, c_rs1_s} + 8) : c_rs1;
 
     assign rs2 = need_switch ? ({2'b00, c_rs2_s} + 8) : c_rs2;
