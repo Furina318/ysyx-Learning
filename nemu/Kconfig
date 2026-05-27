@@ -130,10 +130,6 @@ config WATCHPOINTS
   bool "Open watchpoints"
   default y
 
-config BRANCH_Predictor
-  bool "Enable branch predictor"
-  default n
-
 config TRACE
   bool "Enable tracer"
   default y

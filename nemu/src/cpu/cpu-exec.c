@@ -255,69 +255,8 @@ static void exec_once(Decode *s, vaddr_t pc) {
   s->snpc = pc;
   isa_exec_once(s);
 
-  // if(cnt <= 10) cnt++;
-  // else{
-  //   printf("pc: 0x%08x\n",s->pc);
-  //   cnt = 0;
-  // }
-
   uint32_t opcode = s->isa.inst & 0x7f;
   if(opcode == 0x0000006f || opcode == 0x00000067) {}//空转，不做任何事情
-#ifdef CONFIG_BRANCH_Predictor
-  // =================分支预测器逻辑===============
-  // uint32_t opcode = s->isa.inst & 0x7f;
-  bool is_branch = (opcode == 0x63);  //条件分支 (beq,bne等)
-  bool is_jal = (opcode == 0x6f);     //无条件跳转(jal)
-  bool is_jalr = (opcode == 0x67);    //间接跳转(jalr)
-
-  if(is_branch || is_jal || is_jalr){
-    //哈希.通过取模操作使得索引在有效范围内，防止越界
-    uint32_t bht_idx = ((s->pc >> 2)^ghr) % BHT_SIZE;//计算BHT索引，异或ghr是为了增加随机性，将pc右移是为了忽略指令的字节对齐
-    uint32_t btb_idx = (s->pc >> 2) % BTB_SIZE;//计算BTB索引
-
-    bool jump = (s->dnpc != s->snpc);  //实际是否跳转
-    bool predicted_jump = (bht[bht_idx].state >= 2);  //预测是否跳转
-    vaddr_t predicted_target = btb[btb_idx].valid && btb[btb_idx].pc == s->pc 
-                              ? btb[btb_idx].target : s->snpc;  //BTB预测的目标地址
-    //更新预测统计
-    if(predicted_jump == jump){//预测是否跳转正确
-      bht_hits++;
-    }else{
-      bht_misses++;
-    }
-    if(jump && predicted_target==s->dnpc){//跳转条件下，地址预测正确
-      btb_hits++;
-    }else if(jump){
-      btb_misses++;
-    }
-    //更新饱和计数器
-    if(jump){
-      if (bht[bht_idx].state < 3) bht[bht_idx].state++;//跳转条件下，若非强跳转，则增加状态
-      bht[bht_idx].jump_count++;
-    }else{
-      if (bht[bht_idx].state > 0) bht[bht_idx].state--;//非跳转条件下，若非强不跳转，则减少状态
-      bht[bht_idx].not_jump_count++;
-    }
-    //更新BTB
-    if(jump){
-      btb[btb_idx].pc = s->pc;
-      btb[btb_idx].target = s->dnpc;
-      btb[btb_idx].valid = true;
-    }
-
-    // 更新GHR（左移，记录最新结果：1表示跳转，0表示不跳转）
-    ghr = (ghr << 1) | (jump ? 1 : 0);//左移为新的历史记录腾出空间同时将新的分支结果记录到ghr最低位
-    ghr &= (1 << GHR_SIZE) - 1;  //截断到GHR_SIZE位。掩码（1<<GHR_SIZE）-1的二进制表示为GHR_SIZE个1
-
-    // // 调试输出（可选）
-    // #ifdef CONFIG_ITRACE
-    // printf("Branch at 0x%x: %s, GHR=0x%02x, predicted %s (target 0x%x), actual %s (target 0x%x)\n",
-    //        s->pc, s->logbuf, ghr, 
-    //        predicted_jump ? "jump" : "not jump", predicted_target,
-    //        jump ? "jump" : "not jump", s->dnpc);
-    // #endif
-  }
-#endif
 
 #ifdef CONFIG_FUNC_TRACE
   // ===============函数调用跟踪逻辑===============
@@ -402,26 +341,6 @@ static void statistic() {
   Log("Function call statistics:");
   for (int i = 0; i < func_call_stats_size; i++) {
     Log("  %-20s: %" PRIu64 " calls", func_call_stats[i].name, func_call_stats[i].call_count);
-  }
-#endif
-
-#ifdef CONFIG_BRANCH_Predictor
-  //添加分支预测器统计
-  puts("");
-  Log("Branch Predictor Statistics:");
-  Log("  Total direction predictions: %" PRIu64, bht_hits + bht_misses);
-  Log("  Direction hits: %" PRIu64, bht_hits);
-  Log("  Direction misses: %" PRIu64, bht_misses);
-  if(bht_hits+bht_misses > 0){
-    double direction_hit_rate = (double)bht_hits / (bht_hits+bht_misses)*100;
-    Log("  Direction hit rate: %.2f%%", direction_hit_rate);
-  }
-  Log("  Total target predictions: %" PRIu64, btb_hits+btb_misses);
-  Log("  Target hits: %" PRIu64, btb_hits);
-  Log("  Target misses: %" PRIu64, btb_misses);
-  if(btb_hits+btb_misses > 0){
-    double target_hit_rate = (double)btb_hits / (btb_hits+btb_misses)*100;
-    Log("  Target hit rate: %.2f%%", target_hit_rate);
   }
 #endif
 }

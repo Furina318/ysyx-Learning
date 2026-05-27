@@ -36,7 +36,6 @@ static void welcome() {
   Log("Dtrace: %s", MUXDEF(CONFIG_DEVICR_TRACE, ANSI_FMT("ON", ANSI_FG_GREEN), ANSI_FMT("OFF", ANSI_FG_RED)));
   Log("Mtrace: %s", MUXDEF(CONFIG_MEMORY_TRACE, ANSI_FMT("ON", ANSI_FG_GREEN), ANSI_FMT("OFF", ANSI_FG_RED)));
   Log("Ftrace: %s", MUXDEF(CONFIG_FUNC_TRACEE, ANSI_FMT("ON", ANSI_FG_GREEN), ANSI_FMT("OFF", ANSI_FG_RED)));
-  Log("Branch Predictor: %s", MUXDEF(CONFIG_BRANCH_Predictor, ANSI_FMT("ON", ANSI_FG_GREEN), ANSI_FMT("OFF", ANSI_FG_RED)));
   IFDEF(CONFIG_TRACE, Log("If trace is enabled, a log file will be generated "
         "to record the trace. This may lead to a large log file. "
         "If it is not necessary, you can disable it in menuconfig"));
