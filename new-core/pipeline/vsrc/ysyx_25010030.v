@@ -244,7 +244,7 @@ module ysyx_25010030 (
         .bpu_dnpc       (seq_dnpc       )
     );
 
-    ysyx_25010030_iCache u_icache (
+    icache u_icache (
         .clk         (clock          ),
         .rst         (reset          ),
         .is_fencei   (exu_is_fencei  ),

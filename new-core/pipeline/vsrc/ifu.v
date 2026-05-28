@@ -25,7 +25,11 @@ module ifu (
     assign ifu_valid    = icache_valid & ~exu_flush_en;
     always @(posedge clk) begin
         if (rst) begin
+`ifdef YSYXSOC
+            pc <= `RESET_FLASH_PC;
+`else
             pc <= `RESET_PC;
+`endif
         end else begin
             pc <= pc_updata ? dnpc : pc;
         end

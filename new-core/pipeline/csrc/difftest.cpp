@@ -62,11 +62,8 @@ const char *ref_regs[] = {
 void update_cpu_state(CPU_state *cpu)
 {
     cpu->pc = top_pc;
-    last_ref_pc = cpu->pc;
     for(int i = 0; i < REG_NUM; i++)
         cpu->gpr[i] = top_regs[i];
-    // cpu->csr.mcause = 0xb;
-    // cpu->csr.mstatus = 0x1800;
 }
 
 
@@ -166,8 +163,11 @@ void difftest_step(vaddr_t pc, vaddr_t npc)
 {
     if(is_skip_ref){
         CPU_state ref_r;
-        update_cpu_state(&ref_r);
+        for(int i = 0; i < REG_NUM; i++)
+            ref_r.gpr[i] = top_regs[i];
+        ref_r.pc = pc + 4;
         ref_difftest_regcpy(&ref_r, DIFFTEST_TO_REF);
+        last_ref_pc = pc + 4;
         is_skip_ref = false;
         return;
     }

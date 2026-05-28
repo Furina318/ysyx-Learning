@@ -68,7 +68,7 @@ assign sll_result = alu_src1 << alu_src2[4:0];
 assign sr64_result = {{32{op_sra & alu_src1[31]}}, alu_src1[31:0]} >> alu_src2[4:0];
 assign sr_result   = sr64_result[31:0];
 
-assign alu_result = ({32{op_add|op_sub}} & add_sub_result)
+assign alu_result =  ({32{op_add|op_sub}} & add_sub_result)
                    | ({32{op_slt       }} & slt_result    )
                    | ({32{op_sltu      }} & sltu_result   )
                    | ({32{op_and       }} & and_result    )

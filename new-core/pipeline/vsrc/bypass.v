@@ -62,43 +62,43 @@ end
 always @(posedge clk) begin
     if (rst) begin
         for (idx = 0; idx < BYPASS_DEPTH; idx = idx + 1) begin
-            bypass_rd[idx]      <= 5'b0;
-            bypass_data[idx]    <= 32'b0;
-            bypass_valid[idx]   <= 1'b0;
-            bypass_is_load[idx] <= 1'b0;
+            bypass_rd[idx]      = 5'b0;
+            bypass_data[idx]    = 32'b0;
+            bypass_valid[idx]   = 1'b0;
+            bypass_is_load[idx] = 1'b0;
         end
     end
     else begin
         if (lsu_ready) begin
             if(bypass_valid[2] && bypass_is_load[2]) begin // 旁路缓冲区1中的Load指令数据就绪
-                bypass_data[2]    <= rdata_processed;
-                bypass_is_load[2] <= 1'b0;
-                bypass_valid[2]   <= 1'b1;
+                bypass_data[2]    = rdata_processed;
+                bypass_is_load[2] = 1'b0;
+                bypass_valid[2]   = 1'b1;
             end else if (bypass_valid[1] && bypass_is_load[1])begin
-                bypass_data[1]    <= rdata_processed;
-                bypass_is_load[1] <= 1'b0;
-                bypass_valid[1]   <= 1'b1;
+                bypass_data[1]    = rdata_processed;
+                bypass_is_load[1] = 1'b0;
+                bypass_valid[1]   = 1'b1;
             end else if (bypass_valid[0] && bypass_is_load[0])begin
-                bypass_data[0]    <= rdata_processed;
-                bypass_is_load[0] <= 1'b0;
-                bypass_valid[0]   <= 1'b1;
+                bypass_data[0]    = rdata_processed;
+                bypass_is_load[0] = 1'b0;
+                bypass_valid[0]   = 1'b1;
             end
         end
         if (exu_ready && idu_valid && !exu_flush_en) begin
             // 旁路缓冲区数据移位：条目1 <- 条目0（旧数据后移）
-            bypass_rd[2]       <= bypass_rd[1];
-            bypass_data[2]     <= bypass_data[1];
-            bypass_valid[2]    <= bypass_valid[1];
-            bypass_is_load[2]  <= bypass_is_load[1];
-            bypass_rd[1]       <= bypass_rd[0];
-            bypass_data[1]     <= bypass_data[0];
-            bypass_valid[1]    <= bypass_valid[0];
-            bypass_is_load[1]  <= bypass_is_load[0];
+            bypass_rd[2]       = bypass_rd[1];
+            bypass_data[2]     = bypass_data[1];
+            bypass_valid[2]    = bypass_valid[1];
+            bypass_is_load[2]  = bypass_is_load[1];
+            bypass_rd[1]       = bypass_rd[0];
+            bypass_data[1]     = bypass_data[0];
+            bypass_valid[1]    = bypass_valid[0];
+            bypass_is_load[1]  = bypass_is_load[0];
             // 旁路缓冲区0更新为当前指令的写回信息
-            bypass_rd[0]       <= rd_addr;
-            bypass_data[0]     <= rd_w_bypass_data;
-            bypass_is_load[0]  <= rd_w_bypass_en & is_read;
-            bypass_valid[0]    <= rd_w_bypass_en;
+            bypass_rd[0]       = rd_addr;
+            bypass_data[0]     = rd_w_bypass_data;
+            bypass_is_load[0]  = rd_w_bypass_en & is_read;
+            bypass_valid[0]    = rd_w_bypass_en;
         end
     end
 end

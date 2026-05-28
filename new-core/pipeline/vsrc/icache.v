@@ -1,5 +1,5 @@
 
-module ysyx_25010030_iCache #(
+module icache #(
     // parameter CACHE_SIZE = 64,   
     parameter CACHE_SIZE = 128,
     parameter BLOCK_SIZE = 16    
@@ -8,8 +8,8 @@ module ysyx_25010030_iCache #(
     input wire        rst          ,     
     input wire        is_fencei    ,  
     input wire [31:0] addr         ,      
-    output reg [31:0] inst         ,      
-    output reg        valid        ,     
+    output wire [31:0] inst         ,      
+    output wire       valid        ,     
 
     // AXI接口信号（支持突发传输）
     output reg  [31:0] axi_araddr  ,  
@@ -61,11 +61,7 @@ module ysyx_25010030_iCache #(
     reg [31:0] block_data [0:BEATS_PER_BLOCK-1];  // 存储块内所有32位数据
     reg        ar_done;
 
-`ifdef YSYXSOC
-    wire in_sdram = 1;
-`else
-    wire in_sdram = 0;
-`endif
+wire in_sdram = 1;
 
 
     always @(posedge clk) begin
@@ -80,17 +76,15 @@ module ysyx_25010030_iCache #(
     always @(*) begin
         case (state)
             IDLE: next_state = hit ? IDLE : READ;
-        `ifdef YSYXSOC
             READ: next_state = (axi_rvalid && axi_rready && axi_rlast) ? FILL : READ;
-        `else
-            READ: next_state = (axi_rvalid && axi_rready && axi_rlast) ? IDLE : READ;
-        `endif
             FILL: next_state = IDLE; 
             default: next_state = IDLE;
         endcase
     end
 
     assign hit = valid_ram[req_index] && (tag_ram[req_index] == req_tag) && !is_fencei && in_sdram;
+    assign inst = hit ? data_ram[req_index][beat_idx] : 32'h0; // 命中时输出指令，否则输出0
+    assign valid = hit; // 命中时输出有效信号
 
     // AXI突发传输配置与控制
     assign axi_arid    = 4'h0;    // 固定ID
@@ -106,8 +100,8 @@ module ysyx_25010030_iCache #(
             for (idx = 0; idx < NUM_BLOCKS; idx = idx + 1) begin
                 valid_ram[idx] <= 1'b0;
             end
-            inst  <= 32'h0;
-            valid <= 1'b0;
+            // inst  <= 32'h0;
+            // valid <= 1'b0;
 
             axi_rready <= 1'b0;
             axi_arvalid <= 1'b0;
@@ -127,17 +121,17 @@ module ysyx_25010030_iCache #(
                     saved_index    <= req_index;
                     saved_beat_idx <= beat_idx; 
                     
-                    if (hit) begin
-                        inst  <= data_ram[req_index][beat_idx];
-                        valid <= 1'b1;
-                    end 
-                    else begin
-                        valid <= 1'b0;
-                    end
+                    // if (hit) begin
+                    //     inst  <= data_ram[req_index][beat_idx];
+                    //     valid <= 1'b1;
+                    // end 
+                    // else begin
+                    //     valid <= 1'b0;
+                    // end
                 end
 
                 READ: begin
-                    valid      <= 1'b0;
+                    // valid      <= 1'b0;
                     axi_rready <= 1'b1;
                     if(!axi_arvalid && !ar_done) begin 
                         axi_arvalid <= 1'b1;
@@ -148,13 +142,8 @@ module ysyx_25010030_iCache #(
                         ar_done     <= 1'b1;
                     end
                     if (axi_rvalid) begin
-                    `ifdef YSYXSOC
                         block_data[beat_cnt] <= axi_rdata;
                         beat_cnt <= in_sdram ? beat_cnt + 1'b1 : 2'b0;
-                    `else
-                        inst  <= axi_rdata;
-                        valid <= 1'b1;
-                    `endif
                     end
                 end
 
@@ -165,8 +154,8 @@ module ysyx_25010030_iCache #(
                     for (b = 0; b < BEATS_PER_BLOCK; b = b + 1) begin
                         data_ram[saved_index][b] <= block_data[b];
                     end
-                    inst  <= in_sdram ? block_data[saved_beat_idx] : block_data[2'b0];
-                    valid <= 1'b1;
+                    // inst  <= in_sdram ? block_data[saved_beat_idx] : block_data[2'b0];
+                    // valid <= 1'b1;
                 end
                 default: begin end
             endcase
