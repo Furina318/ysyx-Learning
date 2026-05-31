@@ -8,11 +8,31 @@ module decode (
     output wire                    idu_ready    ,
     output reg                     idu_valid    ,
     input  wire                    exu_ready    ,
-    input  wire [            31:0] pc           ,
-    input  wire [            31:0] bpu_dnpc     ,
-    input  wire [            31:0] inst         ,
+    // input  wire [            31:0] pc           ,
+    // input  wire [            31:0] bpu_dnpc     ,
+    // input  wire [            31:0] inst         ,
+    input  wire [`IF_TO_ID_WD-1:0] if_to_id_bus ,
     output reg  [`ID_TO_EX_WD-1:0] du_bus       
 );
+    wire [31:0] pc;
+    wire [31:0] bpu_dnpc;
+    wire [31:0] inst;
+    wire        is_call;
+    wire        is_ret;
+    wire        is_jal;
+    wire        is_jalr;
+    wire        is_indirect;
+    assign {
+        pc         ,
+        bpu_dnpc   ,
+        inst       ,
+        is_call    ,
+        is_ret     ,
+        is_jal     ,
+        is_jalr    ,
+        is_indirect
+    } = if_to_id_bus;
+
     wire         gpr_we;
 
     wire [ 4: 0] rs1;
@@ -268,7 +288,12 @@ module decode (
                     inst_mret    ,
                     inst_csrrs   ,
                     inst_csrrw   ,
-                    inst_ebreak 
+                    inst_ebreak  ,
+                    is_call      ,
+                    is_ret       ,
+                    is_jal       ,
+                    is_jalr      ,
+                    is_indirect
                 };
             end
             else begin

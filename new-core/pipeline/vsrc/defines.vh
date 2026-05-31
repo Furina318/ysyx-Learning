@@ -8,7 +8,8 @@
 `define ABORT             2
 
 // bus width
-`define ID_TO_EX_WD 155
+`define IF_TO_ID_WD 101
+`define ID_TO_EX_WD 160
 `define EX_TO_LS_WD 109
 `define LS_TO_WB_WD 102
 

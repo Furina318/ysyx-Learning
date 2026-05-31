@@ -25,7 +25,16 @@ module exu (
     output wire [           31: 0] rd_w_bypass_data ,
     output wire                    rd_w_bypass_en   ,
     output wire                    is_read          ,
-
+    // to bpu
+    output reg  [            31:0] bru_pc           ,
+    output reg  [            31:0] bru_dnpc         ,
+    output reg                     bru_dnpc_valid   ,
+    output reg                     bru_taken        ,
+    output reg                     bru_is_call      ,
+    output reg                     bru_is_ret       ,
+    output reg                     bru_is_jal       ,
+    output reg                     bru_is_jalr      ,
+    output reg                     bru_is_indirect  ,
     // lsu
     output reg  [`EX_TO_LS_WD-1:0] ex_to_ls_bus
 );
@@ -58,6 +67,11 @@ module exu (
     wire        inst_csrrs;
     wire        inst_csrrw;
     wire        inst_ebreak;
+    wire        is_call;
+    wire        is_ret;
+    wire        is_jal;
+    wire        is_jalr;
+    wire        is_indirect;
 
     assign {
         pc           ,
@@ -84,7 +98,12 @@ module exu (
         inst_mret    ,
         inst_csrrs   ,
         inst_csrrw   ,
-        inst_ebreak 
+        inst_ebreak  ,
+        is_call      ,
+        is_ret       ,
+        is_jal       ,
+        is_jalr      ,
+        is_indirect
     } = id_to_ex_bus;
 
 `ifdef VERILATOR
@@ -161,7 +180,21 @@ module exu (
         .pc_update   (pc_update      ),
         .bpu_dnpc    (bpu_dnpc       ),
         .flush_en    (exu_flush_en   ),
-        .flush_dnpc  (exu_flush_dnpc )
+        .flush_dnpc  (exu_flush_dnpc ),
+        .is_call        (is_call        ),
+        .is_ret         (is_ret         ),
+        .is_jal         (is_jal         ),
+        .is_jalr        (is_jalr        ),
+        .is_indirect    (is_indirect    ),
+        .bru_pc         (bru_pc        ),
+        .bru_dnpc       (bru_dnpc      ),
+        .bru_dnpc_valid (bru_dnpc_valid),
+        .bru_taken      (bru_taken     ),
+        .bru_is_call    (bru_is_call   ),
+        .bru_is_ret     (bru_is_ret    ),
+        .bru_is_jal     (bru_is_jal    ),
+        .bru_is_jalr    (bru_is_jalr   ),
+        .bru_is_indirect(bru_is_indirect)
     );
 
     wire [31:0] snpc = pc + 4;

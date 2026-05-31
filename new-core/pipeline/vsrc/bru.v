@@ -17,7 +17,22 @@ module bru(
   input  wire        pc_update  ,
   input  wire [31:0] bpu_dnpc   ,
   output reg         flush_en   ,
-  output reg  [31:0] flush_dnpc
+  output reg  [31:0] flush_dnpc ,
+
+  input  wire        is_call       ,
+  input  wire        is_ret        ,
+  input  wire        is_jal        ,
+  input  wire        is_jalr       ,
+  input  wire        is_indirect   ,
+  output reg  [31:0] bru_pc        ,
+  output reg  [31:0] bru_dnpc      ,
+  output reg         bru_dnpc_valid,
+  output reg         bru_taken     ,
+  output reg         bru_is_call   ,
+  output reg         bru_is_ret    ,
+  output reg         bru_is_jal    ,
+  output reg         bru_is_jalr   ,
+  output reg         bru_is_indirect
 );
 
   wire         op_bne  ;
@@ -64,6 +79,15 @@ module bru(
       if (rst) begin
           flush_en   <= 1'b0;
           flush_dnpc <= 32'h0;
+          bru_pc          <= 32'h0;
+          bru_dnpc        <= 32'h0;
+          bru_dnpc_valid  <= 1'b0;
+          bru_taken       <= 1'b0;
+          bru_is_call     <= 1'b0;
+          bru_is_ret      <= 1'b0;
+          bru_is_jal      <= 1'b0;
+          bru_is_jalr     <= 1'b0;
+          bru_is_indirect <= 1'b0;
       end
       else begin
           if (lsu_ready) begin
@@ -73,6 +97,27 @@ module bru(
               end
               else if (pc_update) begin
                   flush_en <= 1'b0;
+              end
+
+              if (pc_will_jump & !flush_en) begin
+                  bru_pc          <= pc;
+                  bru_dnpc        <= target_dnpc;
+                  bru_dnpc_valid  <= 1'b1;
+                  bru_taken       <= (target_dnpc != snpc);
+                  bru_is_call     <= is_call;
+                  bru_is_ret      <= is_ret;
+                  bru_is_jal      <= is_jal;
+                  bru_is_jalr     <= is_jalr;
+                  bru_is_indirect <= is_indirect;
+              end
+              else begin
+                    bru_dnpc_valid  <= 1'b0;
+                    bru_taken       <= 1'b0;
+                    bru_is_call     <= 1'b0;
+                    bru_is_ret      <= 1'b0;
+                    bru_is_jal      <= 1'b0;
+                    bru_is_jalr     <= 1'b0;
+                    bru_is_indirect <= 1'b0;
               end
           end
       end

@@ -99,7 +99,7 @@ module ysyx_25010030 (
     wire        ifu_valid;
     wire        pc_updata;
     wire        idu_ready;
-
+    wire [`IF_TO_ID_WD-1:0] if_to_id_bus;
     wire                    idu_valid;
     wire [`ID_TO_EX_WD-1:0] id_to_ex_bus;
     wire                    exu_ready;
@@ -226,7 +226,43 @@ module ysyx_25010030 (
     wire        wbu_valid;
 
 
-    wire [31:0] seq_dnpc = ifu_pc + 32'h4;
+    // wire [31:0] bpu_dnpc = ifu_pc + 32'h4;
+    wire [31:0] bpu_dnpc;
+    wire        ifu_is_call;
+    wire        ifu_is_ret;
+    wire        ifu_is_jal;
+    wire        ifu_is_jalr;
+    wire        ifu_is_indirect;
+    wire [31:0] bru_pc;
+    wire [31:0] bru_dnpc;
+    wire        bru_dnpc_valid;
+    wire        bru_taken;
+    wire        bru_is_call;
+    wire        bru_is_ret;
+    wire        bru_is_jal;
+    wire        bru_is_jalr;
+    wire        bru_is_indirect;
+
+    bpu u_bpu (
+        .clk            (clock          ),
+        .rst            (reset          ),
+        .pc             (ifu_pc         ),
+        .dnpc           (bpu_dnpc       ),
+        .is_jal         (ifu_is_jal     ),
+        .is_jalr        (ifu_is_jalr    ),
+        .is_call        (ifu_is_call    ),
+        .is_ret         (ifu_is_ret     ),
+        .is_indirect    (ifu_is_indirect),
+        .bru_pc         (bru_pc         ),
+        .bru_dnpc       (bru_dnpc       ),
+        .bru_dnpc_valid (bru_dnpc_valid ),
+        .bru_taken      (bru_taken      ),
+        .bru_is_jal     (bru_is_jal     ),
+        .bru_is_jalr    (bru_is_jalr    ),
+        .bru_is_call    (bru_is_call    ),
+        .bru_is_ret     (bru_is_ret     ),
+        .bru_is_indirect(bru_is_indirect)
+    );
 
     ifu u_ifu (
         .clk            (clock          ),
@@ -237,11 +273,16 @@ module ysyx_25010030 (
         .idu_ready      (idu_ready      ),
         .ifu_valid      (ifu_valid      ),
         .icache_inst    (icache_inst    ),
-        .inst           (ifu_inst       ),
-        .pc             (ifu_pc         ),
         .icache_addr    (icache_addr    ),
         .icache_valid   (icache_valid   ),
-        .bpu_dnpc       (seq_dnpc       )
+        .bpu_dnpc       (bpu_dnpc       ),
+        .pc             (ifu_pc         ),
+        .is_call        (ifu_is_call    ),
+        .is_ret         (ifu_is_ret     ),
+        .is_jal         (ifu_is_jal     ),
+        .is_jalr        (ifu_is_jalr    ),
+        .is_indirect    (ifu_is_indirect),
+        .if_to_id_bus   (if_to_id_bus   )
     );
 
     icache u_icache (
@@ -274,9 +315,10 @@ module ysyx_25010030 (
         .idu_ready    (idu_ready     ),
         .idu_valid    (idu_valid     ),
         .exu_ready    (exu_ready     ),
-        .pc           (ifu_pc        ),
-        .bpu_dnpc     (seq_dnpc      ),
-        .inst         (ifu_inst      ),
+        .if_to_id_bus (if_to_id_bus  ),
+        // .pc           (ifu_pc        ),
+        // .bpu_dnpc     (bpu_dnpc      ),
+        // .inst         (ifu_inst      ),
         .du_bus       (id_to_ex_bus  )
     );
 
@@ -320,6 +362,15 @@ module ysyx_25010030 (
         .rd_w_bypass_data (exu_rd_w_bypass_data),
         .rd_w_bypass_en   (exu_rd_w_bypass_en ),
         .is_read          (exu_is_read        ),
+        .bru_pc           (bru_pc             ),
+        .bru_dnpc         (bru_dnpc           ),
+        .bru_dnpc_valid   (bru_dnpc_valid     ),
+        .bru_taken        (bru_taken          ),
+        .bru_is_call      (bru_is_call        ),
+        .bru_is_ret       (bru_is_ret         ),
+        .bru_is_jal       (bru_is_jal         ),
+        .bru_is_jalr      (bru_is_jalr        ),
+        .bru_is_indirect  (bru_is_indirect    ),
         .ex_to_ls_bus     (ex_to_ls_bus       )
     );
 
