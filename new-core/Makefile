@@ -1,6 +1,6 @@
 # 项目模块名称
 # FRAME = out-of-order-dual
-FRAME = pipeline
+FRAME = rv32imc-pipeline
 ARCH = riscv32-newcore
 ifeq ($(ARCH), riscv32-newysyxsoc)
 TOP_MODULE = ysyxSoCFull
