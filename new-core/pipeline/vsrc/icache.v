@@ -4,12 +4,12 @@ module icache #(
     parameter CACHE_SIZE = 128,
     parameter BLOCK_SIZE = 16    
 )(
-    input wire        clk          ,       
-    input wire        rst          ,     
-    input wire        is_fencei    ,  
-    input wire [31:0] addr         ,      
+    input  wire        clk          ,       
+    input  wire        rst          ,     
+    input  wire        is_fencei    ,  
+    input  wire [31:0] addr         ,      
     output wire [31:0] inst         ,      
-    output wire       valid        ,     
+    output wire       valid         ,     
 
     // AXI接口信号（支持突发传输）
     output reg  [31:0] axi_araddr  ,  
@@ -50,9 +50,10 @@ module icache #(
     reg [         TAG_WIDTH-1:0] saved_tag;      // 保存标签
     reg [       INDEX_WIDTH-1:0] saved_index;    // 保存索引
     reg [                   1:0] saved_beat_idx; // 保存块内数据索引
+    reg [                  31:0] saved_addr;     // 保存请求地址
 
     localparam IDLE = 2'b00;
-    localparam READ = 2'b11;  // 接收突发传输数据
+    localparam READ = 2'b01;  // 接收突发传输数据
     localparam FILL = 2'b10;  // 填充缓存块
 
     reg [1:0] state, next_state;
@@ -120,6 +121,7 @@ wire in_sdram = 1;
                     saved_tag      <= req_tag;
                     saved_index    <= req_index;
                     saved_beat_idx <= beat_idx; 
+                    saved_addr     <= addr;
                     
                     // if (hit) begin
                     //     inst  <= data_ram[req_index][beat_idx];
@@ -135,7 +137,7 @@ wire in_sdram = 1;
                     axi_rready <= 1'b1;
                     if(!axi_arvalid && !ar_done) begin 
                         axi_arvalid <= 1'b1;
-                        axi_araddr  <= in_sdram ? {addr[31:BLOCK_OFFSET_WIDTH], {BLOCK_OFFSET_WIDTH{1'b0}}} : addr;
+                        axi_araddr  <= in_sdram ? {saved_addr[31:BLOCK_OFFSET_WIDTH], {BLOCK_OFFSET_WIDTH{1'b0}}} : saved_addr;
                     end
                     else if(axi_arready) begin
                         axi_arvalid <= 1'b0;

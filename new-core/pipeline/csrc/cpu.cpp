@@ -121,6 +121,7 @@ static void execute_once() {
       nvboard_update();
       #endif
       cycle_sum++;
+      if (npc_state.state != NPC_RUNNING) break;
     } while (last_pc == top->rootp->ysyxSoCFull__DOT__asic__DOT__cpu__DOT__cpu__DOT__ifu_pc);
     #else
     PCSet.pc = top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__ifu_pc;
@@ -134,6 +135,7 @@ static void execute_once() {
       single_cycle();
       cycle_sum++;
       // trace_and_difftest();
+      if (npc_state.state != NPC_RUNNING) break;
     } while (last_pc == top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__ifu_pc);
     #endif
 
