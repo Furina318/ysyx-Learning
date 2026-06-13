@@ -22,6 +22,10 @@ module bru(
   input  wire        is_c_inst       ,
   output reg         bru_is_c_inst   ,
 
+  input  wire        mret_en         ,
+  input  wire        ecall_en        ,
+  input  wire [31:0] csr_rdata       ,
+
   input  wire        is_call         ,
   input  wire        is_ret          ,
   input  wire        is_jal          ,
@@ -76,6 +80,7 @@ module bru(
   wire [31:0] snpc = is_c_inst ? (pc + 2) : (pc + 4);
   wire        pc_will_jump = (|bru_op) | (|jal_or_jalr) | is_fencei;
   wire [31:0] target_dnpc = (bru_result | jal_or_jalr[1]) ? alu_result                   :
+                            (ecall_en   | mret_en       ) ? csr_rdata                    :
                             (jal_or_jalr[0]             ) ? (alu_result & 32'hffff_fffe) : snpc;
 
   always @(posedge clk) begin

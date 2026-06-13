@@ -251,8 +251,8 @@ module ysyx_25010030 (
     wire [`IF_TO_ID_WD-1:0] ib_to_id_bus;
     wire [`IF_TO_ID_WD-1:0] if_to_ib_bus;
 
-    wire [`STB_DEPTH_LOG2-1:0] wbu_stb_id;
-    wire                       wbu_is_store;
+    // wire [`STB_DEPTH_LOG2-1:0] wbu_stb_id;
+    // wire                       wbu_is_store;
     wire [`STB_DEPTH_LOG2-1:0] cmt_stb_id;
     wire                       cmt_is_store;
     wire                       cmt_valid;
@@ -272,8 +272,13 @@ module ysyx_25010030 (
     wire [               31:0] stb_alloc_data;
     wire [                3:0] stb_alloc_wstrb;
 
-    wire        fence_done;
-    reg fencei_killed;
+    wire [11:0] csr_raddr;
+    wire        ecall_en;
+    wire        mret_en;
+    wire [31:0] csr_rdata;
+
+    wire fence_done;
+    reg  fencei_killed;
     always @(posedge clock) begin
         if (reset) fencei_killed <= 1'b0;
         else if (exu_is_fencei & exu_flush_en) fencei_killed <= 1'b1;
@@ -429,6 +434,10 @@ module ysyx_25010030 (
         .cmt_valid        (cmt_valid          ),
         .cmt_stb_id       (cmt_stb_id         ),
         .cmt_is_store     (cmt_is_store       ),
+        .csr_raddr        (csr_raddr          ),
+        .ecall_en         (ecall_en           ),
+        .mret_en          (mret_en            ),
+        .csr_rdata        (csr_rdata          ),
         .ex_to_wb_bus     (ex_to_wb_bus       )
     );
 
@@ -495,8 +504,10 @@ module ysyx_25010030 (
         .wbu_pc       (wbu_pc        ),
         .wbu_inst     (wbu_inst      ),
 
-        .wbu_is_store (wbu_is_store   ),
-        .wbu_stb_id   (wbu_stb_id     ),
+        .csr_raddr    (csr_raddr     ),
+        .ecall_en     (ecall_en      ),
+        .mret_en      (mret_en       ),
+        .csr_rdata    (csr_rdata     ),
         .exu_valid    (exu_valid     ),
         .ex_to_wb_bus (ex_to_wb_bus  ),
         .rs1          (exu_rs1       ),

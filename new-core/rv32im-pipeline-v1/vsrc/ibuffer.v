@@ -1,8 +1,8 @@
 `include "defines.vh"
 
 module ibuffer #(
-    parameter BUFFER_DEPTH = 8,
-    parameter PTR_WIDTH    = 3
+    parameter BUFFER_DEPTH = 16,
+    parameter PTR_WIDTH    = 4
 )(
     input  wire                    clk            ,
     input  wire                    rst            ,

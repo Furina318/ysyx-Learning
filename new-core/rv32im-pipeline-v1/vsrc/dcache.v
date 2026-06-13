@@ -3,7 +3,7 @@
 module dcache #(
     parameter ADDR_WIDTH    = 32,
     parameter DATA_WIDTH    = 32,
-    parameter CACHE_BLOCKS  = 64,
+    parameter CACHE_BLOCKS  = 256,
     parameter BLOCK_SIZE    = 16,
     parameter OFFSET_WIDTH  = $clog2(BLOCK_SIZE),
     parameter INDEX_WIDTH   = $clog2(CACHE_BLOCKS),

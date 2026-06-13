@@ -1,7 +1,7 @@
 `include "defines.vh"
 
 module store_buffer #(
-    parameter STB_DEPTH_LOG2 = 2,           // 深度为 2^2 = 4 项
+    parameter STB_DEPTH_LOG2 = 4,           // 深度为 2^2 = 4 项
     parameter DEPTH      = 1 << STB_DEPTH_LOG2
 )(
     input  wire                      clk          ,
@@ -123,10 +123,10 @@ module store_buffer #(
 
             if (flush_en) begin
                 // 此时队列内真正的有效数量直接退化为已 commit 的数量
-                count <= commit_count + (do_commit ? 3'd1 : 3'd0) - (do_drain ? 3'd1 : 3'd0);
+                count <= commit_count + (do_commit ? 5'd1 : 5'd0) - (do_drain ? 5'd1 : 5'd0);
                 // alloc_ptr 必须回退到：队首(drain_ptr) + 现存的所有已 commit 数量
                 // (do_drain 改变的是队首，不影响队列尾部的绝对位置，只有 do_commit 会延伸安全的队尾)
-                alloc_ptr <= drain_ptr + commit_count[STB_DEPTH_LOG2-1:0] + (do_commit ? 2'd1 : 2'd0);
+                alloc_ptr <= drain_ptr + commit_count[STB_DEPTH_LOG2-1:0] + (do_commit ? 4'd1 : 4'd0);
             end
             else begin
                 if (do_allocate) begin

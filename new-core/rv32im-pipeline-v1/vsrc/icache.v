@@ -1,7 +1,7 @@
 
 module icache #(
     // parameter CACHE_SIZE = 64,   
-    parameter CACHE_SIZE = 128,
+    parameter CACHE_SIZE = 256,
     parameter BLOCK_SIZE = 16    
 )(
     input  wire        clk          ,       

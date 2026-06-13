@@ -96,6 +96,7 @@ module decode (
     wire        inst_srli;
     wire        inst_csrrw;
     wire        inst_csrrs;
+    wire        inst_csrrc;
     wire        inst_ecall;
     wire        inst_mret;
     wire        inst_sb;
@@ -172,6 +173,7 @@ module decode (
     assign inst_xori      = (opcode_06_00 == 7'h13) & (opcode_14_12 == 3'h4);
     assign inst_csrrw     = (opcode_06_00 == 7'h73) & (opcode_14_12 == 3'h1);
     assign inst_csrrs     = (opcode_06_00 == 7'h73) & (opcode_14_12 == 3'h2);
+    assign inst_csrrc     = (opcode_06_00 == 7'h73) & (opcode_14_12 == 3'h3);
     assign inst_sb        = (opcode_06_00 == 7'h23) & (opcode_14_12 == 3'h0);
     assign inst_sh        = (opcode_06_00 == 7'h23) & (opcode_14_12 == 3'h1);
     assign inst_sw        = (opcode_06_00 == 7'h23) & (opcode_14_12 == 3'h2);
@@ -191,7 +193,7 @@ module decode (
     assign inst_waiting   = (opcode_06_00 == 7'h00) & (rd == 5'h00) & (opcode_14_12 == 3'h0) & (rs1 == 5'h00) & (rs2 == 5'h00) & (opcode_31_25 == 7'h00);
 
     assign TYPE_R = (opcode_06_00 == 7'h33);
-    assign TYPE_I = (opcode_06_00 == 7'h13) | is_read | inst_jalr | inst_csrrw | inst_csrrs | inst_fence_i; 
+    assign TYPE_I = (opcode_06_00 == 7'h13) | is_read | inst_jalr | inst_csrrw | inst_csrrs | inst_csrrc | inst_fence_i; 
     assign TYPE_S = (opcode_06_00 == 7'h23);
     assign TYPE_B = (opcode_06_00 == 7'h63);
     assign TYPE_U = inst_auipc  | inst_lui;
@@ -239,7 +241,7 @@ module decode (
     assign gpr_we = TYPE_R    | is_read   |
                     inst_addi | inst_jalr | inst_sltiu| inst_srai  | inst_andi | 
                     inst_xori | inst_srli | inst_slli | inst_ori   | inst_csrrw|
-                    inst_csrrs| inst_jal  | inst_auipc| inst_lui   | inst_slti;
+                    inst_csrrs| inst_jal  | inst_auipc| inst_lui   | inst_slti | inst_csrrc;
 
     assign sw_sh_sb = opcode_14_12[1:0];               // 00: sb, 01: sh, 10: sw
     assign lw_lh_lb = {inst_lw, (inst_lh | inst_lhu)}; // 00: lb/lbu, 01: lh/lhu, 10: lw
@@ -289,6 +291,7 @@ module decode (
                     jal_or_jalr  ,
                     inst_ecall   ,
                     inst_mret    ,
+                    inst_csrrc   ,
                     inst_csrrs   ,
                     inst_csrrw   ,
                     inst_ebreak  ,

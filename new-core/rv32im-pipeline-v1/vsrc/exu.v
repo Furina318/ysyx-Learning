@@ -49,6 +49,11 @@ module exu (
     output reg                        cmt_valid    ,
     output reg [`STB_DEPTH_LOG2-1:0]  cmt_stb_id   , 
     output reg                        cmt_is_store ,
+    // csr
+    output wire [               11:0] csr_raddr    ,
+    output wire                       ecall_en     ,
+    output wire                       mret_en      ,
+    input  wire [               31:0] csr_rdata    ,
     // to wbu 
     output reg  [`EX_TO_WB_WD-1:0] ex_to_wb_bus
 );
@@ -77,10 +82,11 @@ module exu (
     wire        src1_is_pc;
     wire        src2_is_imm;
     wire [ 1:0] jal_or_jalr;  
-    wire        inst_ecall;
-    wire        inst_mret;
-    wire        inst_csrrs;
-    wire        inst_csrrw;
+    // wire        ecall_en;
+    // wire        mret_en;
+    wire        csrrc_op;
+    wire        csrrs_op;
+    wire        csrrw_op;
     wire        inst_ebreak;
     wire        is_call;
     wire        is_ret;
@@ -111,10 +117,11 @@ module exu (
         src1_is_pc   ,
         src2_is_imm  ,
         jal_or_jalr  ,
-        inst_ecall   ,
-        inst_mret    ,
-        inst_csrrs   ,
-        inst_csrrw   ,
+        ecall_en     ,
+        mret_en      ,
+        csrrc_op     ,
+        csrrs_op     ,
+        csrrw_op     ,
         inst_ebreak  ,
         is_call      ,
         is_ret       ,
@@ -129,6 +136,10 @@ module exu (
         if (inst_ebreak) ebreak(`HIT_TRAP, `INST_EBREAK);
     end
 `endif
+
+    wire csr_gpr_we  = csrrc_op | csrrs_op | csrrw_op;
+    assign csr_raddr = imm[11:0];
+    wire [11:0] csr_waddr = imm[11:0];
 
     assign is_fencei = inst_fence_i;
     assign lsu_en    = idu_valid & (is_read | is_write) & !exu_flush_en;
@@ -217,6 +228,9 @@ module exu (
         .is_jal         (is_jal         ),
         .is_jalr        (is_jalr        ),
         .is_indirect    (is_indirect    ),
+        .ecall_en       (ecall_en       ),
+        .mret_en        (mret_en        ),
+        .csr_rdata      (csr_rdata      ),
         .is_c_inst      (is_c_inst      ),
         .bru_is_c_inst  (bru_is_c_inst  ),
         .bru_pc         (bru_pc        ),
@@ -232,9 +246,13 @@ module exu (
 
     wire [31:0] snpc = is_c_inst ? (pc + 2) : (pc + 4);
 
+    wire [31:0] csr_wdata = ({32{csrrw_op}} & src1              ) |
+                            ({32{csrrs_op}} & (src1 | csr_rdata)) |
+                            ({32{csrrc_op}} & (~src1 | csr_rdata));
     wire [31:0] result = |jal_or_jalr ? snpc       :
+                          csr_gpr_we  ? csr_rdata  :
                           mdu_en      ? mdu_result : 
-                          lsu_en      ? lsu_data  : alu_result;
+                          lsu_en      ? lsu_data   : alu_result;
 
     assign rd_w_bypass_en   = gpr_we;
     assign rd_w_bypass_data = result;
@@ -260,8 +278,11 @@ module exu (
                     ex_to_wb_bus <= {
                         pc           , // for difftest
                         inst         , // for difftest
-                        is_write     ,
-                        lsu_stb_id   ,
+                        ecall_en     ,
+                        mret_en      ,
+                        csr_gpr_we   ,
+                        csr_waddr    ,
+                        csr_wdata    ,
                         rd           ,
                         gpr_we       ,
                         result

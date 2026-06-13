@@ -8,16 +8,39 @@
 `define ABORT             2
 
 // FU
-`define STB_DEPTH_LOG2 2
+`define STB_DEPTH_LOG2 4
 
 // bus width
 `define IF_TO_ID_WD 102
-`define ID_TO_EX_WD 193
+`define ID_TO_EX_WD 194
 `define EX_TO_LS_WD 108
-`define EX_TO_WB_WD (103 + `STB_DEPTH_LOG2)
+`define EX_TO_WB_WD 149
 
 
 // clint (0200_0000-0200_ffff)
 `define CLINT_BASE        16'h0200  
 `define CLINT_BASE_START  32'h02000000
 `define CLINT_BASE_END    32'h0200ffff
+
+// csr
+`define XLEN 32
+`define M_MODE 2'b11
+`define S_MODE 2'b01
+`define U_MODE 2'b00
+
+// mstatus csr
+`define SD   (`XLEN - 1)
+`define TSR  22
+`define TW   21
+`define TVM  20
+`define MXR  19
+`define SUM  18
+`define MPRV 17
+`define XS   16:15
+`define FS   14:13
+`define MPP  12:11
+`define SPP  8
+`define MPIE 7
+`define SPIE 5
+`define MIE  3
+`define SIE  1 
