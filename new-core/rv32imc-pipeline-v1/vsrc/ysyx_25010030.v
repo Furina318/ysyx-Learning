@@ -94,11 +94,11 @@ module ysyx_25010030 (
 `endif
 
 
-    wire [31:0] ifu_pc;
-    wire [31:0] ifu_inst;
-    wire        ifu_valid;
-    wire        pc_updata;
-    wire        idu_ready;
+    wire [            31:0] ifu_pc;
+    wire [            31:0] ifu_inst;
+    wire                    ifu_valid;
+    wire                    pc_updata;
+    wire                    idu_ready;
     wire [`IF_TO_ID_WD-1:0] if_to_id_bus;
     wire                    idu_valid;
     wire [`ID_TO_EX_WD-1:0] id_to_ex_bus;
@@ -109,7 +109,7 @@ module ysyx_25010030 (
     wire                    exu_valid;
     wire [            4:0]  exu_rs1;
     wire [            4:0]  exu_rs2;
-    wire [            4:0]  exu_rd;
+    wire [            4:0]  exu_rd_w_bypass;
     wire [           31:0]  exu_rd_w_bypass_data;
     wire                    exu_rd_w_bypass_en;
     wire                    exu_is_read;
@@ -385,7 +385,7 @@ module ysyx_25010030 (
         .exu_flush_en     (exu_flush_en       ),
         .rs1_addr         (exu_rs1            ),
         .rs2_addr         (exu_rs2            ),
-        .rd_addr          (exu_rd             ),
+        .rd_w_bypass      (exu_rd_w_bypass     ),
         .rd_w_bypass_data (exu_rd_w_bypass_data),
         .rd_w_bypass_en   (exu_rd_w_bypass_en ),
         .rf_rs1_data      (rf_rs1_data        ),
@@ -412,7 +412,7 @@ module ysyx_25010030 (
         .rs2_addr         (exu_rs2            ),
         .bypass_rs1_data  (bypass_rs1_data    ),
         .bypass_rs2_data  (bypass_rs2_data    ),
-        .rd_addr          (exu_rd             ),
+        .rd_w_bypass      (exu_rd_w_bypass     ),
         .rd_w_bypass_data (exu_rd_w_bypass_data),
         .rd_w_bypass_en   (exu_rd_w_bypass_en ),
         .is_read          (exu_is_read        ),

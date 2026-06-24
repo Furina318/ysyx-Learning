@@ -34,7 +34,7 @@ module bpu #(
 
     localparam FTB_SETS        = FTB_BLOCKS / FTB_WAYS;
     localparam INDEX_WIDTH     = $clog2(FTB_SETS);
-    localparam TARGET_WIDTH    = DATA_WIDTH - 2;
+    localparam TARGET_WIDTH    = DATA_WIDTH - 1;
     localparam RAS_PTR_WIDTH   = $clog2(RAS_DEPTH);
     localparam WAY_WIDTH       = $clog2(FTB_WAYS);
     
@@ -65,9 +65,9 @@ module bpu #(
 
     integer i, w;
 
-    wire [INDEX_WIDTH-1:0]     pred_set_idx  = pc[2 +: INDEX_WIDTH];
-    wire [  TAG_WIDTH-1:0]     pred_pc_tag   = pc[2 + INDEX_WIDTH +: TAG_WIDTH];
-    wire [ META_IDX_W-1:0]     pred_meta_idx = pc[2 +: META_IDX_W];
+    wire [INDEX_WIDTH-1:0]     pred_set_idx  = pc[1 +: INDEX_WIDTH];
+    wire [  TAG_WIDTH-1:0]     pred_pc_tag   = pc[1 + INDEX_WIDTH +: TAG_WIDTH];
+    wire [ META_IDX_W-1:0]     pred_meta_idx = pc[1 +: META_IDX_W];
 
     // FTB 命中与路选择匹配
     reg                        ftb_hit;
@@ -98,7 +98,7 @@ module bpu #(
     wire [2:0]  tage_pred_provider;
     wire        tage_pred_alt_taken;
 
-    wire [META_IDX_W-1:0] update_meta_idx = bru_pc[2 +: META_IDX_W];
+    wire [META_IDX_W-1:0] update_meta_idx = bru_pc[1 +: META_IDX_W];
 
     tage #(.PC_WIDTH(DATA_WIDTH), .GHR_WIDTH(GHR_WIDTH)) u_tage_core (
         .clk             (clk                                           ),
@@ -148,17 +148,24 @@ module bpu #(
         .br_taken2    (1'b0                                              )
     );
 
-    wire [DATA_WIDTH-1:0] ftb_predicted_target = {ftb_target_selected, 2'b00};
+    wire [DATA_WIDTH-1:0] ftb_predicted_target = {ftb_target_selected, 1'b0};
     wire [DATA_WIDTH-1:0] ras_pop_addr         = ras_stack[ras_ptr - 1'b1];
     wire                  ras_empty            = (ras_cnt == 0);
 
-    assign dnpc = (is_ret && !ras_empty)                          ? ras_pop_addr :
-                  ((is_jalr || is_indirect) && ittage_pred_valid) ? ittage_pred_target :
-                  actual_taken_pred                               ? ftb_predicted_target :
-                  pc + 32'h4;
+    wire [DATA_WIDTH-1:0] seq_dnpc = is_c_inst ? (pc + 32'h2) : (pc + 32'h4);
 
-    wire [INDEX_WIDTH-1:0] update_set_idx  = bru_pc[2 +: INDEX_WIDTH];
-    wire [TAG_WIDTH-1:0]   update_pc_tag   = bru_pc[2 + INDEX_WIDTH +: TAG_WIDTH];
+    // 预测 DNPC：按优先级选择 RAS / ITTAGE / FTB / 顺序
+    // 对于无条件跳转 (jalr/indirect)，若预测目标为 0 则回退到 seq_dnpc，
+    // 避免因 FTB/ITTAGE 中残存的零值条目导致程序跳转到地址 0 而卡死
+    wire [DATA_WIDTH-1:0] raw_dnpc = (is_ret && !ras_empty)                          ? ras_pop_addr :
+                                     ((is_jalr || is_indirect) && ittage_pred_valid) ? ittage_pred_target :
+                                     actual_taken_pred                               ? ftb_predicted_target :
+                                     seq_dnpc;
+
+    assign dnpc = ((is_jalr || is_indirect) && (raw_dnpc == 32'h0)) ? seq_dnpc : raw_dnpc;
+
+    wire [INDEX_WIDTH-1:0] update_set_idx  = bru_pc[1 +: INDEX_WIDTH];
+    wire [TAG_WIDTH-1:0]   update_pc_tag   = bru_pc[1 + INDEX_WIDTH +: TAG_WIDTH];
     
     // 直接通过真实的下一周期 bru_dnpc 与当初预测生成的 meta_pred_dnpc 比对
     wire [GHR_WIDTH-1:0]   hist_ghr        = meta_ghr[update_meta_idx];
@@ -279,7 +286,7 @@ module bpu #(
                     if (bru_is_jal)  ftb_is_jal[update_set_idx][update_hit_way]  <= 1'b1;
                     if (bru_is_jalr) ftb_is_jalr[update_set_idx][update_hit_way] <= 1'b1;
                     if (bru_taken || bru_is_jal || bru_is_jalr) begin
-                        ftb_target[update_set_idx][update_hit_way] <= bru_dnpc[2 +: TARGET_WIDTH];
+                        ftb_target[update_set_idx][update_hit_way] <= bru_dnpc[DATA_WIDTH-1:1];
                     end
                 end else if (bru_taken | bru_is_jal | bru_is_jalr) begin
                     ftb_valid[update_set_idx][update_alloc_way]  <= 1'b1;
@@ -287,7 +294,7 @@ module bpu #(
                     ftb_is_jal[update_set_idx][update_alloc_way] <= bru_is_jal;
                     ftb_is_jalr[update_set_idx][update_alloc_way]<= bru_is_jalr;
                     if (bru_taken || bru_is_jal || bru_is_jalr) begin
-                        ftb_target[update_set_idx][update_alloc_way] <= bru_dnpc[2 +: TARGET_WIDTH];
+                        ftb_target[update_set_idx][update_alloc_way] <= bru_dnpc[DATA_WIDTH-1:1];
                     end
                     for (w = 0; w < FTB_WAYS; w = w + 1) begin
                         if (w[WAY_WIDTH-1:0] == update_alloc_way)

@@ -9,7 +9,7 @@ module bypass #(
     input  wire         exu_flush_en     ,
     input  wire [ 4: 0] rs1_addr         ,
     input  wire [ 4: 0] rs2_addr         ,
-    input  wire [ 4: 0] rd_addr          ,
+    input  wire [ 4: 0] rd_w_bypass      ,
     input  wire [31: 0] rd_w_bypass_data ,
     input  wire         rd_w_bypass_en   ,
     // from wbu
@@ -57,24 +57,24 @@ end
 always @(posedge clk) begin
     if (rst) begin
         for (idx = 0; idx < BYPASS_DEPTH; idx = idx + 1) begin
-            bypass_rd[idx]      = 5'b0;
-            bypass_data[idx]    = 32'b0;
-            bypass_valid[idx]   = 1'b0;
+            bypass_rd[idx]      <= 5'b0;
+            bypass_data[idx]    <= 32'b0;
+            bypass_valid[idx]   <= 1'b0;
         end
     end
     else begin
         if (exu_ready && idu_valid && !exu_flush_en) begin
             // 旁路缓冲区数据移位：条目1 <- 条目0（旧数据后移）
-            bypass_rd[2]       = bypass_rd[1];
-            bypass_data[2]     = bypass_data[1];
-            bypass_valid[2]    = bypass_valid[1];
-            bypass_rd[1]       = bypass_rd[0];
-            bypass_data[1]     = bypass_data[0];
-            bypass_valid[1]    = bypass_valid[0];
+            bypass_rd[2]       <= bypass_rd[1];
+            bypass_data[2]     <= bypass_data[1];
+            bypass_valid[2]    <= bypass_valid[1];
+            bypass_rd[1]       <= bypass_rd[0];
+            bypass_data[1]     <= bypass_data[0];
+            bypass_valid[1]    <= bypass_valid[0];
             // 旁路缓冲区0更新为当前指令的写回信息
-            bypass_rd[0]       = rd_addr;
-            bypass_data[0]     = rd_w_bypass_data;
-            bypass_valid[0]    = rd_w_bypass_en;
+            bypass_rd[0]       <= rd_w_bypass;
+            bypass_data[0]     <= rd_w_bypass_data;
+            bypass_valid[0]    <= rd_w_bypass_en;
         end
     end
 end

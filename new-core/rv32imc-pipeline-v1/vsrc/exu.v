@@ -23,7 +23,7 @@ module exu (
     output wire [            4: 0] rs2_addr         ,
     input  wire [           31: 0] bypass_rs1_data  ,
     input  wire [           31: 0] bypass_rs2_data  ,
-    output wire [            4: 0] rd_addr          ,
+    output wire [            4: 0] rd_w_bypass      ,
     output wire [           31: 0] rd_w_bypass_data ,
     output wire                    rd_w_bypass_en   ,
     output wire                    is_read          ,
@@ -256,7 +256,7 @@ module exu (
 
     assign rd_w_bypass_en   = gpr_we;
     assign rd_w_bypass_data = result;
-    assign rd_addr          = rd;
+    assign rd_w_bypass          = rd;
 
     assign exu_ready = wbu_ready & lsu_ready & mdu_ready & (is_fencei | fence_done);
 
