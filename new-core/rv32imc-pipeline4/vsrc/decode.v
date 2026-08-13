@@ -166,11 +166,11 @@ module decode (
     assign inst_lw        = (opcode_06_00 == 7'h03) & (opcode_14_12 == 3'h2);
     assign inst_slti      = (opcode_06_00 == 7'h13) & (opcode_14_12 == 3'h2);
     assign inst_sltiu     = (opcode_06_00 == 7'h13) & (opcode_14_12 == 3'h3);
-    assign inst_slli      = (opcode_06_00 == 7'h13) & (opcode_14_12 == 3'h1) & (opcode_31_26 == 6'h00);
-    assign inst_sra       = (opcode_06_00 == 7'h33) & (opcode_14_12 == 3'h5) & (opcode_31_26 == 6'h10);
-    assign inst_srai      = (opcode_06_00 == 7'h13) & (opcode_14_12 == 3'h5) & (opcode_31_26 == 6'h10);
-    assign inst_srl       = (opcode_06_00 == 7'h33) & (opcode_14_12 == 3'h5) & (opcode_31_26 == 6'h00);
-    assign inst_srli      = (opcode_06_00 == 7'h13) & (opcode_14_12 == 3'h5) & (opcode_31_26 == 6'h00);
+    assign inst_slli      = (opcode_06_00 == 7'h13) & (opcode_14_12 == 3'h1) & (opcode_31_25 == 7'h00);
+    assign inst_sra       = (opcode_06_00 == 7'h33) & (opcode_14_12 == 3'h5) & (opcode_31_25 == 7'h20);
+    assign inst_srai      = (opcode_06_00 == 7'h13) & (opcode_14_12 == 3'h5) & (opcode_31_25 == 7'h20);
+    assign inst_srl       = (opcode_06_00 == 7'h33) & (opcode_14_12 == 3'h5) & (opcode_31_25 == 7'h00);
+    assign inst_srli      = (opcode_06_00 == 7'h13) & (opcode_14_12 == 3'h5) & (opcode_31_25 == 7'h00);
     assign inst_ori       = (opcode_06_00 == 7'h13) & (opcode_14_12 == 3'h6);
     assign inst_xori      = (opcode_06_00 == 7'h13) & (opcode_14_12 == 3'h4);
     assign inst_csrrw     = (opcode_06_00 == 7'h73) & (opcode_14_12 == 3'h1);

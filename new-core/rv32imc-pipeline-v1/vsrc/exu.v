@@ -248,7 +248,7 @@ module exu (
 
     wire [31:0] csr_wdata = ({32{csrrw_op}} & src1              ) |
                             ({32{csrrs_op}} & (src1 | csr_rdata)) |
-                            ({32{csrrc_op}} & (~src1 | csr_rdata));
+                            ({32{csrrc_op}} & (~src1 & csr_rdata));
     wire [31:0] result = |jal_or_jalr ? snpc       :
                           csr_gpr_we  ? csr_rdata  :
                           mdu_en      ? mdu_result : 

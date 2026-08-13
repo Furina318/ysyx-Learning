@@ -135,11 +135,12 @@ static void execute_once() {
       single_cycle();
       cycle_sum++;
       // trace_and_difftest();      
+      if (!top->reset && top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__wbu_valid) g_nr_guest_inst++; 
       if (npc_state.state != NPC_RUNNING) break;
     } while (last_pc == top->rootp->ysyx_25010030_npc__DOT__cpu__DOT__ifu_pc);
     #endif
 
-    if(!top->reset) g_nr_guest_inst++;
+    // if(!top->reset) g_nr_guest_inst++;
     if(run_time <= start_time) run_time++;
 
     #ifdef YSYXSOC

@@ -1,9 +1,0 @@
-`define RESET_PC 32'h8000_0000
-`define FU_TO_RE_WD 20
-`define DU_TO_RE_WD 20
-`define RE_TO_IS_WD 24
-`define FU_TO_IS_WD 123
-`define DU_BUS_WD   123
-`define IS_TO_EU_WD 123
-`define EU_TO_RO_WD 73
-`define RO_TO_WU_WD 73

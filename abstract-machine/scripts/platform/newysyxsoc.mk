@@ -12,7 +12,7 @@ AM_SRCS := riscv/ysyxsoc/start.S \
 
 CFLAGS    += -fdata-sections -ffunction-sections
 CFLAGS    += -I$(AM_HOME)/am/src/riscv/ysyxsoc/include
-LDSCRIPTS += $(AM_HOME)/scripts/linker-newysyxsoc.ld
+LDSCRIPTS += $(AM_HOME)/scripts/linker-ysyxsoc.ld
 LDFLAGS   += --defsym=_stack_size=2K --defsym=_entry_offset=0x0
 LDFLAGS   += --gc-sections -e _start
 NPCFLAGS += -l $(shell dirname $(IMAGE).elf)/ysyxsoc-log.txt

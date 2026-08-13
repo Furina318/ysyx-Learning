@@ -1,0 +1,156 @@
+module icache #(
+    parameter CACHE_SIZE = 512,
+    parameter BLOCK_SIZE = 32    
+)(
+    input  wire        clk          ,       
+    input  wire        rst          ,     
+    input  wire        is_fencei    ,  
+    input  wire [31:0] addr         ,      
+    output wire [31:0] inst1        ,      
+    output wire [31:0] inst2        ,      
+    output wire        valid        ,    
+
+    // AXI4
+    output reg  [31:0] axi_araddr  ,  
+    output reg         axi_arvalid , 
+    input  wire        axi_arready , 
+    output wire [ 3:0] axi_arid    ,
+    output wire [ 7:0] axi_arlen   ,   
+    output wire [ 2:0] axi_arsize  ,  
+    output wire [ 1:0] axi_arburst , 
+    input  wire        axi_rvalid  ,  
+    output reg         axi_rready  ,  
+    input  wire [31:0] axi_rdata   ,   
+    input  wire [ 1:0] axi_rresp   ,   
+    input  wire [ 3:0] axi_rid     ,
+    input  wire        axi_rlast    
+);
+    // 地址划分 - 直接映射结构
+    // 31 标签        直接映射索引    块内偏移  0
+    // +-------------+-----------+------------+
+    // |     tag     |  index    |  offset    |
+    // +-------------+-----------+------------+
+    localparam NUM_BLOCKS         = CACHE_SIZE / BLOCK_SIZE;               // 总块数
+    localparam BLOCK_OFFSET_WIDTH = $clog2(BLOCK_SIZE);                    // 块内偏移宽度 (5 bits)
+    localparam INDEX_WIDTH        = $clog2(NUM_BLOCKS);                    // 直接映射索引宽度
+    localparam TAG_WIDTH          = 32 - INDEX_WIDTH - BLOCK_OFFSET_WIDTH; // 标签宽度
+    localparam BEATS_PER_BLOCK    = BLOCK_SIZE / 4;                        // 每块的32位数据数 (8 beats)
+ 
+    reg [TAG_WIDTH-1:0] tag_ram   [0:NUM_BLOCKS-1];                      // 标签存储器
+    reg [         31:0] data_ram  [0:NUM_BLOCKS-1][0:BEATS_PER_BLOCK-1]; // 数据存储器
+    reg                 valid_ram [0:NUM_BLOCKS-1];                      // 有效位       
+
+    // 地址分解
+    wire [        TAG_WIDTH-1:0] req_tag   = addr[31 : 32 - TAG_WIDTH];
+    wire [      INDEX_WIDTH-1:0] req_index = addr[INDEX_WIDTH + BLOCK_OFFSET_WIDTH - 1 : BLOCK_OFFSET_WIDTH];
+    wire [                  2:0] beat_idx  = addr[BLOCK_OFFSET_WIDTH-1:2];  // 块内数据索引 (3 bits)
+
+    reg [        TAG_WIDTH-1:0] saved_tag;      // 保存标签
+    reg [      INDEX_WIDTH-1:0] saved_index;    // 保存索引
+    reg [                  2:0] saved_beat_idx; // 保存块内数据索引
+    reg [                 31:0] saved_addr;     // 保存请求地址
+
+    localparam IDLE = 2'b00;
+    localparam READ = 2'b01;  // 接收突发传输数据
+    localparam FILL = 2'b10;  // 填充缓存块
+
+    reg [1:0] state, next_state;
+
+    reg [ 2:0] beat_cnt;  // 已接收的突发beat数
+    reg [31:0] block_data [0:BEATS_PER_BLOCK-1];  // 存储块内所有32位数据
+    reg        ar_done;
+
+    wire in_sdram = 1'b1; 
+
+
+    always @(posedge clk) begin
+        if (rst) begin
+            state <= IDLE;
+        end else begin
+            state <= next_state;
+        end
+    end
+
+    wire hit;
+    always @(*) begin
+        case (state)
+            IDLE: next_state = hit ? IDLE : READ;
+            READ: next_state = (axi_rvalid && axi_rready && axi_rlast) ? FILL : READ;
+            FILL: next_state = IDLE; 
+            default: next_state = IDLE;
+        endcase
+    end
+
+    assign hit = valid_ram[req_index] && (tag_ram[req_index] == req_tag) && !is_fencei;
+    
+    wire [2:0] aligned_beat = beat_idx & 3'b110; 
+    
+    assign inst1 = data_ram[req_index][aligned_beat + 3'd0];   
+    assign inst2 = data_ram[req_index][aligned_beat + 3'd1]; 
+    assign valid = hit; 
+
+    assign axi_arid    = 4'h0;   // 固定ID
+    assign axi_arlen   = 8'h7;   // 突发长度
+    assign axi_arburst = 2'b01;  // 递增突发
+    assign axi_arsize  = 3'b010; // 突发字节
+
+    integer idx;
+    integer b;
+    always @(posedge clk) begin
+        if (rst) begin
+            for (idx = 0; idx < NUM_BLOCKS; idx = idx + 1) begin
+                valid_ram[idx] <= 1'b0;
+            end
+
+            axi_rready <= 1'b0;
+            axi_arvalid <= 1'b0;
+        end
+        else begin
+            if (is_fencei) begin
+                for (idx = 0; idx < NUM_BLOCKS; idx = idx + 1) begin
+                    valid_ram[idx] <= 1'b0;
+                end
+            end
+            case (state)
+                IDLE: begin
+                    axi_rready <= 1'b0;
+                    beat_cnt   <= 3'h0;
+                    ar_done    <= 1'b0;
+
+                    saved_tag      <= req_tag;
+                    saved_index    <= req_index;
+                    saved_beat_idx <= beat_idx; 
+                    saved_addr     <= addr;
+                end
+
+                READ: begin
+                    axi_rready <= 1'b1;
+                    if(!axi_arvalid && !ar_done) begin
+                        axi_arvalid <= 1'b1;
+                        // 保证 AXI 起始地址按 Cache Line 对齐 (32字节边界)
+                        axi_araddr  <= {saved_addr[31:BLOCK_OFFSET_WIDTH], {BLOCK_OFFSET_WIDTH{1'b0}}};
+                    end
+                    else if(axi_arready) begin
+                        axi_arvalid <= 1'b0;
+                        ar_done     <= 1'b1;
+                    end
+                    if (axi_rvalid) begin
+                        block_data[beat_cnt] <= axi_rdata;
+                        beat_cnt <= beat_cnt + 3'b1;
+                    end
+                end
+
+                FILL: begin
+                    axi_rready             <= 1'b0;
+                    valid_ram[saved_index] <= 1'b1;
+                    tag_ram[saved_index]   <= saved_tag;
+                    for (b = 0; b < BEATS_PER_BLOCK; b = b + 1) begin
+                        data_ram[saved_index][b] <= block_data[b];
+                    end
+                end
+                default: begin end
+            endcase
+        end
+    end
+
+endmodule
