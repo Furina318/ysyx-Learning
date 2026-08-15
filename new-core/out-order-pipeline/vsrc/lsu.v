@@ -34,6 +34,7 @@ module lsu #(
     input  wire [ID_WIDTH-1:0]     stb_forward_inst_id,
     input  wire [             3:0] stb_forward_mask,
     input  wire [            31:0] stb_forward_data,
+    input  wire                    stb_forward_ambiguous,
 
     output wire                    stb_forward_full_hit ,
 
@@ -80,8 +81,12 @@ module lsu #(
                             ({4{lw_lh_lb == 2'b01}} & (4'b0011 << addr_off)) |
                             ({4{lw_lh_lb == 2'b10}} & (4'b1111 << addr_off));
     wire [ 3:0] stb_forward_read_mask = read_mask;
-    // 只有当 STB 提供的掩码 包含了所有 Load 需要的掩码，才算完全命中
-    assign stb_forward_full_hit = ((stb_forward_mask & stb_forward_read_mask) == stb_forward_read_mask) && (|stb_forward_read_mask);
+    // 只有当 STB 提供的掩码 包含了所有 Load 需要的掩码，才算完全命中。
+    // 存在转发歧义 (STB 中有已提交但 ID 回绕导致无法判定先后的 store) 时,
+    // 不能直接完成: 该 store 可能恰好覆盖本 load 的地址, 需先等它 drain
+    // 到内存后再读, 否则会读到内存中的旧值。
+    assign stb_forward_full_hit = ((stb_forward_mask & stb_forward_read_mask) == stb_forward_read_mask) && (|stb_forward_read_mask)
+                                  && !stb_forward_ambiguous;
 
     assign stb_alloc_valid = lsu_en & is_write;
     assign stb_alloc_addr  = addr;
@@ -121,9 +126,14 @@ module lsu #(
 
     wire exu_load_req = lsu_en & is_read;
 
+    // 转发歧义时暂缓 load 请求: 不拉取 dcache 读通道, 让出仲裁给 STB drain,
+    // 等歧义条目 (已提交的老 store) 写回内存后再读, 保证读到最新值。
+    // 若不抑制, load 持续占用仲裁 (exu_load_req=1 阻塞 drain), 歧义永不解除。
+    wire exu_load_req_eff = exu_load_req && !stb_forward_ambiguous;
+
     // 仲裁核心：如果处于 Drain 锁定状态，必须强制保持；否则，Load 具有更高优先级
-    wire grant_drain  = drain_active || (stb_drain_valid && !exu_load_req);
-    wire grant_load   = load_active  || (exu_load_req && !drain_active);
+    wire grant_drain  = drain_active || (stb_drain_valid && !exu_load_req_eff);
+    wire grant_load   = load_active  || (exu_load_req_eff && !drain_active);
 
     // 优先级设计：EXU发来的 Load 指令优先级更高，STB Drain 的优先级更低。
     // 如果 STB 满了阻塞了 EXU，lsu_en 为高但无法前进，此时若不是 Load，就会放行 Drain。

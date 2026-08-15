@@ -186,6 +186,7 @@ module ysyx_25010030 (
     wire [31:0] stb_forward_addr, stb_forward_data;
     wire [ 3:0] stb_forward_mask;
     wire        stb_forward_full_hit;
+    wire        stb_forward_ambiguous;
     wire        stb_alloc_valid;
     wire [31:0] stb_alloc_addr, stb_alloc_data;
     wire [ 3:0] stb_alloc_wstrb;
@@ -673,10 +674,11 @@ module ysyx_25010030 (
         .dcache_wstrb         (dcache_wstrb         ), 
         .dcache_rdata         (dcache_rdata         ),
         .dcache_ready         (dcache_ready         ),
-        .stb_forward_addr     (stb_forward_addr     ), 
+        .stb_forward_addr     (stb_forward_addr     ),
         .stb_forward_inst_id  (lsu_inst_id          ),
         .stb_forward_data     (stb_forward_data     ),
         .stb_forward_mask     (stb_forward_mask     ),
+        .stb_forward_ambiguous(stb_forward_ambiguous),
         .stb_forward_full_hit (stb_forward_full_hit ),
         .stb_alloc_valid      (stb_alloc_valid      ), 
         .stb_alloc_addr       (stb_alloc_addr       ),
@@ -719,6 +721,7 @@ module ysyx_25010030 (
         .stb_forward_inst_id(lsu_inst_id  ),
         .stb_forward_data(stb_forward_data),
         .stb_forward_mask(stb_forward_mask),
+        .stb_forward_ambiguous(stb_forward_ambiguous),
         .stb_drain_valid (stb_drain_valid ),
         .stb_drain_addr  (stb_drain_addr  ),
         .stb_drain_data  (stb_drain_data  ),

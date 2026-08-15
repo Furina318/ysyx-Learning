@@ -33,6 +33,7 @@ module store_buffer #(
     input  wire [ID_WIDTH-1:0]       stb_forward_inst_id ,
     output wire [               3:0] stb_forward_mask ,
     output wire [              31:0] stb_forward_data ,
+    output wire                      stb_forward_ambiguous ,
 
     // to LSU
     output wire                      stb_drain_valid ,
@@ -117,6 +118,24 @@ module store_buffer #(
         end
     endgenerate
 
+    // ── 转发歧义检测 ──
+    // ID 回绕比较 (6 bit, 窗口 32) 只在条目与 load 的 id 距离 < 32 时正确。
+    // 未提交条目仍在 ROB (深度 32) 内, 与 load 的距离必然 < 32, 判定永远正确;
+    // 但已提交的 store 会在 STB 中驻留 (drain 被连续 load 抢占时可达数十条指令),
+    // 其 id 与 load 的距离可能 ≥ 32, 此时"不早于"的判定不可信: 条目实际上必然
+    // 比 load 老 (提交是程序序的), 若按"不早于"跳过转发, load 会读回内存旧值。
+    // 因此: 存在"已提交且被判不早于 load"的条目时, 置歧义标志, 由 LSU 暂缓 load
+    // 并优先 drain, 等该条目写回内存后再放行 load (读到的即是新值)。
+    wire [DEPTH-1:0] entry_fwd_ambiguous;
+    genvar ga;
+    generate
+        for (ga = 0; ga < DEPTH; ga = ga + 1) begin : gen_fwd_amb
+            assign entry_fwd_ambiguous[ga] = entry_valid[ga] && entry_commit[ga] &&
+                                             !entry_older_than_fwd[ga];
+        end
+    endgenerate
+    assign stb_forward_ambiguous = |entry_fwd_ambiguous;
+
     reg [STB_DEPTH_LOG2:0] flush_surviving_count;
     integer s;
     always @(*) begin
@@ -189,6 +208,15 @@ module store_buffer #(
             // ── 正常操作 (冲刷周期外) ──
             else begin
                 if (do_drain) begin
+                    drain_ptr <= drain_ptr + 1'b1;
+                end
+                // 表头空洞跳过: 冲刷可能把 drain_ptr 处的未提交条目清成空洞,
+                // 而其后已有已提交的 store 等待写回。若不移走指针, stb_drain_valid
+                // 永远为 0, 已提交的 store 无法 drain (直到下一次冲刷才被修复),
+                // 期间 load 既无法转发 (歧义/空洞) 又读不到新值。跳过空洞不会破坏
+                // 环形队列语义: 该槽位将来被回绕分配时仍位于 [drain_ptr, alloc_ptr)
+                // 弧内, drain 顺序 (程序序) 保持不变。
+                else if (!entry_valid[drain_ptr] && (drain_ptr != alloc_ptr)) begin
                     drain_ptr <= drain_ptr + 1'b1;
                 end
 
