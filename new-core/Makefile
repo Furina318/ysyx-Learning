@@ -1,6 +1,6 @@
 # 项目模块名称
 # FRAME = rv32imc-pipeline-v1
-FRAME = out-order-pipeline
+FRAME = out-order-pipeline-v1
 ARCH = riscv32-newcore
 
 # --- kconfig configuration ---

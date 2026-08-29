@@ -15,7 +15,7 @@ module ittage #(
     parameter PC_WIDTH     = 32  ,
     parameter TARGET_WIDTH = 32  ,
     parameter TAG_WIDTH    = 14  ,
-    parameter GHR_WIDTH    = 32  ,
+    parameter GHR_WIDTH    = 128 ,
     parameter U_WIDTH      = 2
 )(
     input  wire                         clk            ,

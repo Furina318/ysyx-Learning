@@ -5,7 +5,7 @@ module tage #(
     parameter COUNTER_WIDTH= 3 , // 3-bit饱和计数器提供更高的预测鲁棒性
     parameter USEFUL_WIDTH = 2 ,
     parameter BASE_SETS    = 512,
-    parameter T_SETS       = 8
+    parameter T_SETS       = 256
 )(
     input  wire                 clk             ,
     input  wire                 rst             ,

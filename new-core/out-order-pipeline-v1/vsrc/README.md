@@ -1,0 +1,7 @@
+这是一个支持RV32IMC的流水线，接有icache，dcache，BPU分支预测器
+
+其中LSU被处理为EXU的一个功能单元FU。
+
+包含IBU（指令缓存队列）和STB（store-buffer写内存指令缓存），以求尽可能利用所有空闲的周期
+
+理论上是可以支持C拓展的，但是开了C拓展之后运行microbench测试到[fb]相关测试的时候卡住陷入循环，后续为nemu也支持c拓展给该核提供difftest，届时再对该问题进行修复
