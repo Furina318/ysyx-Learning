@@ -1,6 +1,6 @@
 # 项目模块名称
-# FRAME = rv32imc-pipeline-v1
-FRAME = out-order-pipeline-v1
+FRAME = rv32imc-pipeline-v1
+# FRAME = out-order-pipeline-v1
 ARCH = riscv32-newcore
 
 # --- kconfig configuration ---
@@ -313,6 +313,7 @@ clean:
 	rm -rf $(OBJ_DIR)
 	rm -rf $(BUILD_DIR)
 	rm -rf *.vcd
+	rm -rf *.fst
 	rm -rf ./log/*
 	rm -rf mtrace.log
 

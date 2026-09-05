@@ -146,6 +146,12 @@ static void execute_once() {
         if(top->rootp->ysyx_25010030_npc->cpu->rob_cmt_valid_2) g_nr_guest_inst++;
       }
       cycle_sum++;
+      if ((cycle_sum % 100000) == 0)
+        printf("[PROG] cycle=%lu bpu_pc=0x%08x cmt1=%d cmt2=%d\n", cycle_sum,
+               (unsigned)top->rootp->ysyx_25010030_npc->cpu->bpu_pc,
+               (int)top->rootp->ysyx_25010030_npc->cpu->rob_cmt_valid_1,
+               (int)top->rootp->ysyx_25010030_npc->cpu->rob_cmt_valid_2);
+      fflush(stdout);
       if (npc_state.state != NPC_RUNNING) break;
     } while (last_pc == top->rootp->ysyx_25010030_npc->cpu->bpu_pc);
     #endif
