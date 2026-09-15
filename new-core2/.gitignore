@@ -1,0 +1,22 @@
+# Build outputs
+build/
+obj_dir/
+*.vcd
+*.fst
+*.log
+log/
+mtrace.log
+.stamp.*
+
+# Generated config files (from menuconfig)
+include/generated/
+include/config/
+.config
+.config.old
+
+# kconfig tool build artifacts
+tools/kconfig/build/
+tools/fixdep/build/
+
+# Merged verilog
+build/
