@@ -1,5 +1,5 @@
 # 项目模块名称
-FRAME = rv32imc-pipeline-v1
+FRAME = rv32imfc-pipeline-v1
 # FRAME = out-order-pipeline-v1
 ARCH = riscv32-newcore
 
