@@ -20,3 +20,18 @@ tools/fixdep/build/
 
 # Merged verilog
 build/
+
+!Makefile
+!*.mk
+!*.[cSh]
+!*.v
+!*.cc
+!*.cpp
+!.gitignore
+!*.md
+!*.vh
+!*.scala
+!*.nxdc
+!*.sh
+!build.sc
+!*.sdc

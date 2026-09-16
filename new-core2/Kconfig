@@ -1,0 +1,278 @@
+mainmenu "ysyx NPC Configuration Menu"
+
+menu "Simulation & Debugging"
+config WAVE
+    bool "Enable waveform dump"
+    default n
+    help
+      Enable dumping waveform (VCD/FST) during simulation.
+      When enabled, waveform will be recorded based on WAVE_MODE setting.
+
+choice
+    prompt "Waveform recording mode"
+    depends on WAVE
+    default WAVE_MODE_RANGE
+
+config WAVE_MODE_FULL
+    bool "Record from reset to end"
+config WAVE_MODE_RANGE
+    bool "Record from START_TIME to END_TIME"
+config WAVE_MODE_ROLLING
+    bool "Rolling mode: update file periodically"
+endchoice
+
+config WAVE_MODE
+    int
+    depends on WAVE
+    default 0 if WAVE_MODE_FULL
+    default 1 if WAVE_MODE_RANGE
+    default 2 if WAVE_MODE_ROLLING
+    default 1
+
+config WAVE_START_TIME
+    int "Waveform start time (cycles)"
+    depends on WAVE
+    default 0
+
+config WAVE_END_TIME
+    int "Waveform end time (cycles)"
+    depends on WAVE
+    default 100000
+
+config WAVE_MAX_UPDATE_CYCLES
+    int "Max update cycles for rolling waveform mode"
+    depends on WAVE && WAVE_MODE_ROLLING
+    default 10000
+
+config TRACE
+    bool "Enable tracer"
+    default n
+    help
+      Enable the main tracing framework.
+      When enabled, individual trace types (function, memory, instruction) can be selected.
+
+config FTRACE
+    bool "Enable function tracer"
+    depends on TRACE
+    default n
+    help
+      Record function call/return traces.
+
+config MTRACE
+    bool "Enable memory tracer"
+    depends on TRACE
+    default n
+    help
+      Record memory access traces.
+
+config BTRACE
+    bool "Enable branch-miss tracer"
+    depends on TRACE
+    default n
+    help
+      Record branch prediction misses to btrace.log.
+      For every cycle where the hardware (BRU training loop) detects a
+      mispredict (real target != predicted target), log the branch's PC,
+      instruction, predicted target, real target and instruction type.
+      Useful for debugging the fetch stage / branch predictor.
+
+config ITRACE
+    bool "Enable instruction tracer"
+    depends on TRACE
+    default n
+    help
+      Record instruction execution traces with disassembly.
+
+config DIFFTEST
+    bool "Enable differential testing"
+    default n
+    help
+      Compare NPC execution against a reference simulator (e.g., NEMU).
+      Note: Enabling this significantly slows down simulation.
+
+config WATCHPOINTS
+    bool "Enable watchpoints"
+    default y
+    help
+      Enable watchpoint support for debugging memory accesses.
+
+config RT_CHECK
+    bool "Enable runtime checking"
+    default y
+
+config LIGHTSSS
+    bool "Enable LightSSS (fork-based lightweight simulation snapshot)"
+    default n
+    help
+      LightSSS is a lightweight checkpoint/snapshot mechanism adapted from
+      XiangShan. The main simulation process forks a child process every
+      LIGHTSSS_FORK_INTERVAL cycles (the child blocks, preserving a snapshot
+      of the simulator state at that instant). When the main simulation
+      errors out (HIT_BAD_TRAP / difftest mismatch / abort), the newest
+      child is woken and re-runs from the captured state, dumping the
+      waveform of the erroneous region — avoiding the overhead of a full
+      circuit-state checkpoint file.
+
+config LIGHTSSS_FORK_INTERVAL
+    int "LightSSS fork interval (simulation cycles)"
+    depends on LIGHTSSS
+    default 1000
+    help
+      How many simulation cycles the main process runs before forking the
+      next LightSSS child snapshot. A smaller value keeps a more recent
+      snapshot (tighter error window) at the cost of more forks.
+endmenu
+
+menu "Devices"
+config DEVICE
+    bool "Enable device support"
+    default y
+
+config HAS_SERIAL
+    bool "Enable serial port (UART)"
+    default y
+
+config HAS_TIMER
+    bool "Enable timer"
+    default y
+
+config HAS_KEYBOARD
+    bool "Enable keyboard (i8042)"
+    default y
+
+config HAS_VGA
+    bool "Enable VGA display"
+    default n
+endmenu
+
+menu "Timer Configuration"
+config TIMER_GETTIMEOFDAY
+    bool "Use gettimeofday for timer"
+    default y
+endmenu
+
+menu "Memory Layout"
+config MSIZE
+    hex "Physical memory size"
+    default 0x8000000
+    help
+      Size of the simulated physical memory (in bytes).
+      Default: 0x8000000 (128MB)
+
+config MBASE
+    hex "Memory base address"
+    default 0x80000000
+    help
+      Base address of physical memory. Default: 0x80000000
+
+config PC_RESET_OFFSET
+    hex "PC reset offset"
+    default 0x0
+    help
+      Offset added to MBASE for the reset PC value.
+      Reset PC = MBASE + PC_RESET_OFFSET.
+endmenu
+
+menu "Device MMIO Addresses"
+config DEVICE_BASE
+    hex "Device MMIO base address"
+    default 0xa0000000
+
+config MMIO_BASE
+    hex "MMIO base address"
+    default 0xa0000000
+
+config SERIAL_MMIO
+    hex "Serial port MMIO address"
+    default 0xa0000000
+
+config RTC_MMIO
+    hex "RTC MMIO address"
+    default 0xa0002000
+
+config I8042_DATA_MMIO
+    hex "Keyboard (i8042) data MMIO address"
+    default 0xa0001000
+
+config VGA_CTL_MMIO
+    hex "VGA control MMIO address"
+    depends on HAS_VGA
+    default 0xa0003000
+
+config FB_ADDR
+    hex "Framebuffer MMIO address"
+    depends on HAS_VGA
+    default 0xa1000000
+
+config VGA_SHOW_SCREEN
+    bool "Show VGA screen"
+    depends on HAS_VGA
+    default y
+
+config VGA_SIZE_400x300
+    bool "Use 400x300 VGA resolution"
+    depends on HAS_VGA
+    default y
+
+config AUDIO_CTL_MMIO
+    hex "Audio control MMIO address"
+    default 0xa0004000
+
+config SB_ADDR
+    hex "Sound buffer MMIO address"
+    default 0xa1200000
+
+config SB_SIZE
+    hex "Sound buffer size"
+    default 0x10000
+
+config SDCARD_CTL_MMIO
+    hex "SD card control MMIO address"
+    default 0xa3000000
+
+config SDCARD_IMG_PATH
+    string "SD card image path"
+    default "The path of sdcard image"
+endmenu
+
+menu "SOC Memory Map"
+config SOC_MROM_BASE
+    hex "MROM base address"
+    default 0x20000000
+
+config SOC_MROM_SIZE
+    hex "MROM size"
+    default 0x1000
+    help
+      Size of MROM (0x20000fff - 0x20000000 = 0x1000 = 4KB)
+
+config SOC_FLASH_BASE
+    hex "Flash base address"
+    default 0x30000000
+
+config SOC_FLASH_SIZE
+    hex "Flash size"
+    default 0x10000000
+    help
+      Size of flash memory region (0x3fffffff - 0x30000000 = 0x10000000 = 256MB)
+
+config SOC_PSRAM_BASE
+    hex "PSRAM base address"
+    default 0x80000000
+
+config SOC_PSRAM_SIZE
+    hex "PSRAM size"
+    default 0x20000000
+    help
+      Size of PSRAM (0x9fffffff - 0x80000000 = 0x20000000 = 512MB)
+
+config SOC_SDRAM_BASE
+    hex "SDRAM base address"
+    default 0xa0000000
+
+config SOC_SDRAM_SIZE
+    hex "SDRAM size"
+    default 0x20000000
+    help
+      Size of SDRAM (0xbfffffff - 0xa0000000 = 0x20000000 = 512MB)
+endmenu
